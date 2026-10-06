@@ -17,10 +17,13 @@ def prepare():
     config = ROOT / "config/models.json"
     models = json.loads(config.read_text())
     model_id = "mtp_shared_packed_q3"
-    if model_id in models:
-        if not verify(model_path(model_id), models[model_id]["files"][0]):
+    registered = models.get(model_id)
+    filename = registered["files"][0]["path"] if registered else "mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf"
+    path = ROOT / "models" / model_id / filename
+    if registered and path.exists():
+        if not verify(path, registered["files"][0]):
             raise RuntimeError("Existing packed helper differs from the registered hash")
-        return models[model_id]
+        return registered
     source = model_path("mtp_shared_q3")
     if not verify(source, models["mtp_shared_q3"]["files"][0]):
         raise RuntimeError("Shared helper source hash differs")
@@ -29,7 +32,6 @@ def prepare():
     dense = [t for t in reader.tensors if not t.name.endswith("_exps.weight")]
     if len(experts) != 3 or len(dense) != 29:
         raise ValueError("Expected three expert tables and 29 small tensors")
-    path = ROOT / "models" / model_id / "mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf"
     path.parent.mkdir(parents=True, exist_ok=True)
     partial = path.with_suffix(".gguf.part")
     if partial.exists() or path.exists():
@@ -75,12 +77,15 @@ def prepare():
             if b is None or field.types != b.types or field.contents() != b.contents():
                 raise AssertionError(f"Metadata changed: {name}")
         spec = {"path": path.name, "size_bytes": partial.stat().st_size, "sha256": sha256(partial)}
-        result = {"derived": {"source_model": "mtp_shared_q3", "source_sha256": models["mtp_shared_q3"]["files"][0]["sha256"],
+        if registered and spec != registered["files"][0]:
+            raise RuntimeError("Recreated packed helper differs from the pinned file; partial retained")
+        result = registered or {"derived": {"source_model": "mtp_shared_q3", "source_sha256": models["mtp_shared_q3"]["files"][0]["sha256"],
             "layout": record["layout"], "required_engine": "mtp-shared",
             "receipt": str((folder / "preparation.json").relative_to(ROOT))}, "files": [spec]}
         partial.rename(path)
-        models[model_id] = result
-        config.write_text(json.dumps(models, indent=2) + "\n")
+        if not registered:
+            models[model_id] = result
+            config.write_text(json.dumps(models, indent=2) + "\n")
         record.update(status="passed", output=result, retained_tensor_proofs=proofs,
                       cpu_expert_bytes=sum(t.n_bytes for t in experts), gpu_dense_bytes=sum(t.n_bytes for t in dense))
         print(f"Packed helper verified: {len(proofs)} unchanged tensors; GPU dense region {record['gpu_dense_bytes']/1024**2:.2f} MiB")
