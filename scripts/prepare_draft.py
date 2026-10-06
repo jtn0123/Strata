@@ -35,14 +35,15 @@ def prepare(quant):
     if revision != runtime["llama_cpp"]["revision"] or command_output(["git", "-C", str(directory), "status", "--porcelain"]):
         raise RuntimeError("Quantizer source checkout is not clean and pinned")
     model_id = "mtp_" + quant
-    if model_id in models:
-        if verify(model_path(model_id), models[model_id]["files"][0]):
+    registered = models.get(model_id)
+    qtype = {"q3": "Q3_K_S", "q2": "Q2_K", "q2_0": "Q2_0"}[quant]
+    relative = registered["files"][0]["path"] if registered else f"mtp-Qwen3.8-Flash-Next-{qtype}-pure.gguf"
+    destination = ROOT / "models" / model_id / relative
+    if registered and destination.exists():
+        if verify(destination, registered["files"][0]):
             print(f"Verified existing {model_id}")
             return
         raise RuntimeError("Existing derived draft failed integrity verification")
-    qtype = {"q3": "Q3_K_S", "q2": "Q2_K", "q2_0": "Q2_0"}[quant]
-    relative = f"mtp-Qwen3.8-Flash-Next-{qtype}-pure.gguf"
-    destination = ROOT / "models" / model_id / relative
     destination.parent.mkdir(parents=True, exist_ok=True)
     partial = destination.with_suffix(".gguf.part")
     if destination.exists() or partial.exists():
@@ -69,12 +70,15 @@ def prepare(quant):
             while chunk := stream.read(32 * 1024**2):
                 digest.update(chunk)
         spec = {"path": relative, "size_bytes": partial.stat().st_size, "sha256": digest.hexdigest()}
+        if registered and spec != registered["files"][0]:
+            raise RuntimeError("Recreated quantized helper differs from the pinned file; partial retained")
         partial.rename(destination)
         derived = {"source_model": "mtp_bf16", "source_sha256": source["files"][0]["sha256"],
                    "quant": qtype, "pure": True, "runtime_revision": revision,
                    "receipt": str(path.relative_to(ROOT))}
-        models[model_id] = {"derived": derived, "files": [spec]}
-        config_path.write_text(json.dumps(models, indent=2) + "\n")
+        if not registered:
+            models[model_id] = {"derived": derived, "files": [spec]}
+            config_path.write_text(json.dumps(models, indent=2) + "\n")
         record.update(status="passed", output=models[model_id], elapsed_s=time.monotonic() - started)
         save()
         print(f"Prepared {model_id}: {spec['size_bytes']/1e9:.3f} GB; SHA256 {spec['sha256']}", flush=True)

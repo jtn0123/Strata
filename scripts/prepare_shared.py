@@ -20,17 +20,19 @@ def derive():
     from gguf import GGUFReader, GGUFWriter, GGUFValueType
     config = ROOT / "config/models.json"
     models = json.loads(config.read_text())
-    if "mtp_shared_q3" in models:
-        if not verify(model_path("mtp_shared_q3"), models["mtp_shared_q3"]["files"][0]):
+    registered = models.get("mtp_shared_q3")
+    filename = registered["files"][0]["path"] if registered else "mtp-Qwen3.8-Flash-Next-Q3_K_S-shared.gguf"
+    path = ROOT / "models/mtp_shared_q3" / filename
+    if registered and path.exists():
+        if not verify(path, registered["files"][0]):
             raise RuntimeError("Existing shared helper differs from its registered hash")
-        return models["mtp_shared_q3"]
+        return registered
     source = model_path("mtp_q3")
     if not verify(source, models["mtp_q3"]["files"][0]):
         raise RuntimeError("Source Q3 helper differs from the pinned hash")
     reader = GGUFReader(source)
     if {t.name for t in reader.tensors} & REMOVED != REMOVED:
         raise ValueError("Source helper is missing one of the expected duplicated tensors")
-    path = ROOT / "models/mtp_shared_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-shared.gguf"
     path.parent.mkdir(parents=True, exist_ok=True)
     partial = path.with_suffix(".gguf.part")
     if path.exists() or partial.exists():
@@ -77,12 +79,15 @@ def derive():
             if other is None or field.types != other.types or field.contents() != other.contents():
                 raise AssertionError(f"Metadata changed: {name}")
         spec = {"path": path.name, "size_bytes": partial.stat().st_size, "sha256": sha256(partial)}
-        result = {"derived": {"source_model": "mtp_q3", "source_sha256": models["mtp_q3"]["files"][0]["sha256"],
+        if registered and spec != registered["files"][0]:
+            raise RuntimeError("Recreated shared helper differs from the pinned file; partial retained")
+        result = registered or {"derived": {"source_model": "mtp_q3", "source_sha256": models["mtp_q3"]["files"][0]["sha256"],
             "removed_tensors": sorted(REMOVED), "required_engine": "mtp-shared",
             "receipt": str((folder / "preparation.json").relative_to(ROOT))}, "files": [spec]}
         partial.rename(path)
-        models["mtp_shared_q3"] = result
-        config.write_text(json.dumps(models, indent=2) + "\n")
+        if not registered:
+            models["mtp_shared_q3"] = result
+            config.write_text(json.dumps(models, indent=2) + "\n")
         record.update(status="passed", output=result, retained_tensor_proofs=proof,
                       saved_bytes=source.stat().st_size - spec["size_bytes"])
         print(f"Prepared shared helper: {spec['size_bytes']/1e9:.3f} GB; saved {record['saved_bytes']/1024**2:.1f} MiB")

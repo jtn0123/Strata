@@ -1,0 +1,89 @@
+test_packed_rebuild_rejects_a_changed_registered_hash (test_reprovision.ReprovisionTests.test_packed_rebuild_rejects_a_changed_registered_hash) ... ERROR
+test_quantized_rebuild_rejects_changed_pin (test_reprovision.ReprovisionTests.test_quantized_rebuild_rejects_changed_pin) ... ERROR
+test_quantized_registry_rebuilds_missing_output_with_identical_pin (test_reprovision.ReprovisionTests.test_quantized_registry_rebuilds_missing_output_with_identical_pin) ... ERROR
+test_shared_and_packed_registry_rebuild_missing_files_with_identical_pins (test_reprovision.ReprovisionTests.test_shared_and_packed_registry_rebuild_missing_files_with_identical_pins) ... ERROR
+test_shared_rebuild_rejects_a_changed_registered_hash (test_reprovision.ReprovisionTests.test_shared_rebuild_rejects_a_changed_registered_hash) ... ERROR
+
+======================================================================
+ERROR: test_packed_rebuild_rejects_a_changed_registered_hash (test_reprovision.ReprovisionTests.test_packed_rebuild_rejects_a_changed_registered_hash)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/tests/test_reprovision.py", line 86, in test_packed_rebuild_rejects_a_changed_registered_hash
+    self.bad_shared_pin(True)
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/tests/test_reprovision.py", line 107, in bad_shared_pin
+    (prepare_shared_layout.prepare if packed else prepare_shared.derive)()
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/scripts/prepare_shared_layout.py", line 21, in prepare
+    if not verify(model_path(model_id), models[model_id]["files"][0]):
+                  ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/tests/test_reprovision.py", line 53, in model_path
+    raise FileNotFoundError(path)
+FileNotFoundError: /var/folders/k5/wc0mdfp571x8q991krfk2v2r0000gn/T/tmpwv9i65xx/models/mtp_shared_packed_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf
+
+======================================================================
+ERROR: test_quantized_rebuild_rejects_changed_pin (test_reprovision.ReprovisionTests.test_quantized_rebuild_rejects_changed_pin)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/tests/test_reprovision.py", line 115, in test_quantized_rebuild_rejects_changed_pin
+    self.quantized(True)
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/tests/test_reprovision.py", line 149, in quantized
+    prepare_draft.prepare("q3")
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/scripts/prepare_draft.py", line 39, in prepare
+    if verify(model_path(model_id), models[model_id]["files"][0]):
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/tests/test_reprovision.py", line 140, in model_path
+    raise FileNotFoundError(path)
+FileNotFoundError: /var/folders/k5/wc0mdfp571x8q991krfk2v2r0000gn/T/tmp3bjijxze/models/mtp_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-pure.gguf
+
+======================================================================
+ERROR: test_quantized_registry_rebuilds_missing_output_with_identical_pin (test_reprovision.ReprovisionTests.test_quantized_registry_rebuilds_missing_output_with_identical_pin)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/tests/test_reprovision.py", line 112, in test_quantized_registry_rebuilds_missing_output_with_identical_pin
+    self.quantized(False)
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/tests/test_reprovision.py", line 152, in quantized
+    prepare_draft.prepare("q3")
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/scripts/prepare_draft.py", line 39, in prepare
+    if verify(model_path(model_id), models[model_id]["files"][0]):
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/tests/test_reprovision.py", line 140, in model_path
+    raise FileNotFoundError(path)
+FileNotFoundError: /var/folders/k5/wc0mdfp571x8q991krfk2v2r0000gn/T/tmprznfwcia/models/mtp_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-pure.gguf
+
+======================================================================
+ERROR: test_shared_and_packed_registry_rebuild_missing_files_with_identical_pins (test_reprovision.ReprovisionTests.test_shared_and_packed_registry_rebuild_missing_files_with_identical_pins)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/tests/test_reprovision.py", line 76, in test_shared_and_packed_registry_rebuild_missing_files_with_identical_pins
+    self.assertEqual(prepare_shared.derive(), shared)
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/scripts/prepare_shared.py", line 24, in derive
+    if not verify(model_path("mtp_shared_q3"), models["mtp_shared_q3"]["files"][0]):
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/tests/test_reprovision.py", line 53, in model_path
+    raise FileNotFoundError(path)
+FileNotFoundError: /var/folders/k5/wc0mdfp571x8q991krfk2v2r0000gn/T/tmpzqrdk44a/models/mtp_shared_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-shared.gguf
+
+======================================================================
+ERROR: test_shared_rebuild_rejects_a_changed_registered_hash (test_reprovision.ReprovisionTests.test_shared_rebuild_rejects_a_changed_registered_hash)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/tests/test_reprovision.py", line 83, in test_shared_rebuild_rejects_a_changed_registered_hash
+    self.bad_shared_pin(False)
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/tests/test_reprovision.py", line 107, in bad_shared_pin
+    (prepare_shared_layout.prepare if packed else prepare_shared.derive)()
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/scripts/prepare_shared.py", line 24, in derive
+    if not verify(model_path("mtp_shared_q3"), models["mtp_shared_q3"]["files"][0]):
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/justin/Documents/Github/Strata-Mac-Lab/tests/test_reprovision.py", line 53, in model_path
+    raise FileNotFoundError(path)
+FileNotFoundError: /var/folders/k5/wc0mdfp571x8q991krfk2v2r0000gn/T/tmpxmpfr0lr/models/mtp_shared_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-shared.gguf
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.066s
+
+FAILED (errors=5)
+Prepared shared helper: 0.000 GB; saved 0.0 MiB
+Packed helper verified: 32 unchanged tensors; GPU dense region 0.00 MiB
+Prepared shared helper: 0.000 GB; saved 0.0 MiB
+Packed helper verified: 32 unchanged tensors; GPU dense region 0.00 MiB
+Prepared shared helper: 0.000 GB; saved 0.0 MiB

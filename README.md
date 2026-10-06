@@ -41,6 +41,8 @@ python3 scripts/provision.py
 
 Sources, dependencies and model revisions are pinned in `config/` and `requirements.txt`. Downloads resume and verify exact byte count and SHA256 before a model becomes available. The original three downloads use about 72 GB. Recreating the optional Q3 helper adds a 7.77 GB BF16 source and 1.80 GB derived file; leave another 20 GiB spare. Smaller helpers are quantized from verified BF16, not re-quantized from the compressed Q4 file. `prepare_draft.py` records source/tool pins, output SHA256 and native quantization logs. The experiments also retain Q2_K and Q2_0 variants; they are not the chosen profile.
 
+Saved derived-model entries do not require the local files to exist already: the preparation tools regenerate missing outputs and check them against the registered byte count/SHA256 before accepting them. Recreated files preserve the registry and its original pins. Existing corrupted or unexpected partial files still require review; a mismatch is not silently re-pinned.
+
 ## Test and track
 
 ```sh
