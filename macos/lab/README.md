@@ -114,7 +114,7 @@ To run the packed mixed profile manually:
 .venv/bin/python scripts/run.py flash --engine mtp-shared --spec draft-mtp --draft-model mtp_shared_packed_q3 --draft 2 --draft-placement mixed
 ```
 
-The [helper tuning results](bench/HELPER-TUNING.md) compare prediction depth and CPU workers against fresh controls. `Start Strata - Writing Test.command` uses one predicted token; it helped the short writing workloads, especially the Chinese test, but slowed cached replies. `Start Strata - Fast Follow-ups Test.command` uses four predicted tokens; it helped longer cached ledger replies but slowed prose and Chinese writing. The original shared launcher remains at two tokens. Stop the active model before switching launchers.
+The [helper tuning results](bench/HELPER-TUNING.md) compare prediction depth and CPU workers against fresh controls in the earlier shared engine. The later [few-row GPU math comparison](bench/METAL-MMA.md) upgrades the optional writing launcher to the `mtp-mma` engine and three predicted tokens: about 49 TPS for synthetic writing and 56 TPS for code. The fast follow-up launcher uses the same new engine with four predicted tokens: about 69 TPS on the longer cached-ledger test. The original shared launcher remains at two tokens, and the ordinary launcher retains prediction off. Stop the active model before switching launchers.
 
 To reproduce the separate tuning sweeps, first print their plans, then add `--run` to benchmark:
 
@@ -126,6 +126,18 @@ To reproduce the separate tuning sweeps, first print their plans, then add `--ru
 ```
 
 `--draft-threads N` changes the helper's generation and input-processing workers; the main model stays at eight CPU threads. The measured depth profiles use eight helper workers. Thread and depth gains are separate experiments and must not be added together.
+
+The separate few-row dense Metal experiment combines the existing shared helper with the pinned patch from llama.cpp PR #30065. It uses the same model/helper files and its own native build. Preparation compiles code without loading weights; math checks use synthetic tensors. The trace and app checks load the full model. The comparison prints its plan unless `--run` is supplied.
+
+```sh
+.venv/bin/python scripts/prepare_mma.py --jobs 2
+.venv/bin/python scripts/verify_mma.py
+.venv/bin/python scripts/trace_mma.py
+.venv/bin/python scripts/benchmark_mma.py
+.venv/bin/python scripts/verify_helper_tuning.py --engine mtp-mma
+```
+
+The writing upgrade improves short synthetic generation 11.5% over this suite's freshly remeasured prior one-token profile; it changes both the kernel and prediction depth. The kernel alone improves three-token writing/code roughly 17%. The four-token cached comparison improves output speed 20.0% and complete reply time 11.1%. Twelve speed passes pass 360 answer checks with zero new swap; all 27 real app checks and 1,076 synthetic GPU math checks pass. These are focused checks, not a broad model-quality evaluation. [Full measurements and limits](bench/METAL-MMA.md).
 
 ## Next steps
 

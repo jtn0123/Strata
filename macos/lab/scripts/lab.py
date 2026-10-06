@@ -19,7 +19,7 @@ def model_path(model_id):
 def server_command(model_id, port=8096, context=4096, batch=512, ubatch=128,
                    spec="none", draft=3, cache_type="f16", threads=8, draft_placement="gpu",
                    draft_model="mtp", engine="baseline", draft_threads=None):
-    from engines import engine_binary
+    from engines import engine_binary, supports_feature
     command = [str(engine_binary(engine)), "-m", str(model_path(model_id)), "--host", "127.0.0.1",
                "--port", str(port), "-c", str(context), "-b", str(batch), "-ub", str(ubatch),
                "-t", str(threads), "-tb", str(threads), "-ngl", "all", "-fit", "off",
@@ -33,7 +33,7 @@ def server_command(model_id, port=8096, context=4096, batch=512, ubatch=128,
             raise ValueError("The lab MTP head is only compatible with Flash-Next")
         draft_spec = json.loads((ROOT / "config/models.json").read_text())[draft_model]
         required = draft_spec.get("derived", {}).get("required_engine")
-        if required and engine != required:
+        if required and not supports_feature(engine, required):
             raise ValueError(f"{draft_model} requires the {required} engine")
         if draft_placement == "mixed" and draft_model != "mtp_shared_packed_q3":
             raise ValueError("Mixed placement requires the packed shared helper")

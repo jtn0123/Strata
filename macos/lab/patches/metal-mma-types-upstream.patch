@@ -1,0 +1,122 @@
+From b0cb151326e6b436c265c641f23235864f7de090 Mon Sep 17 00:00:00 2001
+From: Pratik Narola <pratik.narola@tether.io>
+Date: Mon, 5 Oct 2026 16:59:31 +0530
+Subject: [PATCH] metal : few-row MMA mat-mul for the remaining src0 types
+
+The generic few-row MMA kernel works for any type with a 16-weight
+dequantizer, so it now also takes BF16, Q1_0, Q2_0, MXFP4, Q2_K, Q3_K,
+TQ2_0 and the IQ types. Each type starts at the row count where it beats
+the current kernels on an M3 Ultra: 5 rows for TQ2_0, 4 for BF16, 3
+for MXFP4, Q2_0, Q2_K and IQ4_NL, and 2 for the others.
+
+test-backend-ops perf -o MUL_MAT, m=4096, k=14336, M3 Ultra, time of this
+change over master (mean of two interleaved runs each): 0.23 to 0.98 from
+the threshold to 8 rows, 0.24 to 0.33 at 9 to 16 rows, and 0.99 to 1.01 at
+1 and 512 rows.
+---
+ ggml/src/ggml-metal/ggml-metal-common.cpp    | 24 ++++++++++++++++++++
+ ggml/src/ggml-metal/kernels/mul_mv_mma.metal | 19 ++++++++++++++++
+ tests/test-backend-ops.cpp                   |  9 +++++---
+ 3 files changed, 49 insertions(+), 3 deletions(-)
+
+diff --git a/ggml/src/ggml-metal/ggml-metal-common.cpp b/ggml/src/ggml-metal/ggml-metal-common.cpp
+index 8b065f54ad55..a00f87c99b25 100644
+--- a/ggml/src/ggml-metal/ggml-metal-common.cpp
++++ b/ggml/src/ggml-metal/ggml-metal-common.cpp
+@@ -80,6 +80,22 @@ static bool ggml_metal_mul_mv_mma_type_supported(enum ggml_type type) {
+         case GGML_TYPE_Q4_K:
+         case GGML_TYPE_Q5_K:
+         case GGML_TYPE_Q6_K:
++        case GGML_TYPE_BF16:
++        case GGML_TYPE_Q1_0:
++        case GGML_TYPE_Q2_0:
++        case GGML_TYPE_MXFP4:
++        case GGML_TYPE_Q2_K:
++        case GGML_TYPE_Q3_K:
++        case GGML_TYPE_IQ2_XXS:
++        case GGML_TYPE_IQ2_XS:
++        case GGML_TYPE_IQ2_S:
++        case GGML_TYPE_IQ3_XXS:
++        case GGML_TYPE_IQ3_S:
++        case GGML_TYPE_IQ1_S:
++        case GGML_TYPE_IQ1_M:
++        case GGML_TYPE_IQ4_NL:
++        case GGML_TYPE_IQ4_XS:
++        case GGML_TYPE_TQ2_0:
+             return true;
+         default:
+             return false;
+@@ -105,10 +121,18 @@ static int64_t ggml_metal_mul_mv_mma_rows_min(enum ggml_type type) {
+     switch (type) {
+         case GGML_TYPE_F32:
+             return 6;
++        case GGML_TYPE_TQ2_0:
++            return 5;
++        case GGML_TYPE_BF16:
++            return 4;
+         case GGML_TYPE_F16:
++        case GGML_TYPE_Q2_0:
+         case GGML_TYPE_Q4_K:
+         case GGML_TYPE_Q5_0:
+         case GGML_TYPE_Q5_1:
++        case GGML_TYPE_Q2_K:
++        case GGML_TYPE_IQ4_NL:
++        case GGML_TYPE_MXFP4:
+             return 3;
+         default:
+             return 2;
+diff --git a/ggml/src/ggml-metal/kernels/mul_mv_mma.metal b/ggml/src/ggml-metal/kernels/mul_mv_mma.metal
+index fcf981a93c29..5cf245d5210d 100644
+--- a/ggml/src/ggml-metal/kernels/mul_mv_mma.metal
++++ b/ggml/src/ggml-metal/kernels/mul_mv_mma.metal
+@@ -605,4 +605,23 @@ MUL_MV_MMA_GEN("q5_1", block_q5_1, 2,     dequantize_q5_1)
+ MUL_MV_MMA_GEN("q4_K", block_q4_K, QK_NL, dequantize_q4_K)
+ MUL_MV_MMA_GEN("q6_K", block_q6_K, QK_NL, dequantize_q6_K)
+ 
++#if defined(GGML_METAL_HAS_BF16)
++MUL_MV_MMA_GEN("bf16",    bfloat4x4,     1,     dequantize_bf16)
++#endif
++MUL_MV_MMA_GEN("q1_0",    block_q1_0,    8,     dequantize_q1_0)
++MUL_MV_MMA_GEN("q2_0",    block_q2_0,    4,     dequantize_q2_0)
++MUL_MV_MMA_GEN("mxfp4",   block_mxfp4,   2,     dequantize_mxfp4)
++MUL_MV_MMA_GEN("q2_K",    block_q2_K,    QK_NL, dequantize_q2_K)
++MUL_MV_MMA_GEN("q3_K",    block_q3_K,    QK_NL, dequantize_q3_K)
++MUL_MV_MMA_GEN("iq2_xxs", block_iq2_xxs, QK_NL, dequantize_iq2_xxs)
++MUL_MV_MMA_GEN("iq2_xs",  block_iq2_xs,  QK_NL, dequantize_iq2_xs)
++MUL_MV_MMA_GEN("iq2_s",   block_iq2_s,   QK_NL, dequantize_iq2_s)
++MUL_MV_MMA_GEN("iq3_xxs", block_iq3_xxs, QK_NL, dequantize_iq3_xxs)
++MUL_MV_MMA_GEN("iq3_s",   block_iq3_s,   QK_NL, dequantize_iq3_s)
++MUL_MV_MMA_GEN("iq1_s",   block_iq1_s,   QK_NL, dequantize_iq1_s)
++MUL_MV_MMA_GEN("iq1_m",   block_iq1_m,   QK_NL, dequantize_iq1_m)
++MUL_MV_MMA_GEN("iq4_nl",  block_iq4_nl,  2,     dequantize_iq4_nl)
++MUL_MV_MMA_GEN("iq4_xs",  block_iq4_xs,  QK_NL, dequantize_iq4_xs)
++MUL_MV_MMA_GEN("tq2_0",   block_tq2_0,   QK_NL, dequantize_tq2_0)
++
+ #undef MUL_MV_MMA_GEN
+diff --git a/tests/test-backend-ops.cpp b/tests/test-backend-ops.cpp
+index d8893025e700..5618d1f28729 100644
+--- a/tests/test-backend-ops.cpp
++++ b/tests/test-backend-ops.cpp
+@@ -10381,8 +10381,11 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_eval() {
+             test_cases.emplace_back(new test_mul_mat(GGML_TYPE_Q4_0, GGML_TYPE_F32, m, n, k, {1, 1}, {1, 1}));
+         }
+         test_cases.emplace_back(new test_mul_mat(GGML_TYPE_Q4_0, GGML_TYPE_F32, 64, n, 256, {3, 2}, {2, 1}));
+-        for (ggml_type type_a : {GGML_TYPE_F32, GGML_TYPE_F16, GGML_TYPE_Q4_1, GGML_TYPE_Q5_0, GGML_TYPE_Q5_1, GGML_TYPE_Q8_0,
+-                                 GGML_TYPE_Q4_K, GGML_TYPE_Q5_K, GGML_TYPE_Q6_K}) {
++        for (ggml_type type_a : {GGML_TYPE_F32, GGML_TYPE_F16, GGML_TYPE_BF16, GGML_TYPE_Q4_1, GGML_TYPE_Q5_0, GGML_TYPE_Q5_1,
++                                 GGML_TYPE_Q8_0, GGML_TYPE_Q1_0, GGML_TYPE_Q2_0, GGML_TYPE_MXFP4, GGML_TYPE_Q2_K, GGML_TYPE_Q3_K,
++                                 GGML_TYPE_Q4_K, GGML_TYPE_Q5_K, GGML_TYPE_Q6_K, GGML_TYPE_TQ2_0,
++                                 GGML_TYPE_IQ2_XXS, GGML_TYPE_IQ2_XS, GGML_TYPE_IQ2_S, GGML_TYPE_IQ3_XXS, GGML_TYPE_IQ3_S,
++                                 GGML_TYPE_IQ1_S, GGML_TYPE_IQ1_M, GGML_TYPE_IQ4_NL, GGML_TYPE_IQ4_XS}) {
+             test_cases.emplace_back(new test_mul_mat(type_a, GGML_TYPE_F32, 48,  n, 2560, {1, 1}, {1, 1}));
+             test_cases.emplace_back(new test_mul_mat(type_a, GGML_TYPE_F32, 1000, n, 1024, {1, 1}, {1, 1}));
+             test_cases.emplace_back(new test_mul_mat(type_a, GGML_TYPE_F32, 3000, n, 512,  {1, 1}, {1, 1}));
+@@ -10405,7 +10408,7 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_eval() {
+             test_cases.emplace_back(new test_mul_mat(type_a, GGML_TYPE_F32, 1000, n, 1024, {1, 1}, {1, 1}, {0, 1, 2, 3}, 1280));
+         }
+         // a src1 with a nonzero mean, for the zero points and mins of quantized src0 types
+-        for (ggml_type type_a : {GGML_TYPE_Q4_0, GGML_TYPE_Q4_1, GGML_TYPE_Q5_0, GGML_TYPE_Q8_0, GGML_TYPE_Q4_K, GGML_TYPE_Q5_K}) {
++        for (ggml_type type_a : {GGML_TYPE_Q4_0, GGML_TYPE_Q4_1, GGML_TYPE_Q5_0, GGML_TYPE_Q8_0, GGML_TYPE_Q2_K, GGML_TYPE_Q4_K, GGML_TYPE_Q5_K}) {
+             test_cases.emplace_back(new test_mul_mat_pos(type_a, GGML_TYPE_F32, 1000, n, 1024, {1, 1}, {1, 1}));
+         }
+     }

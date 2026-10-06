@@ -2,6 +2,8 @@
 
 October 6, 2026. Full Qwen3.8-Flash-Next GSQ-RCO Q2_0 on the 48 GiB M5 Pro. This compares the existing packed shared helper against fresh two-token/eight-worker controls. The percentages below are additional gains from that helper profile, not gains from the original prediction-off baseline or the older roughly 47 TPS result.
 
+Later on October 6, the [few-row GPU math experiment](METAL-MMA.md) upgraded the optional writing launcher to the new `mtp-mma` engine and three predicted tokens, and the fast follow-up launcher to that engine with four tokens. The settings, recommendations and tables below describe this earlier unpatched-engine checkpoint. Its raw records remain unchanged; use `--engine mtp-shared` to reproduce it.
+
 ## Decision
 
 Keep the ordinary launcher on conversation caching with prediction off. Keep the balanced shared helper at two predicted tokens and eight CPU workers. One token helps short writing; three helps this code test and cached replies; four gives the best longer cached-ledger result but hurts prose and Chinese writing. There is no single winning prediction depth across every workload.

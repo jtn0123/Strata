@@ -1,3 +1,3 @@
 #!/bin/zsh
 cd "${0:A:h}"
-exec .venv/bin/python scripts/run.py flash --engine mtp-shared --spec draft-mtp --draft-model mtp_shared_packed_q3 --draft 1 --draft-placement mixed --draft-threads 8 "$@"
+exec .venv/bin/python scripts/run.py flash --engine mtp-mma --spec draft-mtp --draft-model mtp_shared_packed_q3 --draft 3 --draft-placement mixed --draft-threads 8 "$@"
