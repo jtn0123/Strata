@@ -75,6 +75,8 @@ The GPU draft exceeded the default GPU memory budget on this Mac. A CPU draft pa
 
 ## Next steps
 
+The [October 6 parent/fork review](bench/UPSTREAM-SCAN.md) ranks specific Mac experiments and records which improvements are already in this runtime. The first candidate is an isolated Q2_0 Metal kernel change, after a sustained baseline; it has not been applied or benchmarked here yet.
+
 1. Conversation caching is implemented, benchmarked and enabled. Its matched follow-up results are in [the scoreboard](bench/RESULTS.md) and [experiment notes](bench/NOTES.md).
 2. The smaller prediction helper is implemented and benchmarked. Keep it optional: its benefit depends on sampling and workload. [Prediction results](bench/PREDICTION.md).
 3. Treat larger contexts and higher-precision full models as separate capacity experiments. Porting Strata's expert scheduler to Metal is a larger engineering project.
