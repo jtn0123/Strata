@@ -31,8 +31,16 @@ def server_command(model_id, port=8096, context=4096, batch=512, ubatch=128,
     if spec == "draft-mtp":
         if model_id != "flash":
             raise ValueError("The lab MTP head is only compatible with Flash-Next")
-        layers = {"gpu": "all", "cpu": "0", "output": "1"}[draft_placement]
+        draft_spec = json.loads((ROOT / "config/models.json").read_text())[draft_model]
+        required = draft_spec.get("derived", {}).get("required_engine")
+        if required and engine != required:
+            raise ValueError(f"{draft_model} requires the {required} engine")
+        if draft_placement == "mixed" and draft_model != "mtp_shared_packed_q3":
+            raise ValueError("Mixed placement requires the packed shared helper")
+        layers = {"gpu": "all", "cpu": "0", "output": "1", "mixed": "all"}[draft_placement]
         command.extend(["-md", str(model_path(draft_model)), "--spec-draft-ngl", layers])
+        if draft_placement == "mixed":
+            command.extend(["--spec-draft-cpu-moe", "--no-op-offload"])
     return command
 
 

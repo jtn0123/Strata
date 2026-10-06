@@ -2,6 +2,8 @@
 
 Keep prediction optional. The normal profile retains caching and no MTP: the fixed-length writing gain disappears at temperature 0.6 and fresh-prompt startup becomes slower. Cached ledger replies finish 4-10% sooner, a limited workload benefit.
 
+This is the original helper checkpoint. Later [draft vocabulary](DRAFT-VOCAB.md) and [shared weights/layout](SHARED-HELPER.md) reports compare fresh unchanged controls, English code/prose, Chinese writing and cached replies. Their workload gains are reported separately; do not add percentages from different suites.
+
 The main model, native runtime, context and processing batch stay the same. Selected helper: locally generated Q3_K_S pure, two draft tokens, output projection on GPU and its body on CPU. It is 1.798 GB, versus 2.786 GB for the original self-contained Q4 helper (35.5% smaller). Norms/router precision and shape-compatible fallback quantization are preserved. Derived SHA256 and preparation receipts are in config/models.json.
 
 | Workload | Size | Baseline output tok/s | Prediction output tok/s | Writing change | First-token delay change | Total time change |

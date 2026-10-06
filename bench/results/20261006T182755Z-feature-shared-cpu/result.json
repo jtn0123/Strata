@@ -1,0 +1,2988 @@
+{
+  "schema": 1,
+  "run_id": "20261006T182755Z-feature-shared-cpu",
+  "status": "passed",
+  "settings": {
+    "model": "flash",
+    "label": "feature-shared-cpu",
+    "comparison_profile": "shared-cpu",
+    "engine": "mtp-shared",
+    "draft_vocab": "off",
+    "context": 4096,
+    "batch": 512,
+    "ubatch": 512,
+    "cache_type": "f16",
+    "spec": "draft-mtp",
+    "draft": 2,
+    "draft_placement": "output",
+    "draft_model": "mtp_shared_q3",
+    "threads": 8,
+    "temperature": 0.6,
+    "extended_checks": true,
+    "repeats": 1,
+    "warmups": 0,
+    "predict": 64,
+    "prompts": [
+      512,
+      2048
+    ],
+    "real_workloads": true,
+    "cached_workloads": true
+  },
+  "command": [
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-mtp-shared/build/bin/llama-server",
+    "-m",
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "62860",
+    "-c",
+    "4096",
+    "-b",
+    "512",
+    "-ub",
+    "512",
+    "-t",
+    "8",
+    "-tb",
+    "8",
+    "-ngl",
+    "all",
+    "-fit",
+    "off",
+    "-fa",
+    "on",
+    "-lm",
+    "mmap",
+    "-lzm",
+    "on",
+    "-np",
+    "1",
+    "-ctk",
+    "f16",
+    "-ctv",
+    "f16",
+    "--cache-ram",
+    "0",
+    "--spec-type",
+    "draft-mtp",
+    "--spec-draft-n-max",
+    "2",
+    "--metrics",
+    "--jinja",
+    "--no-webui",
+    "--alias",
+    "flash",
+    "--verbosity",
+    "4",
+    "--cors-origins",
+    "localhost",
+    "-md",
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/models/mtp_shared_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-shared.gguf",
+    "--spec-draft-ngl",
+    "1"
+  ],
+  "runtime": {
+    "llama_cpp": {
+      "repository": "https://github.com/ggml-org/llama.cpp.git",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "tag": "v0.6.0"
+    },
+    "strata_macos": {
+      "repository": "https://github.com/jinzy0623/Strata-macOS.git",
+      "revision": "2cc4153409edb3f859187bdf10f13e34972d6ffb"
+    },
+    "build_flags": [
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DGGML_METAL=ON",
+      "-DGGML_METAL_EMBED_LIBRARY=ON",
+      "-DLLAMA_BUILD_TESTS=OFF",
+      "-DLLAMA_BUILD_EXAMPLES=OFF",
+      "-DLLAMA_BUILD_TOOLS=ON"
+    ]
+  },
+  "model": {
+    "repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "revision": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+    "files": [
+      {
+        "path": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "size_bytes": 37623740192,
+        "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+      },
+      {
+        "path": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "size_bytes": 28800138432,
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+      }
+    ]
+  },
+  "host_before": {
+    "os": "macOS-27.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "chip": "Apple M5 Pro",
+    "ram_bytes": 51539607552,
+    "cpu_count": 18,
+    "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=36831331)\t80%; AC attached; not charging present: true",
+    "power_settings": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n womp                 0\n displaysleep         10\n networkoversleep     0\n sleep                1\n lessbright           0\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                0\n tcpkeepalive         1\n disksleep            10",
+    "thermal_status": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+    "gpu_wired_limit": "iogpu.wired_limit_mb: 0",
+    "vm_stat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                   169073.\nPages active:                                 718939.\nPages inactive:                              1864809.\nPages speculative:                              1203.\nPages throttled:                                   0.\nPages wired down:                             236550.\nPages purgeable:                               21337.\n\"Translation faults\":                      744170109.\nPages copy-on-write:                        29166619.\nPages zero filled:                         528702616.\nPages reactivated:                          48968298.\nPages purged:                               11039069.\nFile-backed pages:                           2132334.\nAnonymous pages:                              452617.\nPages stored in compressor:                   171803.\nPages occupied by compressor:                  94649.\nDecompressions:                             34610046.\nCompressions:                               41490443.\nPageins:                                    60006122.\nPageouts:                                      71375.\nSwapins:                                      172995.\nSwapouts:                                     367071.\nPages tagged:                                 112640.\nPages tagged resident:                         97992.\nPages tagged compressed:                       14648.\nPages tag-storage:                             98304.\nPages tag-storage holding tags:                 8060.\nPages tag-storage free:                         3799.\nPages tag-storage non-tag pageable:            83759.\nPages tag-storage non-tag wired:                   8.\nBytes of compressed tags:                    2100352.\nTagged compressions:                         1169294.\nTagged decompressions:                       1046757.",
+    "swap": {
+      "total": 2147483648,
+      "used": 1412562944,
+      "free": 734920704,
+      "percent": 65.8,
+      "sin": 983140302848,
+      "sout": 1169408000
+    },
+    "available_bytes": 33344389120
+  },
+  "cases": [
+    {
+      "prompt_tokens": 512,
+      "repeat": 1,
+      "prompt_sha256": "8412cb4be87cb4c90fdffb6bf82f7c2dfa8b0c9179e99e845ee147eb74e50521",
+      "workload": "synthetic",
+      "ttft_s": 1.343609750001633,
+      "wall_s": 3.076860500004841,
+      "prompt_tok_s": 381.3286024753589,
+      "generation_tok_s": 36.35027121341244,
+      "output_tokens": 64,
+      "response": {
+        "ttft_s": 1.343609750001633,
+        "wall_s": 3.076860500004841,
+        "text": "Based on the text provided, here is a plain-language explanation of a **repeatable benchmark**:\n\n### What it is\nA repeatable benchmark is a structured test designed to measure how fast and efficiently a computer system (or software model) performs under specific conditions. The key word is **\"repeatable,\"** meaning the",
+        "generated_token_ids": [
+          27775,
+          383,
+          279,
+          1414,
+          3766,
+          11,
+          1532,
+          369,
+          264,
+          13983,
+          42117,
+          15673,
+          314,
+          264,
+          2972,
+          29625,
+          470,
+          27502,
+          92217,
+          271,
+          13962,
+          3437,
+          424,
+          369,
+          198,
+          32,
+          12771,
+          470,
+          27502,
+          369,
+          264,
+          31838,
+          1228,
+          5995,
+          310,
+          6420,
+          1204,
+          4778,
+          321,
+          28750,
+          264,
+          6165,
+          1785,
+          318,
+          269,
+          3061,
+          1558,
+          8,
+          25822,
+          1172,
+          3050,
+          4530,
+          13,
+          561,
+          1328,
+          3299,
+          369,
+          173976,
+          29625,
+          470,
+          1288,
+          332,
+          7063,
+          279
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 64,
+          "tokens_evaluated": 512,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.6000000238418579,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 64,
+            "n_predict": 64,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nThe lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 448 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. Explain a repeatable benchmark in plain language.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": true,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 575,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 512,
+            "prompt_ms": 1342.674,
+            "prompt_per_token_ms": 2.62241015625,
+            "prompt_per_second": 381.3286024753589,
+            "predicted_n": 64,
+            "predicted_ms": 1733.137,
+            "predicted_per_token_ms": 27.51011111111111,
+            "predicted_per_second": 36.35027121341244,
+            "draft_n": 54,
+            "draft_n_accepted": 35
+          }
+        }
+      },
+      "system_disk_read_bytes": 256819200,
+      "swap_before_bytes": 1412562944,
+      "swap_after_bytes": 1412562944
+    },
+    {
+      "prompt_tokens": 2048,
+      "repeat": 1,
+      "prompt_sha256": "2545d989e5219ff7e1523c4efeb6e96127a849e4184ffb5f6ea548b4663575bf",
+      "workload": "synthetic",
+      "ttft_s": 4.572280500004126,
+      "wall_s": 6.333671459004108,
+      "prompt_tok_s": 448.02720365177174,
+      "generation_tok_s": 35.80782452119823,
+      "output_tokens": 64,
+      "response": {
+        "ttft_s": 4.572280500004126,
+        "wall_s": 6.333671459004108,
+        "text": "Based on the repetitive text provided, here is a plain-language explanation of what a **repeatable benchmark** means in this context:\n\n### What is a Repeatable Benchmark?\n\nA repeatable benchmark is a **test performed multiple times under identical conditions** to ensure the results are consistent and reliable. It is not just",
+        "generated_token_ids": [
+          27775,
+          383,
+          279,
+          56127,
+          1414,
+          3766,
+          11,
+          1532,
+          369,
+          264,
+          13983,
+          42117,
+          15673,
+          314,
+          1092,
+          264,
+          2972,
+          29625,
+          470,
+          27502,
+          332,
+          3254,
+          303,
+          411,
+          2193,
+          25,
+          271,
+          13962,
+          3437,
+          369,
+          264,
+          43311,
+          470,
+          59542,
+          30,
+          271,
+          32,
+          12771,
+          470,
+          27502,
+          369,
+          264,
+          2972,
+          1877,
+          10345,
+          5081,
+          2942,
+          1172,
+          18922,
+          4530,
+          332,
+          310,
+          5790,
+          279,
+          2961,
+          513,
+          12594,
+          321,
+          14294,
+          13,
+          1049,
+          369,
+          524,
+          1066
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 64,
+          "tokens_evaluated": 2048,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.6000000238418579,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 64,
+            "n_predict": 64,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nThe lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab machine has 48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. The lab48 GB of memory. Its SSD stores model lookup rows. We compare repeatable inference runs, preserve the baseline, and record speed and memory. Explain a repeatable benchmark in plain language.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": true,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 2111,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 2048,
+            "prompt_ms": 4571.151,
+            "prompt_per_token_ms": 2.23200732421875,
+            "prompt_per_second": 448.02720365177174,
+            "predicted_n": 64,
+            "predicted_ms": 1759.392,
+            "predicted_per_token_ms": 27.926857142857145,
+            "predicted_per_second": 35.80782452119823,
+            "draft_n": 50,
+            "draft_n_accepted": 38
+          }
+        }
+      },
+      "system_disk_read_bytes": 498753536,
+      "swap_before_bytes": 1412562944,
+      "swap_after_bytes": 1412562944
+    },
+    {
+      "workload": "code",
+      "prompt_tokens": 48,
+      "repeat": 1,
+      "prompt_sha256": "f9ba431ed5991f394ccdbdbb57938e0acb96c21afad608d13b8d165e9d8dd19a",
+      "ttft_s": 0.5505599579992122,
+      "wall_s": 2.1382767079994665,
+      "prompt_tok_s": 87.38664768434487,
+      "generation_tok_s": 39.693965824125485,
+      "output_tokens": 64,
+      "response": {
+        "ttft_s": 0.5505599579992122,
+        "wall_s": 2.1382767079994665,
+        "text": "```python\nfrom collections import OrderedDict\n\n\nclass LRUCache:\n    \"\"\"\n    A Least Recently Used (LRU) cache with a fixed capacity.\n\n    The cache stores key-value pairs and evicts the least recently used\n    item when the capacity is exceeded.\n\n    Methods:\n        get(key",
+        "generated_token_ids": [
+          71093,
+          12305,
+          198,
+          1445,
+          14856,
+          1120,
+          51425,
+          1358,
+          1005,
+          43072,
+          5287,
+          1714,
+          25,
+          198,
+          262,
+          4071,
+          198,
+          262,
+          357,
+          87401,
+          39642,
+          11851,
+          318,
+          19504,
+          52,
+          8,
+          6297,
+          440,
+          264,
+          8097,
+          8390,
+          13,
+          271,
+          262,
+          561,
+          6297,
+          10220,
+          1328,
+          18509,
+          13139,
+          321,
+          3514,
+          29015,
+          279,
+          3140,
+          5742,
+          1429,
+          198,
+          262,
+          1455,
+          948,
+          279,
+          8390,
+          369,
+          32689,
+          13,
+          271,
+          262,
+          18233,
+          25,
+          198,
+          285,
+          615,
+          4702
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 64,
+          "tokens_evaluated": 48,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.6000000238418579,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 64,
+            "n_predict": 64,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nWrite Python code for a small LRU cache with get and put methods, a capacity limit, and a demonstration. Explain its correctness and time complexity after the code. Be detailed.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": true,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 111,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 48,
+            "prompt_ms": 549.283,
+            "prompt_per_token_ms": 11.443395833333334,
+            "prompt_per_second": 87.38664768434487,
+            "predicted_n": 64,
+            "predicted_ms": 1587.143,
+            "predicted_per_token_ms": 25.192746031746033,
+            "predicted_per_second": 39.693965824125485,
+            "draft_n": 47,
+            "draft_n_accepted": 39
+          }
+        }
+      }
+    },
+    {
+      "workload": "prose",
+      "prompt_tokens": 53,
+      "repeat": 1,
+      "prompt_sha256": "a30a4f74b791c59ea8f535b35d3532af29160b66f086ad9b79fb6a879597a2c9",
+      "ttft_s": 0.7677324999967823,
+      "wall_s": 2.4955003329960164,
+      "prompt_tok_s": 69.13265905076946,
+      "generation_tok_s": 36.461181863166395,
+      "output_tokens": 64,
+      "response": {
+        "ttft_s": 0.7677324999967823,
+        "wall_s": 2.4955003329960164,
+        "text": "Designing a fair computer performance experiment requires rigorous control of variables to ensure that observed differences are attributable to the algorithm or hardware being tested, rather than environmental noise. A robust methodology involves isolating the system under test from external interference, standardizing inputs, and statistically validating results. Below is a comprehensive guide covering the essential components",
+        "generated_token_ids": [
+          19846,
+          286,
+          264,
+          6415,
+          6165,
+          4906,
+          9064,
+          7225,
+          45332,
+          2444,
+          314,
+          7101,
+          310,
+          5790,
+          421,
+          12784,
+          11461,
+          513,
+          68045,
+          310,
+          279,
+          11767,
+          466,
+          11436,
+          1602,
+          12152,
+          11,
+          4598,
+          1056,
+          11810,
+          11639,
+          13,
+          357,
+          21094,
+          35822,
+          17077,
+          12720,
+          1060,
+          279,
+          1785,
+          1172,
+          1228,
+          494,
+          8976,
+          30195,
+          11,
+          5129,
+          4694,
+          10804,
+          11,
+          321,
+          45287,
+          66350,
+          2961,
+          13,
+          20543,
+          369,
+          264,
+          15352,
+          8214,
+          17661,
+          279,
+          7326,
+          6599
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 64,
+          "tokens_evaluated": 53,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.6000000238418579,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 64,
+            "n_predict": 64,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nExplain how to design a fair computer performance experiment. Cover warmup, input sizes, background activity, repeated trials, latency, throughput and memory. Use about 700 words with concrete examples.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": false,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 116,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 53,
+            "prompt_ms": 766.642,
+            "prompt_per_token_ms": 14.464943396226417,
+            "prompt_per_second": 69.13265905076946,
+            "predicted_n": 64,
+            "predicted_ms": 1727.865,
+            "predicted_per_token_ms": 27.42642857142857,
+            "predicted_per_second": 36.461181863166395,
+            "draft_n": 54,
+            "draft_n_accepted": 35
+          }
+        }
+      }
+    },
+    {
+      "workload": "chinese",
+      "prompt_tokens": 56,
+      "repeat": 1,
+      "prompt_sha256": "7685925f0e1ff4e8b9c22f3e5d43a67d528221464f39a502c17377369c6a8b06",
+      "ttft_s": 0.5382193330005975,
+      "wall_s": 2.475877582997782,
+      "prompt_tok_s": 104.139740654853,
+      "generation_tok_s": 32.515994772666744,
+      "output_tokens": 64,
+      "response": {
+        "ttft_s": 0.5382193330005975,
+        "wall_s": 2.475877582997782,
+        "text": "\u516c\u5e73\u6bd4\u8f83\u4e24\u4e2a\u672c\u5730\u4eba\u5de5\u667a\u80fd\u6a21\u578b\u7684\u6027\u80fd\uff0c\u4e0d\u80fd\u4ec5\u51ed\u201c\u611f\u89c9\u5feb\u201d\u6216\u201c\u6162\u201d\uff0c\u5fc5\u987b\u5efa\u7acb\u4e25\u8c28\u7684\u63a7\u5236\u53d8\u91cf\u4f53\u7cfb\u3002\u9996\u5148\uff0c**\u9884\u70ed\uff08Warm-up\uff09**\u81f3\u5173\u91cd\u8981\u3002\u6a21\u578b\u9996\u6b21\u52a0\u8f7d\u65f6\u9700\u5c06\u6743\u91cd\u4ece\u786c\u76d8\u8bfb\u53d6\u81f3\u663e\u5b58\u6216\u5185\u5b58\uff0c\u8fd9\u4e00\u8fc7\u7a0b\u8017\u65f6\u6781\u957f\u4e14\u4e0d\u53ef\u590d\u73b0\u3002\u56e0\u6b64\uff0c",
+        "generated_token_ids": [
+          99657,
+          97016,
+          97889,
+          103862,
+          109015,
+          103725,
+          115554,
+          3709,
+          96849,
+          96725,
+          97963,
+          2005,
+          98414,
+          96239,
+          828,
+          96348,
+          2005,
+          97448,
+          32478,
+          97240,
+          98255,
+          110490,
+          113813,
+          104201,
+          98141,
+          1710,
+          99924,
+          3709,
+          332,
+          118797,
+          9616,
+          91986,
+          5072,
+          203309,
+          113870,
+          1710,
+          103725,
+          103789,
+          102173,
+          95865,
+          96195,
+          96123,
+          113726,
+          96200,
+          104723,
+          111388,
+          96337,
+          96547,
+          96458,
+          96348,
+          108777,
+          3709,
+          97884,
+          97424,
+          124445,
+          96376,
+          95940,
+          97447,
+          97196,
+          96374,
+          95963,
+          1710,
+          100532,
+          3709
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 64,
+          "tokens_evaluated": 56,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.6000000238418579,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 64,
+            "n_predict": 64,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\n\u8bf7\u7528\u4e2d\u6587\u8be6\u7ec6\u89e3\u91ca\u5982\u4f55\u516c\u5e73\u6bd4\u8f83\u4e24\u4e2a\u672c\u5730\u4eba\u5de5\u667a\u80fd\u6a21\u578b\u8fd0\u884c\u7a0b\u5e8f\u7684\u6027\u80fd\u3002\u8ba8\u8bba\u9884\u70ed\u3001\u8f93\u5165\u957f\u5ea6\u3001\u91cd\u590d\u6d4b\u8bd5\u3001\u540e\u53f0\u7a0b\u5e8f\u3001\u9996\u5b57\u5ef6\u8fdf\u3001\u751f\u6210\u901f\u5ea6\u548c\u5185\u5b58\uff0c\u7ed9\u51fa\u5177\u4f53\u4f8b\u5b50\uff0c\u5199\u7ea6\u516b\u767e\u5b57\u3002<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": false,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 119,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 56,
+            "prompt_ms": 537.739,
+            "prompt_per_token_ms": 9.602482142857143,
+            "prompt_per_second": 104.139740654853,
+            "predicted_n": 64,
+            "predicted_ms": 1937.508,
+            "predicted_per_token_ms": 30.75409523809524,
+            "predicted_per_second": 32.515994772666744,
+            "draft_n": 60,
+            "draft_n_accepted": 32
+          }
+        }
+      }
+    }
+  ],
+  "warmups": [],
+  "checks": [
+    {
+      "prompt": "What is 17 multiplied by 23? Reply with only the number.",
+      "expected": "391",
+      "passed": true,
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "391"
+            }
+          }
+        ],
+        "created": 1791311300,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 4,
+          "prompt_tokens": 29,
+          "total_tokens": 33,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-GtwE95vxpSxUT48hiW3Lj3x06no1OXkX",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 29,
+          "prompt_ms": 346.859,
+          "prompt_per_token_ms": 11.960655172413793,
+          "prompt_per_second": 83.60746009185289,
+          "predicted_n": 4,
+          "predicted_ms": 62.977,
+          "predicted_per_token_ms": 20.99233333333333,
+          "predicted_per_second": 47.6364386998428,
+          "draft_n": 2,
+          "draft_n_accepted": 2
+        }
+      }
+    },
+    {
+      "prompt": "The lab's secret label is violet-730. Repeat only that exact label.",
+      "expected": "violet-730",
+      "passed": true,
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "violet-730"
+            }
+          }
+        ],
+        "created": 1791311301,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 7,
+          "prompt_tokens": 30,
+          "total_tokens": 37,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-ljcqqRcq21VooBdcpuE1hjKke7WaHnr6",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 30,
+          "prompt_ms": 320.482,
+          "prompt_per_token_ms": 10.682733333333335,
+          "prompt_per_second": 93.60900144157861,
+          "predicted_n": 7,
+          "predicted_ms": 131.731,
+          "predicted_per_token_ms": 21.955166666666667,
+          "predicted_per_second": 45.54736546446926,
+          "draft_n": 4,
+          "draft_n_accepted": 4
+        }
+      }
+    },
+    {
+      "name": "multiply",
+      "temperature": 0,
+      "prompt": "What is 17 multiplied by 23? Reply with only the number.",
+      "expected": "391",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "391"
+            }
+          }
+        ],
+        "created": 1791311301,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 4,
+          "prompt_tokens": 29,
+          "total_tokens": 33,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-lg9NGTk6WuzieC1KKA5xXlI5jaa8Vj4Q",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 29,
+          "prompt_ms": 296.074,
+          "prompt_per_token_ms": 10.20944827586207,
+          "prompt_per_second": 97.94848585151009,
+          "predicted_n": 4,
+          "predicted_ms": 63.278,
+          "predicted_per_token_ms": 21.092666666666666,
+          "predicted_per_second": 47.40984228325801,
+          "draft_n": 2,
+          "draft_n_accepted": 2
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "different-multiply",
+      "temperature": 0,
+      "prompt": "What is 53 multiplied by 19? Reply with only the number.",
+      "expected": "1007",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "1007"
+            }
+          }
+        ],
+        "created": 1791311302,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 5,
+          "prompt_tokens": 29,
+          "total_tokens": 34,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-rkbVVfREhw6TTPPpzcss7Wwd3RKKCq4B",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 29,
+          "prompt_ms": 307.783,
+          "prompt_per_token_ms": 10.613206896551725,
+          "prompt_per_second": 94.2222279982975,
+          "predicted_n": 5,
+          "predicted_ms": 127.015,
+          "predicted_per_token_ms": 31.75375,
+          "predicted_per_second": 31.49234342400504,
+          "draft_n": 4,
+          "draft_n_accepted": 2
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "sum",
+      "temperature": 0,
+      "prompt": "Orion has 14 samples, Lyra has 17, and Draco has 9. Give only the total sample count.",
+      "expected": "40",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "40"
+            }
+          }
+        ],
+        "created": 1791311302,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 3,
+          "prompt_tokens": 40,
+          "total_tokens": 43,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-1n3JzL75p1X3wUjSBdYB4hSnEwP75Qgr",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 40,
+          "prompt_ms": 401.148,
+          "prompt_per_token_ms": 10.0287,
+          "prompt_per_second": 99.71382133277493,
+          "predicted_n": 3,
+          "predicted_ms": 64.099,
+          "predicted_per_token_ms": 32.0495,
+          "predicted_per_second": 31.201734816455794,
+          "draft_n": 2,
+          "draft_n_accepted": 2
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "extract-json",
+      "temperature": 0,
+      "prompt": "The city is Reno, the count is 37, and active is true. Return exactly one JSON object with keys city, count, active. No prose or Markdown.",
+      "expected": {
+        "city": "Reno",
+        "count": 37,
+        "active": true
+      },
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "{\"city\":\"Reno\",\"count\":37,\"active\":true}"
+            }
+          }
+        ],
+        "created": 1791311303,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 47,
+          "total_tokens": 63,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-9bYn0QEymg2llaHQ6kfnAEdtlwSDehOK",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 47,
+          "prompt_ms": 376.795,
+          "prompt_per_token_ms": 8.016914893617022,
+          "prompt_per_second": 124.73626242386443,
+          "predicted_n": 16,
+          "predicted_ms": 389.225,
+          "predicted_per_token_ms": 25.948333333333334,
+          "predicted_per_second": 38.53812062431756,
+          "draft_n": 12,
+          "draft_n_accepted": 9
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "sort-unique-json",
+      "temperature": 0,
+      "prompt": "Sort [9, 2, 9, 5, 2] numerically and remove duplicates. Reply only with a JSON array, without Markdown.",
+      "expected": [
+        2,
+        5,
+        9
+      ],
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "[2,5,9]"
+            }
+          }
+        ],
+        "created": 1791311303,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 8,
+          "prompt_tokens": 44,
+          "total_tokens": 52,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-0T7bZkpA9zC1j8rnAhHuzWz62OhUDrij",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 44,
+          "prompt_ms": 403.764,
+          "prompt_per_token_ms": 9.176454545454545,
+          "prompt_per_second": 108.97454948930564,
+          "predicted_n": 8,
+          "predicted_ms": 190.841,
+          "predicted_per_token_ms": 27.263,
+          "predicted_per_second": 36.679749110516084,
+          "draft_n": 6,
+          "draft_n_accepted": 4
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "updated-label",
+      "temperature": 0,
+      "prompt": "The old label was violet-730. It was replaced by blue-9173. Reply with only the current label.",
+      "expected": "blue-9173",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "blue-9173"
+            }
+          }
+        ],
+        "created": 1791311304,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 7,
+          "prompt_tokens": 40,
+          "total_tokens": 47,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-SusIvqNh8Xw3mHa4RgxQ57Ad0aNRMDU8",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 40,
+          "prompt_ms": 385.155,
+          "prompt_per_token_ms": 9.628874999999999,
+          "prompt_per_second": 103.8542924277239,
+          "predicted_n": 7,
+          "predicted_ms": 127.97,
+          "predicted_per_token_ms": 21.328333333333333,
+          "predicted_per_second": 46.88598890364929,
+          "draft_n": 4,
+          "draft_n_accepted": 4
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "ledger",
+      "temperature": 0,
+      "prompt": "Records: R07 label=cedar-18493; R19 label=violet-61052; R28 label=basil-27031. Give only the label for R19.",
+      "expected": "violet-61052",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "violet-61052"
+            }
+          }
+        ],
+        "created": 1791311305,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 9,
+          "prompt_tokens": 64,
+          "total_tokens": 73,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-3E5lzOfIAxeXVYCFCl0yJMIZRcCHONjj",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 64,
+          "prompt_ms": 413.527,
+          "prompt_per_token_ms": 6.461359375,
+          "prompt_per_second": 154.76619422673733,
+          "predicted_n": 9,
+          "predicted_ms": 186.446,
+          "predicted_per_token_ms": 23.30575,
+          "predicted_per_second": 42.90786608454995,
+          "draft_n": 6,
+          "draft_n_accepted": 6
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "python-function",
+      "temperature": 0,
+      "prompt": "Write a Python function named triple with one argument n that returns n multiplied by 3. Reply with only Python code, without Markdown fences.",
+      "expected": "triple(-4, 0, 7) == (-12, 0, 21)",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "def triple(n):\n    return n * 3"
+            }
+          }
+        ],
+        "created": 1791311305,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 12,
+          "prompt_tokens": 40,
+          "total_tokens": 52,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-csfG3E0nVfCCHoTP3UmaIDk9CVktUiKw",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 40,
+          "prompt_ms": 393.513,
+          "prompt_per_token_ms": 9.837824999999999,
+          "prompt_per_second": 101.64848429403858,
+          "predicted_n": 12,
+          "predicted_ms": 259.321,
+          "predicted_per_token_ms": 23.574636363636365,
+          "predicted_per_second": 42.418469772984054,
+          "draft_n": 8,
+          "draft_n_accepted": 8
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "chinese-multiply",
+      "temperature": 0,
+      "prompt": "17\u4e58\u4ee523\u662f\u591a\u5c11\uff1f\u53ea\u56de\u590d\u6570\u5b57\u3002",
+      "expected": "391",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "391"
+            }
+          }
+        ],
+        "created": 1791311306,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 4,
+          "prompt_tokens": 23,
+          "total_tokens": 27,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-BHXuPllBP4BowTZQp9kwgie7DSCLSkqC",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 23,
+          "prompt_ms": 290.817,
+          "prompt_per_token_ms": 12.644217391304348,
+          "prompt_per_second": 79.0875361481619,
+          "predicted_n": 4,
+          "predicted_ms": 64.016,
+          "predicted_per_token_ms": 21.33866666666667,
+          "predicted_per_second": 46.86328417895526,
+          "draft_n": 2,
+          "draft_n_accepted": 2
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "chinese-json",
+      "temperature": 0,
+      "prompt": "\u57ce\u5e02\u662f\u676d\u5dde\uff0c\u6570\u91cf\u662f37\u3002\u53ea\u8fd4\u56de\u4e00\u4e2aJSON\u5bf9\u8c61\uff0c\u952e\u4e3acity\u548ccount\uff0c\u4e0d\u8981\u89e3\u91ca\u3002\u4e0d\u8981\u4f7f\u7528Markdown\u6216\u4ee3\u7801\u5757\u3002",
+      "expected": {
+        "city": "\u676d\u5dde",
+        "count": 37
+      },
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "{\"city\":\"\u676d\u5dde\",\"count\":37}"
+            }
+          }
+        ],
+        "created": 1791311306,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 11,
+          "prompt_tokens": 43,
+          "total_tokens": 54,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-wxeaL89wgIw83Atyd60H7bnwjQlMA0lU",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 43,
+          "prompt_ms": 353.299,
+          "prompt_per_token_ms": 8.216255813953488,
+          "prompt_per_second": 121.70993973942751,
+          "predicted_n": 11,
+          "predicted_ms": 253.754,
+          "predicted_per_token_ms": 25.3754,
+          "predicted_per_second": 39.40824578134729,
+          "draft_n": 8,
+          "draft_n_accepted": 7
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "accented-label",
+      "temperature": 0,
+      "prompt": "Copy only this label exactly: caf\u00e9-4719. No quotes or explanation.",
+      "expected": "caf\u00e9-4719",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "caf\u00e9-4719"
+            }
+          }
+        ],
+        "created": 1791311307,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 8,
+          "prompt_tokens": 30,
+          "total_tokens": 38,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-0M7dTwghyg963g6eaS8wabPwnGiclrcH",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 30,
+          "prompt_ms": 615.596,
+          "prompt_per_token_ms": 20.519866666666665,
+          "prompt_per_second": 48.73326012514701,
+          "predicted_n": 8,
+          "predicted_ms": 283.449,
+          "predicted_per_token_ms": 40.492714285714285,
+          "predicted_per_second": 24.69580065549711,
+          "draft_n": 6,
+          "draft_n_accepted": 4
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "multiply",
+      "temperature": 0.6,
+      "prompt": "What is 17 multiplied by 23? Reply with only the number.",
+      "expected": "391",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "391"
+            }
+          }
+        ],
+        "created": 1791311308,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 4,
+          "prompt_tokens": 29,
+          "total_tokens": 33,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-58kWxh4N3jV2M5p4nBCk6BZLkOfhZxVr",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 29,
+          "prompt_ms": 384.256,
+          "prompt_per_token_ms": 13.250206896551724,
+          "prompt_per_second": 75.4705196535643,
+          "predicted_n": 4,
+          "predicted_ms": 70.995,
+          "predicted_per_token_ms": 23.665000000000003,
+          "predicted_per_second": 42.25649693640397,
+          "draft_n": 2,
+          "draft_n_accepted": 2
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "different-multiply",
+      "temperature": 0.6,
+      "prompt": "What is 53 multiplied by 19? Reply with only the number.",
+      "expected": "1007",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "1007"
+            }
+          }
+        ],
+        "created": 1791311308,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 5,
+          "prompt_tokens": 29,
+          "total_tokens": 34,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-clXjf9YrZ0jwQojzH3lhhImjb5ukLuWe",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 29,
+          "prompt_ms": 331.109,
+          "prompt_per_token_ms": 11.41755172413793,
+          "prompt_per_second": 87.58445104180196,
+          "predicted_n": 5,
+          "predicted_ms": 239.44,
+          "predicted_per_token_ms": 59.86,
+          "predicted_per_second": 16.70564650851988,
+          "draft_n": 4,
+          "draft_n_accepted": 2
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "sum",
+      "temperature": 0.6,
+      "prompt": "Orion has 14 samples, Lyra has 17, and Draco has 9. Give only the total sample count.",
+      "expected": "40",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "40"
+            }
+          }
+        ],
+        "created": 1791311309,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 3,
+          "prompt_tokens": 40,
+          "total_tokens": 43,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-85ORvgZmHqRK54aRH4FsrbvPjPtNlpkL",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 40,
+          "prompt_ms": 577.523,
+          "prompt_per_token_ms": 14.438075000000001,
+          "prompt_per_second": 69.26131080493764,
+          "predicted_n": 3,
+          "predicted_ms": 65.612,
+          "predicted_per_token_ms": 32.806,
+          "predicted_per_second": 30.48222886057429,
+          "draft_n": 2,
+          "draft_n_accepted": 2
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "extract-json",
+      "temperature": 0.6,
+      "prompt": "The city is Reno, the count is 37, and active is true. Return exactly one JSON object with keys city, count, active. No prose or Markdown.",
+      "expected": {
+        "city": "Reno",
+        "count": 37,
+        "active": true
+      },
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "{\"city\":\"Reno\",\"count\":37,\"active\":true}"
+            }
+          }
+        ],
+        "created": 1791311310,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 16,
+          "prompt_tokens": 47,
+          "total_tokens": 63,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-HQybGRDI14yc1QXCOtUtNHUtVtvuxy30",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 47,
+          "prompt_ms": 670.356,
+          "prompt_per_token_ms": 14.262893617021277,
+          "prompt_per_second": 70.11200019094332,
+          "predicted_n": 16,
+          "predicted_ms": 423.845,
+          "predicted_per_token_ms": 28.256333333333334,
+          "predicted_per_second": 35.39029598084205,
+          "draft_n": 12,
+          "draft_n_accepted": 9
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "sort-unique-json",
+      "temperature": 0.6,
+      "prompt": "Sort [9, 2, 9, 5, 2] numerically and remove duplicates. Reply only with a JSON array, without Markdown.",
+      "expected": [
+        2,
+        5,
+        9
+      ],
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "[2, 5, 9]"
+            }
+          }
+        ],
+        "created": 1791311311,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 10,
+          "prompt_tokens": 44,
+          "total_tokens": 54,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-baJtpUb9BdJbhodX6BQy3NqmobeImY7Q",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 44,
+          "prompt_ms": 630.356,
+          "prompt_per_token_ms": 14.326272727272727,
+          "prompt_per_second": 69.80182626960003,
+          "predicted_n": 10,
+          "predicted_ms": 222.26,
+          "predicted_per_token_ms": 24.695555555555554,
+          "predicted_per_second": 40.493116170251064,
+          "draft_n": 6,
+          "draft_n_accepted": 6
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "updated-label",
+      "temperature": 0.6,
+      "prompt": "The old label was violet-730. It was replaced by blue-9173. Reply with only the current label.",
+      "expected": "blue-9173",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "blue-9173"
+            }
+          }
+        ],
+        "created": 1791311311,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 7,
+          "prompt_tokens": 40,
+          "total_tokens": 47,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-Iaw0LZS4flfKSkdzokzfxr2o8UK9S4l9",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 40,
+          "prompt_ms": 599.651,
+          "prompt_per_token_ms": 14.991274999999998,
+          "prompt_per_second": 66.70546701331274,
+          "predicted_n": 7,
+          "predicted_ms": 129.421,
+          "predicted_per_token_ms": 21.570166666666665,
+          "predicted_per_second": 46.36032792205284,
+          "draft_n": 4,
+          "draft_n_accepted": 4
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "ledger",
+      "temperature": 0.6,
+      "prompt": "Records: R07 label=cedar-18493; R19 label=violet-61052; R28 label=basil-27031. Give only the label for R19.",
+      "expected": "violet-61052",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "violet-61052"
+            }
+          }
+        ],
+        "created": 1791311312,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 9,
+          "prompt_tokens": 64,
+          "total_tokens": 73,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-byffO39nwXzOaSk9LbLklB1wSo0kOUvF",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 64,
+          "prompt_ms": 601.999,
+          "prompt_per_token_ms": 9.406234375,
+          "prompt_per_second": 106.31246895758963,
+          "predicted_n": 9,
+          "predicted_ms": 202.287,
+          "predicted_per_token_ms": 25.285875,
+          "predicted_per_second": 39.54777123591728,
+          "draft_n": 6,
+          "draft_n_accepted": 6
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "python-function",
+      "temperature": 0.6,
+      "prompt": "Write a Python function named triple with one argument n that returns n multiplied by 3. Reply with only Python code, without Markdown fences.",
+      "expected": "triple(-4, 0, 7) == (-12, 0, 21)",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "def triple(n):\n    return n * 3"
+            }
+          }
+        ],
+        "created": 1791311313,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 12,
+          "prompt_tokens": 40,
+          "total_tokens": 52,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-nWas85BolomD3leN9IUFWWwb2UO6yJsX",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 40,
+          "prompt_ms": 543.702,
+          "prompt_per_token_ms": 13.59255,
+          "prompt_per_second": 73.56971282062601,
+          "predicted_n": 12,
+          "predicted_ms": 261.968,
+          "predicted_per_token_ms": 23.815272727272728,
+          "predicted_per_second": 41.98986135711232,
+          "draft_n": 8,
+          "draft_n_accepted": 8
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "chinese-multiply",
+      "temperature": 0.6,
+      "prompt": "17\u4e58\u4ee523\u662f\u591a\u5c11\uff1f\u53ea\u56de\u590d\u6570\u5b57\u3002",
+      "expected": "391",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "391"
+            }
+          }
+        ],
+        "created": 1791311313,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 4,
+          "prompt_tokens": 23,
+          "total_tokens": 27,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-HuzVN9TIMre0GsKrbpsU7PBTyAnaN6KE",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 23,
+          "prompt_ms": 313.271,
+          "prompt_per_token_ms": 13.620478260869566,
+          "prompt_per_second": 73.4188609861749,
+          "predicted_n": 4,
+          "predicted_ms": 64.995,
+          "predicted_per_token_ms": 21.665000000000003,
+          "predicted_per_second": 46.15739672282483,
+          "draft_n": 2,
+          "draft_n_accepted": 2
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "chinese-json",
+      "temperature": 0.6,
+      "prompt": "\u57ce\u5e02\u662f\u676d\u5dde\uff0c\u6570\u91cf\u662f37\u3002\u53ea\u8fd4\u56de\u4e00\u4e2aJSON\u5bf9\u8c61\uff0c\u952e\u4e3acity\u548ccount\uff0c\u4e0d\u8981\u89e3\u91ca\u3002\u4e0d\u8981\u4f7f\u7528Markdown\u6216\u4ee3\u7801\u5757\u3002",
+      "expected": {
+        "city": "\u676d\u5dde",
+        "count": 37
+      },
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "{\"city\":\"\u676d\u5dde\",\"count\":37}"
+            }
+          }
+        ],
+        "created": 1791311314,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 11,
+          "prompt_tokens": 43,
+          "total_tokens": 54,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-EZpcz7LMb5bdndJj2IAxqGOeIAMNge2a",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 43,
+          "prompt_ms": 446.789,
+          "prompt_per_token_ms": 10.390441860465115,
+          "prompt_per_second": 96.24229781843331,
+          "predicted_n": 11,
+          "predicted_ms": 257.993,
+          "predicted_per_token_ms": 25.7993,
+          "predicted_per_second": 38.760741570507726,
+          "draft_n": 8,
+          "draft_n_accepted": 7
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "accented-label",
+      "temperature": 0.6,
+      "prompt": "Copy only this label exactly: caf\u00e9-4719. No quotes or explanation.",
+      "expected": "caf\u00e9-4719",
+      "response": {
+        "choices": [
+          {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "caf\u00e9-4719"
+            }
+          }
+        ],
+        "created": 1791311315,
+        "model": "flash",
+        "system_fingerprint": "b1-d812350",
+        "object": "chat.completion",
+        "usage": {
+          "completion_tokens": 8,
+          "prompt_tokens": 30,
+          "total_tokens": 38,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "id": "chatcmpl-hPZtMyagJgBrLXIPJrdmI7pFzY67QmHI",
+        "timings": {
+          "cache_n": 0,
+          "prompt_n": 30,
+          "prompt_ms": 333.46,
+          "prompt_per_token_ms": 11.115333333333332,
+          "prompt_per_second": 89.9658129910634,
+          "predicted_n": 8,
+          "predicted_ms": 199.09,
+          "predicted_per_token_ms": 28.44142857142857,
+          "predicted_per_second": 35.15997789944246,
+          "draft_n": 6,
+          "draft_n_accepted": 4
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "cached-ledger",
+      "budget": 512,
+      "repeat": 0,
+      "passed": true,
+      "response": {
+        "ttft_s": 0.472895624996454,
+        "wall_s": 1.0394514169965987,
+        "native_timings": {
+          "cache_n": 503,
+          "prompt_n": 42,
+          "prompt_ms": 472.189,
+          "prompt_per_token_ms": 11.24259523809524,
+          "prompt_per_second": 88.9474341841932,
+          "predicted_n": 25,
+          "predicted_ms": 566.368,
+          "predicted_per_token_ms": 23.59866666666667,
+          "predicted_per_second": 42.37527543929035,
+          "draft_n": 16,
+          "draft_n_accepted": 16
+        },
+        "token_ids": [
+          1931,
+          277,
+          12,
+          16,
+          15,
+          16,
+          22,
+          17,
+          11,
+          76990,
+          12,
+          16,
+          15,
+          18,
+          23,
+          22,
+          11,
+          76990,
+          12,
+          16,
+          15,
+          22,
+          18,
+          16,
+          248046
+        ],
+        "text": "cedar-10172, violet-10387, violet-10731<|im_end|>",
+        "prompt_tokens": 545,
+        "prompt_sha256": "1399242c80e7dcd6a5d2e5b73b75f425800e825cada2081a4bb503fa0916ba5a"
+      }
+    },
+    {
+      "name": "cached-ledger",
+      "budget": 512,
+      "repeat": 1,
+      "passed": true,
+      "response": {
+        "ttft_s": 0.3928241249959683,
+        "wall_s": 0.9016887499965378,
+        "native_timings": {
+          "cache_n": 503,
+          "prompt_n": 42,
+          "prompt_ms": 392.274,
+          "prompt_per_token_ms": 9.339857142857143,
+          "prompt_per_second": 107.06801878278958,
+          "predicted_n": 25,
+          "predicted_ms": 508.621,
+          "predicted_per_token_ms": 21.192541666666667,
+          "predicted_per_second": 47.186411886257154,
+          "draft_n": 16,
+          "draft_n_accepted": 16
+        },
+        "token_ids": [
+          1931,
+          277,
+          12,
+          16,
+          15,
+          19,
+          23,
+          24,
+          11,
+          76990,
+          12,
+          16,
+          15,
+          22,
+          15,
+          19,
+          11,
+          76990,
+          12,
+          16,
+          16,
+          15,
+          19,
+          23,
+          248046
+        ],
+        "text": "cedar-10489, violet-10704, violet-11048<|im_end|>",
+        "prompt_tokens": 545,
+        "prompt_sha256": "fba6b31032ffbf16cbe5a4f1091abeb753f89077fe7c5c188629b87844727ef4"
+      }
+    },
+    {
+      "name": "cached-ledger",
+      "budget": 2048,
+      "repeat": 0,
+      "passed": true,
+      "response": {
+        "ttft_s": 0.4508167909953045,
+        "wall_s": 0.956138290996023,
+        "native_timings": {
+          "cache_n": 2027,
+          "prompt_n": 42,
+          "prompt_ms": 449.968,
+          "prompt_per_token_ms": 10.71352380952381,
+          "prompt_per_second": 93.339970842371,
+          "predicted_n": 24,
+          "predicted_ms": 505.163,
+          "predicted_per_token_ms": 21.963608695652173,
+          "predicted_per_second": 45.52985867927778,
+          "draft_n": 16,
+          "draft_n_accepted": 16
+        },
+        "token_ids": [
+          14778,
+          12,
+          16,
+          15,
+          23,
+          16,
+          22,
+          11,
+          65326,
+          12,
+          16,
+          16,
+          21,
+          22,
+          22,
+          11,
+          76990,
+          12,
+          16,
+          18,
+          18,
+          16,
+          16,
+          248046
+        ],
+        "text": "amber-10817, amber-11677, violet-13311<|im_end|>",
+        "prompt_tokens": 2069,
+        "prompt_sha256": "a2e7325157484a49aeadf8fb867fd86a953ddc5c3679b78370a5d80336e08c87"
+      }
+    },
+    {
+      "name": "cached-ledger",
+      "budget": 2048,
+      "repeat": 1,
+      "passed": true,
+      "response": {
+        "ttft_s": 0.4369130409977515,
+        "wall_s": 0.9443434159984463,
+        "native_timings": {
+          "cache_n": 2027,
+          "prompt_n": 42,
+          "prompt_ms": 436.244,
+          "prompt_per_token_ms": 10.386761904761906,
+          "prompt_per_second": 96.27639577850927,
+          "predicted_n": 24,
+          "predicted_ms": 507.284,
+          "predicted_per_token_ms": 22.05582608695652,
+          "predicted_per_second": 45.33949424779808,
+          "draft_n": 16,
+          "draft_n_accepted": 16
+        },
+        "token_ids": [
+          14778,
+          12,
+          16,
+          16,
+          16,
+          18,
+          19,
+          11,
+          65326,
+          12,
+          16,
+          16,
+          24,
+          24,
+          19,
+          11,
+          76990,
+          12,
+          16,
+          18,
+          21,
+          17,
+          23,
+          248046
+        ],
+        "text": "amber-11134, amber-11994, violet-13628<|im_end|>",
+        "prompt_tokens": 2069,
+        "prompt_sha256": "17c9817b792ddb1f6adaf1b9e2a9cc1cf13a8d3804d3bd09e0123f1aebad4be9"
+      }
+    }
+  ],
+  "selected_engine": {
+    "engine": "mtp-shared",
+    "directory": "vendor/llama-mtp-shared",
+    "revision": "d81235049384534c167caea52b85a694f6103d14",
+    "source_diff_sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a",
+    "patch": {
+      "schema": 1,
+      "id": "mtp-shared",
+      "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+      "directory": "vendor/llama-mtp-shared",
+      "patch": "patches/mtp-shared-weights.patch",
+      "patch_sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a",
+      "source_diff_sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a",
+      "modified_files": [
+        "src/llama-context.cpp",
+        "src/llama-cparams.h",
+        "src/models/qwen4exp.cpp"
+      ],
+      "upstream": {
+        "repository": "https://github.com/danielhanchen/llama.cpp",
+        "revision": "6fcaa16f4b360649933a54d1f91ad40ed35c0e11",
+        "branch": "qwen4exp/mtp",
+        "reference_path": "src/models/qwen4exp.cpp",
+        "license_file": "patches/LLAMA-LICENSE.txt"
+      },
+      "scope": "Optional token embeddings and output only for MTP-only GGUF. Borrow target tensors without taking ownership or sharing draft KV; target weights and graph remain unchanged. The borrowed LM head is Q5_K rather than the selected helper's Q3_K, so draft proposals can change."
+    },
+    "artifacts": {
+      "llama-server": "a241c2cf3b9cdf9b2a1e5aa0bd3fdb6786a813ecd8bbb590fd4b51c88f7386ec",
+      "libggml-base.0.26.0.dylib": "a5b908e38bbd6f8cc68e9594652afda94ce71fc9370e1e8bea9900342a601d84",
+      "libggml-base.0.dylib": "a5b908e38bbd6f8cc68e9594652afda94ce71fc9370e1e8bea9900342a601d84",
+      "libggml-base.dylib": "a5b908e38bbd6f8cc68e9594652afda94ce71fc9370e1e8bea9900342a601d84",
+      "libggml-blas.0.26.0.dylib": "553b78dd6e2f0bacf8167f56f80a413244ec982eae65f626bd385b8eebab4c19",
+      "libggml-blas.0.dylib": "553b78dd6e2f0bacf8167f56f80a413244ec982eae65f626bd385b8eebab4c19",
+      "libggml-blas.dylib": "553b78dd6e2f0bacf8167f56f80a413244ec982eae65f626bd385b8eebab4c19",
+      "libggml-cpu.0.26.0.dylib": "9098cbf453b18f9bf5369f05da7931fdc8ca042b473cee900d2ae9ced81de10f",
+      "libggml-cpu.0.dylib": "9098cbf453b18f9bf5369f05da7931fdc8ca042b473cee900d2ae9ced81de10f",
+      "libggml-cpu.dylib": "9098cbf453b18f9bf5369f05da7931fdc8ca042b473cee900d2ae9ced81de10f",
+      "libggml-metal.0.26.0.dylib": "41541c732b1fe0f4df1c4275aa932f836bd274a9541da6d30e5009a740f14c83",
+      "libggml-metal.0.dylib": "41541c732b1fe0f4df1c4275aa932f836bd274a9541da6d30e5009a740f14c83",
+      "libggml-metal.dylib": "41541c732b1fe0f4df1c4275aa932f836bd274a9541da6d30e5009a740f14c83",
+      "libggml.0.26.0.dylib": "9a6c38510dbc9dcb2e23156583ef9705971bd8c1b9c8d441eb1eb0d77390c760",
+      "libggml.0.dylib": "9a6c38510dbc9dcb2e23156583ef9705971bd8c1b9c8d441eb1eb0d77390c760",
+      "libggml.dylib": "9a6c38510dbc9dcb2e23156583ef9705971bd8c1b9c8d441eb1eb0d77390c760",
+      "libllama-common.0.6.0.dylib": "086781c4d07fb3f7321a13db98d5c934053b0aaea2be0942a2928d17ed10e8d5",
+      "libllama-common.0.dylib": "086781c4d07fb3f7321a13db98d5c934053b0aaea2be0942a2928d17ed10e8d5",
+      "libllama-common.dylib": "086781c4d07fb3f7321a13db98d5c934053b0aaea2be0942a2928d17ed10e8d5",
+      "libllama-server-impl.dylib": "f3ccda162076f71a09103eb4ca107d766b0c4cab4984ac72a66add5cb7fc56f4",
+      "libllama.0.6.0.dylib": "b96a4d4ebffb0b007945bd2aab5dccf720a0013f27044b5c366ef30a1c9a5a45",
+      "libllama.0.dylib": "b96a4d4ebffb0b007945bd2aab5dccf720a0013f27044b5c366ef30a1c9a5a45",
+      "libllama.dylib": "b96a4d4ebffb0b007945bd2aab5dccf720a0013f27044b5c366ef30a1c9a5a45",
+      "libmtmd.0.6.0.dylib": "c48b139e99b9908d791aab923387ea8cd2bbc90dac6f19d37e1eaa3dad366779",
+      "libmtmd.0.dylib": "c48b139e99b9908d791aab923387ea8cd2bbc90dac6f19d37e1eaa3dad366779",
+      "libmtmd.dylib": "c48b139e99b9908d791aab923387ea8cd2bbc90dac6f19d37e1eaa3dad366779"
+    },
+    "build_receipt": {
+      "engine": "mtp-shared",
+      "directory": "vendor/llama-mtp-shared",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a",
+      "patch": {
+        "schema": 1,
+        "id": "mtp-shared",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-mtp-shared",
+        "patch": "patches/mtp-shared-weights.patch",
+        "patch_sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a",
+        "source_diff_sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a",
+        "modified_files": [
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp"
+        ],
+        "upstream": {
+          "repository": "https://github.com/danielhanchen/llama.cpp",
+          "revision": "6fcaa16f4b360649933a54d1f91ad40ed35c0e11",
+          "branch": "qwen4exp/mtp",
+          "reference_path": "src/models/qwen4exp.cpp",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        },
+        "scope": "Optional token embeddings and output only for MTP-only GGUF. Borrow target tensors without taking ownership or sharing draft KV; target weights and graph remain unchanged. The borrowed LM head is Q5_K rather than the selected helper's Q3_K, so draft proposals can change."
+      },
+      "artifacts": {
+        "llama-server": "a241c2cf3b9cdf9b2a1e5aa0bd3fdb6786a813ecd8bbb590fd4b51c88f7386ec",
+        "libggml-base.0.26.0.dylib": "a5b908e38bbd6f8cc68e9594652afda94ce71fc9370e1e8bea9900342a601d84",
+        "libggml-base.0.dylib": "a5b908e38bbd6f8cc68e9594652afda94ce71fc9370e1e8bea9900342a601d84",
+        "libggml-base.dylib": "a5b908e38bbd6f8cc68e9594652afda94ce71fc9370e1e8bea9900342a601d84",
+        "libggml-blas.0.26.0.dylib": "553b78dd6e2f0bacf8167f56f80a413244ec982eae65f626bd385b8eebab4c19",
+        "libggml-blas.0.dylib": "553b78dd6e2f0bacf8167f56f80a413244ec982eae65f626bd385b8eebab4c19",
+        "libggml-blas.dylib": "553b78dd6e2f0bacf8167f56f80a413244ec982eae65f626bd385b8eebab4c19",
+        "libggml-cpu.0.26.0.dylib": "9098cbf453b18f9bf5369f05da7931fdc8ca042b473cee900d2ae9ced81de10f",
+        "libggml-cpu.0.dylib": "9098cbf453b18f9bf5369f05da7931fdc8ca042b473cee900d2ae9ced81de10f",
+        "libggml-cpu.dylib": "9098cbf453b18f9bf5369f05da7931fdc8ca042b473cee900d2ae9ced81de10f",
+        "libggml-metal.0.26.0.dylib": "41541c732b1fe0f4df1c4275aa932f836bd274a9541da6d30e5009a740f14c83",
+        "libggml-metal.0.dylib": "41541c732b1fe0f4df1c4275aa932f836bd274a9541da6d30e5009a740f14c83",
+        "libggml-metal.dylib": "41541c732b1fe0f4df1c4275aa932f836bd274a9541da6d30e5009a740f14c83",
+        "libggml.0.26.0.dylib": "9a6c38510dbc9dcb2e23156583ef9705971bd8c1b9c8d441eb1eb0d77390c760",
+        "libggml.0.dylib": "9a6c38510dbc9dcb2e23156583ef9705971bd8c1b9c8d441eb1eb0d77390c760",
+        "libggml.dylib": "9a6c38510dbc9dcb2e23156583ef9705971bd8c1b9c8d441eb1eb0d77390c760",
+        "libllama-common.0.6.0.dylib": "086781c4d07fb3f7321a13db98d5c934053b0aaea2be0942a2928d17ed10e8d5",
+        "libllama-common.0.dylib": "086781c4d07fb3f7321a13db98d5c934053b0aaea2be0942a2928d17ed10e8d5",
+        "libllama-common.dylib": "086781c4d07fb3f7321a13db98d5c934053b0aaea2be0942a2928d17ed10e8d5",
+        "libllama-server-impl.dylib": "f3ccda162076f71a09103eb4ca107d766b0c4cab4984ac72a66add5cb7fc56f4",
+        "libllama.0.6.0.dylib": "b96a4d4ebffb0b007945bd2aab5dccf720a0013f27044b5c366ef30a1c9a5a45",
+        "libllama.0.dylib": "b96a4d4ebffb0b007945bd2aab5dccf720a0013f27044b5c366ef30a1c9a5a45",
+        "libllama.dylib": "b96a4d4ebffb0b007945bd2aab5dccf720a0013f27044b5c366ef30a1c9a5a45",
+        "libmtmd.0.6.0.dylib": "c48b139e99b9908d791aab923387ea8cd2bbc90dac6f19d37e1eaa3dad366779",
+        "libmtmd.0.dylib": "c48b139e99b9908d791aab923387ea8cd2bbc90dac6f19d37e1eaa3dad366779",
+        "libmtmd.dylib": "c48b139e99b9908d791aab923387ea8cd2bbc90dac6f19d37e1eaa3dad366779"
+      },
+      "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+      "build_settings": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GGML_BLAS": "ON",
+        "GGML_CPU": "ON",
+        "GGML_METAL": "ON",
+        "GGML_METAL_EMBED_LIBRARY": "ON",
+        "GGML_NATIVE": "ON",
+        "LLAMA_BUILD_TESTS": "OFF",
+        "LLAMA_BUILD_TOOLS": "ON"
+      },
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+    }
+  },
+  "draft_vocabulary": null,
+  "method": "Single slot, full Metal offload, fixed seed 1234; sampling temperature is recorded in settings. Exact synthetic chat prompt sizes and fixed output count from settings; no prompt reuse; ignore EOS for timing only. No model downloads during a run. Warm OS file cache is uncontrolled. TTFT includes HTTP and prompt evaluation. Correctness checks use normal EOS handling.",
+  "actual_sources": {
+    "llama_cpp": {
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "dirty": ""
+    },
+    "strata_macos": {
+      "revision": "2cc4153409edb3f859187bdf10f13e34972d6ffb",
+      "dirty": ""
+    }
+  },
+  "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+  "draft_model": {
+    "derived": {
+      "source_model": "mtp_q3",
+      "source_sha256": "717e861aae936ebaa92fd3fb8b10df6d27f919432d4b4109b94b7732228ff728",
+      "removed_tensors": [
+        "output.weight",
+        "token_embd.weight"
+      ],
+      "required_engine": "mtp-shared",
+      "receipt": "bench/results/20261006T182700Z-prepare-mtp-shared/preparation.json"
+    },
+    "files": [
+      {
+        "path": "mtp-Qwen3.8-Flash-Next-Q3_K_S-shared.gguf",
+        "size_bytes": 1251560832,
+        "sha256": "6b8a04dfd4c60e1bde4b25de96f0d7b0a9a39c2b90cba43e27e199c2d839713d"
+      }
+    ]
+  },
+  "ready_s": 8.409499082998082,
+  "props": {
+    "default_generation_settings": {
+      "params": {
+        "seed": 4294967295,
+        "temperature": 1.0,
+        "dynatemp_range": 0.0,
+        "dynatemp_exponent": 1.0,
+        "top_k": 20,
+        "top_p": 0.949999988079071,
+        "min_p": 0.05000000074505806,
+        "top_n_sigma": -1.0,
+        "xtc_probability": 0.0,
+        "xtc_threshold": 0.10000000149011612,
+        "typical_p": 1.0,
+        "repeat_last_n": 64,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 0.0,
+        "frequency_penalty": 0.0,
+        "dry_multiplier": 0.0,
+        "dry_base": 1.75,
+        "dry_allowed_length": 2,
+        "dry_penalty_last_n": 64,
+        "mirostat": 0,
+        "mirostat_tau": 5.0,
+        "mirostat_eta": 0.10000000149011612,
+        "adaptive_target": -1.0,
+        "adaptive_decay": 0.8999999761581421,
+        "max_tokens": -1,
+        "n_predict": -1,
+        "n_keep": 0,
+        "n_discard": 0,
+        "ignore_eos": false,
+        "stream": false,
+        "n_probs": 0,
+        "min_keep": 0,
+        "chat_format": "Content-only",
+        "reasoning_format": "none",
+        "reasoning_in_content": false,
+        "generation_prompt": "",
+        "samplers": [
+          "penalties",
+          "dry",
+          "top_n_sigma",
+          "top_k",
+          "typ_p",
+          "top_p",
+          "min_p",
+          "xtc",
+          "temperature"
+        ],
+        "speculative.types": "none",
+        "timings_per_token": false,
+        "post_sampling_probs": false,
+        "backend_sampling": false,
+        "lora": []
+      },
+      "n_ctx": 4096
+    },
+    "total_slots": 1,
+    "model_alias": "flash",
+    "model_ftype": "Q2_0",
+    "model_path": "/Users/justin/Documents/Github/Strata-Mac-Lab/models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+    "modalities": {
+      "vision": false,
+      "video": false,
+      "audio": false
+    },
+    "media_marker": "<__media_yxKKlcmcr4O1uhOdqXINDYMs2GoF6jnv__>",
+    "endpoint_slots": true,
+    "endpoint_props": false,
+    "endpoint_metrics": true,
+    "ui": false,
+    "ui_settings": {},
+    "chat_template": "{%- set image_count = namespace(value=0) %}\n{%- set video_count = namespace(value=0) %}\n{%- macro render_content(content, do_vision_count, is_system_content=false) %}\n    {%- if content is string %}\n        {{- content }}\n    {%- elif content is iterable and content is not mapping %}\n        {%- for item in content %}\n            {%- if 'image' in item or 'image_url' in item or item.type == 'image' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain images.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set image_count.value = image_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Picture ' ~ image_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '<|vision_start|><|image_pad|><|vision_end|>' }}\n            {%- elif 'video' in item or item.type == 'video' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain videos.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set video_count.value = video_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Video ' ~ video_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '<|vision_start|><|video_pad|><|vision_end|>' }}\n            {%- elif 'text' in item %}\n                {{- item.text }}\n            {%- else %}\n                {{- raise_exception('Unexpected item type in content.') }}\n            {%- endif %}\n        {%- endfor %}\n    {%- elif content is none or content is undefined %}\n        {{- '' }}\n    {%- else %}\n        {{- raise_exception('Unexpected content type.') }}\n    {%- endif %}\n{%- endmacro %}\n{%- if not messages %}\n    {{- raise_exception('No messages provided.') }}\n{%- endif %}\n{%- set sysns = namespace(count=0, text='') %}\n{%- for message in messages %}\n    {%- if sysns.count == loop.index0 and (message.role == 'system' or message.role == 'developer') %}\n        {%- set sys_content = render_content(message.content, false, true)|trim %}\n        {%- if sys_content %}\n            {%- set sysns.text = sysns.text + ('\\n' if sysns.text else '') + sys_content %}\n        {%- endif %}\n        {%- set sysns.count = sysns.count + 1 %}\n    {%- endif %}\n{%- endfor %}\n{%- set num_sys = sysns.count %}\n{%- set merged_system = sysns.text %}\n{%- set reasoning_instructions = '' %}\n{%- if enable_thinking is undefined or enable_thinking is true %}\n    {%- set resolved_reasoning_effort = reasoning_effort|default('xhigh') %}\n    {%- if resolved_reasoning_effort == 'high' %}\n        {%- set resolved_reasoning_effort = 'xhigh' %}\n    {%- endif %}\n    {%- if resolved_reasoning_effort not in ('xhigh', 'medium', 'low') %}\n        {{- raise_exception('Unexpected reasoning effort ' ~ reasoning_effort ~ '. Supported types are xhigh (default), medium, and low.') }}\n    {%- endif %}\n    {%- if resolved_reasoning_effort == 'xhigh' %}\n        {%- set reasoning_instructions = 'Reasoning effort is set to xhigh. Please think carefully through the task, validate key assumptions, consider plausible alternatives, and prioritize correctness, consistency, and clarity in the final answer.' %}\n    {%- elif resolved_reasoning_effort == 'low' %}\n        {%- set reasoning_instructions = 'Reasoning effort is set to low. Keep your thinking brief and focused, moving directly to the conclusion without unnecessary elaboration.' %}\n    {%- endif %}\n{%- endif %}\n{%- if tools and tools is iterable and tools is not mapping %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if reasoning_instructions %}\n        {{- reasoning_instructions + '\\n\\n' }}\n    {%- endif %}\n    {{- \"# Tools\\n\\nYou have access to the following functions:\\n\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\" }}\n    {{- '\\n\\nIf you choose to call a function ONLY reply in the following format with NO suffix:\\n\\n<tool_call>\\n<function=example_function_name>\\n<parameter=example_parameter_1>\\nvalue_1\\n</parameter>\\n<parameter=example_parameter_2>\\nThis is the value for the second parameter\\nthat can span\\nmultiple lines\\n</parameter>\\n</function>\\n</tool_call>\\n\\n<IMPORTANT>\\nReminder:\\n- Function calls MUST follow the specified format: an inner <function=...></function> block must be nested within <tool_call></tool_call> XML tags\\n- Required parameters MUST be specified\\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\\n</IMPORTANT>' }}\n    {%- if merged_system %}\n        {{- '\\n\\n' + merged_system }}\n    {%- endif %}\n    {{- '<|im_end|>\\n' }}\n{%- else %}\n    {%- if merged_system %}\n        {{- '<|im_start|>system\\n' + (reasoning_instructions + '\\n\\n' if reasoning_instructions else '')  + merged_system + '<|im_end|>\\n' }}\n    {%- elif reasoning_instructions %}\n        {{- '<|im_start|>system\\n' + reasoning_instructions + '<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" %}\n        {%- set content = render_content(message.content, false)|trim %}\n        {%- if not(content.startswith('<tool_response>') and content.endswith('</tool_response>')) %}\n            {%- set ns.multi_step_tool = false %}\n            {%- set ns.last_query_index = index %}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if loop.index0 >= num_sys %}\n    {%- set content = render_content(message.content, true)|trim %}\n    {%- if message.role == \"system\" or message.role == \"developer\" %}\n        {{- raise_exception('System message must be at the beginning.') }}\n    {%- elif message.role == \"user\" %}\n        {{- '<|im_start|>' + message.role + '\\n' + content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is string %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- endif %}\n        {%- set reasoning_content = reasoning_content|trim %}\n        {%- if preserve_thinking is undefined or preserve_thinking is true or loop.index0 > ns.last_query_index %}\n            {{- '<|im_start|>' + message.role + '\\n<think>\\n' + reasoning_content + '\\n</think>\\n\\n' + content }}\n        {%- else %}\n            {{- '<|im_start|>' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls and message.tool_calls is iterable and message.tool_calls is not mapping %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if tool_call.function is defined %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {%- if tool_call.name is not defined or tool_call.name is none %}\n                    {{- raise_exception('Tool call is missing a function name.') }}\n                {%- endif %}\n                {%- if loop.first %}\n                    {%- if content|trim %}\n                        {{- '\\n\\n<tool_call>\\n<function=' + tool_call.name + '>\\n' }}\n                    {%- else %}\n                        {{- '<tool_call>\\n<function=' + tool_call.name + '>\\n' }}\n                    {%- endif %}\n                {%- else %}\n                    {{- '\\n<tool_call>\\n<function=' + tool_call.name + '>\\n' }}\n                {%- endif %}\n                {%- if tool_call.arguments is mapping %}\n                    {%- for args_name, args_value in tool_call.arguments|items %}\n                        {{- '<parameter=' + args_name + '>\\n' }}\n                        {%- set args_value = args_value | string if args_value is string else args_value | tojson | safe %}\n                        {{- args_value }}\n                        {{- '\\n</parameter>\\n' }}\n                    {%- endfor %}\n                {%- elif tool_call.arguments is string %}\n                    {%- if tool_call.arguments|trim %}\n                        {{- raise_exception('Tool call arguments for function \"' + (tool_call.name | string) + '\" were passed as a JSON string. Parse them into an object before calling apply_chat_template.') }}\n                    {%- endif %}\n                {%- elif tool_call.arguments is defined and tool_call.arguments is not none %}\n                    {{- raise_exception('Tool call arguments for function \"' + (tool_call.name | string) + '\" must be an object/mapping or a JSON string.') }}\n                {%- endif %}\n                {{- '</function>\\n</tool_call>' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.previtem and loop.previtem.role != \"tool\" %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- content }}\n        {{- '\\n</tool_response>' }}\n        {%- if not loop.last and loop.nextitem.role != \"tool\" %}\n            {{- '<|im_end|>\\n' }}\n        {%- elif loop.last %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- else %}\n        {{- raise_exception('Unexpected message role.') }}\n    {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '<think>\\n\\n</think>\\n\\n' }}\n    {%- else %}\n        {{- '<think>\\n' }}\n    {%- endif %}\n{%- endif %}\n{#- Unsloth fixes - developer role, merged system messages, tool calling #}",
+    "chat_template_caps": {
+      "supports_object_arguments": true,
+      "supports_parallel_tool_calls": true,
+      "supports_preserve_reasoning": true,
+      "supports_reasoning_effort": true,
+      "supports_string_content": true,
+      "supports_system_role": true,
+      "supports_tool_calls": true,
+      "supports_tools": true,
+      "supports_typed_content": true
+    },
+    "bos_token": "<|endoftext|>",
+    "eos_token": "<|im_end|>",
+    "build_info": "b1-d812350",
+    "is_sleeping": false,
+    "cors_proxy_enabled": false
+  },
+  "cached_cases": [
+    {
+      "history_budget": 512,
+      "repeat": 0,
+      "warmup": true,
+      "expected": [
+        "cedar-10172",
+        "violet-10387",
+        "violet-10731"
+      ],
+      "ttft_s": 0.472895624996454,
+      "wall_s": 1.0394514169965987,
+      "native_timings": {
+        "cache_n": 503,
+        "prompt_n": 42,
+        "prompt_ms": 472.189,
+        "prompt_per_token_ms": 11.24259523809524,
+        "prompt_per_second": 88.9474341841932,
+        "predicted_n": 25,
+        "predicted_ms": 566.368,
+        "predicted_per_token_ms": 23.59866666666667,
+        "predicted_per_second": 42.37527543929035,
+        "draft_n": 16,
+        "draft_n_accepted": 16
+      },
+      "token_ids": [
+        1931,
+        277,
+        12,
+        16,
+        15,
+        16,
+        22,
+        17,
+        11,
+        76990,
+        12,
+        16,
+        15,
+        18,
+        23,
+        22,
+        11,
+        76990,
+        12,
+        16,
+        15,
+        22,
+        18,
+        16,
+        248046
+      ],
+      "text": "cedar-10172, violet-10387, violet-10731<|im_end|>",
+      "prompt_tokens": 545,
+      "prompt_sha256": "1399242c80e7dcd6a5d2e5b73b75f425800e825cada2081a4bb503fa0916ba5a"
+    },
+    {
+      "history_budget": 512,
+      "repeat": 1,
+      "warmup": false,
+      "expected": [
+        "cedar-10489",
+        "violet-10704",
+        "violet-11048"
+      ],
+      "ttft_s": 0.3928241249959683,
+      "wall_s": 0.9016887499965378,
+      "native_timings": {
+        "cache_n": 503,
+        "prompt_n": 42,
+        "prompt_ms": 392.274,
+        "prompt_per_token_ms": 9.339857142857143,
+        "prompt_per_second": 107.06801878278958,
+        "predicted_n": 25,
+        "predicted_ms": 508.621,
+        "predicted_per_token_ms": 21.192541666666667,
+        "predicted_per_second": 47.186411886257154,
+        "draft_n": 16,
+        "draft_n_accepted": 16
+      },
+      "token_ids": [
+        1931,
+        277,
+        12,
+        16,
+        15,
+        19,
+        23,
+        24,
+        11,
+        76990,
+        12,
+        16,
+        15,
+        22,
+        15,
+        19,
+        11,
+        76990,
+        12,
+        16,
+        16,
+        15,
+        19,
+        23,
+        248046
+      ],
+      "text": "cedar-10489, violet-10704, violet-11048<|im_end|>",
+      "prompt_tokens": 545,
+      "prompt_sha256": "fba6b31032ffbf16cbe5a4f1091abeb753f89077fe7c5c188629b87844727ef4"
+    },
+    {
+      "history_budget": 2048,
+      "repeat": 0,
+      "warmup": true,
+      "expected": [
+        "amber-10817",
+        "amber-11677",
+        "violet-13311"
+      ],
+      "ttft_s": 0.4508167909953045,
+      "wall_s": 0.956138290996023,
+      "native_timings": {
+        "cache_n": 2027,
+        "prompt_n": 42,
+        "prompt_ms": 449.968,
+        "prompt_per_token_ms": 10.71352380952381,
+        "prompt_per_second": 93.339970842371,
+        "predicted_n": 24,
+        "predicted_ms": 505.163,
+        "predicted_per_token_ms": 21.963608695652173,
+        "predicted_per_second": 45.52985867927778,
+        "draft_n": 16,
+        "draft_n_accepted": 16
+      },
+      "token_ids": [
+        14778,
+        12,
+        16,
+        15,
+        23,
+        16,
+        22,
+        11,
+        65326,
+        12,
+        16,
+        16,
+        21,
+        22,
+        22,
+        11,
+        76990,
+        12,
+        16,
+        18,
+        18,
+        16,
+        16,
+        248046
+      ],
+      "text": "amber-10817, amber-11677, violet-13311<|im_end|>",
+      "prompt_tokens": 2069,
+      "prompt_sha256": "a2e7325157484a49aeadf8fb867fd86a953ddc5c3679b78370a5d80336e08c87"
+    },
+    {
+      "history_budget": 2048,
+      "repeat": 1,
+      "warmup": false,
+      "expected": [
+        "amber-11134",
+        "amber-11994",
+        "violet-13628"
+      ],
+      "ttft_s": 0.4369130409977515,
+      "wall_s": 0.9443434159984463,
+      "native_timings": {
+        "cache_n": 2027,
+        "prompt_n": 42,
+        "prompt_ms": 436.244,
+        "prompt_per_token_ms": 10.386761904761906,
+        "prompt_per_second": 96.27639577850927,
+        "predicted_n": 24,
+        "predicted_ms": 507.284,
+        "predicted_per_token_ms": 22.05582608695652,
+        "predicted_per_second": 45.33949424779808,
+        "draft_n": 16,
+        "draft_n_accepted": 16
+      },
+      "token_ids": [
+        14778,
+        12,
+        16,
+        16,
+        16,
+        18,
+        19,
+        11,
+        65326,
+        12,
+        16,
+        16,
+        24,
+        24,
+        19,
+        11,
+        76990,
+        12,
+        16,
+        18,
+        21,
+        17,
+        23,
+        248046
+      ],
+      "text": "amber-11134, amber-11994, violet-13628<|im_end|>",
+      "prompt_tokens": 2069,
+      "prompt_sha256": "17c9817b792ddb1f6adaf1b9e2a9cc1cf13a8d3804d3bd09e0123f1aebad4be9"
+    }
+  ],
+  "run_wall_s": 56.65349499999866,
+  "memory": {
+    "guard": null,
+    "peak_rss_bytes": 33514635264,
+    "minimum_available_bytes": 1657290752,
+    "peak_swap_bytes": 1466957824,
+    "swap_growth_bytes": 54394880,
+    "system_disk_read_bytes": 29473697792,
+    "sampling_interval_s": 0.25,
+    "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+  },
+  "host_after": {
+    "os": "macOS-27.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "chip": "Apple M5 Pro",
+    "ram_bytes": 51539607552,
+    "cpu_count": 18,
+    "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=36831331)\t80%; AC attached; not charging present: true",
+    "power_settings": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n womp                 0\n displaysleep         10\n networkoversleep     0\n sleep                1\n lessbright           0\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                0\n tcpkeepalive         1\n disksleep            10",
+    "thermal_status": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+    "gpu_wired_limit": "iogpu.wired_limit_mb: 0",
+    "vm_stat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                   118885.\nPages active:                                 175491.\nPages inactive:                              1030240.\nPages speculative:                              4793.\nPages throttled:                                   0.\nPages wired down:                            1629805.\nPages purgeable:                               15616.\n\"Translation faults\":                      751823874.\nPages copy-on-write:                        29217387.\nPages zero filled:                         532172442.\nPages reactivated:                          50676509.\nPages purged:                               12226550.\nFile-backed pages:                           1069667.\nAnonymous pages:                              140857.\nPages stored in compressor:                   251165.\nPages occupied by compressor:                 126009.\nDecompressions:                             36533105.\nCompressions:                               43842809.\nPageins:                                    61885490.\nPageouts:                                      73266.\nSwapins:                                      173515.\nSwapouts:                                     370391.\nPages tagged:                                 109503.\nPages tagged resident:                         86308.\nPages tagged compressed:                       23195.\nPages tag-storage:                             98304.\nPages tag-storage holding tags:                 7502.\nPages tag-storage free:                        12766.\nPages tag-storage non-tag pageable:            75667.\nPages tag-storage non-tag wired:                   8.\nBytes of compressed tags:                    3778880.\nTagged compressions:                         1248670.\nTagged decompressions:                       1115643.",
+    "swap": {
+      "total": 2147483648,
+      "used": 1458569216,
+      "free": 688914432,
+      "percent": 67.9,
+      "sin": 1013931868160,
+      "sout": 1200390144
+    },
+    "available_bytes": 18974441472
+  },
+  "summary": [
+    {
+      "workload": "chinese",
+      "prompt_tokens": 56,
+      "median_generation_tok_s": 32.515994772666744,
+      "median_ttft_s": 0.5382193330005975,
+      "median_prompt_tok_s": 104.139740654853
+    },
+    {
+      "workload": "code",
+      "prompt_tokens": 48,
+      "median_generation_tok_s": 39.693965824125485,
+      "median_ttft_s": 0.5505599579992122,
+      "median_prompt_tok_s": 87.38664768434487
+    },
+    {
+      "workload": "prose",
+      "prompt_tokens": 53,
+      "median_generation_tok_s": 36.461181863166395,
+      "median_ttft_s": 0.7677324999967823,
+      "median_prompt_tok_s": 69.13265905076946
+    },
+    {
+      "workload": "synthetic",
+      "prompt_tokens": 512,
+      "median_generation_tok_s": 36.35027121341244,
+      "median_ttft_s": 1.343609750001633,
+      "median_prompt_tok_s": 381.3286024753589
+    },
+    {
+      "workload": "synthetic",
+      "prompt_tokens": 2048,
+      "median_generation_tok_s": 35.80782452119823,
+      "median_ttft_s": 4.572280500004126,
+      "median_prompt_tok_s": 448.02720365177174
+    }
+  ]
+}

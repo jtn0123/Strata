@@ -18,7 +18,7 @@ def check_triple(content):
     assert [scope["triple"](n) for n in [-4, 0, 7]] == [-12, 0, 21]
 
 
-def run_answer_checks(base, model):
+def run_answer_checks(base, model, multilingual=False):
     cases = [
         ("multiply", "What is 17 multiplied by 23? Reply with only the number.", "391", "text"),
         ("different-multiply", "What is 53 multiplied by 19? Reply with only the number.", "1007", "text"),
@@ -29,6 +29,13 @@ def run_answer_checks(base, model):
         ("ledger", "Records: R07 label=cedar-18493; R19 label=violet-61052; R28 label=basil-27031. Give only the label for R19.", "violet-61052", "text"),
         ("python-function", "Write a Python function named triple with one argument n that returns n multiplied by 3. Reply with only Python code, without Markdown fences.", "triple(-4, 0, 7) == (-12, 0, 21)", "code"),
     ]
+    if multilingual:
+        cases.extend([
+            ("chinese-multiply", "17乘以23是多少？只回复数字。", "391", "text"),
+            ("chinese-json", '城市是杭州，数量是37。只返回一个JSON对象，键为city和count，不要解释。不要使用Markdown或代码块。',
+             {"city": "杭州", "count": 37}, "json"),
+            ("accented-label", 'Copy only this label exactly: café-4719. No quotes or explanation.', "café-4719", "text"),
+        ])
     checks = []
     for temperature in [0, 0.6]:
         for name, prompt, expected, kind in cases:
