@@ -79,9 +79,8 @@ def main():
         ap.error("Use at least one repeat and history budgets between 128 and 3000")
     with (ROOT / "bench/.lock").open("w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        binary = str(ROOT / "vendor/llama.cpp/build/bin/llama-server")
-        if any(p.info["exe"] == binary for p in psutil.process_iter(["exe"])):
-            raise RuntimeError("Stop the running lab model before benchmarking; run Stop Strata.command first")
+        from check_memory import assert_no_model_server
+        assert_no_model_server()
         run(args)
 
 

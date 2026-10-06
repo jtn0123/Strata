@@ -13,11 +13,14 @@ import psutil
 
 from benchmark import Monitor, wait_ready
 from lab import ROOT, server_command
+from engines import ENGINES, verify_engine
+from check_memory import assert_no_model_server
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("model", choices=["small", "flash"], nargs="?", default="flash")
+    ap.add_argument("--engine", choices=ENGINES, default="baseline")
     ap.add_argument("--port", type=int, default=8095)
     ap.add_argument("--native-port", type=int, default=8096)
     ap.add_argument("--context", type=int, default=4096)
@@ -29,6 +32,8 @@ def main():
     ap.add_argument("--draft-model", default="mtp")
     ap.add_argument("--prompt-cache", action=argparse.BooleanOptionalAction, default=True)
     args = ap.parse_args()
+    assert_no_model_server()
+    engine_info = verify_engine(args.engine, require_receipt=(args.engine != "baseline"))
     def interrupted(signum, frame):
         raise KeyboardInterrupt
     signal.signal(signal.SIGTERM, interrupted)
@@ -40,7 +45,7 @@ def main():
     folder.mkdir(parents=True)
     active_path = ROOT / "bench/runtime/active.json"
     active_path.write_text(json.dumps({"pid": os.getpid(), "create_time": psutil.Process().create_time(),
-                           "model": args.model, "port": args.port, "native_port": args.native_port,
+                           "model": args.model, "engine": args.engine, "port": args.port, "native_port": args.native_port,
                            "log_directory": str(folder)}, indent=2) + "\n")
     config = {"native_url": f"http://127.0.0.1:{args.native_port}", "model_name": args.model,
               "host": "127.0.0.1", "fit_max_tokens": True, "prompt_cache": args.prompt_cache}
@@ -51,8 +56,10 @@ def main():
         try:
             command = server_command(args.model, args.native_port, args.context, ubatch=args.ubatch,
                                      cache_type=args.cache_type, spec=args.spec, draft=args.draft,
-                                     draft_placement=args.draft_placement, draft_model=args.draft_model)
+                                     draft_placement=args.draft_placement, draft_model=args.draft_model,
+                                     engine=args.engine)
             (folder / "command.json").write_text(json.dumps(command, indent=2) + "\n")
+            (folder / "engine.json").write_text(json.dumps(engine_info, indent=2) + "\n")
             native = subprocess.Popen(command, stdout=log, stderr=log)
             monitor = Monitor(native, folder / "memory.jsonl")
             monitor.thread.start()

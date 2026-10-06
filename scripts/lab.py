@@ -18,8 +18,9 @@ def model_path(model_id):
 
 def server_command(model_id, port=8096, context=4096, batch=512, ubatch=128,
                    spec="none", draft=3, cache_type="f16", threads=8, draft_placement="gpu",
-                   draft_model="mtp"):
-    command = [str(BIN), "-m", str(model_path(model_id)), "--host", "127.0.0.1",
+                   draft_model="mtp", engine="baseline"):
+    from engines import engine_binary
+    command = [str(engine_binary(engine)), "-m", str(model_path(model_id)), "--host", "127.0.0.1",
                "--port", str(port), "-c", str(context), "-b", str(batch), "-ub", str(ubatch),
                "-t", str(threads), "-tb", str(threads), "-ngl", "all", "-fit", "off",
                "-fa", "on", "-lm", "mmap", "-lzm", "on", "-np", "1",
