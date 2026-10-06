@@ -1,8 +1,30 @@
 # Optimization 3: Q2 GPU math
 
-**Ready for an approved experiment; benchmarks and model loading are on hold.** Prepared October 6, 2026 on the 48 GiB M5 Pro. No new TPS or percentage speed gain is available yet.
+**Benchmarked October 6, 2026: keep the original engine as the default.** On this 48 GiB M5 Pro, the final confirmation showed small, mixed writing gains, slower prompt processing and little improvement to total response time. Earlier passes were affected by other work on the Mac. The Q2 candidate remains optional.
 
 This changes how the GPU calculates the existing compressed Q2 weights. It keeps the full Flash-Next model, all experts and lazy SSD lookup. It is a speed experiment, not a change to model size or precision. The original engine and everyday launcher remain the baseline.
+
+## Measured result
+
+Final adjacent confirmation after Java build activity subsided; each entry is the median of three 512-token replies after an excluded warmup. Browser/UI and media-analysis work remained, so this was not a fully idle Mac.
+
+| Input tokens | Original output TPS | Candidate output TPS | Writing change | Original input TPS | Candidate input TPS | Input change |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 512 | 37.91 | 38.01 | +0.27% | 679.25 | 637.88 | -6.09% |
+| 2048 | 35.55 | 36.86 | +3.68% | 647.00 | 599.80 | -7.29% |
+
+| Input tokens | Original first token | Candidate first token | Original full reply | Candidate full reply | Reply time reduction |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 512 | 0.754 s | 0.803 s | 14.235 s | 14.245 s | -0.07% |
+| 2048 | 3.166 s | 3.415 s | 17.548 s | 17.309 s | +1.36% |
+
+The short reply was essentially unchanged. The long reply finished about 0.24 seconds sooner but started about 0.25 seconds later. These small, inconsistent gains do not justify changing the everyday engine. [Exact confirmation, formulas and raw runs](results/20261006-q2-confirmation-analysis/COMPARISON.md).
+
+The initial baseline/candidate/candidate/baseline comparison recorded **-8.83% / -7.30%** writing changes for 512/2048-token inputs. Java builds and browser tests were active during parts of that sequence, and the same candidate's short-prompt median varied from 29.20 to 34.60 to 38.01 TPS across the three passes. Those earlier differences do not establish that the patch itself caused a slowdown. [Original four-pass record](results/20261006T172232Z-q2-comparison/COMPARISON.md), [background observations](diagnostics/20261006-q2-background.jsonl).
+
+All six successful passes completed **108/108 focused answer checks**: 54 on the candidate and 54 on the original engine. They covered arithmetic, structured output, record recall, simple code and normal stopping at greedy and sampled settings. The candidate changes floating-point accumulation; its sampled token sequences differed from the original's, so this is not a bit-for-bit parity claim.
+
+The first attempted load stopped before timing because system swap grew **2.14 GiB** while the Docker VM was active. After Justin authorized stopping Colima, six passes completed without a memory-guard trip. Final-pair swap growth was 0.0006 GiB on the candidate and zero on the original; sampled minimum available RAM was 3.06 GiB and 2.76 GiB respectively. Earlier swap remained allocated. Colima and all lab model servers were left stopped; Justin requested no VM restart. [Stopped attempt](results/20261006T171840Z-q2-1-baseline/result.json).
 
 ## Prepared and checked
 
@@ -24,7 +46,7 @@ Double-click `Check RAM - Next Experiment.command`, or run:
 
 This lists current available/wired memory, existing swap and the largest process names, then prints the test plan and exits. It does not start inference, quit apps, or measure model speed. Process RSS is approximate and excludes some Metal/compressed memory; inspect Activity Monitor too. Previous swap does not disappear immediately when an app closes. No Strata model server is currently left running.
 
-## After explicit approval
+## Benchmark command
 
 From the lab directory, the prepared command is:
 
@@ -38,7 +60,7 @@ Results preserve exact commands, source/patch/binary hashes, identical prompt ha
 
 The generated `COMPARISON.md` and `comparison.json` compare against this fresh baseline. Output improvement is `100 * (candidate TPS / baseline TPS - 1)`; waiting reduction is `100 * (1 - candidate seconds / baseline seconds)`. Negative percentages mean a regression. This is not a guaranteed cold-SSD test; macOS file caches and unrelated activity remain uncontrolled.
 
-Full-model numerical behavior, answer quality, sustained speed and real-adapter performance of the candidate still need verification. A passing synthetic GPU test does not settle those questions. The existing caching optimization remains enabled for normal app use; this first kernel comparison deliberately measures fresh prompts. Benchmarking the prediction helper or larger contexts is a later, separate step.
+The full-model native answer checks and sustained measurements above are complete. Candidate-specific validation through the real Strata adapter remains separate; the everyday launcher still uses its previously verified original engine. The existing caching optimization remains enabled for normal app use; this kernel comparison deliberately measures fresh prompts. Benchmarking the prediction helper or larger contexts is a later, separate step.
 
 ## Reproduce preparation only
 

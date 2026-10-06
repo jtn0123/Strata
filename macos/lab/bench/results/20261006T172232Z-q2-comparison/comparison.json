@@ -1,0 +1,188 @@
+{
+  "schema": 1,
+  "kind": "q2-metal",
+  "status": "passed",
+  "runs": [
+    {
+      "run_id": "20261006T172232Z-q2-1-baseline",
+      "engine": "baseline",
+      "status": "passed",
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 31556845568,
+        "minimum_available_bytes": 2086617088,
+        "peak_swap_bytes": 2511273984,
+        "swap_growth_bytes": 1835008,
+        "system_disk_read_bytes": 42650365952,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      }
+    },
+    {
+      "run_id": "20261006T172507Z-q2-2-q2-masked",
+      "engine": "q2-masked",
+      "status": "passed",
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 37740838912,
+        "minimum_available_bytes": 1724203008,
+        "peak_swap_bytes": 2083258368,
+        "swap_growth_bytes": 265027584,
+        "system_disk_read_bytes": 11389054976,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      }
+    },
+    {
+      "run_id": "20261006T172754Z-q2-3-q2-masked",
+      "engine": "q2-masked",
+      "status": "passed",
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 38008389632,
+        "minimum_available_bytes": 1750564864,
+        "peak_swap_bytes": 2118320128,
+        "swap_growth_bytes": 152502272,
+        "system_disk_read_bytes": 4450361344,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      }
+    },
+    {
+      "run_id": "20261006T173022Z-q2-4-baseline",
+      "engine": "baseline",
+      "status": "passed",
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 37950111744,
+        "minimum_available_bytes": 2959556608,
+        "peak_swap_bytes": 2042822656,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 3956596736,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      }
+    }
+  ],
+  "order": [
+    "baseline",
+    "q2-masked",
+    "q2-masked",
+    "baseline"
+  ],
+  "predict": 512,
+  "repeats": 3,
+  "preflight": {
+    "memory": {
+      "total": 51539607552,
+      "available": 28326182912,
+      "percent": 45.0,
+      "used": 21217034240,
+      "free": 782827520,
+      "active": 17068179456,
+      "inactive": 27514781696,
+      "wired": 4148854784
+    },
+    "swap": {
+      "total": 3221225472,
+      "used": 2509438976,
+      "free": 711786496,
+      "percent": 77.9,
+      "sin": 683623399424,
+      "sout": 132136960
+    },
+    "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 89%",
+    "largest_process_groups": [
+      {
+        "name": "java",
+        "rss_bytes": 2682552320
+      },
+      {
+        "name": "Deep Feast",
+        "rss_bytes": 2597535744
+      },
+      {
+        "name": "2.1.291",
+        "rss_bytes": 1405288448
+      },
+      {
+        "name": "T3 Code (Alpha) Helper (Renderer)",
+        "rss_bytes": 809861120
+      },
+      {
+        "name": "T3 Code (Alpha)",
+        "rss_bytes": 466911232
+      },
+      {
+        "name": "codex",
+        "rss_bytes": 308740096
+      },
+      {
+        "name": "dotnet",
+        "rss_bytes": 302645248
+      },
+      {
+        "name": "OpenTaskManager",
+        "rss_bytes": 300384256
+      },
+      {
+        "name": "grafana",
+        "rss_bytes": 189267968
+      },
+      {
+        "name": "Task Manager",
+        "rss_bytes": 134463488
+      },
+      {
+        "name": "T3 Code (Alpha) Helper",
+        "rss_bytes": 94912512
+      },
+      {
+        "name": "Unity Hub",
+        "rss_bytes": 72499200
+      }
+    ],
+    "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth."
+  },
+  "correctness_record": "bench/features/20261006T171145Z-q2-metal/checks.json",
+  "summary": [
+    {
+      "prompt_tokens": 512,
+      "baseline": {
+        "generation_tok_s": 35.03064452276672,
+        "prompt_tok_s": 629.3936626253515,
+        "ttft_s": 0.8146952710012556,
+        "wall_s": 15.399204667002778
+      },
+      "q2-masked": {
+        "generation_tok_s": 31.9363587679309,
+        "prompt_tok_s": 571.0120583063735,
+        "ttft_s": 0.8995964374989853,
+        "wall_s": 16.971091291998164
+      },
+      "generation_increase_percent": -8.833082568106377,
+      "prompt_increase_percent": -9.275848770935236,
+      "ttft_reduction_percent": -10.421217542282601,
+      "total_time_reduction_percent": -10.207583177094893
+    },
+    {
+      "prompt_tokens": 2048,
+      "baseline": {
+        "generation_tok_s": 35.314970928976436,
+        "prompt_tok_s": 580.4967483861941,
+        "ttft_s": 3.529195062503277,
+        "wall_s": 18.016802791502414
+      },
+      "q2-masked": {
+        "generation_tok_s": 32.737188075862996,
+        "prompt_tok_s": 555.3658201702126,
+        "ttft_s": 3.6947180415008916,
+        "wall_s": 19.333703542000876
+      },
+      "generation_increase_percent": -7.299405281396776,
+      "prompt_increase_percent": -4.329210850163512,
+      "ttft_reduction_percent": -4.69010570586621,
+      "total_time_reduction_percent": -7.30929214099838
+    }
+  ]
+}

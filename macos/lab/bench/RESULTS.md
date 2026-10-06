@@ -34,6 +34,19 @@ Measured on this 48 GiB M5 Pro. Raw JSON, CSV, native logs, exact prompt IDs and
 | [prediction-baseline-b-t06](results/20261006T145946Z-prediction-baseline-b-t06/result.json) | 2048 | 37.48 | 3.107 | 659.4 | 35.87 | 1.02 | 0.00 | passed |
 | [prediction-q3-output2-t06](results/20261006T150044Z-prediction-q3-output2-t06/result.json) | 512 | 38.38 | 1.104 | 463.9 | 37.98 | 1.02 | 0.00 | passed |
 | [prediction-q3-output2-t06](results/20261006T150044Z-prediction-q3-output2-t06/result.json) | 2048 | 37.30 | 4.389 | 466.7 | 37.98 | 1.02 | 0.00 | passed |
+| [q2-1-baseline](results/20261006T171840Z-q2-1-baseline/result.json) | - | - | - | - | 26.34 | 2.38 | 2.14 | failed: RuntimeError: Server exited during load with code -15; see server.log |
+| [q2-1-baseline](results/20261006T172232Z-q2-1-baseline/result.json) | 512 | 36.19 | 0.774 | 662.8 | 29.39 | 2.34 | 0.00 | passed |
+| [q2-1-baseline](results/20261006T172232Z-q2-1-baseline/result.json) | 2048 | 35.18 | 3.559 | 575.5 | 29.39 | 2.34 | 0.00 | passed |
+| [q2-2-q2-masked](results/20261006T172507Z-q2-2-q2-masked/result.json) | 512 | 29.20 | 0.957 | 539.0 | 35.15 | 1.94 | 0.25 | passed |
+| [q2-2-q2-masked](results/20261006T172507Z-q2-2-q2-masked/result.json) | 2048 | 30.92 | 3.863 | 531.5 | 35.15 | 1.94 | 0.25 | passed |
+| [q2-3-q2-masked](results/20261006T172754Z-q2-3-q2-masked/result.json) | 512 | 34.60 | 0.857 | 598.6 | 35.40 | 1.97 | 0.14 | passed |
+| [q2-3-q2-masked](results/20261006T172754Z-q2-3-q2-masked/result.json) | 2048 | 35.37 | 3.582 | 571.9 | 35.40 | 1.97 | 0.14 | passed |
+| [q2-4-baseline](results/20261006T173022Z-q2-4-baseline/result.json) | 512 | 34.03 | 0.845 | 606.3 | 35.34 | 1.90 | 0.00 | passed |
+| [q2-4-baseline](results/20261006T173022Z-q2-4-baseline/result.json) | 2048 | 35.45 | 3.525 | 581.3 | 35.34 | 1.90 | 0.00 | passed |
+| [q2-quiet-confirmation](results/20261006T173319Z-q2-quiet-confirmation/result.json) | 512 | 38.01 | 0.803 | 637.9 | 33.65 | 1.72 | 0.00 | passed |
+| [q2-quiet-confirmation](results/20261006T173319Z-q2-quiet-confirmation/result.json) | 2048 | 36.86 | 3.415 | 599.8 | 33.65 | 1.72 | 0.00 | passed |
+| [q2-quiet-baseline](results/20261006T173609Z-q2-quiet-baseline/result.json) | 512 | 37.91 | 0.754 | 679.2 | 35.73 | 1.70 | 0.00 | passed |
+| [q2-quiet-baseline](results/20261006T173609Z-q2-quiet-baseline/result.json) | 2048 | 35.55 | 3.166 | 647.0 | 35.73 | 1.70 | 0.00 | passed |
 
 ## Optimization 1: conversation caching
 
