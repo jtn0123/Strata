@@ -6,7 +6,9 @@ import subprocess
 
 from lab import ROOT
 
-ENGINES = ("baseline", "q2-masked")
+EXPERIMENTS = {"q2-masked": "q2_experiment.json", "draft-vocab": "draft_vocab_experiment.json",
+               "mtp-shared": "mtp_shared_experiment.json"}
+ENGINES = ("baseline", *EXPERIMENTS)
 
 
 def sha256(path):
@@ -24,13 +26,13 @@ def source_info(engine, root=ROOT):
     if engine == "baseline":
         directory = "vendor/llama.cpp"
         manifest = None
-    elif engine == "q2-masked":
-        manifest = json.loads((root / "config/q2_experiment.json").read_text())
+    elif engine in EXPERIMENTS:
+        manifest = json.loads((root / "config" / EXPERIMENTS[engine]).read_text())
         directory = manifest["directory"]
         if manifest["base_revision"] != revision:
-            raise RuntimeError("Q2 experiment does not match the pinned baseline")
+            raise RuntimeError(f"{engine} experiment does not match the pinned baseline")
         if sha256(root / manifest["patch"]) != manifest["patch_sha256"]:
-            raise RuntimeError("Q2 patch hash differs from the experiment manifest")
+            raise RuntimeError(f"{engine} patch hash differs from the experiment manifest")
     else:
         raise ValueError(f"Unknown engine: {engine}")
     path = root / directory
@@ -41,9 +43,9 @@ def source_info(engine, root=ROOT):
     if manifest:
         expected_status = "\n".join(f" M {name}" for name in manifest["modified_files"])
         if status.strip() != expected_status.strip() or git(path, "diff", "--cached"):
-            raise RuntimeError("Candidate contains changes beyond the approved Q2 patch")
+            raise RuntimeError("Candidate contains changes beyond the experiment patch")
         if hashlib.sha256(diff).hexdigest() != manifest["source_diff_sha256"]:
-            raise RuntimeError("Candidate source diff differs from the approved Q2 patch")
+            raise RuntimeError("Candidate source diff differs from the experiment patch")
     elif status or diff:
         raise RuntimeError("Baseline native checkout must remain unmodified")
     return {"engine": engine, "directory": directory, "revision": revision,
@@ -51,9 +53,10 @@ def source_info(engine, root=ROOT):
 
 
 def engine_binary(engine, root=ROOT):
-    directory = "vendor/llama.cpp" if engine == "baseline" else "vendor/llama-q2-masked"
     if engine not in ENGINES:
         raise ValueError(f"Unknown engine: {engine}")
+    directory = "vendor/llama.cpp" if engine == "baseline" else json.loads(
+        (root / "config" / EXPERIMENTS[engine]).read_text())["directory"]
     return root / directory / "build/bin/llama-server"
 
 

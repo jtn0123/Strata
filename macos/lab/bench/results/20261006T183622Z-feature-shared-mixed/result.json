@@ -1,0 +1,427 @@
+{
+  "schema": 1,
+  "run_id": "20261006T183622Z-feature-shared-mixed",
+  "status": "failed",
+  "settings": {
+    "model": "flash",
+    "label": "feature-shared-mixed",
+    "comparison_profile": "shared-mixed",
+    "engine": "mtp-shared",
+    "draft_vocab": "off",
+    "context": 4096,
+    "batch": 512,
+    "ubatch": 512,
+    "cache_type": "f16",
+    "spec": "draft-mtp",
+    "draft": 2,
+    "draft_placement": "mixed",
+    "draft_model": "mtp_shared_q3",
+    "threads": 8,
+    "temperature": 0.6,
+    "extended_checks": true,
+    "repeats": 1,
+    "warmups": 0,
+    "predict": 64,
+    "prompts": [
+      512,
+      2048
+    ],
+    "real_workloads": true,
+    "cached_workloads": true
+  },
+  "command": [
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-mtp-shared/build/bin/llama-server",
+    "-m",
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "50162",
+    "-c",
+    "4096",
+    "-b",
+    "512",
+    "-ub",
+    "512",
+    "-t",
+    "8",
+    "-tb",
+    "8",
+    "-ngl",
+    "all",
+    "-fit",
+    "off",
+    "-fa",
+    "on",
+    "-lm",
+    "mmap",
+    "-lzm",
+    "on",
+    "-np",
+    "1",
+    "-ctk",
+    "f16",
+    "-ctv",
+    "f16",
+    "--cache-ram",
+    "0",
+    "--spec-type",
+    "draft-mtp",
+    "--spec-draft-n-max",
+    "2",
+    "--metrics",
+    "--jinja",
+    "--no-webui",
+    "--alias",
+    "flash",
+    "--verbosity",
+    "4",
+    "--cors-origins",
+    "localhost",
+    "-md",
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/models/mtp_shared_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-shared.gguf",
+    "--spec-draft-ngl",
+    "all",
+    "--spec-draft-cpu-moe",
+    "--no-op-offload"
+  ],
+  "runtime": {
+    "llama_cpp": {
+      "repository": "https://github.com/ggml-org/llama.cpp.git",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "tag": "v0.6.0"
+    },
+    "strata_macos": {
+      "repository": "https://github.com/jinzy0623/Strata-macOS.git",
+      "revision": "2cc4153409edb3f859187bdf10f13e34972d6ffb"
+    },
+    "build_flags": [
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DGGML_METAL=ON",
+      "-DGGML_METAL_EMBED_LIBRARY=ON",
+      "-DLLAMA_BUILD_TESTS=OFF",
+      "-DLLAMA_BUILD_EXAMPLES=OFF",
+      "-DLLAMA_BUILD_TOOLS=ON"
+    ]
+  },
+  "model": {
+    "repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "revision": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+    "files": [
+      {
+        "path": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "size_bytes": 37623740192,
+        "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+      },
+      {
+        "path": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "size_bytes": 28800138432,
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+      }
+    ]
+  },
+  "host_before": {
+    "os": "macOS-27.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "chip": "Apple M5 Pro",
+    "ram_bytes": 51539607552,
+    "cpu_count": 18,
+    "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=36831331)\t80%; AC attached; not charging present: true",
+    "power_settings": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n womp                 0\n displaysleep         10\n networkoversleep     0\n sleep                1\n lessbright           0\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                0\n tcpkeepalive         1\n disksleep            10",
+    "thermal_status": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+    "gpu_wired_limit": "iogpu.wired_limit_mb: 0",
+    "vm_stat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    29576.\nPages active:                                 344430.\nPages inactive:                              2384302.\nPages speculative:                              9004.\nPages throttled:                                   0.\nPages wired down:                             211960.\nPages purgeable:                                7183.\n\"Translation faults\":                      778806939.\nPages copy-on-write:                        29758095.\nPages zero filled:                         543890973.\nPages reactivated:                          56816946.\nPages purged:                               13362229.\nFile-backed pages:                           2557519.\nAnonymous pages:                              180217.\nPages stored in compressor:                   202886.\nPages occupied by compressor:                 105951.\nDecompressions:                             37968432.\nCompressions:                               45482700.\nPageins:                                    62846205.\nPageouts:                                      73566.\nSwapins:                                      174301.\nSwapouts:                                     370447.\nPages tagged:                                 105159.\nPages tagged resident:                         84707.\nPages tagged compressed:                       20452.\nPages tag-storage:                             98304.\nPages tag-storage holding tags:                 7444.\nPages tag-storage free:                        11073.\nPages tag-storage non-tag pageable:            78634.\nPages tag-storage non-tag wired:                   8.\nBytes of compressed tags:                    3191808.\nTagged compressions:                         1293681.\nTagged decompressions:                       1162231.",
+    "swap": {
+      "total": 2147483648,
+      "used": 1451098112,
+      "free": 696385536,
+      "percent": 67.6,
+      "sin": 1029672222720,
+      "sout": 1205305344
+    },
+    "available_bytes": 39697891328
+  },
+  "cases": [],
+  "warmups": [],
+  "checks": [],
+  "selected_engine": {
+    "engine": "mtp-shared",
+    "directory": "vendor/llama-mtp-shared",
+    "revision": "d81235049384534c167caea52b85a694f6103d14",
+    "source_diff_sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a",
+    "patch": {
+      "schema": 1,
+      "id": "mtp-shared",
+      "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+      "directory": "vendor/llama-mtp-shared",
+      "patch": "patches/mtp-shared-weights.patch",
+      "patch_sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a",
+      "source_diff_sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a",
+      "modified_files": [
+        "src/llama-context.cpp",
+        "src/llama-cparams.h",
+        "src/models/qwen4exp.cpp"
+      ],
+      "upstream": {
+        "repository": "https://github.com/danielhanchen/llama.cpp",
+        "revision": "6fcaa16f4b360649933a54d1f91ad40ed35c0e11",
+        "branch": "qwen4exp/mtp",
+        "reference_path": "src/models/qwen4exp.cpp",
+        "license_file": "patches/LLAMA-LICENSE.txt"
+      },
+      "scope": "Optional token embeddings and output only for MTP-only GGUF. Borrow target tensors without taking ownership or sharing draft KV; target weights and graph remain unchanged. The borrowed LM head is Q5_K rather than the selected helper's Q3_K, so draft proposals can change."
+    },
+    "artifacts": {
+      "llama-server": "a241c2cf3b9cdf9b2a1e5aa0bd3fdb6786a813ecd8bbb590fd4b51c88f7386ec",
+      "libggml-base.0.26.0.dylib": "a5b908e38bbd6f8cc68e9594652afda94ce71fc9370e1e8bea9900342a601d84",
+      "libggml-base.0.dylib": "a5b908e38bbd6f8cc68e9594652afda94ce71fc9370e1e8bea9900342a601d84",
+      "libggml-base.dylib": "a5b908e38bbd6f8cc68e9594652afda94ce71fc9370e1e8bea9900342a601d84",
+      "libggml-blas.0.26.0.dylib": "553b78dd6e2f0bacf8167f56f80a413244ec982eae65f626bd385b8eebab4c19",
+      "libggml-blas.0.dylib": "553b78dd6e2f0bacf8167f56f80a413244ec982eae65f626bd385b8eebab4c19",
+      "libggml-blas.dylib": "553b78dd6e2f0bacf8167f56f80a413244ec982eae65f626bd385b8eebab4c19",
+      "libggml-cpu.0.26.0.dylib": "9098cbf453b18f9bf5369f05da7931fdc8ca042b473cee900d2ae9ced81de10f",
+      "libggml-cpu.0.dylib": "9098cbf453b18f9bf5369f05da7931fdc8ca042b473cee900d2ae9ced81de10f",
+      "libggml-cpu.dylib": "9098cbf453b18f9bf5369f05da7931fdc8ca042b473cee900d2ae9ced81de10f",
+      "libggml-metal.0.26.0.dylib": "41541c732b1fe0f4df1c4275aa932f836bd274a9541da6d30e5009a740f14c83",
+      "libggml-metal.0.dylib": "41541c732b1fe0f4df1c4275aa932f836bd274a9541da6d30e5009a740f14c83",
+      "libggml-metal.dylib": "41541c732b1fe0f4df1c4275aa932f836bd274a9541da6d30e5009a740f14c83",
+      "libggml.0.26.0.dylib": "9a6c38510dbc9dcb2e23156583ef9705971bd8c1b9c8d441eb1eb0d77390c760",
+      "libggml.0.dylib": "9a6c38510dbc9dcb2e23156583ef9705971bd8c1b9c8d441eb1eb0d77390c760",
+      "libggml.dylib": "9a6c38510dbc9dcb2e23156583ef9705971bd8c1b9c8d441eb1eb0d77390c760",
+      "libllama-common.0.6.0.dylib": "086781c4d07fb3f7321a13db98d5c934053b0aaea2be0942a2928d17ed10e8d5",
+      "libllama-common.0.dylib": "086781c4d07fb3f7321a13db98d5c934053b0aaea2be0942a2928d17ed10e8d5",
+      "libllama-common.dylib": "086781c4d07fb3f7321a13db98d5c934053b0aaea2be0942a2928d17ed10e8d5",
+      "libllama-server-impl.dylib": "f3ccda162076f71a09103eb4ca107d766b0c4cab4984ac72a66add5cb7fc56f4",
+      "libllama.0.6.0.dylib": "b96a4d4ebffb0b007945bd2aab5dccf720a0013f27044b5c366ef30a1c9a5a45",
+      "libllama.0.dylib": "b96a4d4ebffb0b007945bd2aab5dccf720a0013f27044b5c366ef30a1c9a5a45",
+      "libllama.dylib": "b96a4d4ebffb0b007945bd2aab5dccf720a0013f27044b5c366ef30a1c9a5a45",
+      "libmtmd.0.6.0.dylib": "c48b139e99b9908d791aab923387ea8cd2bbc90dac6f19d37e1eaa3dad366779",
+      "libmtmd.0.dylib": "c48b139e99b9908d791aab923387ea8cd2bbc90dac6f19d37e1eaa3dad366779",
+      "libmtmd.dylib": "c48b139e99b9908d791aab923387ea8cd2bbc90dac6f19d37e1eaa3dad366779"
+    },
+    "build_receipt": {
+      "engine": "mtp-shared",
+      "directory": "vendor/llama-mtp-shared",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a",
+      "patch": {
+        "schema": 1,
+        "id": "mtp-shared",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-mtp-shared",
+        "patch": "patches/mtp-shared-weights.patch",
+        "patch_sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a",
+        "source_diff_sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a",
+        "modified_files": [
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp"
+        ],
+        "upstream": {
+          "repository": "https://github.com/danielhanchen/llama.cpp",
+          "revision": "6fcaa16f4b360649933a54d1f91ad40ed35c0e11",
+          "branch": "qwen4exp/mtp",
+          "reference_path": "src/models/qwen4exp.cpp",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        },
+        "scope": "Optional token embeddings and output only for MTP-only GGUF. Borrow target tensors without taking ownership or sharing draft KV; target weights and graph remain unchanged. The borrowed LM head is Q5_K rather than the selected helper's Q3_K, so draft proposals can change."
+      },
+      "artifacts": {
+        "llama-server": "a241c2cf3b9cdf9b2a1e5aa0bd3fdb6786a813ecd8bbb590fd4b51c88f7386ec",
+        "libggml-base.0.26.0.dylib": "a5b908e38bbd6f8cc68e9594652afda94ce71fc9370e1e8bea9900342a601d84",
+        "libggml-base.0.dylib": "a5b908e38bbd6f8cc68e9594652afda94ce71fc9370e1e8bea9900342a601d84",
+        "libggml-base.dylib": "a5b908e38bbd6f8cc68e9594652afda94ce71fc9370e1e8bea9900342a601d84",
+        "libggml-blas.0.26.0.dylib": "553b78dd6e2f0bacf8167f56f80a413244ec982eae65f626bd385b8eebab4c19",
+        "libggml-blas.0.dylib": "553b78dd6e2f0bacf8167f56f80a413244ec982eae65f626bd385b8eebab4c19",
+        "libggml-blas.dylib": "553b78dd6e2f0bacf8167f56f80a413244ec982eae65f626bd385b8eebab4c19",
+        "libggml-cpu.0.26.0.dylib": "9098cbf453b18f9bf5369f05da7931fdc8ca042b473cee900d2ae9ced81de10f",
+        "libggml-cpu.0.dylib": "9098cbf453b18f9bf5369f05da7931fdc8ca042b473cee900d2ae9ced81de10f",
+        "libggml-cpu.dylib": "9098cbf453b18f9bf5369f05da7931fdc8ca042b473cee900d2ae9ced81de10f",
+        "libggml-metal.0.26.0.dylib": "41541c732b1fe0f4df1c4275aa932f836bd274a9541da6d30e5009a740f14c83",
+        "libggml-metal.0.dylib": "41541c732b1fe0f4df1c4275aa932f836bd274a9541da6d30e5009a740f14c83",
+        "libggml-metal.dylib": "41541c732b1fe0f4df1c4275aa932f836bd274a9541da6d30e5009a740f14c83",
+        "libggml.0.26.0.dylib": "9a6c38510dbc9dcb2e23156583ef9705971bd8c1b9c8d441eb1eb0d77390c760",
+        "libggml.0.dylib": "9a6c38510dbc9dcb2e23156583ef9705971bd8c1b9c8d441eb1eb0d77390c760",
+        "libggml.dylib": "9a6c38510dbc9dcb2e23156583ef9705971bd8c1b9c8d441eb1eb0d77390c760",
+        "libllama-common.0.6.0.dylib": "086781c4d07fb3f7321a13db98d5c934053b0aaea2be0942a2928d17ed10e8d5",
+        "libllama-common.0.dylib": "086781c4d07fb3f7321a13db98d5c934053b0aaea2be0942a2928d17ed10e8d5",
+        "libllama-common.dylib": "086781c4d07fb3f7321a13db98d5c934053b0aaea2be0942a2928d17ed10e8d5",
+        "libllama-server-impl.dylib": "f3ccda162076f71a09103eb4ca107d766b0c4cab4984ac72a66add5cb7fc56f4",
+        "libllama.0.6.0.dylib": "b96a4d4ebffb0b007945bd2aab5dccf720a0013f27044b5c366ef30a1c9a5a45",
+        "libllama.0.dylib": "b96a4d4ebffb0b007945bd2aab5dccf720a0013f27044b5c366ef30a1c9a5a45",
+        "libllama.dylib": "b96a4d4ebffb0b007945bd2aab5dccf720a0013f27044b5c366ef30a1c9a5a45",
+        "libmtmd.0.6.0.dylib": "c48b139e99b9908d791aab923387ea8cd2bbc90dac6f19d37e1eaa3dad366779",
+        "libmtmd.0.dylib": "c48b139e99b9908d791aab923387ea8cd2bbc90dac6f19d37e1eaa3dad366779",
+        "libmtmd.dylib": "c48b139e99b9908d791aab923387ea8cd2bbc90dac6f19d37e1eaa3dad366779"
+      },
+      "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+      "build_settings": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GGML_BLAS": "ON",
+        "GGML_CPU": "ON",
+        "GGML_METAL": "ON",
+        "GGML_METAL_EMBED_LIBRARY": "ON",
+        "GGML_NATIVE": "ON",
+        "LLAMA_BUILD_TESTS": "OFF",
+        "LLAMA_BUILD_TOOLS": "ON"
+      },
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+    }
+  },
+  "draft_vocabulary": null,
+  "method": "Single slot, full Metal offload, fixed seed 1234; sampling temperature is recorded in settings. Exact synthetic chat prompt sizes and fixed output count from settings; no prompt reuse; ignore EOS for timing only. No model downloads during a run. Warm OS file cache is uncontrolled. TTFT includes HTTP and prompt evaluation. Correctness checks use normal EOS handling.",
+  "actual_sources": {
+    "llama_cpp": {
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "dirty": ""
+    },
+    "strata_macos": {
+      "revision": "2cc4153409edb3f859187bdf10f13e34972d6ffb",
+      "dirty": ""
+    }
+  },
+  "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+  "draft_model": {
+    "derived": {
+      "source_model": "mtp_q3",
+      "source_sha256": "717e861aae936ebaa92fd3fb8b10df6d27f919432d4b4109b94b7732228ff728",
+      "removed_tensors": [
+        "output.weight",
+        "token_embd.weight"
+      ],
+      "required_engine": "mtp-shared",
+      "receipt": "bench/results/20261006T182700Z-prepare-mtp-shared/preparation.json"
+    },
+    "files": [
+      {
+        "path": "mtp-Qwen3.8-Flash-Next-Q3_K_S-shared.gguf",
+        "size_bytes": 1251560832,
+        "sha256": "6b8a04dfd4c60e1bde4b25de96f0d7b0a9a39c2b90cba43e27e199c2d839713d"
+      }
+    ]
+  },
+  "ready_s": 2.5624637080036337,
+  "props": {
+    "default_generation_settings": {
+      "params": {
+        "seed": 4294967295,
+        "temperature": 1.0,
+        "dynatemp_range": 0.0,
+        "dynatemp_exponent": 1.0,
+        "top_k": 20,
+        "top_p": 0.949999988079071,
+        "min_p": 0.05000000074505806,
+        "top_n_sigma": -1.0,
+        "xtc_probability": 0.0,
+        "xtc_threshold": 0.10000000149011612,
+        "typical_p": 1.0,
+        "repeat_last_n": 64,
+        "repeat_penalty": 1.0,
+        "presence_penalty": 0.0,
+        "frequency_penalty": 0.0,
+        "dry_multiplier": 0.0,
+        "dry_base": 1.75,
+        "dry_allowed_length": 2,
+        "dry_penalty_last_n": 64,
+        "mirostat": 0,
+        "mirostat_tau": 5.0,
+        "mirostat_eta": 0.10000000149011612,
+        "adaptive_target": -1.0,
+        "adaptive_decay": 0.8999999761581421,
+        "max_tokens": -1,
+        "n_predict": -1,
+        "n_keep": 0,
+        "n_discard": 0,
+        "ignore_eos": false,
+        "stream": false,
+        "n_probs": 0,
+        "min_keep": 0,
+        "chat_format": "Content-only",
+        "reasoning_format": "none",
+        "reasoning_in_content": false,
+        "generation_prompt": "",
+        "samplers": [
+          "penalties",
+          "dry",
+          "top_n_sigma",
+          "top_k",
+          "typ_p",
+          "top_p",
+          "min_p",
+          "xtc",
+          "temperature"
+        ],
+        "speculative.types": "none",
+        "timings_per_token": false,
+        "post_sampling_probs": false,
+        "backend_sampling": false,
+        "lora": []
+      },
+      "n_ctx": 4096
+    },
+    "total_slots": 1,
+    "model_alias": "flash",
+    "model_ftype": "Q2_0",
+    "model_path": "/Users/justin/Documents/Github/Strata-Mac-Lab/models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+    "modalities": {
+      "vision": false,
+      "video": false,
+      "audio": false
+    },
+    "media_marker": "<__media_HBVjokO8lCERhNpR0kkErcjEcavwXNfP__>",
+    "endpoint_slots": true,
+    "endpoint_props": false,
+    "endpoint_metrics": true,
+    "ui": false,
+    "ui_settings": {},
+    "chat_template": "{%- set image_count = namespace(value=0) %}\n{%- set video_count = namespace(value=0) %}\n{%- macro render_content(content, do_vision_count, is_system_content=false) %}\n    {%- if content is string %}\n        {{- content }}\n    {%- elif content is iterable and content is not mapping %}\n        {%- for item in content %}\n            {%- if 'image' in item or 'image_url' in item or item.type == 'image' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain images.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set image_count.value = image_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Picture ' ~ image_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '<|vision_start|><|image_pad|><|vision_end|>' }}\n            {%- elif 'video' in item or item.type == 'video' %}\n                {%- if is_system_content %}\n                    {{- raise_exception('System message cannot contain videos.') }}\n                {%- endif %}\n                {%- if do_vision_count %}\n                    {%- set video_count.value = video_count.value + 1 %}\n                {%- endif %}\n                {%- if add_vision_id %}\n                    {{- 'Video ' ~ video_count.value ~ ': ' }}\n                {%- endif %}\n                {{- '<|vision_start|><|video_pad|><|vision_end|>' }}\n            {%- elif 'text' in item %}\n                {{- item.text }}\n            {%- else %}\n                {{- raise_exception('Unexpected item type in content.') }}\n            {%- endif %}\n        {%- endfor %}\n    {%- elif content is none or content is undefined %}\n        {{- '' }}\n    {%- else %}\n        {{- raise_exception('Unexpected content type.') }}\n    {%- endif %}\n{%- endmacro %}\n{%- if not messages %}\n    {{- raise_exception('No messages provided.') }}\n{%- endif %}\n{%- set sysns = namespace(count=0, text='') %}\n{%- for message in messages %}\n    {%- if sysns.count == loop.index0 and (message.role == 'system' or message.role == 'developer') %}\n        {%- set sys_content = render_content(message.content, false, true)|trim %}\n        {%- if sys_content %}\n            {%- set sysns.text = sysns.text + ('\\n' if sysns.text else '') + sys_content %}\n        {%- endif %}\n        {%- set sysns.count = sysns.count + 1 %}\n    {%- endif %}\n{%- endfor %}\n{%- set num_sys = sysns.count %}\n{%- set merged_system = sysns.text %}\n{%- set reasoning_instructions = '' %}\n{%- if enable_thinking is undefined or enable_thinking is true %}\n    {%- set resolved_reasoning_effort = reasoning_effort|default('xhigh') %}\n    {%- if resolved_reasoning_effort == 'high' %}\n        {%- set resolved_reasoning_effort = 'xhigh' %}\n    {%- endif %}\n    {%- if resolved_reasoning_effort not in ('xhigh', 'medium', 'low') %}\n        {{- raise_exception('Unexpected reasoning effort ' ~ reasoning_effort ~ '. Supported types are xhigh (default), medium, and low.') }}\n    {%- endif %}\n    {%- if resolved_reasoning_effort == 'xhigh' %}\n        {%- set reasoning_instructions = 'Reasoning effort is set to xhigh. Please think carefully through the task, validate key assumptions, consider plausible alternatives, and prioritize correctness, consistency, and clarity in the final answer.' %}\n    {%- elif resolved_reasoning_effort == 'low' %}\n        {%- set reasoning_instructions = 'Reasoning effort is set to low. Keep your thinking brief and focused, moving directly to the conclusion without unnecessary elaboration.' %}\n    {%- endif %}\n{%- endif %}\n{%- if tools and tools is iterable and tools is not mapping %}\n    {{- '<|im_start|>system\\n' }}\n    {%- if reasoning_instructions %}\n        {{- reasoning_instructions + '\\n\\n' }}\n    {%- endif %}\n    {{- \"# Tools\\n\\nYou have access to the following functions:\\n\\n<tools>\" }}\n    {%- for tool in tools %}\n        {{- \"\\n\" }}\n        {{- tool | tojson }}\n    {%- endfor %}\n    {{- \"\\n</tools>\" }}\n    {{- '\\n\\nIf you choose to call a function ONLY reply in the following format with NO suffix:\\n\\n<tool_call>\\n<function=example_function_name>\\n<parameter=example_parameter_1>\\nvalue_1\\n</parameter>\\n<parameter=example_parameter_2>\\nThis is the value for the second parameter\\nthat can span\\nmultiple lines\\n</parameter>\\n</function>\\n</tool_call>\\n\\n<IMPORTANT>\\nReminder:\\n- Function calls MUST follow the specified format: an inner <function=...></function> block must be nested within <tool_call></tool_call> XML tags\\n- Required parameters MUST be specified\\n- You may provide optional reasoning for your function call in natural language BEFORE the function call, but NOT after\\n- If there is no function call available, answer the question like normal with your current knowledge and do not tell the user about function calls\\n</IMPORTANT>' }}\n    {%- if merged_system %}\n        {{- '\\n\\n' + merged_system }}\n    {%- endif %}\n    {{- '<|im_end|>\\n' }}\n{%- else %}\n    {%- if merged_system %}\n        {{- '<|im_start|>system\\n' + (reasoning_instructions + '\\n\\n' if reasoning_instructions else '')  + merged_system + '<|im_end|>\\n' }}\n    {%- elif reasoning_instructions %}\n        {{- '<|im_start|>system\\n' + reasoning_instructions + '<|im_end|>\\n' }}\n    {%- endif %}\n{%- endif %}\n{%- set ns = namespace(multi_step_tool=true, last_query_index=messages|length - 1) %}\n{%- for message in messages[::-1] %}\n    {%- set index = (messages|length - 1) - loop.index0 %}\n    {%- if ns.multi_step_tool and message.role == \"user\" %}\n        {%- set content = render_content(message.content, false)|trim %}\n        {%- if not(content.startswith('<tool_response>') and content.endswith('</tool_response>')) %}\n            {%- set ns.multi_step_tool = false %}\n            {%- set ns.last_query_index = index %}\n        {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- for message in messages %}\n    {%- if loop.index0 >= num_sys %}\n    {%- set content = render_content(message.content, true)|trim %}\n    {%- if message.role == \"system\" or message.role == \"developer\" %}\n        {{- raise_exception('System message must be at the beginning.') }}\n    {%- elif message.role == \"user\" %}\n        {{- '<|im_start|>' + message.role + '\\n' + content + '<|im_end|>' + '\\n' }}\n    {%- elif message.role == \"assistant\" %}\n        {%- set reasoning_content = '' %}\n        {%- if message.reasoning_content is string %}\n            {%- set reasoning_content = message.reasoning_content %}\n        {%- endif %}\n        {%- set reasoning_content = reasoning_content|trim %}\n        {%- if preserve_thinking is undefined or preserve_thinking is true or loop.index0 > ns.last_query_index %}\n            {{- '<|im_start|>' + message.role + '\\n<think>\\n' + reasoning_content + '\\n</think>\\n\\n' + content }}\n        {%- else %}\n            {{- '<|im_start|>' + message.role + '\\n' + content }}\n        {%- endif %}\n        {%- if message.tool_calls and message.tool_calls is iterable and message.tool_calls is not mapping %}\n            {%- for tool_call in message.tool_calls %}\n                {%- if tool_call.function is defined %}\n                    {%- set tool_call = tool_call.function %}\n                {%- endif %}\n                {%- if tool_call.name is not defined or tool_call.name is none %}\n                    {{- raise_exception('Tool call is missing a function name.') }}\n                {%- endif %}\n                {%- if loop.first %}\n                    {%- if content|trim %}\n                        {{- '\\n\\n<tool_call>\\n<function=' + tool_call.name + '>\\n' }}\n                    {%- else %}\n                        {{- '<tool_call>\\n<function=' + tool_call.name + '>\\n' }}\n                    {%- endif %}\n                {%- else %}\n                    {{- '\\n<tool_call>\\n<function=' + tool_call.name + '>\\n' }}\n                {%- endif %}\n                {%- if tool_call.arguments is mapping %}\n                    {%- for args_name, args_value in tool_call.arguments|items %}\n                        {{- '<parameter=' + args_name + '>\\n' }}\n                        {%- set args_value = args_value | string if args_value is string else args_value | tojson | safe %}\n                        {{- args_value }}\n                        {{- '\\n</parameter>\\n' }}\n                    {%- endfor %}\n                {%- elif tool_call.arguments is string %}\n                    {%- if tool_call.arguments|trim %}\n                        {{- raise_exception('Tool call arguments for function \"' + (tool_call.name | string) + '\" were passed as a JSON string. Parse them into an object before calling apply_chat_template.') }}\n                    {%- endif %}\n                {%- elif tool_call.arguments is defined and tool_call.arguments is not none %}\n                    {{- raise_exception('Tool call arguments for function \"' + (tool_call.name | string) + '\" must be an object/mapping or a JSON string.') }}\n                {%- endif %}\n                {{- '</function>\\n</tool_call>' }}\n            {%- endfor %}\n        {%- endif %}\n        {{- '<|im_end|>\\n' }}\n    {%- elif message.role == \"tool\" %}\n        {%- if loop.previtem and loop.previtem.role != \"tool\" %}\n            {{- '<|im_start|>user' }}\n        {%- endif %}\n        {{- '\\n<tool_response>\\n' }}\n        {{- content }}\n        {{- '\\n</tool_response>' }}\n        {%- if not loop.last and loop.nextitem.role != \"tool\" %}\n            {{- '<|im_end|>\\n' }}\n        {%- elif loop.last %}\n            {{- '<|im_end|>\\n' }}\n        {%- endif %}\n    {%- else %}\n        {{- raise_exception('Unexpected message role.') }}\n    {%- endif %}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|im_start|>assistant\\n' }}\n    {%- if enable_thinking is defined and enable_thinking is false %}\n        {{- '<think>\\n\\n</think>\\n\\n' }}\n    {%- else %}\n        {{- '<think>\\n' }}\n    {%- endif %}\n{%- endif %}\n{#- Unsloth fixes - developer role, merged system messages, tool calling #}",
+    "chat_template_caps": {
+      "supports_object_arguments": true,
+      "supports_parallel_tool_calls": true,
+      "supports_preserve_reasoning": true,
+      "supports_reasoning_effort": true,
+      "supports_string_content": true,
+      "supports_system_role": true,
+      "supports_tool_calls": true,
+      "supports_tools": true,
+      "supports_typed_content": true
+    },
+    "bos_token": "<|endoftext|>",
+    "eos_token": "<|im_end|>",
+    "build_info": "b1-d812350",
+    "is_sleeping": false,
+    "cors_proxy_enabled": false
+  },
+  "error": "RuntimeError: Streaming response has no first token or final timing record",
+  "memory": {
+    "guard": null,
+    "peak_rss_bytes": 40142028800,
+    "minimum_available_bytes": 3122069504,
+    "peak_swap_bytes": 1451098112,
+    "swap_growth_bytes": 0,
+    "system_disk_read_bytes": 28512256,
+    "sampling_interval_s": 0.25,
+    "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+  },
+  "host_after": {
+    "os": "macOS-27.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "chip": "Apple M5 Pro",
+    "ram_bytes": 51539607552,
+    "cpu_count": 18,
+    "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=36831331)\t80%; AC attached; not charging present: true",
+    "power_settings": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n womp                 0\n displaysleep         10\n networkoversleep     0\n sleep                1\n lessbright           0\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                0\n tcpkeepalive         1\n disksleep            10",
+    "thermal_status": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+    "gpu_wired_limit": "iogpu.wired_limit_mb: 0",
+    "vm_stat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    90817.\nPages active:                                 219624.\nPages inactive:                               732650.\nPages speculative:                               427.\nPages throttled:                                   0.\nPages wired down:                            1931803.\nPages purgeable:                                3921.\n\"Translation faults\":                      781320830.\nPages copy-on-write:                        29763398.\nPages zero filled:                         544040643.\nPages reactivated:                          56835585.\nPages purged:                               13380421.\nFile-backed pages:                            794761.\nAnonymous pages:                              157940.\nPages stored in compressor:                   218876.\nPages occupied by compressor:                 109902.\nDecompressions:                             37971808.\nCompressions:                               45505890.\nPageins:                                    62848154.\nPageouts:                                      73574.\nSwapins:                                      174305.\nSwapouts:                                     370447.\nPages tagged:                                 105114.\nPages tagged resident:                         82219.\nPages tagged compressed:                       22895.\nPages tag-storage:                             98304.\nPages tag-storage holding tags:                 7323.\nPages tag-storage free:                        13157.\nPages tag-storage non-tag pageable:            73541.\nPages tag-storage non-tag wired:                   8.\nBytes of compressed tags:                    3697024.\nTagged compressions:                         1296156.\nTagged decompressions:                       1162261.",
+    "swap": {
+      "total": 2147483648,
+      "used": 1451098112,
+      "free": 696385536,
+      "percent": 67.6,
+      "sin": 1029704155136,
+      "sout": 1205436416
+    },
+    "available_bytes": 13567164416
+  }
+}

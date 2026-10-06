@@ -20,6 +20,10 @@ Use `scripts/run.py flash --no-prompt-cache` to restore v1's uncached conversati
 
 The optional `Start Strata - Prediction Test.command` uses the measured smaller Q3 helper, with its body on CPU and output projection on GPU. Stop the current app before switching profiles. This is an experiment: at temperature 0 it wrote 11-13% faster, but at temperature 0.6 the fixed-length writing gain disappeared. Cached record-lookup replies finished 4-10% sooner, while fresh replies took longer. The normal launcher keeps prediction off. [Exact comparisons](bench/PREDICTION.md).
 
+`Start Strata - Shared Prediction Test.command` selects the isolated shared-weight engine and packed helper layout. It removes 521 MiB of duplicated helper tables and keeps helper experts on CPU while placing small dense operations on GPU. [Sharing, layout and comparison evidence](bench/SHARED-HELPER.md) records its scope. The separate [smaller word-list experiment](bench/DRAFT-VOCAB.md) stays optional: it helps some writing generation but slows cached replies compared with the full helper.
+
+The packed mixed comparison measured writing generation 7.7-11.6% faster and cached complete replies 7.0-11.0% sooner than the old helper. All eight passes completed 240 answer checks with no new swap; the actual Strata app passed nine API checks. Fresh long-input replies still take longer than ordinary prediction-off operation, so this is an optional workload choice and the normal launcher retains its original engine/settings.
+
 No login service or system-wide Python packages are installed. Native and Strata source checkouts are under `vendor/`; model files and virtual environment stay outside git.
 
 ## Recreate the environment
@@ -69,9 +73,44 @@ The selected full Flash-Next Q2_0 files contain 37.6 GB of model weights and a s
 
 This experiment preserves all 512 experts per layer in the selected compressed model. It does not use the separate Coder variant that drops experts. It also does not port the upstream CUDA expert scheduler: Metal reads resident weights through unified memory, while the existing lazy lookup path uses SSD.
 
-The full files do not include an MTP block. The optional 2.79 GB self-contained Q4_K_M draft head is downloaded separately. The pinned upstream runtime has a qwen4exp MTP graph; its loader still requires the draft's own embeddings/output projection. Therefore this lab uses the self-contained head, not the smaller shared variant.
+The full files do not include an MTP block. The original optional 2.79 GB self-contained Q4_K_M draft head is downloaded separately; the selected Q3 helper is 1.80 GB. The untouched pinned runtime requires the helper's own embeddings/output projection. A separate weight-sharing build now tests borrowing these tables from the main model; it does not change the normal engine.
 
-The GPU draft exceeded the default GPU memory budget on this Mac. A CPU draft passed the timing and two answer checks and produced 43-45 output tokens/s, versus 37-39 without it. It also added 1.85 GiB of swap and increased first-response time. It stays off in the normal profile. Greedy output diverged after token 92 in the 512-token workload, while the 2048-token workload matched exactly; do not assume bit-for-bit parity across this batch-based optimization. Raw results preserve both outputs. No system GPU memory limit was changed.
+The original self-contained Q4 GPU draft exceeded the default GPU memory budget on this Mac. Its CPU variant produced 43-45 output tokens/s but added 1.85 GiB of swap and longer startup. The later selected Q3 split profile avoided new swap; its measured tradeoffs are in [PREDICTION.md](bench/PREDICTION.md). No system GPU memory limit was changed.
+
+## Isolated prediction experiments
+
+Build and prepare without loading the main model:
+
+```sh
+.venv/bin/python scripts/prepare_vocab.py --jobs 2
+.venv/bin/python scripts/prepare_shared.py --jobs 2
+.venv/bin/python scripts/prepare_shared_layout.py
+```
+
+The vocabulary build keeps a multilingual 106K helper word list, while the main model still verifies against all 248K tokens. The compact head adds about 111.5 MiB and is explicitly marked as weights so a CPU helper body can retain GPU output placement. The sharing build derives a helper with two duplicated tables removed, validates every retained byte, and borrows the main model's existing tables. It keeps its own conversation state. The layout preparation groups CPU experts ahead of GPU dense tensors, reducing the mixed helper's mapped GPU-weight span from 1,183 MiB to 45.6 MiB without changing its weights. Each engine uses a separate checkout, binary, source hash and build receipt.
+
+The comparison commands below print a RAM snapshot and plan without loading models. Add `--run` to execute them. Feature checks do load the full model and terminate it afterward.
+
+```sh
+.venv/bin/python scripts/verify_vocab.py
+.venv/bin/python scripts/benchmark_vocab.py --predict 128
+.venv/bin/python scripts/verify_shared.py --mixed-only
+.venv/bin/python scripts/benchmark_shared.py --include-mixed
+```
+
+To manually try the compact vocabulary in the web app, after stopping the current model:
+
+```sh
+.venv/bin/python scripts/run.py flash --engine draft-vocab --draft-vocab 106k --spec draft-mtp --draft-model mtp_q3 --draft 2 --draft-placement output
+```
+
+Full-GPU helper placement failed at batch 512 and was very slow at batch 128. It is not the recommended path. The mixed profile keeps helper expert tables on CPU and disables automatic CPU-op offload. Cross-session caching remains deferred.
+
+To run the packed mixed profile manually:
+
+```sh
+.venv/bin/python scripts/run.py flash --engine mtp-shared --spec draft-mtp --draft-model mtp_shared_packed_q3 --draft 2 --draft-placement mixed
+```
 
 ## Next steps
 
@@ -79,6 +118,7 @@ The [October 6 parent/fork review](bench/UPSTREAM-SCAN.md) ranks specific Mac ex
 
 1. Conversation caching is implemented, benchmarked and enabled. Its matched follow-up results are in [the scoreboard](bench/RESULTS.md) and [experiment notes](bench/NOTES.md).
 2. The smaller prediction helper is implemented and benchmarked. Keep it optional: its benefit depends on sampling and workload. [Prediction results](bench/PREDICTION.md).
+   The later [draft vocabulary](bench/DRAFT-VOCAB.md) and [shared helper/layout](bench/SHARED-HELPER.md) experiments use independent controls and retain the normal engine.
 3. Treat larger contexts and higher-precision full models as separate capacity experiments. Porting Strata's expert scheduler to Metal is a larger engineering project.
 4. Investigate two-device execution later. The AMD desktop's memory does not automatically merge with Mac unified memory; networking and GPU support must be tested separately.
 

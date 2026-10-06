@@ -14,6 +14,7 @@ import psutil
 from benchmark import Monitor, wait_ready
 from lab import ROOT, server_command
 from engines import ENGINES, verify_engine
+from draft_vocab import experiment_environment
 from check_memory import assert_no_model_server
 
 
@@ -21,6 +22,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("model", choices=["small", "flash"], nargs="?", default="flash")
     ap.add_argument("--engine", choices=ENGINES, default="baseline")
+    ap.add_argument("--draft-vocab", choices=["off", "106k"], default="off")
     ap.add_argument("--port", type=int, default=8095)
     ap.add_argument("--native-port", type=int, default=8096)
     ap.add_argument("--context", type=int, default=4096)
@@ -28,10 +30,13 @@ def main():
     ap.add_argument("--cache-type", default="f16", choices=["f16", "q8_0", "q4_0"])
     ap.add_argument("--spec", default="none", choices=["none", "draft-mtp"])
     ap.add_argument("--draft", type=int, default=3)
-    ap.add_argument("--draft-placement", choices=["gpu", "cpu", "output"], default="cpu")
+    ap.add_argument("--draft-placement", choices=["gpu", "cpu", "output", "mixed"], default="cpu")
     ap.add_argument("--draft-model", default="mtp")
     ap.add_argument("--prompt-cache", action=argparse.BooleanOptionalAction, default=True)
     args = ap.parse_args()
+    if args.draft_vocab != "off" and args.spec != "draft-mtp":
+        ap.error("The draft vocabulary requires --spec draft-mtp")
+    native_env, vocab_info = experiment_environment(args.engine, args.draft_vocab)
     assert_no_model_server()
     engine_info = verify_engine(args.engine, require_receipt=(args.engine != "baseline"))
     def interrupted(signum, frame):
@@ -60,7 +65,8 @@ def main():
                                      engine=args.engine)
             (folder / "command.json").write_text(json.dumps(command, indent=2) + "\n")
             (folder / "engine.json").write_text(json.dumps(engine_info, indent=2) + "\n")
-            native = subprocess.Popen(command, stdout=log, stderr=log)
+            (folder / "draft-vocabulary.json").write_text(json.dumps(vocab_info, indent=2) + "\n")
+            native = subprocess.Popen(command, stdout=log, stderr=log, env=native_env)
             monitor = Monitor(native, folder / "memory.jsonl")
             monitor.thread.start()
             wait_ready(native, config["native_url"])

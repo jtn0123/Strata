@@ -2,51 +2,170 @@
 
 Measured on this 48 GiB M5 Pro. Raw JSON, CSV, native logs, exact prompt IDs and 250 ms memory samples are saved beside each run. Earlier results stay unchanged.
 
-| Run | Prompt tokens | Output tok/s (median) | First token (median, s) | Input tok/s (median) | Peak RSS (GiB) | Peak swap (GiB) | Swap growth (GiB) | Status |
+| Run | Workload / prompt tokens | Output tok/s (median) | First token (median, s) | Input tok/s (median) | Peak RSS (GiB) | Peak swap (GiB) | Swap growth (GiB) | Status |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| [small-baseline](results/20261006T105737Z-small-baseline/result.json) | 512 | 77.56 | 0.325 | 1576.7 | 3.01 | 0.00 | 0.00 | passed |
-| [small-baseline](results/20261006T105737Z-small-baseline/result.json) | 2048 | 76.13 | 1.256 | 1631.4 | 3.01 | 0.00 | 0.00 | passed |
-| [small-ubatch512](results/20261006T105818Z-small-ubatch512/result.json) | 512 | 77.41 | 0.248 | 2069.9 | 3.05 | 0.00 | 0.00 | passed |
-| [small-ubatch512](results/20261006T105818Z-small-ubatch512/result.json) | 2048 | 75.76 | 0.943 | 2173.9 | 3.05 | 0.00 | 0.00 | passed |
-| [small-baseline-confirm](results/20261006T105843Z-small-baseline-confirm/result.json) | 512 | 77.51 | 0.325 | 1579.3 | 3.01 | 0.00 | 0.00 | passed |
-| [small-baseline-confirm](results/20261006T105843Z-small-baseline-confirm/result.json) | 2048 | 75.95 | 1.256 | 1631.6 | 3.01 | 0.00 | 0.00 | passed |
-| [flash-baseline](results/20261006T111445Z-flash-baseline/result.json) | 512 | 38.74 | 1.230 | 416.3 | 34.39 | 0.02 | 0.01 | passed |
-| [flash-baseline](results/20261006T111445Z-flash-baseline/result.json) | 2048 | 37.55 | 4.943 | 414.4 | 34.39 | 0.02 | 0.01 | passed |
-| [flash-ubatch512](results/20261006T111541Z-flash-ubatch512/result.json) | 512 | 38.72 | 0.750 | 683.5 | 35.68 | 0.02 | 0.00 | passed |
-| [flash-ubatch512](results/20261006T111541Z-flash-ubatch512/result.json) | 2048 | 37.44 | 3.111 | 658.4 | 35.68 | 0.02 | 0.00 | passed |
+| [small-baseline](results/20261006T105737Z-small-baseline/result.json) | synthetic / 512 | 77.56 | 0.325 | 1576.7 | 3.01 | 0.00 | 0.00 | passed |
+| [small-baseline](results/20261006T105737Z-small-baseline/result.json) | synthetic / 2048 | 76.13 | 1.256 | 1631.4 | 3.01 | 0.00 | 0.00 | passed |
+| [small-ubatch512](results/20261006T105818Z-small-ubatch512/result.json) | synthetic / 512 | 77.41 | 0.248 | 2069.9 | 3.05 | 0.00 | 0.00 | passed |
+| [small-ubatch512](results/20261006T105818Z-small-ubatch512/result.json) | synthetic / 2048 | 75.76 | 0.943 | 2173.9 | 3.05 | 0.00 | 0.00 | passed |
+| [small-baseline-confirm](results/20261006T105843Z-small-baseline-confirm/result.json) | synthetic / 512 | 77.51 | 0.325 | 1579.3 | 3.01 | 0.00 | 0.00 | passed |
+| [small-baseline-confirm](results/20261006T105843Z-small-baseline-confirm/result.json) | synthetic / 2048 | 75.95 | 1.256 | 1631.6 | 3.01 | 0.00 | 0.00 | passed |
+| [flash-baseline](results/20261006T111445Z-flash-baseline/result.json) | synthetic / 512 | 38.74 | 1.230 | 416.3 | 34.39 | 0.02 | 0.01 | passed |
+| [flash-baseline](results/20261006T111445Z-flash-baseline/result.json) | synthetic / 2048 | 37.55 | 4.943 | 414.4 | 34.39 | 0.02 | 0.01 | passed |
+| [flash-ubatch512](results/20261006T111541Z-flash-ubatch512/result.json) | synthetic / 512 | 38.72 | 0.750 | 683.5 | 35.68 | 0.02 | 0.00 | passed |
+| [flash-ubatch512](results/20261006T111541Z-flash-ubatch512/result.json) | synthetic / 2048 | 37.44 | 3.111 | 658.4 | 35.68 | 0.02 | 0.00 | passed |
 | [flash-mtp3-ubatch512](results/20261006T111640Z-flash-mtp3-ubatch512/result.json) | - | - | - | - | 37.35 | 0.14 | 0.12 | failed: RuntimeError: Streaming response has no first token or final timing record |
-| [flash-mtp3-cpu-ubatch512](results/20261006T111806Z-flash-mtp3-cpu-ubatch512/result.json) | 512 | 45.05 | 1.016 | 504.3 | 38.31 | 1.99 | 1.85 | passed |
-| [flash-mtp3-cpu-ubatch512](results/20261006T111806Z-flash-mtp3-cpu-ubatch512/result.json) | 2048 | 42.66 | 4.148 | 493.8 | 38.31 | 1.99 | 1.85 | passed |
-| [flash-8k-ubatch512](results/20261006T111954Z-flash-8k-ubatch512/result.json) | 1024 | 38.27 | 1.504 | 680.9 | 35.94 | 1.93 | 0.00 | passed |
-| [flash-8k-ubatch512](results/20261006T111954Z-flash-8k-ubatch512/result.json) | 4096 | 37.19 | 6.616 | 619.2 | 35.94 | 1.93 | 0.00 | passed |
-| [prediction-baseline-a](results/20261006T144910Z-prediction-baseline-a/result.json) | 512 | 38.97 | 0.749 | 684.4 | 33.37 | 1.03 | 0.00 | passed |
-| [prediction-baseline-a](results/20261006T144910Z-prediction-baseline-a/result.json) | 2048 | 37.59 | 3.106 | 659.4 | 33.37 | 1.03 | 0.00 | passed |
+| [flash-mtp3-cpu-ubatch512](results/20261006T111806Z-flash-mtp3-cpu-ubatch512/result.json) | synthetic / 512 | 45.05 | 1.016 | 504.3 | 38.31 | 1.99 | 1.85 | passed |
+| [flash-mtp3-cpu-ubatch512](results/20261006T111806Z-flash-mtp3-cpu-ubatch512/result.json) | synthetic / 2048 | 42.66 | 4.148 | 493.8 | 38.31 | 1.99 | 1.85 | passed |
+| [flash-8k-ubatch512](results/20261006T111954Z-flash-8k-ubatch512/result.json) | synthetic / 1024 | 38.27 | 1.504 | 680.9 | 35.94 | 1.93 | 0.00 | passed |
+| [flash-8k-ubatch512](results/20261006T111954Z-flash-8k-ubatch512/result.json) | synthetic / 4096 | 37.19 | 6.616 | 619.2 | 35.94 | 1.93 | 0.00 | passed |
+| [prediction-baseline-a](results/20261006T144910Z-prediction-baseline-a/result.json) | synthetic / 512 | 38.97 | 0.749 | 684.4 | 33.37 | 1.03 | 0.00 | passed |
+| [prediction-baseline-a](results/20261006T144910Z-prediction-baseline-a/result.json) | synthetic / 2048 | 37.59 | 3.106 | 659.4 | 33.37 | 1.03 | 0.00 | passed |
 | [prediction-q2-gpu2](results/20261006T144952Z-prediction-q2-gpu2/result.json) | - | - | - | - | 37.10 | 1.03 | 0.00 | failed: RuntimeError: Streaming response has no first token or final timing record |
-| [prediction-q2-output2](results/20261006T145142Z-prediction-q2-output2/result.json) | 512 | 39.52 | 1.083 | 473.2 | 37.95 | 1.03 | 0.00 | passed |
-| [prediction-q2-output2](results/20261006T145142Z-prediction-q2-output2/result.json) | 2048 | 40.00 | 4.162 | 492.1 | 37.95 | 1.03 | 0.00 | passed |
-| [prediction-q2_0-gpu2](results/20261006T145347Z-prediction-q2_0-gpu2/result.json) | 512 | 13.86 | 0.918 | 558.3 | 37.33 | 1.02 | 0.00 | failed |
-| [prediction-q2_0-gpu2](results/20261006T145347Z-prediction-q2_0-gpu2/result.json) | 2048 | 14.42 | 4.460 | 459.3 | 37.33 | 1.02 | 0.00 | failed |
-| [prediction-q3-output2](results/20261006T145640Z-prediction-q3-output2/result.json) | 512 | 43.15 | 1.070 | 478.6 | 37.36 | 1.02 | 0.00 | passed |
-| [prediction-q3-output2](results/20261006T145640Z-prediction-q3-output2/result.json) | 2048 | 42.53 | 4.297 | 476.8 | 37.36 | 1.02 | 0.00 | passed |
-| [prediction-q3-cpu2](results/20261006T145805Z-prediction-q3-cpu2/result.json) | 512 | 41.07 | 1.058 | 484.3 | 37.94 | 1.02 | 0.00 | passed |
-| [prediction-q3-cpu2](results/20261006T145805Z-prediction-q3-cpu2/result.json) | 2048 | 41.42 | 4.392 | 466.4 | 37.94 | 1.02 | 0.00 | passed |
-| [prediction-baseline-b-t06](results/20261006T145946Z-prediction-baseline-b-t06/result.json) | 512 | 38.99 | 0.749 | 684.3 | 35.87 | 1.02 | 0.00 | passed |
-| [prediction-baseline-b-t06](results/20261006T145946Z-prediction-baseline-b-t06/result.json) | 2048 | 37.48 | 3.107 | 659.4 | 35.87 | 1.02 | 0.00 | passed |
-| [prediction-q3-output2-t06](results/20261006T150044Z-prediction-q3-output2-t06/result.json) | 512 | 38.38 | 1.104 | 463.9 | 37.98 | 1.02 | 0.00 | passed |
-| [prediction-q3-output2-t06](results/20261006T150044Z-prediction-q3-output2-t06/result.json) | 2048 | 37.30 | 4.389 | 466.7 | 37.98 | 1.02 | 0.00 | passed |
+| [prediction-q2-output2](results/20261006T145142Z-prediction-q2-output2/result.json) | synthetic / 512 | 39.52 | 1.083 | 473.2 | 37.95 | 1.03 | 0.00 | passed |
+| [prediction-q2-output2](results/20261006T145142Z-prediction-q2-output2/result.json) | synthetic / 2048 | 40.00 | 4.162 | 492.1 | 37.95 | 1.03 | 0.00 | passed |
+| [prediction-q2_0-gpu2](results/20261006T145347Z-prediction-q2_0-gpu2/result.json) | synthetic / 512 | 13.86 | 0.918 | 558.3 | 37.33 | 1.02 | 0.00 | failed |
+| [prediction-q2_0-gpu2](results/20261006T145347Z-prediction-q2_0-gpu2/result.json) | synthetic / 2048 | 14.42 | 4.460 | 459.3 | 37.33 | 1.02 | 0.00 | failed |
+| [prediction-q3-output2](results/20261006T145640Z-prediction-q3-output2/result.json) | synthetic / 512 | 43.15 | 1.070 | 478.6 | 37.36 | 1.02 | 0.00 | passed |
+| [prediction-q3-output2](results/20261006T145640Z-prediction-q3-output2/result.json) | synthetic / 2048 | 42.53 | 4.297 | 476.8 | 37.36 | 1.02 | 0.00 | passed |
+| [prediction-q3-cpu2](results/20261006T145805Z-prediction-q3-cpu2/result.json) | synthetic / 512 | 41.07 | 1.058 | 484.3 | 37.94 | 1.02 | 0.00 | passed |
+| [prediction-q3-cpu2](results/20261006T145805Z-prediction-q3-cpu2/result.json) | synthetic / 2048 | 41.42 | 4.392 | 466.4 | 37.94 | 1.02 | 0.00 | passed |
+| [prediction-baseline-b-t06](results/20261006T145946Z-prediction-baseline-b-t06/result.json) | synthetic / 512 | 38.99 | 0.749 | 684.3 | 35.87 | 1.02 | 0.00 | passed |
+| [prediction-baseline-b-t06](results/20261006T145946Z-prediction-baseline-b-t06/result.json) | synthetic / 2048 | 37.48 | 3.107 | 659.4 | 35.87 | 1.02 | 0.00 | passed |
+| [prediction-q3-output2-t06](results/20261006T150044Z-prediction-q3-output2-t06/result.json) | synthetic / 512 | 38.38 | 1.104 | 463.9 | 37.98 | 1.02 | 0.00 | passed |
+| [prediction-q3-output2-t06](results/20261006T150044Z-prediction-q3-output2-t06/result.json) | synthetic / 2048 | 37.30 | 4.389 | 466.7 | 37.98 | 1.02 | 0.00 | passed |
 | [q2-1-baseline](results/20261006T171840Z-q2-1-baseline/result.json) | - | - | - | - | 26.34 | 2.38 | 2.14 | failed: RuntimeError: Server exited during load with code -15; see server.log |
-| [q2-1-baseline](results/20261006T172232Z-q2-1-baseline/result.json) | 512 | 36.19 | 0.774 | 662.8 | 29.39 | 2.34 | 0.00 | passed |
-| [q2-1-baseline](results/20261006T172232Z-q2-1-baseline/result.json) | 2048 | 35.18 | 3.559 | 575.5 | 29.39 | 2.34 | 0.00 | passed |
-| [q2-2-q2-masked](results/20261006T172507Z-q2-2-q2-masked/result.json) | 512 | 29.20 | 0.957 | 539.0 | 35.15 | 1.94 | 0.25 | passed |
-| [q2-2-q2-masked](results/20261006T172507Z-q2-2-q2-masked/result.json) | 2048 | 30.92 | 3.863 | 531.5 | 35.15 | 1.94 | 0.25 | passed |
-| [q2-3-q2-masked](results/20261006T172754Z-q2-3-q2-masked/result.json) | 512 | 34.60 | 0.857 | 598.6 | 35.40 | 1.97 | 0.14 | passed |
-| [q2-3-q2-masked](results/20261006T172754Z-q2-3-q2-masked/result.json) | 2048 | 35.37 | 3.582 | 571.9 | 35.40 | 1.97 | 0.14 | passed |
-| [q2-4-baseline](results/20261006T173022Z-q2-4-baseline/result.json) | 512 | 34.03 | 0.845 | 606.3 | 35.34 | 1.90 | 0.00 | passed |
-| [q2-4-baseline](results/20261006T173022Z-q2-4-baseline/result.json) | 2048 | 35.45 | 3.525 | 581.3 | 35.34 | 1.90 | 0.00 | passed |
-| [q2-quiet-confirmation](results/20261006T173319Z-q2-quiet-confirmation/result.json) | 512 | 38.01 | 0.803 | 637.9 | 33.65 | 1.72 | 0.00 | passed |
-| [q2-quiet-confirmation](results/20261006T173319Z-q2-quiet-confirmation/result.json) | 2048 | 36.86 | 3.415 | 599.8 | 33.65 | 1.72 | 0.00 | passed |
-| [q2-quiet-baseline](results/20261006T173609Z-q2-quiet-baseline/result.json) | 512 | 37.91 | 0.754 | 679.2 | 35.73 | 1.70 | 0.00 | passed |
-| [q2-quiet-baseline](results/20261006T173609Z-q2-quiet-baseline/result.json) | 2048 | 35.55 | 3.166 | 647.0 | 35.73 | 1.70 | 0.00 | passed |
+| [q2-1-baseline](results/20261006T172232Z-q2-1-baseline/result.json) | synthetic / 512 | 36.19 | 0.774 | 662.8 | 29.39 | 2.34 | 0.00 | passed |
+| [q2-1-baseline](results/20261006T172232Z-q2-1-baseline/result.json) | synthetic / 2048 | 35.18 | 3.559 | 575.5 | 29.39 | 2.34 | 0.00 | passed |
+| [q2-2-q2-masked](results/20261006T172507Z-q2-2-q2-masked/result.json) | synthetic / 512 | 29.20 | 0.957 | 539.0 | 35.15 | 1.94 | 0.25 | passed |
+| [q2-2-q2-masked](results/20261006T172507Z-q2-2-q2-masked/result.json) | synthetic / 2048 | 30.92 | 3.863 | 531.5 | 35.15 | 1.94 | 0.25 | passed |
+| [q2-3-q2-masked](results/20261006T172754Z-q2-3-q2-masked/result.json) | synthetic / 512 | 34.60 | 0.857 | 598.6 | 35.40 | 1.97 | 0.14 | passed |
+| [q2-3-q2-masked](results/20261006T172754Z-q2-3-q2-masked/result.json) | synthetic / 2048 | 35.37 | 3.582 | 571.9 | 35.40 | 1.97 | 0.14 | passed |
+| [q2-4-baseline](results/20261006T173022Z-q2-4-baseline/result.json) | synthetic / 512 | 34.03 | 0.845 | 606.3 | 35.34 | 1.90 | 0.00 | passed |
+| [q2-4-baseline](results/20261006T173022Z-q2-4-baseline/result.json) | synthetic / 2048 | 35.45 | 3.525 | 581.3 | 35.34 | 1.90 | 0.00 | passed |
+| [q2-quiet-confirmation](results/20261006T173319Z-q2-quiet-confirmation/result.json) | synthetic / 512 | 38.01 | 0.803 | 637.9 | 33.65 | 1.72 | 0.00 | passed |
+| [q2-quiet-confirmation](results/20261006T173319Z-q2-quiet-confirmation/result.json) | synthetic / 2048 | 36.86 | 3.415 | 599.8 | 33.65 | 1.72 | 0.00 | passed |
+| [q2-quiet-baseline](results/20261006T173609Z-q2-quiet-baseline/result.json) | synthetic / 512 | 37.91 | 0.754 | 679.2 | 35.73 | 1.70 | 0.00 | passed |
+| [q2-quiet-baseline](results/20261006T173609Z-q2-quiet-baseline/result.json) | synthetic / 2048 | 35.55 | 3.166 | 647.0 | 35.73 | 1.70 | 0.00 | passed |
+| [vocab-feature](results/20261006T181113Z-vocab-feature/result.json) | synthetic / 48 | 37.77 | 0.608 | 79.1 | 28.78 | 1.50 | 0.48 | completed-check-failure |
+| [vocab-feature](results/20261006T181113Z-vocab-feature/result.json) | synthetic / 53 | 32.79 | 0.381 | 139.4 | 28.78 | 1.50 | 0.48 | completed-check-failure |
+| [vocab-feature](results/20261006T181113Z-vocab-feature/result.json) | synthetic / 56 | 31.29 | 0.390 | 143.8 | 28.78 | 1.50 | 0.48 | completed-check-failure |
+| [vocab-feature](results/20261006T181113Z-vocab-feature/result.json) | synthetic / 512 | 32.88 | 1.249 | 410.7 | 28.78 | 1.50 | 0.48 | completed-check-failure |
+| [vocab-feature](results/20261006T181113Z-vocab-feature/result.json) | synthetic / 2048 | 33.16 | 4.547 | 450.9 | 28.78 | 1.50 | 0.48 | completed-check-failure |
+| [vocab-1-plain](results/20261006T181358Z-vocab-1-plain/result.json) | chinese / 56 | 36.45 | 0.294 | 190.7 | 36.21 | 1.46 | 0.00 | passed |
+| [vocab-1-plain](results/20261006T181358Z-vocab-1-plain/result.json) | code / 48 | 37.75 | 0.269 | 178.9 | 36.21 | 1.46 | 0.00 | passed |
+| [vocab-1-plain](results/20261006T181358Z-vocab-1-plain/result.json) | prose / 53 | 37.26 | 0.277 | 191.9 | 36.21 | 1.46 | 0.00 | passed |
+| [vocab-1-plain](results/20261006T181358Z-vocab-1-plain/result.json) | synthetic / 512 | 36.50 | 0.768 | 667.5 | 36.21 | 1.46 | 0.00 | passed |
+| [vocab-1-plain](results/20261006T181358Z-vocab-1-plain/result.json) | synthetic / 2048 | 35.97 | 3.157 | 649.0 | 36.21 | 1.46 | 0.00 | passed |
+| [vocab-2-full](results/20261006T181631Z-vocab-2-full/result.json) | chinese / 56 | 33.38 | 0.398 | 141.1 | 37.71 | 1.43 | 0.00 | passed |
+| [vocab-2-full](results/20261006T181631Z-vocab-2-full/result.json) | code / 48 | 41.22 | 0.481 | 100.0 | 37.71 | 1.43 | 0.00 | passed |
+| [vocab-2-full](results/20261006T181631Z-vocab-2-full/result.json) | prose / 53 | 31.94 | 0.426 | 125.8 | 37.71 | 1.43 | 0.00 | passed |
+| [vocab-2-full](results/20261006T181631Z-vocab-2-full/result.json) | synthetic / 512 | 34.87 | 1.279 | 402.1 | 37.71 | 1.43 | 0.00 | passed |
+| [vocab-2-full](results/20261006T181631Z-vocab-2-full/result.json) | synthetic / 2048 | 34.88 | 5.214 | 393.3 | 37.71 | 1.43 | 0.00 | passed |
+| [vocab-3-subset](results/20261006T181924Z-vocab-3-subset/result.json) | chinese / 56 | 31.91 | 0.390 | 143.9 | 37.67 | 1.41 | 0.00 | passed |
+| [vocab-3-subset](results/20261006T181924Z-vocab-3-subset/result.json) | code / 48 | 39.75 | 0.415 | 116.8 | 37.67 | 1.41 | 0.00 | passed |
+| [vocab-3-subset](results/20261006T181924Z-vocab-3-subset/result.json) | prose / 53 | 31.42 | 0.406 | 130.9 | 37.67 | 1.41 | 0.00 | passed |
+| [vocab-3-subset](results/20261006T181924Z-vocab-3-subset/result.json) | synthetic / 512 | 34.17 | 1.489 | 358.5 | 37.67 | 1.41 | 0.00 | passed |
+| [vocab-3-subset](results/20261006T181924Z-vocab-3-subset/result.json) | synthetic / 2048 | 34.59 | 5.294 | 387.1 | 37.67 | 1.41 | 0.00 | passed |
+| [vocab-4-subset](results/20261006T182225Z-vocab-4-subset/result.json) | synthetic / 512 | 33.54 | 1.206 | 426.2 | 37.81 | 1.35 | 0.00 | failed |
+| [feature-shared-cpu](results/20261006T182755Z-feature-shared-cpu/result.json) | chinese / 56 | 32.52 | 0.538 | 104.1 | 31.21 | 1.37 | 0.05 | passed |
+| [feature-shared-cpu](results/20261006T182755Z-feature-shared-cpu/result.json) | code / 48 | 39.69 | 0.551 | 87.4 | 31.21 | 1.37 | 0.05 | passed |
+| [feature-shared-cpu](results/20261006T182755Z-feature-shared-cpu/result.json) | prose / 53 | 36.46 | 0.768 | 69.1 | 31.21 | 1.37 | 0.05 | passed |
+| [feature-shared-cpu](results/20261006T182755Z-feature-shared-cpu/result.json) | synthetic / 512 | 36.35 | 1.344 | 381.3 | 31.21 | 1.37 | 0.05 | passed |
+| [feature-shared-cpu](results/20261006T182755Z-feature-shared-cpu/result.json) | synthetic / 2048 | 35.81 | 4.572 | 448.0 | 31.21 | 1.37 | 0.05 | passed |
+| [feature-shared-gpu](results/20261006T182852Z-feature-shared-gpu/result.json) | synthetic / 512 | 2.96 | 1.458 | 351.4 | 37.27 | 1.36 | 0.00 | failed |
+| [feature-shared-gpu](results/20261006T182852Z-feature-shared-gpu/result.json) | synthetic / 2048 | 4.98 | 7.180 | 285.3 | 37.27 | 1.36 | 0.00 | failed |
+| [feature-shared-gpu](results/20261006T183135Z-feature-shared-gpu/result.json) | chinese / 56 | 4.31 | 1.980 | 28.3 | 36.94 | 1.36 | 0.00 | passed |
+| [feature-shared-gpu](results/20261006T183135Z-feature-shared-gpu/result.json) | code / 48 | 6.64 | 1.290 | 37.2 | 36.94 | 1.36 | 0.00 | passed |
+| [feature-shared-gpu](results/20261006T183135Z-feature-shared-gpu/result.json) | prose / 53 | 4.50 | 1.419 | 37.4 | 36.94 | 1.36 | 0.00 | passed |
+| [feature-shared-gpu](results/20261006T183135Z-feature-shared-gpu/result.json) | synthetic / 512 | 10.09 | 3.815 | 134.2 | 36.94 | 1.36 | 0.00 | passed |
+| [feature-shared-gpu](results/20261006T183135Z-feature-shared-gpu/result.json) | synthetic / 2048 | 5.30 | 13.219 | 154.9 | 36.94 | 1.36 | 0.00 | passed |
+| [feature-shared-mixed](results/20261006T183622Z-feature-shared-mixed/result.json) | - | - | - | - | 37.39 | 1.35 | 0.00 | failed: RuntimeError: Streaming response has no first token or final timing record |
+| [feature-shared-mixed](results/20261006T183903Z-feature-shared-mixed/result.json) | chinese / 56 | 33.86 | 0.345 | 162.5 | 34.58 | 1.33 | 0.00 | passed |
+| [feature-shared-mixed](results/20261006T183903Z-feature-shared-mixed/result.json) | code / 48 | 44.84 | 0.318 | 151.3 | 34.58 | 1.33 | 0.00 | passed |
+| [feature-shared-mixed](results/20261006T183903Z-feature-shared-mixed/result.json) | prose / 53 | 38.80 | 0.321 | 165.1 | 34.58 | 1.33 | 0.00 | passed |
+| [feature-shared-mixed](results/20261006T183903Z-feature-shared-mixed/result.json) | synthetic / 512 | 35.11 | 1.109 | 462.4 | 34.58 | 1.33 | 0.00 | passed |
+| [feature-shared-mixed](results/20261006T183903Z-feature-shared-mixed/result.json) | synthetic / 2048 | 41.69 | 3.925 | 522.0 | 34.58 | 1.33 | 0.00 | passed |
+| [vocab-1-plain](results/20261006T183950Z-vocab-1-plain/result.json) | chinese / 56 | 37.57 | 0.283 | 198.3 | 36.18 | 1.30 | 0.00 | passed |
+| [vocab-1-plain](results/20261006T183950Z-vocab-1-plain/result.json) | code / 48 | 37.23 | 0.271 | 177.7 | 36.18 | 1.30 | 0.00 | passed |
+| [vocab-1-plain](results/20261006T183950Z-vocab-1-plain/result.json) | prose / 53 | 38.32 | 0.276 | 192.8 | 36.18 | 1.30 | 0.00 | passed |
+| [vocab-1-plain](results/20261006T183950Z-vocab-1-plain/result.json) | synthetic / 512 | 37.12 | 0.759 | 675.4 | 36.18 | 1.30 | 0.00 | passed |
+| [vocab-1-plain](results/20261006T183950Z-vocab-1-plain/result.json) | synthetic / 2048 | 35.79 | 3.156 | 649.2 | 36.18 | 1.30 | 0.00 | passed |
+| [vocab-2-full](results/20261006T184129Z-vocab-2-full/result.json) | chinese / 56 | 34.70 | 0.346 | 162.1 | 37.45 | 1.30 | 0.00 | passed |
+| [vocab-2-full](results/20261006T184129Z-vocab-2-full/result.json) | code / 48 | 44.83 | 0.336 | 143.2 | 37.45 | 1.30 | 0.00 | passed |
+| [vocab-2-full](results/20261006T184129Z-vocab-2-full/result.json) | prose / 53 | 37.09 | 0.347 | 153.0 | 37.45 | 1.30 | 0.00 | passed |
+| [vocab-2-full](results/20261006T184129Z-vocab-2-full/result.json) | synthetic / 512 | 37.48 | 1.146 | 449.5 | 37.45 | 1.30 | 0.00 | passed |
+| [vocab-2-full](results/20261006T184129Z-vocab-2-full/result.json) | synthetic / 2048 | 36.74 | 4.556 | 449.7 | 37.45 | 1.30 | 0.00 | passed |
+| [vocab-3-subset](results/20261006T184322Z-vocab-3-subset/result.json) | chinese / 56 | 35.15 | 0.369 | 152.4 | 38.34 | 1.35 | 0.05 | passed |
+| [vocab-3-subset](results/20261006T184322Z-vocab-3-subset/result.json) | code / 48 | 43.53 | 0.625 | 97.9 | 38.34 | 1.35 | 0.05 | passed |
+| [vocab-3-subset](results/20261006T184322Z-vocab-3-subset/result.json) | prose / 53 | 38.47 | 0.370 | 143.5 | 38.34 | 1.35 | 0.05 | passed |
+| [vocab-3-subset](results/20261006T184322Z-vocab-3-subset/result.json) | synthetic / 512 | 39.15 | 1.083 | 473.3 | 38.34 | 1.35 | 0.05 | passed |
+| [vocab-3-subset](results/20261006T184322Z-vocab-3-subset/result.json) | synthetic / 2048 | 38.75 | 4.644 | 442.6 | 38.34 | 1.35 | 0.05 | passed |
+| [vocab-4-subset](results/20261006T184513Z-vocab-4-subset/result.json) | chinese / 56 | 35.58 | 0.344 | 162.9 | 38.48 | 1.35 | 0.00 | passed |
+| [vocab-4-subset](results/20261006T184513Z-vocab-4-subset/result.json) | code / 48 | 43.68 | 0.344 | 139.6 | 38.48 | 1.35 | 0.00 | passed |
+| [vocab-4-subset](results/20261006T184513Z-vocab-4-subset/result.json) | prose / 53 | 31.18 | 0.354 | 149.9 | 38.48 | 1.35 | 0.00 | passed |
+| [vocab-4-subset](results/20261006T184513Z-vocab-4-subset/result.json) | synthetic / 512 | 39.11 | 1.090 | 470.0 | 38.48 | 1.35 | 0.00 | passed |
+| [vocab-4-subset](results/20261006T184513Z-vocab-4-subset/result.json) | synthetic / 2048 | 38.63 | 4.738 | 435.1 | 38.48 | 1.35 | 0.00 | passed |
+| [vocab-5-full](results/20261006T184707Z-vocab-5-full/result.json) | chinese / 56 | 34.79 | 0.344 | 162.9 | 38.21 | 1.34 | 0.00 | passed |
+| [vocab-5-full](results/20261006T184707Z-vocab-5-full/result.json) | code / 48 | 43.25 | 0.348 | 138.1 | 38.21 | 1.34 | 0.00 | passed |
+| [vocab-5-full](results/20261006T184707Z-vocab-5-full/result.json) | prose / 53 | 37.10 | 0.353 | 150.4 | 38.21 | 1.34 | 0.00 | passed |
+| [vocab-5-full](results/20261006T184707Z-vocab-5-full/result.json) | synthetic / 512 | 37.75 | 1.076 | 476.4 | 38.21 | 1.34 | 0.00 | passed |
+| [vocab-5-full](results/20261006T184707Z-vocab-5-full/result.json) | synthetic / 2048 | 37.04 | 4.389 | 466.7 | 38.21 | 1.34 | 0.00 | passed |
+| [vocab-6-plain](results/20261006T184856Z-vocab-6-plain/result.json) | chinese / 56 | 38.42 | 0.278 | 201.8 | 36.33 | 1.34 | 0.00 | passed |
+| [vocab-6-plain](results/20261006T184856Z-vocab-6-plain/result.json) | code / 48 | 37.81 | 0.269 | 178.9 | 36.33 | 1.34 | 0.00 | passed |
+| [vocab-6-plain](results/20261006T184856Z-vocab-6-plain/result.json) | prose / 53 | 38.08 | 0.275 | 193.0 | 36.33 | 1.34 | 0.00 | passed |
+| [vocab-6-plain](results/20261006T184856Z-vocab-6-plain/result.json) | synthetic / 512 | 38.12 | 0.754 | 679.2 | 36.33 | 1.34 | 0.00 | passed |
+| [vocab-6-plain](results/20261006T184856Z-vocab-6-plain/result.json) | synthetic / 2048 | 36.51 | 3.126 | 655.4 | 36.33 | 1.34 | 0.00 | passed |
+| [shared-1-plain](results/20261006T185032Z-shared-1-plain/result.json) | chinese / 56 | 38.09 | 0.279 | 201.2 | 36.34 | 1.33 | 0.00 | passed |
+| [shared-1-plain](results/20261006T185032Z-shared-1-plain/result.json) | code / 48 | 38.28 | 0.270 | 178.3 | 36.34 | 1.33 | 0.00 | passed |
+| [shared-1-plain](results/20261006T185032Z-shared-1-plain/result.json) | prose / 53 | 38.23 | 0.275 | 193.1 | 36.34 | 1.33 | 0.00 | passed |
+| [shared-1-plain](results/20261006T185032Z-shared-1-plain/result.json) | synthetic / 512 | 37.93 | 0.759 | 675.5 | 36.34 | 1.33 | 0.00 | passed |
+| [shared-1-plain](results/20261006T185032Z-shared-1-plain/result.json) | synthetic / 2048 | 35.77 | 3.166 | 647.0 | 36.34 | 1.33 | 0.00 | passed |
+| [shared-2-full](results/20261006T185208Z-shared-2-full/result.json) | chinese / 56 | 23.97 | 1.150 | 53.8 | 37.92 | 2.90 | 1.58 | failed |
+| [shared-2-full](results/20261006T185208Z-shared-2-full/result.json) | code / 48 | 39.48 | 0.732 | 66.3 | 37.92 | 2.90 | 1.58 | failed |
+| [shared-2-full](results/20261006T185208Z-shared-2-full/result.json) | prose / 53 | 32.44 | 0.506 | 107.7 | 37.92 | 2.90 | 1.58 | failed |
+| [shared-2-full](results/20261006T185208Z-shared-2-full/result.json) | synthetic / 512 | 34.41 | 1.133 | 453.0 | 37.92 | 2.90 | 1.58 | failed |
+| [shared-2-full](results/20261006T185208Z-shared-2-full/result.json) | synthetic / 2048 | 36.53 | 4.449 | 460.4 | 37.92 | 2.90 | 1.58 | failed |
+| [shared-1-plain](results/20261006T185833Z-shared-1-plain/result.json) | chinese / 56 | 37.61 | 0.281 | 199.6 | 36.24 | 1.68 | 0.00 | passed |
+| [shared-1-plain](results/20261006T185833Z-shared-1-plain/result.json) | code / 48 | 37.98 | 0.269 | 179.0 | 36.24 | 1.68 | 0.00 | passed |
+| [shared-1-plain](results/20261006T185833Z-shared-1-plain/result.json) | prose / 53 | 37.38 | 0.279 | 190.2 | 36.24 | 1.68 | 0.00 | passed |
+| [shared-1-plain](results/20261006T185833Z-shared-1-plain/result.json) | synthetic / 512 | 38.12 | 0.753 | 680.3 | 36.24 | 1.68 | 0.00 | passed |
+| [shared-1-plain](results/20261006T185833Z-shared-1-plain/result.json) | synthetic / 2048 | 36.41 | 3.128 | 654.8 | 36.24 | 1.68 | 0.00 | passed |
+| [shared-2-full](results/20261006T190011Z-shared-2-full/result.json) | chinese / 56 | 31.84 | 0.391 | 143.9 | 38.05 | 1.63 | 0.00 | passed |
+| [shared-2-full](results/20261006T190011Z-shared-2-full/result.json) | code / 48 | 43.51 | 0.355 | 135.5 | 38.05 | 1.63 | 0.00 | passed |
+| [shared-2-full](results/20261006T190011Z-shared-2-full/result.json) | prose / 53 | 35.63 | 0.356 | 149.0 | 38.05 | 1.63 | 0.00 | passed |
+| [shared-2-full](results/20261006T190011Z-shared-2-full/result.json) | synthetic / 512 | 37.03 | 1.132 | 452.8 | 38.05 | 1.63 | 0.00 | passed |
+| [shared-2-full](results/20261006T190011Z-shared-2-full/result.json) | synthetic / 2048 | 36.37 | 4.544 | 450.8 | 38.05 | 1.63 | 0.00 | passed |
+| [shared-3-shared-cpu](results/20261006T190204Z-shared-3-shared-cpu/result.json) | chinese / 56 | 33.04 | 0.385 | 146.0 | 37.90 | 1.59 | 0.00 | passed |
+| [shared-3-shared-cpu](results/20261006T190204Z-shared-3-shared-cpu/result.json) | code / 48 | 41.82 | 0.350 | 137.3 | 37.90 | 1.59 | 0.00 | passed |
+| [shared-3-shared-cpu](results/20261006T190204Z-shared-3-shared-cpu/result.json) | prose / 53 | 33.56 | 0.446 | 119.0 | 37.90 | 1.59 | 0.00 | passed |
+| [shared-3-shared-cpu](results/20261006T190204Z-shared-3-shared-cpu/result.json) | synthetic / 512 | 36.04 | 1.180 | 434.8 | 37.90 | 1.59 | 0.00 | passed |
+| [shared-3-shared-cpu](results/20261006T190204Z-shared-3-shared-cpu/result.json) | synthetic / 2048 | 36.65 | 4.616 | 443.7 | 37.90 | 1.59 | 0.00 | passed |
+| [shared-4-shared-mixed](results/20261006T190357Z-shared-4-shared-mixed/result.json) | chinese / 56 | 34.77 | 0.313 | 179.2 | 37.87 | 1.54 | 0.00 | passed |
+| [shared-4-shared-mixed](results/20261006T190357Z-shared-4-shared-mixed/result.json) | code / 48 | 42.36 | 0.310 | 155.3 | 37.87 | 1.54 | 0.00 | passed |
+| [shared-4-shared-mixed](results/20261006T190357Z-shared-4-shared-mixed/result.json) | prose / 53 | 37.80 | 0.311 | 170.9 | 37.87 | 1.54 | 0.00 | passed |
+| [shared-4-shared-mixed](results/20261006T190357Z-shared-4-shared-mixed/result.json) | synthetic / 512 | 40.65 | 1.018 | 503.7 | 37.87 | 1.54 | 0.00 | passed |
+| [shared-4-shared-mixed](results/20261006T190357Z-shared-4-shared-mixed/result.json) | synthetic / 2048 | 38.90 | 4.106 | 499.0 | 37.87 | 1.54 | 0.00 | passed |
+| [shared-5-shared-mixed](results/20261006T190540Z-shared-5-shared-mixed/result.json) | chinese / 56 | 33.65 | 0.331 | 169.6 | 37.74 | 1.54 | 0.00 | passed |
+| [shared-5-shared-mixed](results/20261006T190540Z-shared-5-shared-mixed/result.json) | code / 48 | 43.50 | 0.310 | 154.9 | 37.74 | 1.54 | 0.00 | passed |
+| [shared-5-shared-mixed](results/20261006T190540Z-shared-5-shared-mixed/result.json) | prose / 53 | 34.46 | 0.360 | 149.1 | 37.74 | 1.54 | 0.00 | passed |
+| [shared-5-shared-mixed](results/20261006T190540Z-shared-5-shared-mixed/result.json) | synthetic / 512 | 41.47 | 0.953 | 537.7 | 37.74 | 1.54 | 0.00 | passed |
+| [shared-5-shared-mixed](results/20261006T190540Z-shared-5-shared-mixed/result.json) | synthetic / 2048 | 39.32 | 4.185 | 489.6 | 37.74 | 1.54 | 0.00 | passed |
+| [shared-6-shared-cpu](results/20261006T190724Z-shared-6-shared-cpu/result.json) | chinese / 56 | 34.77 | 0.350 | 160.1 | 37.69 | 1.48 | 0.00 | passed |
+| [shared-6-shared-cpu](results/20261006T190724Z-shared-6-shared-cpu/result.json) | code / 48 | 42.85 | 0.351 | 137.2 | 37.69 | 1.48 | 0.00 | passed |
+| [shared-6-shared-cpu](results/20261006T190724Z-shared-6-shared-cpu/result.json) | prose / 53 | 35.78 | 0.417 | 129.8 | 37.69 | 1.48 | 0.00 | passed |
+| [shared-6-shared-cpu](results/20261006T190724Z-shared-6-shared-cpu/result.json) | synthetic / 512 | 38.30 | 1.085 | 472.3 | 37.69 | 1.48 | 0.00 | passed |
+| [shared-6-shared-cpu](results/20261006T190724Z-shared-6-shared-cpu/result.json) | synthetic / 2048 | 38.42 | 4.385 | 467.1 | 37.69 | 1.48 | 0.00 | passed |
+| [shared-7-full](results/20261006T190914Z-shared-7-full/result.json) | chinese / 56 | 32.68 | 0.370 | 151.6 | 37.97 | 1.47 | 0.00 | passed |
+| [shared-7-full](results/20261006T190914Z-shared-7-full/result.json) | code / 48 | 40.66 | 0.373 | 129.0 | 37.97 | 1.47 | 0.00 | passed |
+| [shared-7-full](results/20261006T190914Z-shared-7-full/result.json) | prose / 53 | 34.57 | 0.414 | 128.4 | 37.97 | 1.47 | 0.00 | passed |
+| [shared-7-full](results/20261006T190914Z-shared-7-full/result.json) | synthetic / 512 | 36.87 | 1.529 | 361.9 | 37.97 | 1.47 | 0.00 | passed |
+| [shared-7-full](results/20261006T190914Z-shared-7-full/result.json) | synthetic / 2048 | 35.68 | 4.832 | 426.3 | 37.97 | 1.47 | 0.00 | passed |
+| [shared-8-plain](results/20261006T191108Z-shared-8-plain/result.json) | chinese / 56 | 36.77 | 0.285 | 196.7 | 36.32 | 1.46 | 0.00 | passed |
+| [shared-8-plain](results/20261006T191108Z-shared-8-plain/result.json) | code / 48 | 37.12 | 0.269 | 178.8 | 36.32 | 1.46 | 0.00 | passed |
+| [shared-8-plain](results/20261006T191108Z-shared-8-plain/result.json) | prose / 53 | 36.84 | 0.280 | 189.4 | 36.32 | 1.46 | 0.00 | passed |
+| [shared-8-plain](results/20261006T191108Z-shared-8-plain/result.json) | synthetic / 512 | 36.93 | 0.775 | 660.9 | 36.32 | 1.46 | 0.00 | passed |
+| [shared-8-plain](results/20261006T191108Z-shared-8-plain/result.json) | synthetic / 2048 | 35.66 | 3.268 | 626.9 | 36.32 | 1.46 | 0.00 | passed |
 
 ## Optimization 1: conversation caching
 
@@ -65,7 +184,11 @@ Reduction = 100 x (1 - cached duration / uncached duration). Output speed change
 
 [Optimization 2: prediction-helper percentages, tradeoffs and decision](PREDICTION.md)
 
-[Optimization 3: isolated Q2 Metal experiment and benchmark hold](Q2-METAL.md)
+[Optimization 3: isolated Q2 Metal measurements and decision](Q2-METAL.md)
+
+[Optimization 4: smaller draft vocabulary](DRAFT-VOCAB.md)
+
+[Optimization 5: sharing helper weights and GPU placement](SHARED-HELPER.md)
 
 ## Interpretation
 
@@ -83,6 +206,7 @@ Reduction = 100 x (1 - cached duration / uncached duration). Output speed change
 - [20261006T112221Z-flash-integration](results/20261006T112221Z-flash-integration.json): 9/9 checks passed.
 - [20261006T141248Z-flash-integration](results/20261006T141248Z-flash-integration.json): 9/9 checks passed.
 - [20261006T155222Z-flash-integration](results/20261006T155222Z-flash-integration.json): 9/9 checks passed.
+- [20261006T185730Z-flash-integration](results/20261006T185730Z-flash-integration.json): 9/9 checks passed.
 - [20261006T112501Z-flash-context-probe](results/20261006T112501Z-flash-context-probe.json): passed, varied records across 2831 input tokens.
 - [20261006T141353Z-flash-cache-api](results/20261006T141353Z-flash-cache-api.json): 2/2 real Strata HTTP follow-ups correct with confirmed native cache reuse.
 

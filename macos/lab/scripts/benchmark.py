@@ -17,6 +17,7 @@ import urllib.request
 import psutil
 from lab import ROOT, request, server_command
 from engines import ENGINES, verify_engine
+from draft_vocab import experiment_environment
 from check_memory import assert_no_model_server
 
 
@@ -137,13 +138,16 @@ def main():
     ap.add_argument("model", choices=["small", "flash"])
     ap.add_argument("--label", required=True)
     ap.add_argument("--engine", choices=ENGINES, default="baseline")
+    ap.add_argument("--draft-vocab", choices=["off", "106k"], default="off")
+    ap.add_argument("--real-workloads", action="store_true")
+    ap.add_argument("--cached-workloads", action="store_true")
     ap.add_argument("--context", type=int, default=4096)
     ap.add_argument("--batch", type=int, default=512)
     ap.add_argument("--ubatch", type=int, default=128)
     ap.add_argument("--cache-type", default="f16", choices=["f16", "q8_0", "q4_0"])
     ap.add_argument("--spec", default="none", choices=["none", "draft-mtp"])
     ap.add_argument("--draft", type=int, default=3)
-    ap.add_argument("--draft-placement", choices=["gpu", "cpu", "output"], default="gpu")
+    ap.add_argument("--draft-placement", choices=["gpu", "cpu", "output", "mixed"], default="gpu")
     ap.add_argument("--draft-model", default="mtp")
     ap.add_argument("--threads", type=int, default=8)
     ap.add_argument("--temperature", type=float, default=0)
@@ -167,6 +171,10 @@ def run(args):
     if args.repeats < 1 or warmups < 0:
         raise ValueError("Use at least one measured repeat and nonnegative warmups")
     engine_info = verify_engine(engine, require_receipt=(engine != "baseline"))
+    vocab_mode = getattr(args, "draft_vocab", "off")
+    if vocab_mode != "off" and args.spec != "draft-mtp":
+        raise ValueError("A draft vocabulary can only be used with prediction enabled")
+    env, vocab_info = experiment_environment(engine, vocab_mode)
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + args.label
     folder = ROOT / "bench/results" / run_id
     folder.mkdir()
@@ -182,6 +190,7 @@ def run(args):
               "model": json.loads((ROOT / "config/models.json").read_text())[args.model],
               "host_before": host_snapshot(), "cases": [], "warmups": [], "checks": [],
               "selected_engine": engine_info,
+              "draft_vocabulary": vocab_info,
               "method": "Single slot, full Metal offload, fixed seed 1234; sampling temperature is recorded in settings. Exact synthetic chat prompt sizes and fixed output count from settings; no prompt reuse; ignore EOS for timing only. No model downloads during a run. Warm OS file cache is uncontrolled. TTFT includes HTTP and prompt evaluation. Correctness checks use normal EOS handling."}
     record["actual_sources"] = {}
     for name, directory in [("llama_cpp", "llama.cpp"), ("strata_macos", "Strata-macOS")]:
@@ -202,7 +211,7 @@ def run(args):
     with (folder / "server.log").open("w") as log:
         try:
             started = time.monotonic()
-            process = subprocess.Popen(command, stdout=log, stderr=log)
+            process = subprocess.Popen(command, stdout=log, stderr=log, env=env)
             monitor = Monitor(process, folder / "memory.jsonl")
             monitor.thread.start()
             record["ready_s"] = wait_ready(process, base)
@@ -227,6 +236,7 @@ def run(args):
                     io_after = psutil.disk_io_counters()
                     timings = result["final"]["timings"]
                     case = {"prompt_tokens": length, "repeat": repetition + 1, "prompt_sha256": prompt_hash,
+                            "workload": "synthetic",
                             "ttft_s": result["ttft_s"], "wall_s": result["wall_s"],
                             "prompt_tok_s": timings["prompt_per_second"],
                             "generation_tok_s": timings["predicted_per_second"],
@@ -239,6 +249,32 @@ def run(args):
                     save()
                     phase = f"warmup={repetition + warmups + 1}" if repetition < 0 else f"repeat={repetition+1}"
                     print(f"prompt={length} {phase}: {case['generation_tok_s']:.2f} tok/s, TTFT {case['ttft_s']:.2f}s, prompt {case['prompt_tok_s']:.1f} tok/s", flush=True)
+            if getattr(args, "real_workloads", False):
+                tasks = {
+                    "code": "Write Python code for a small LRU cache with get and put methods, a capacity limit, and a demonstration. Explain its correctness and time complexity after the code. Be detailed.",
+                    "prose": "Explain how to design a fair computer performance experiment. Cover warmup, input sizes, background activity, repeated trials, latency, throughput and memory. Use about 700 words with concrete examples.",
+                    "chinese": "请用中文详细解释如何公平比较两个本地人工智能模型运行程序的性能。讨论预热、输入长度、重复测试、后台程序、首字延迟、生成速度和内存，给出具体例子，写约八百字。",
+                }
+                for name, content in tasks.items():
+                    rendered = request(base, "/apply-template", {"messages": [{"role": "user", "content": content}],
+                        "chat_template_kwargs": {"enable_thinking": False}})["prompt"]
+                    prompt = request(base, "/tokenize", {"content": rendered, "add_special": False, "parse_special": True})["tokens"]
+                    prompt_hash = hashlib.sha256(json.dumps(prompt).encode()).hexdigest()
+                    for repetition in range(-warmups, args.repeats):
+                        result = stream_completion(base, {"prompt": prompt, "n_predict": args.predict, "stream": True,
+                            "cache_prompt": False, "temperature": args.temperature, "seed": 1234,
+                            "ignore_eos": True, "return_tokens": True})
+                        timings = result["final"]["timings"]
+                        if timings["prompt_n"] != len(prompt) or timings["predicted_n"] != args.predict:
+                            raise RuntimeError(f"Real-workload token count mismatch: {timings}")
+                        case = {"workload": name, "prompt_tokens": len(prompt), "repeat": repetition + 1,
+                            "prompt_sha256": prompt_hash, "ttft_s": result["ttft_s"], "wall_s": result["wall_s"],
+                            "prompt_tok_s": timings["prompt_per_second"], "generation_tok_s": timings["predicted_per_second"],
+                            "output_tokens": timings["predicted_n"], "response": result}
+                        record["warmups" if repetition < 0 else "cases"].append(case)
+                        save()
+                        print(f"{name} {'warmup' if repetition < 0 else 'repeat=' + str(repetition+1)}: "
+                              f"{case['generation_tok_s']:.2f} tok/s, TTFT {case['ttft_s']:.2f}s", flush=True)
             for prompt, expected in [("What is 17 multiplied by 23? Reply with only the number.", "391"),
                                      ("The lab's secret label is violet-730. Repeat only that exact label.", "violet-730")]:
                 response = request(base, "/v1/chat/completions", {"model": args.model,
@@ -251,8 +287,41 @@ def run(args):
                 save()
             if args.extended_checks:
                 from answer_checks import run_answer_checks
-                record["checks"].extend(run_answer_checks(base, args.model))
+                record["checks"].extend(run_answer_checks(base, args.model,
+                    multilingual=getattr(args, "real_workloads", False)))
                 save()
+            if getattr(args, "cached_workloads", False):
+                from benchmark_cache import build_workload, clean, correct, measure
+                from native_backend import NativeEngine, NativeTemplate, NativeTokenizer
+                tokenizer, template = NativeTokenizer(base), NativeTemplate(base)
+                native = NativeEngine(base, record["props"], args.model, True)
+                record["cached_cases"] = []
+                def encode(messages):
+                    return tokenizer.encode(template.render(messages, enable_thinking=False), parse_special=True)
+                for budget in (512, 2048):
+                    for repetition in range(args.repeats + 1):
+                        workload = build_workload(template, tokenizer, budget, repetition)
+                        native.prompt_cache = False
+                        prime = measure(native, tokenizer, encode(workload["messages"]), 16, args.temperature)
+                        native.prompt_cache = True
+                        if prime["native_timings"]["cache_n"]:
+                            raise AssertionError("Ledger priming unexpectedly reused prompt tokens")
+                        if clean(prime["text"]) != "READY":
+                            raise AssertionError(f"Ledger priming failed: {prime['text']}")
+                        messages = workload["messages"] + [{"role": "assistant", "content": clean(prime["text"])},
+                            {"role": "user", "content": workload["question"]}]
+                        result = measure(native, tokenizer, encode(messages), 96, args.temperature)
+                        if not result["native_timings"]["cache_n"]:
+                            raise AssertionError("Cached follow-up did not reuse its primed history")
+                        passed = correct(result["text"], workload["expected"])
+                        record["checks"].append({"name": "cached-ledger", "budget": budget,
+                            "repeat": repetition, "passed": passed, "response": result})
+                        record["cached_cases"].append({"history_budget": budget, "repeat": repetition,
+                            "warmup": repetition == 0, "expected": workload["expected"], **result})
+                        save()
+                        print(f"cached {budget} {'warmup' if repetition == 0 else 'repeat=' + str(repetition)}: "
+                              f"{result['native_timings']['predicted_per_second']:.2f} tok/s, "
+                              f"TTFT {result['ttft_s']:.3f}s, correct={passed}", flush=True)
             with urllib.request.urlopen(base + "/metrics") as response:
                 (folder / "metrics.txt").write_bytes(response.read())
             record["run_wall_s"] = time.monotonic() - started
@@ -272,14 +341,14 @@ def run(args):
                     process.wait()
             record["host_after"] = host_snapshot()
             if record["cases"]:
-                record["summary"] = [{"prompt_tokens": n,
-                     "median_generation_tok_s": statistics.median(c["generation_tok_s"] for c in record["cases"] if c["prompt_tokens"] == n),
-                     "median_ttft_s": statistics.median(c["ttft_s"] for c in record["cases"] if c["prompt_tokens"] == n),
-                     "median_prompt_tok_s": statistics.median(c["prompt_tok_s"] for c in record["cases"] if c["prompt_tokens"] == n)}
-                     for n in sorted({c["prompt_tokens"] for c in record["cases"]})]
+                record["summary"] = [{"workload": name, "prompt_tokens": n,
+                     **{"median_" + metric: statistics.median(c[metric] for c in record["cases"]
+                         if c["prompt_tokens"] == n and c["workload"] == name)
+                        for metric in ("generation_tok_s", "ttft_s", "prompt_tok_s")}}
+                     for name, n in sorted({(c["workload"], c["prompt_tokens"]) for c in record["cases"]})]
             save()
             with (folder / "cases.csv").open("w", newline="") as output:
-                keys = ["prompt_tokens", "repeat", "ttft_s", "wall_s", "prompt_tok_s", "generation_tok_s", "output_tokens"]
+                keys = ["workload", "prompt_tokens", "repeat", "ttft_s", "wall_s", "prompt_tok_s", "generation_tok_s", "output_tokens"]
                 writer = csv.DictWriter(output, fieldnames=keys, extrasaction="ignore")
                 writer.writeheader()
                 writer.writerows(record["cases"])

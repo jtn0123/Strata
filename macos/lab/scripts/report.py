@@ -9,7 +9,7 @@ def main():
     results = sorted((ROOT / "bench/results").glob("*/result.json"))
     lines = ["# Strata Mac experiment results", "",
              "Measured on this 48 GiB M5 Pro. Raw JSON, CSV, native logs, exact prompt IDs and 250 ms memory samples are saved beside each run. Earlier results stay unchanged.", "",
-             "| Run | Prompt tokens | Output tok/s (median) | First token (median, s) | Input tok/s (median) | Peak RSS (GiB) | Peak swap (GiB) | Swap growth (GiB) | Status |",
+             "| Run | Workload / prompt tokens | Output tok/s (median) | First token (median, s) | Input tok/s (median) | Peak RSS (GiB) | Peak swap (GiB) | Swap growth (GiB) | Status |",
              "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |"]
     for path in results:
         record = json.loads(path.read_text())
@@ -19,7 +19,7 @@ def main():
         peak_swap = memory.get("peak_swap_bytes", 0) / 1024**3
         label = f"[{record['settings']['label']}](results/{path.parent.name}/result.json)"
         for summary in record.get("summary", []):
-            lines.append(f"| {label} | {summary['prompt_tokens']} | {summary['median_generation_tok_s']:.2f} | {summary['median_ttft_s']:.3f} | {summary['median_prompt_tok_s']:.1f} | {peak:.2f} | {peak_swap:.2f} | {swap:.2f} | {record['status']} |")
+            lines.append(f"| {label} | {summary.get('workload', 'synthetic')} / {summary['prompt_tokens']} | {summary['median_generation_tok_s']:.2f} | {summary['median_ttft_s']:.3f} | {summary['median_prompt_tok_s']:.1f} | {peak:.2f} | {peak_swap:.2f} | {swap:.2f} | {record['status']} |")
         if not record.get("summary"):
             lines.append(f"| {label} | - | - | - | - | {peak:.2f} | {peak_swap:.2f} | {swap:.2f} | {record['status']}: {record.get('error', '')} |")
     comparisons = sorted((ROOT / "bench/results").glob("*/comparison.json"))
@@ -50,7 +50,11 @@ def main():
     if (ROOT / "bench/PREDICTION.md").exists():
         lines.insert(lines.index("## Interpretation"), "[Optimization 2: prediction-helper percentages, tradeoffs and decision](PREDICTION.md)\n")
     if (ROOT / "bench/Q2-METAL.md").exists():
-        lines.insert(lines.index("## Interpretation"), "[Optimization 3: isolated Q2 Metal experiment and benchmark hold](Q2-METAL.md)\n")
+        lines.insert(lines.index("## Interpretation"), "[Optimization 3: isolated Q2 Metal measurements and decision](Q2-METAL.md)\n")
+    if (ROOT / "bench/DRAFT-VOCAB.md").exists():
+        lines.insert(lines.index("## Interpretation"), "[Optimization 4: smaller draft vocabulary](DRAFT-VOCAB.md)\n")
+    if (ROOT / "bench/SHARED-HELPER.md").exists():
+        lines.insert(lines.index("## Interpretation"), "[Optimization 5: sharing helper weights and GPU placement](SHARED-HELPER.md)\n")
     for path in sorted((ROOT / "bench/results").glob("*-integration.json")):
         record = json.loads(path.read_text())
         passed = sum(c["passed"] for c in record["checks"])

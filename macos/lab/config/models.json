@@ -98,5 +98,40 @@
         "sha256": "717e861aae936ebaa92fd3fb8b10df6d27f919432d4b4109b94b7732228ff728"
       }
     ]
+  },
+  "mtp_shared_q3": {
+    "derived": {
+      "source_model": "mtp_q3",
+      "source_sha256": "717e861aae936ebaa92fd3fb8b10df6d27f919432d4b4109b94b7732228ff728",
+      "removed_tensors": [
+        "output.weight",
+        "token_embd.weight"
+      ],
+      "required_engine": "mtp-shared",
+      "receipt": "bench/results/20261006T182700Z-prepare-mtp-shared/preparation.json"
+    },
+    "files": [
+      {
+        "path": "mtp-Qwen3.8-Flash-Next-Q3_K_S-shared.gguf",
+        "size_bytes": 1251560832,
+        "sha256": "6b8a04dfd4c60e1bde4b25de96f0d7b0a9a39c2b90cba43e27e199c2d839713d"
+      }
+    ]
+  },
+  "mtp_shared_packed_q3": {
+    "derived": {
+      "source_model": "mtp_shared_q3",
+      "source_sha256": "6b8a04dfd4c60e1bde4b25de96f0d7b0a9a39c2b90cba43e27e199c2d839713d",
+      "layout": "CPU expert tables first, GPU dense tensors last",
+      "required_engine": "mtp-shared",
+      "receipt": "bench/results/20261006T183818Z-prepare-shared-layout/preparation.json"
+    },
+    "files": [
+      {
+        "path": "mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf",
+        "size_bytes": 1251560832,
+        "sha256": "e7e8a4187cbca95f51d82c618e76fe6057a25ba376599fd11bbd2e2c48380954"
+      }
+    ]
   }
 }
