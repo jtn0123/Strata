@@ -75,7 +75,7 @@ The GPU draft exceeded the default GPU memory budget on this Mac. A CPU draft pa
 
 ## Next steps
 
-The [October 6 parent/fork review](bench/UPSTREAM-SCAN.md) ranks specific Mac experiments and records which improvements are already in this runtime. The isolated Q2_0 Metal kernel candidate is built and passed 124 small GPU correctness checks. Model tests and performance benchmarks are **on hold until Justin approves after checking RAM**. The normal launcher still selects the original engine. [Prepared experiment and commands](bench/Q2-METAL.md).
+The [October 6 parent/fork review](bench/UPSTREAM-SCAN.md) ranks specific Mac experiments and records which improvements are already in this runtime. The isolated Q2_0 Metal candidate passed 124 small GPU correctness checks and 54 full-model answer checks; six baseline/candidate benchmark passes completed. Final writing gains were +0.3% / +3.7% for short/long prompts, while input processing slowed 6-7% and full replies changed little. Background work affected earlier passes. The normal launcher keeps the original engine. [Measured results, evidence and commands](bench/Q2-METAL.md).
 
 1. Conversation caching is implemented, benchmarked and enabled. Its matched follow-up results are in [the scoreboard](bench/RESULTS.md) and [experiment notes](bench/NOTES.md).
 2. The smaller prediction helper is implemented and benchmarked. Keep it optional: its benefit depends on sampling and workload. [Prediction results](bench/PREDICTION.md).

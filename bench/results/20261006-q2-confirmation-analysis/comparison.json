@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "kind": "q2-metal-confirmation",
+  "status": "passed",
+  "captured_at": "2026-10-06T17:39:39.916163+00:00",
+  "execution_order": [
+    "candidate",
+    "baseline"
+  ],
+  "settings": {
+    "model": "flash",
+    "label": "q2-quiet-baseline",
+    "engine": "baseline",
+    "context": 4096,
+    "batch": 512,
+    "ubatch": 512,
+    "cache_type": "f16",
+    "spec": "none",
+    "draft": 3,
+    "draft_placement": "gpu",
+    "draft_model": "mtp",
+    "threads": 8,
+    "temperature": 0.6,
+    "extended_checks": true,
+    "repeats": 3,
+    "warmups": 1,
+    "predict": 512,
+    "prompts": [
+      512,
+      2048
+    ]
+  },
+  "runs": {
+    "baseline": "20261006T173609Z-q2-quiet-baseline",
+    "candidate": "20261006T173319Z-q2-quiet-confirmation"
+  },
+  "summary": [
+    {
+      "prompt_tokens": 512,
+      "baseline": {
+        "generation_tok_s": 37.90689547199537,
+        "prompt_tok_s": 679.2486872723124,
+        "ttft_s": 0.7543141670030309,
+        "wall_s": 14.23474150000402
+      },
+      "candidate": {
+        "generation_tok_s": 38.00770879638958,
+        "prompt_tok_s": 637.8822309931029,
+        "ttft_s": 0.8032444580021547,
+        "wall_s": 14.244720208000217
+      },
+      "generation_increase_percent": 0.2659498308656971,
+      "prompt_increase_percent": -6.090031096758763,
+      "ttft_reduction_percent": -6.4867257092000585,
+      "total_time_reduction_percent": -0.07010108329816855
+    },
+    {
+      "prompt_tokens": 2048,
+      "baseline": {
+        "generation_tok_s": 35.5507814388744,
+        "prompt_tok_s": 646.9958447576436,
+        "ttft_s": 3.166255292002461,
+        "wall_s": 17.54810266700224
+      },
+      "candidate": {
+        "generation_tok_s": 36.857448803849564,
+        "prompt_tok_s": 599.7999104986071,
+        "ttft_s": 3.4151606250015902,
+        "wall_s": 17.308822499995586
+      },
+      "generation_increase_percent": 3.6754954802381334,
+      "prompt_increase_percent": -7.294627104864249,
+      "ttft_reduction_percent": -7.861189640261501,
+      "total_time_reduction_percent": 1.3635671704645413
+    }
+  ],
+  "checks_passed": 36,
+  "memory": {
+    "baseline": {
+      "guard": null,
+      "peak_rss_bytes": 38365331456,
+      "minimum_available_bytes": 2960818176,
+      "peak_swap_bytes": 1825308672,
+      "swap_growth_bytes": 0,
+      "system_disk_read_bytes": 3352391680,
+      "sampling_interval_s": 0.25,
+      "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+    },
+    "candidate": {
+      "guard": null,
+      "peak_rss_bytes": 36136615936,
+      "minimum_available_bytes": 3280289792,
+      "peak_swap_bytes": 1842085888,
+      "swap_growth_bytes": 655360,
+      "system_disk_read_bytes": 6813364224,
+      "sampling_interval_s": 0.25,
+      "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+    }
+  },
+  "initial_four_pass_comparison": "bench/results/20261006T172232Z-q2-comparison/comparison.json",
+  "method": "Adjacent candidate/baseline confirmation after Java build load subsided; same full model and settings, three measured 512-token replies per input length, one excluded warmup. Browser/UI and media-analysis work remained; not a fully idle or guaranteed cold-SSD test. Earlier four-pass results remain intact. Small gains are not established as repeatable.",
+  "decision": "Keep the original engine default; Q2 candidate remains optional. Writing speed gain is small/mixed and prompt processing regressed.",
+  "vm": "Colima stopped with explicit user authorization; user requested no restart."
+}
