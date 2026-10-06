@@ -47,6 +47,8 @@ def main():
               "- Swap growth is relative to the start of each run. Peak swap includes pages left swapped by earlier experiments; the 8K run inherited swap from the CPU draft test.",
               "- The default guard stops a run if swap grows by more than 2 GiB or available RAM stays below 384 MiB for four seconds. A stopped configuration is recorded as a failure, not a speed result.",
               "", "## Integration checks", ""]
+    if (ROOT / "bench/PREDICTION.md").exists():
+        lines.insert(lines.index("## Interpretation"), "[Optimization 2: prediction-helper percentages, tradeoffs and decision](PREDICTION.md)\n")
     for path in sorted((ROOT / "bench/results").glob("*-integration.json")):
         record = json.loads(path.read_text())
         passed = sum(c["passed"] for c in record["checks"])

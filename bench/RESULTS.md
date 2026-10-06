@@ -19,6 +19,21 @@ Measured on this 48 GiB M5 Pro. Raw JSON, CSV, native logs, exact prompt IDs and
 | [flash-mtp3-cpu-ubatch512](results/20261006T111806Z-flash-mtp3-cpu-ubatch512/result.json) | 2048 | 42.66 | 4.148 | 493.8 | 38.31 | 1.99 | 1.85 | passed |
 | [flash-8k-ubatch512](results/20261006T111954Z-flash-8k-ubatch512/result.json) | 1024 | 38.27 | 1.504 | 680.9 | 35.94 | 1.93 | 0.00 | passed |
 | [flash-8k-ubatch512](results/20261006T111954Z-flash-8k-ubatch512/result.json) | 4096 | 37.19 | 6.616 | 619.2 | 35.94 | 1.93 | 0.00 | passed |
+| [prediction-baseline-a](results/20261006T144910Z-prediction-baseline-a/result.json) | 512 | 38.97 | 0.749 | 684.4 | 33.37 | 1.03 | 0.00 | passed |
+| [prediction-baseline-a](results/20261006T144910Z-prediction-baseline-a/result.json) | 2048 | 37.59 | 3.106 | 659.4 | 33.37 | 1.03 | 0.00 | passed |
+| [prediction-q2-gpu2](results/20261006T144952Z-prediction-q2-gpu2/result.json) | - | - | - | - | 37.10 | 1.03 | 0.00 | failed: RuntimeError: Streaming response has no first token or final timing record |
+| [prediction-q2-output2](results/20261006T145142Z-prediction-q2-output2/result.json) | 512 | 39.52 | 1.083 | 473.2 | 37.95 | 1.03 | 0.00 | passed |
+| [prediction-q2-output2](results/20261006T145142Z-prediction-q2-output2/result.json) | 2048 | 40.00 | 4.162 | 492.1 | 37.95 | 1.03 | 0.00 | passed |
+| [prediction-q2_0-gpu2](results/20261006T145347Z-prediction-q2_0-gpu2/result.json) | 512 | 13.86 | 0.918 | 558.3 | 37.33 | 1.02 | 0.00 | failed |
+| [prediction-q2_0-gpu2](results/20261006T145347Z-prediction-q2_0-gpu2/result.json) | 2048 | 14.42 | 4.460 | 459.3 | 37.33 | 1.02 | 0.00 | failed |
+| [prediction-q3-output2](results/20261006T145640Z-prediction-q3-output2/result.json) | 512 | 43.15 | 1.070 | 478.6 | 37.36 | 1.02 | 0.00 | passed |
+| [prediction-q3-output2](results/20261006T145640Z-prediction-q3-output2/result.json) | 2048 | 42.53 | 4.297 | 476.8 | 37.36 | 1.02 | 0.00 | passed |
+| [prediction-q3-cpu2](results/20261006T145805Z-prediction-q3-cpu2/result.json) | 512 | 41.07 | 1.058 | 484.3 | 37.94 | 1.02 | 0.00 | passed |
+| [prediction-q3-cpu2](results/20261006T145805Z-prediction-q3-cpu2/result.json) | 2048 | 41.42 | 4.392 | 466.4 | 37.94 | 1.02 | 0.00 | passed |
+| [prediction-baseline-b-t06](results/20261006T145946Z-prediction-baseline-b-t06/result.json) | 512 | 38.99 | 0.749 | 684.3 | 35.87 | 1.02 | 0.00 | passed |
+| [prediction-baseline-b-t06](results/20261006T145946Z-prediction-baseline-b-t06/result.json) | 2048 | 37.48 | 3.107 | 659.4 | 35.87 | 1.02 | 0.00 | passed |
+| [prediction-q3-output2-t06](results/20261006T150044Z-prediction-q3-output2-t06/result.json) | 512 | 38.38 | 1.104 | 463.9 | 37.98 | 1.02 | 0.00 | passed |
+| [prediction-q3-output2-t06](results/20261006T150044Z-prediction-q3-output2-t06/result.json) | 2048 | 37.30 | 4.389 | 466.7 | 37.98 | 1.02 | 0.00 | passed |
 
 ## Optimization 1: conversation caching
 
@@ -30,8 +45,12 @@ Matched follow-up prompts through the Strata adapter, caching off versus on. Sam
 | [small / 20261006T140905Z-small-conversation-cache](results/20261006T140905Z-small-conversation-cache/comparison.json) | 2048 | 1.005 | 0.083 | 91.8% | 70.4% | -0.0% | 9/9 | passed |
 | [flash / 20261006T141016Z-flash-conversation-cache](results/20261006T141016Z-flash-conversation-cache/comparison.json) | 512 | 0.951 | 0.259 | 72.8% | 44.1% | +1.0% | 15/15 | passed |
 | [flash / 20261006T141016Z-flash-conversation-cache](results/20261006T141016Z-flash-conversation-cache/comparison.json) | 2048 | 3.351 | 0.272 | 91.9% | 77.4% | -0.7% | 15/15 | passed |
+| [flash / 20261006T150238Z-flash-prediction-cache-baseline-t06](results/20261006T150238Z-flash-prediction-cache-baseline-t06/comparison.json) | 512 | 0.947 | 0.258 | 72.8% | 44.0% | +0.3% | 11/11 | passed |
+| [flash / 20261006T150238Z-flash-prediction-cache-baseline-t06](results/20261006T150238Z-flash-prediction-cache-baseline-t06/comparison.json) | 2048 | 3.340 | 0.271 | 91.9% | 77.5% | -0.5% | 11/11 | passed |
 
 Reduction = 100 x (1 - cached duration / uncached duration). Output speed change = 100 x (cached rate / uncached rate - 1). Prompt cache is one engine slot; an unrelated chat may replace it. Memory samples cover both modes in the same process; paired RSS values are not isolated allocation measurements.
+
+[Optimization 2: prediction-helper percentages, tradeoffs and decision](PREDICTION.md)
 
 ## Interpretation
 
@@ -48,6 +67,7 @@ Reduction = 100 x (1 - cached duration / uncached duration). Output speed change
 - [20261006T110714Z-small-integration](results/20261006T110714Z-small-integration.json): 9/9 checks passed.
 - [20261006T112221Z-flash-integration](results/20261006T112221Z-flash-integration.json): 9/9 checks passed.
 - [20261006T141248Z-flash-integration](results/20261006T141248Z-flash-integration.json): 9/9 checks passed.
+- [20261006T155222Z-flash-integration](results/20261006T155222Z-flash-integration.json): 9/9 checks passed.
 - [20261006T112501Z-flash-context-probe](results/20261006T112501Z-flash-context-probe.json): passed, varied records across 2831 input tokens.
 - [20261006T141353Z-flash-cache-api](results/20261006T141353Z-flash-cache-api.json): 2/2 real Strata HTTP follow-ups correct with confirmed native cache reuse.
 

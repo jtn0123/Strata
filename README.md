@@ -18,6 +18,8 @@ Open **http://127.0.0.1:8095**. OpenAI-compatible clients use **http://127.0.0.1
 
 Use `scripts/run.py flash --no-prompt-cache` to restore v1's uncached conversation behavior. Caching reuses the common prefix in one engine slot; switching to a different conversation may replace it. It adds no separate multi-chat RAM cache. It can change rounding and generated token choices, so semantic answer checks accompany the timing comparison.
 
+The optional `Start Strata - Prediction Test.command` uses the measured smaller Q3 helper, with its body on CPU and output projection on GPU. Stop the current app before switching profiles. This is an experiment: at temperature 0 it wrote 11-13% faster, but at temperature 0.6 the fixed-length writing gain disappeared. Cached record-lookup replies finished 4-10% sooner, while fresh replies took longer. The normal launcher keeps prediction off. [Exact comparisons](bench/PREDICTION.md).
+
 No login service or system-wide Python packages are installed. Native and Strata source checkouts are under `vendor/`; model files and virtual environment stay outside git.
 
 ## Recreate the environment
@@ -29,9 +31,11 @@ python3 scripts/provision.py
 .venv/bin/python scripts/download_models.py small
 .venv/bin/python scripts/download_models.py flash
 .venv/bin/python scripts/download_models.py mtp
+.venv/bin/python scripts/download_models.py mtp_bf16
+.venv/bin/python scripts/prepare_draft.py q3
 ```
 
-Sources, dependencies and model revisions are pinned in `config/` and `requirements.txt`. Downloads resume and verify exact byte count and SHA256 before a model becomes available. About 72 GB of model storage plus build files and 20 GiB spare disk space are needed for all three downloads.
+Sources, dependencies and model revisions are pinned in `config/` and `requirements.txt`. Downloads resume and verify exact byte count and SHA256 before a model becomes available. The original three downloads use about 72 GB. Recreating the optional Q3 helper adds a 7.77 GB BF16 source and 1.80 GB derived file; leave another 20 GiB spare. Smaller helpers are quantized from verified BF16, not re-quantized from the compressed Q4 file. `prepare_draft.py` records source/tool pins, output SHA256 and native quantization logs. The experiments also retain Q2_K and Q2_0 variants; they are not the chosen profile.
 
 ## Test and track
 
@@ -41,6 +45,7 @@ Sources, dependencies and model revisions are pinned in `config/` and `requireme
 .venv/bin/python scripts/benchmark.py flash --label flash-baseline
 .venv/bin/python scripts/benchmark.py flash --label flash-mtp-cpu --ubatch 512 --spec draft-mtp --draft 3 --draft-placement cpu
 .venv/bin/python scripts/benchmark_cache.py flash
+.venv/bin/python scripts/benchmark.py flash --label prediction-q3 --ubatch 512 --spec draft-mtp --draft-model mtp_q3 --draft 2 --draft-placement output --extended-checks
 .venv/bin/python scripts/report.py
 ```
 
@@ -71,7 +76,7 @@ The GPU draft exceeded the default GPU memory budget on this Mac. A CPU draft pa
 ## Next steps
 
 1. Conversation caching is implemented, benchmarked and enabled. Its matched follow-up results are in [the scoreboard](bench/RESULTS.md) and [experiment notes](bench/NOTES.md).
-2. Reduce the prediction helper's extra memory, then compare speed, swap and answer quality against the adopted profile. MTP remains off until its overall tradeoff improves.
+2. The smaller prediction helper is implemented and benchmarked. Keep it optional: its benefit depends on sampling and workload. [Prediction results](bench/PREDICTION.md).
 3. Treat larger contexts and higher-precision full models as separate capacity experiments. Porting Strata's expert scheduler to Metal is a larger engineering project.
 4. Investigate two-device execution later. The AMD desktop's memory does not automatically merge with Mac unified memory; networking and GPU support must be tested separately.
 

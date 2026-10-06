@@ -61,9 +61,12 @@ def download(model_id, model, spec):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("model", choices=["small", "flash", "mtp"])
+    models = json.loads((ROOT / "config/models.json").read_text())
+    parser.add_argument("model", choices=list(models))
     args = parser.parse_args()
-    model = json.loads((ROOT / "config/models.json").read_text())[args.model]
+    model = models[args.model]
+    if model.get("derived"):
+        raise RuntimeError("This draft is generated locally; use scripts/prepare_draft.py")
     remaining = sum(max(0, spec["size_bytes"] - ((ROOT / "models" / args.model / spec["path"]).with_suffix(".gguf.part").stat().st_size if (ROOT / "models" / args.model / spec["path"]).with_suffix(".gguf.part").exists() else 0)) for spec in model["files"] if not (ROOT / "models" / args.model / spec["path"]).exists())
     if shutil.disk_usage(ROOT).free < remaining + 20 * 1024**3:
         raise RuntimeError("Insufficient disk headroom for download plus 20 GiB reserve")

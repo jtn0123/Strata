@@ -25,7 +25,8 @@ def main():
     ap.add_argument("--cache-type", default="f16", choices=["f16", "q8_0", "q4_0"])
     ap.add_argument("--spec", default="none", choices=["none", "draft-mtp"])
     ap.add_argument("--draft", type=int, default=3)
-    ap.add_argument("--draft-placement", choices=["gpu", "cpu"], default="cpu")
+    ap.add_argument("--draft-placement", choices=["gpu", "cpu", "output"], default="cpu")
+    ap.add_argument("--draft-model", default="mtp")
     ap.add_argument("--prompt-cache", action=argparse.BooleanOptionalAction, default=True)
     args = ap.parse_args()
     def interrupted(signum, frame):
@@ -50,7 +51,7 @@ def main():
         try:
             command = server_command(args.model, args.native_port, args.context, ubatch=args.ubatch,
                                      cache_type=args.cache_type, spec=args.spec, draft=args.draft,
-                                     draft_placement=args.draft_placement)
+                                     draft_placement=args.draft_placement, draft_model=args.draft_model)
             (folder / "command.json").write_text(json.dumps(command, indent=2) + "\n")
             native = subprocess.Popen(command, stdout=log, stderr=log)
             monitor = Monitor(native, folder / "memory.jsonl")

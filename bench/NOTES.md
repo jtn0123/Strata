@@ -42,6 +42,22 @@ Keep conversation caching enabled. The gain applies when conversation history ma
 
 These are local single-user timing and sanity checks, not a broad quality evaluation. Fixed-length generation ignores EOS for timing. OS file cache is uncontrolled and background applications were left running. The Mac's SSD speed was tested separately with a short uncached file test; it is not a sustained inference bandwidth guarantee.
 
-The next useful experiment is reducing the draft's additional memory, then comparing varied real prompts and answer quality. The current runtime does not borrow a shared MTP head's embeddings/output tensors; test a runtime that supports that before writing custom kernels. Higher-precision models and the AMD desktop remain separate future capacity experiments.
+The smaller-helper experiment is complete; see optimization 2 below. The current runtime does not borrow a shared MTP head's embeddings/output tensors. A runtime supporting that or profiling the remaining CPU/GPU work is a possible next speed experiment. Higher-precision main models and the AMD desktop remain separate future capacity experiments.
+
+## Optimization 2: a smaller prediction helper
+
+[Percentage comparison and all source records](PREDICTION.md). The full main model, runtime pin, batch 512, 4K context and conversation-cache behavior remain the same. Only the helper and its draft/placement settings vary.
+
+Three helpers were quantized from the SHA256-verified, revision-pinned BF16 MTP source: Q2_K (1.491 GB), Q2_0 (1.110 GB) and Q3_K_S (1.798 GB). The selected Q3 file is 35.5% smaller than the original 2.786 GB Q4 helper. Preparation receipts, compatible tensor fallbacks, inventories and hashes are saved. Helper file size is not total runtime memory: CPU repacking, target rollback state and temporary buffers also consume RAM.
+
+The all-GPU Q2_K attempt failed on its first request with a Metal out-of-memory error. Q2_0 on GPU accepted fewer than 2% of draft tokens, slowed to 12-16 tokens/s and then failed. Both failed records stay in the scoreboard. Splitting the helper's body onto CPU and its output projection onto GPU avoided the GPU limit. Q3 split placement was faster than Q2 split or Q3 CPU-only placement. No GPU memory sysctl or engine-source patch was applied.
+
+At greedy sampling, the selected Q3/two-token helper wrote 43.15 and 42.53 tokens/s versus 38.97 and 37.59, gains of 10.7% and 13.1%. First-token waiting grew 38-43%. At temperature 0.6, fixed-length writing changed -1.6% and -0.5%, while total response time increased 10.1% and 20.0%. These compare identical 512/2048-token synthetic prompts and fixed 128-token outputs.
+
+Matched, cached ledger follow-ups at temperature 0.6 gave a narrower benefit: output rates rose 35.1% and 25.6%, and complete answers finished 10.1% and 3.9% sooner. The first token arrived 28.1% and 32.6% later. All 11 conversation/changed-label checks passed. This does not establish the same gain for open-ended conversation.
+
+Selected native helper runs passed 18 focused answer checks each, including structured output and a small code function at temperatures 0 and 0.6. [Nine real app API/adapter checks](results/20261006T155222Z-flash-integration.json) passed with the selected helper active, including cancellation and disconnect recovery. [The app proof](results/20261006T155345Z-prediction-app-proof.json) binds that suite to the exact helper/placement command. Greedy timing output still diverges after token 92 on the 512-token input, while the 2048-token input matches; general exact-token equivalence is not claimed.
+
+No additional swap grew in the selected runs, though about 1 GiB of pre-existing system swap remained. Keep the normal launcher on caching with prediction off. `Start Strata - Prediction Test.command` provides the tested optional profile; stop the current app before switching. The ordinary profile was restored after checking the helper app.
 
 [Raw scoreboard and records](RESULTS.md)

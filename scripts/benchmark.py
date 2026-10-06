@@ -140,14 +140,20 @@ def main():
     ap.add_argument("--cache-type", default="f16", choices=["f16", "q8_0", "q4_0"])
     ap.add_argument("--spec", default="none", choices=["none", "draft-mtp"])
     ap.add_argument("--draft", type=int, default=3)
-    ap.add_argument("--draft-placement", choices=["gpu", "cpu"], default="gpu")
+    ap.add_argument("--draft-placement", choices=["gpu", "cpu", "output"], default="gpu")
+    ap.add_argument("--draft-model", default="mtp")
     ap.add_argument("--threads", type=int, default=8)
+    ap.add_argument("--temperature", type=float, default=0)
+    ap.add_argument("--extended-checks", action="store_true")
     ap.add_argument("--repeats", type=int, default=3)
     ap.add_argument("--predict", type=int, default=128)
     ap.add_argument("--prompts", type=int, nargs="+", default=[512, 2048])
     args = ap.parse_args()
     with (ROOT / "bench/.lock").open("w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        binary = str(ROOT / "vendor/llama.cpp/build/bin/llama-server")
+        if any(p.info["exe"] == binary for p in psutil.process_iter(["exe"])):
+            raise RuntimeError("Stop the running lab model before benchmarking")
         record = run(args)
         if record["status"] != "passed":
             raise SystemExit(1)
@@ -162,12 +168,13 @@ def run(args):
         port = sock.getsockname()[1]
     base = f"http://127.0.0.1:{port}"
     command = server_command(args.model, port, args.context, args.batch, args.ubatch,
-                             args.spec, args.draft, args.cache_type, args.threads, args.draft_placement)
+                             args.spec, args.draft, args.cache_type, args.threads, args.draft_placement,
+                             args.draft_model)
     record = {"schema": 1, "run_id": run_id, "status": "running", "settings": vars(args),
               "command": command, "runtime": json.loads((ROOT / "config/runtime.json").read_text()),
               "model": json.loads((ROOT / "config/models.json").read_text())[args.model],
               "host_before": host_snapshot(), "cases": [], "checks": [],
-              "method": "Single slot, full Metal offload, fixed seed 1234 and greedy sampling. Exact synthetic chat prompt sizes and fixed output count from settings; no prompt reuse; ignore EOS for timing only. No model downloads during a run. Warm OS file cache is uncontrolled. TTFT includes HTTP and prompt evaluation. Correctness checks use normal EOS handling."}
+              "method": "Single slot, full Metal offload, fixed seed 1234; sampling temperature is recorded in settings. Exact synthetic chat prompt sizes and fixed output count from settings; no prompt reuse; ignore EOS for timing only. No model downloads during a run. Warm OS file cache is uncontrolled. TTFT includes HTTP and prompt evaluation. Correctness checks use normal EOS handling."}
     record["actual_sources"] = {}
     for name, directory in [("llama_cpp", "llama.cpp"), ("strata_macos", "Strata-macOS")]:
         path = ROOT / "vendor" / directory
@@ -179,7 +186,7 @@ def run(args):
     record["binary_version"] = command_output([command[0], "--version"])
     result_path = folder / "result.json"
     if args.spec == "draft-mtp":
-        record["draft_model"] = json.loads((ROOT / "config/models.json").read_text())["mtp"]
+        record["draft_model"] = json.loads((ROOT / "config/models.json").read_text())[args.draft_model]
     def save():
         result_path.write_text(json.dumps(record, indent=2) + "\n")
     save()
@@ -204,7 +211,7 @@ def run(args):
                 (folder / f"prompt-{length}.json").write_text(json.dumps(prompt) + "\n")
                 for repetition in range(args.repeats):
                     payload = {"prompt": prompt, "n_predict": args.predict, "stream": True,
-                               "cache_prompt": False, "temperature": 0, "seed": 1234,
+                               "cache_prompt": False, "temperature": args.temperature, "seed": 1234,
                                "ignore_eos": True, "return_tokens": True}
                     io_before = psutil.disk_io_counters()
                     swap_before = psutil.swap_memory().used
@@ -232,6 +239,10 @@ def run(args):
                 content = response["choices"][0]["message"].get("content") or ""
                 record["checks"].append({"prompt": prompt, "expected": expected, "passed": content.strip() == expected,
                                          "response": response})
+                save()
+            if args.extended_checks:
+                from answer_checks import run_answer_checks
+                record["checks"].extend(run_answer_checks(base, args.model))
                 save()
             with urllib.request.urlopen(base + "/metrics") as response:
                 (folder / "metrics.txt").write_bytes(response.read())

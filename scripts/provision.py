@@ -37,7 +37,7 @@ def main():
             raise RuntimeError(f"{path} revision differs from config/runtime.json; preserve that checkout and use a new lab directory")
     cmake = ROOT / ".venv/bin/cmake"
     run([cmake, "-S", "vendor/llama.cpp", "-B", "vendor/llama.cpp/build", *runtime["build_flags"]])
-    run([cmake, "--build", "vendor/llama.cpp/build", "--target", "llama-server", "llama-bench", "-j", "12"])
+    run([cmake, "--build", "vendor/llama.cpp/build", "--target", "llama-server", "llama-bench", "llama-quantize", "-j", "12"])
 
 
 if __name__ == "__main__":

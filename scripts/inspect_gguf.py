@@ -52,5 +52,5 @@ def inventory(model_id):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("model", choices=["small", "flash", "mtp"])
+    parser.add_argument("model", choices=list(json.loads((ROOT / "config/models.json").read_text())))
     inventory(parser.parse_args().model)

@@ -17,7 +17,8 @@ def model_path(model_id):
 
 
 def server_command(model_id, port=8096, context=4096, batch=512, ubatch=128,
-                   spec="none", draft=3, cache_type="f16", threads=8, draft_placement="gpu"):
+                   spec="none", draft=3, cache_type="f16", threads=8, draft_placement="gpu",
+                   draft_model="mtp"):
     command = [str(BIN), "-m", str(model_path(model_id)), "--host", "127.0.0.1",
                "--port", str(port), "-c", str(context), "-b", str(batch), "-ub", str(ubatch),
                "-t", str(threads), "-tb", str(threads), "-ngl", "all", "-fit", "off",
@@ -29,7 +30,8 @@ def server_command(model_id, port=8096, context=4096, batch=512, ubatch=128,
     if spec == "draft-mtp":
         if model_id != "flash":
             raise ValueError("The lab MTP head is only compatible with Flash-Next")
-        command.extend(["-md", str(model_path("mtp")), "--spec-draft-ngl", "all" if draft_placement == "gpu" else "0"])
+        layers = {"gpu": "all", "cpu": "0", "output": "1"}[draft_placement]
+        command.extend(["-md", str(model_path(draft_model)), "--spec-draft-ngl", layers])
     return command
 
 

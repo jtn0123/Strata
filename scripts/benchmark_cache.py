@@ -19,9 +19,9 @@ from lab import ROOT, request, server_command
 from native_backend import NativeEngine, NativeTemplate, NativeTokenizer
 
 
-def measure(engine, tokenizer, ids, max_new=96):
+def measure(engine, tokenizer, ids, max_new=96, temperature=0):
     started, first, tokens = time.monotonic(), None, []
-    for token in engine.generate(ids, max_new, {"temperature": 0, "seed": 1234}, threading.Event()):
+    for token in engine.generate(ids, max_new, {"temperature": temperature, "seed": 1234}, threading.Event()):
         if token is not None:
             first = first or time.monotonic()
             tokens.append(token)
@@ -68,6 +68,12 @@ def main():
     ap.add_argument("model", choices=["small", "flash"], default="flash", nargs="?")
     ap.add_argument("--repeats", type=int, default=5)
     ap.add_argument("--histories", type=int, nargs="+", default=[512, 2048])
+    ap.add_argument("--spec", choices=["none", "draft-mtp"], default="none")
+    ap.add_argument("--draft-model", default="mtp")
+    ap.add_argument("--draft", type=int, default=3)
+    ap.add_argument("--draft-placement", choices=["gpu", "cpu", "output"], default="gpu")
+    ap.add_argument("--label", default="conversation-cache")
+    ap.add_argument("--temperature", type=float, default=0)
     args = ap.parse_args()
     if args.repeats < 1 or any(n < 128 or n > 3000 for n in args.histories):
         ap.error("Use at least one repeat and history budgets between 128 and 3000")
@@ -80,23 +86,26 @@ def main():
 
 
 def run(args):
-    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + args.model + "-conversation-cache"
+    run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + args.model + "-" + args.label
     folder = ROOT / "bench/results" / run_id
     folder.mkdir()
     with socket.socket() as sock:
         sock.bind(("127.0.0.1", 0))
         port = sock.getsockname()[1]
     base = f"http://127.0.0.1:{port}"
-    command = server_command(args.model, port, 4096, ubatch=512)
-    record = {"schema": 1, "kind": "conversation-cache", "run_id": run_id,
+    command = server_command(args.model, port, 4096, ubatch=512, spec=args.spec, draft=args.draft,
+                             draft_placement=args.draft_placement, draft_model=args.draft_model)
+    record = {"schema": 1, "kind": "conversation-cache" if args.spec == "none" else "prediction-cache", "run_id": run_id,
               "settings": vars(args), "command": command, "status": "running",
               "runtime": json.loads((ROOT / "config/runtime.json").read_text()),
               "model": json.loads((ROOT / "config/models.json").read_text())[args.model],
               "binary_version": command_output([command[0], "--version"]),
               "host_before": host_snapshot(), "cases": [], "checks": [],
-              "method": "Paired real adapter runs. Each variant is primed with the same uncached first turn. Follow-up uses identical tokens with cache off/on; order alternates AB/BA. Greedy seed 1234, normal EOS, max 96 answer tokens. Each history has an excluded warm-up pair. Compare TTFT and wall time on matched follow-ups, not the earlier synthetic cold-prompt benchmark. OS cache and background activity are uncontrolled. No extra multi-conversation RAM cache or MTP."}
+              "method": "Paired real adapter runs. Each variant is primed with the same uncached first turn. Follow-up uses identical tokens with cache off/on; order alternates AB/BA. Seed 1234 and temperature from settings, normal EOS, max 96 answer tokens. Each history has an excluded warm-up pair. Compare TTFT and wall time on matched follow-ups, not the earlier synthetic cold-prompt benchmark. OS cache and background activity are uncontrolled. No extra multi-conversation RAM cache. Speculative settings and draft identity are recorded."}
     record["adapter_sha256"] = hashlib.sha256((ROOT / "scripts/native_backend.py").read_bytes()).hexdigest()
     record["benchmark_sha256"] = hashlib.sha256((ROOT / "scripts/benchmark_cache.py").read_bytes()).hexdigest()
+    if args.spec == "draft-mtp":
+        record["draft_model"] = json.loads((ROOT / "config/models.json").read_text())[args.draft_model]
     record["actual_sources"] = {}
     for name, directory in [("llama_cpp", "llama.cpp"), ("strata_macos", "Strata-macOS")]:
         path = ROOT / "vendor" / directory
@@ -120,6 +129,8 @@ def run(args):
             tokenizer, template = NativeTokenizer(base), NativeTemplate(base)
             engines = {flag: NativeEngine(base, props, args.model, flag) for flag in (False, True)}
             proc = psutil.Process(process.pid)
+            def evaluate(engine, ids, max_new=96):
+                return measure(engine, tokenizer, ids, max_new, args.temperature)
             def encode(messages):
                 return tokenizer.encode(template.render(messages, enable_thinking=False), parse_special=True)
             for budget in args.histories:
@@ -129,7 +140,7 @@ def run(args):
                     order = [False, True] if repetition % 2 == 0 else [True, False]
                     paired = {}
                     for flag in order:
-                        prime = measure(engines[False], tokenizer, first_ids, 16)
+                        prime = evaluate(engines[False], first_ids, 16)
                         if clean(prime["text"]) != "READY":
                             raise AssertionError(f"Prime did not follow the ledger instruction: {prime['text']}")
                         followup = workload["messages"] + [{"role": "assistant", "content": clean(prime["text"])},
@@ -139,7 +150,7 @@ def run(args):
                                 "cache": flag, "order": order, "expected": workload["expected"],
                                 "messages": followup, "prompt_token_ids": ids, "prime": prime,
                                 "rss_before_bytes": proc.memory_info().rss, "swap_before_bytes": psutil.swap_memory().used}
-                        case.update(measure(engines[flag], tokenizer, ids))
+                        case.update(evaluate(engines[flag], ids))
                         case["rss_after_bytes"] = proc.memory_info().rss
                         case["swap_after_bytes"] = psutil.swap_memory().used
                         case["correct"] = correct(case["text"], workload["expected"])
@@ -165,10 +176,10 @@ def run(args):
                 seed_messages = ledger["messages"]
                 if name == "replace-new-chat-label":
                     seed_messages = [{"role": "user", "content": "The fresh chat label is plum-70291. Reply only with that label."}]
-                measure(engines[False], tokenizer, encode(seed_messages), 32)
+                evaluate(engines[False], encode(seed_messages), 32)
                 ids = encode(messages)
-                on = measure(engines[True], tokenizer, ids)
-                off = measure(engines[False], tokenizer, ids)
+                on = evaluate(engines[True], ids)
+                off = evaluate(engines[False], ids)
                 record["checks"].append({"name": name, "passed": correct(on["text"], expected) and correct(off["text"], expected),
                                          "expected": expected, "prompt_token_ids": ids, "cache_on": on, "cache_off": off,
                                          "exact_token_match": on["token_ids"] == off["token_ids"]})
