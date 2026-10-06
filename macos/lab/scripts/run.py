@@ -18,6 +18,14 @@ from draft_vocab import experiment_environment
 from check_memory import assert_no_model_server
 
 
+def assert_ports_available(ports):
+    for port in ports:
+        with socket.socket() as sock:
+            if os.name != "nt":
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            sock.bind(("127.0.0.1", port))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("model", choices=["small", "flash"], nargs="?", default="flash")
@@ -32,6 +40,7 @@ def main():
     ap.add_argument("--draft", type=int, default=3)
     ap.add_argument("--draft-placement", choices=["gpu", "cpu", "output", "mixed"], default="cpu")
     ap.add_argument("--draft-model", default="mtp")
+    ap.add_argument("--draft-threads", type=int, help="CPU workers for the prediction helper only")
     ap.add_argument("--prompt-cache", action=argparse.BooleanOptionalAction, default=True)
     args = ap.parse_args()
     if args.draft_vocab != "off" and args.spec != "draft-mtp":
@@ -43,9 +52,7 @@ def main():
         raise KeyboardInterrupt
     signal.signal(signal.SIGTERM, interrupted)
     signal.signal(signal.SIGHUP, interrupted)
-    for port in (args.port, args.native_port):
-        with socket.socket() as sock:
-            sock.bind(("127.0.0.1", port))
+    assert_ports_available((args.port, args.native_port))
     folder = ROOT / "bench/runtime" / datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     folder.mkdir(parents=True)
     active_path = ROOT / "bench/runtime/active.json"
@@ -62,7 +69,7 @@ def main():
             command = server_command(args.model, args.native_port, args.context, ubatch=args.ubatch,
                                      cache_type=args.cache_type, spec=args.spec, draft=args.draft,
                                      draft_placement=args.draft_placement, draft_model=args.draft_model,
-                                     engine=args.engine)
+                                     engine=args.engine, draft_threads=args.draft_threads)
             (folder / "command.json").write_text(json.dumps(command, indent=2) + "\n")
             (folder / "engine.json").write_text(json.dumps(engine_info, indent=2) + "\n")
             (folder / "draft-vocabulary.json").write_text(json.dumps(vocab_info, indent=2) + "\n")

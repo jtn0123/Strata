@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "kind": "integration",
+  "model": "flash",
+  "checks": [
+    {
+      "name": "Unicode tokenizer roundtrip",
+      "passed": true,
+      "detail": {
+        "text": "Hello, caf\u00e9 \ud83c\udf0d \u4e2d\u6587",
+        "tokens": [
+          9419,
+          11,
+          50203,
+          10838,
+          234,
+          235,
+          220,
+          99986
+        ]
+      }
+    },
+    {
+      "name": "Native/Strata adapter greedy token parity",
+      "passed": true,
+      "detail": {
+        "native_token_ids": [
+          18,
+          24,
+          16,
+          248046
+        ],
+        "adapter_token_ids": [
+          18,
+          24,
+          16,
+          248046
+        ],
+        "text": "391"
+      }
+    },
+    {
+      "name": "OpenAI non-stream content and EOS",
+      "passed": true,
+      "detail": {
+        "id": "chatcmpl-16d1eb2db49c4912be8fe532",
+        "object": "chat.completion",
+        "created": 1791322610,
+        "model": "flash",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "391"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 29,
+          "completion_tokens": 4,
+          "total_tokens": 33
+        }
+      }
+    },
+    {
+      "name": "OpenAI streaming completion",
+      "passed": true,
+      "detail": {
+        "content": "391",
+        "done": true
+      }
+    },
+    {
+      "name": "Anthropic content and EOS",
+      "passed": true,
+      "detail": {
+        "id": "msg_15a1895f639b4fec970cb3e0",
+        "type": "message",
+        "role": "assistant",
+        "model": "flash",
+        "content": [
+          {
+            "type": "text",
+            "text": "391"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 29,
+          "output_tokens": 4
+        }
+      }
+    },
+    {
+      "name": "Tools rejected explicitly",
+      "passed": true,
+      "detail": {
+        "error": {
+          "type": "invalid_request_error",
+          "message": "Tool calls are not supported by this Mac profile"
+        }
+      }
+    },
+    {
+      "name": "Context overflow rejected explicitly",
+      "passed": true,
+      "detail": {
+        "error": {
+          "type": "invalid_request_error",
+          "message": "prompt (12012 tokens) leaves no room to answer in the context (4096); requests are never truncated"
+        }
+      }
+    },
+    {
+      "name": "Cancellation and subsequent request",
+      "passed": true,
+      "detail": {
+        "cancel_seconds": 0.00019570899894461036,
+        "subsequent_response": {
+          "id": "chatcmpl-20a5b684777441a3b18f7f4b",
+          "object": "chat.completion",
+          "created": 1791322611,
+          "model": "flash",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "391"
+              },
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 29,
+            "completion_tokens": 4,
+            "total_tokens": 33
+          }
+        }
+      }
+    },
+    {
+      "name": "Client disconnect and subsequent request",
+      "passed": true,
+      "detail": {
+        "id": "chatcmpl-c948afd384cf4c199244858b",
+        "object": "chat.completion",
+        "created": 1791322612,
+        "model": "flash",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "391"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 29,
+          "completion_tokens": 4,
+          "total_tokens": 33
+        }
+      }
+    }
+  ],
+  "note": "Real local native engine and Strata app. Functional tests can run during downloads; their timings are not benchmark results.",
+  "passed": true
+}

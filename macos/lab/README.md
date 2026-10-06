@@ -114,6 +114,19 @@ To run the packed mixed profile manually:
 .venv/bin/python scripts/run.py flash --engine mtp-shared --spec draft-mtp --draft-model mtp_shared_packed_q3 --draft 2 --draft-placement mixed
 ```
 
+The [helper tuning results](bench/HELPER-TUNING.md) compare prediction depth and CPU workers against fresh controls. `Start Strata - Writing Test.command` uses one predicted token; it helped the short writing workloads, especially the Chinese test, but slowed cached replies. `Start Strata - Fast Follow-ups Test.command` uses four predicted tokens; it helped longer cached ledger replies but slowed prose and Chinese writing. The original shared launcher remains at two tokens. Stop the active model before switching launchers.
+
+To reproduce the separate tuning sweeps, first print their plans, then add `--run` to benchmark:
+
+```sh
+.venv/bin/python scripts/benchmark_tuning.py --axis depth
+.venv/bin/python scripts/benchmark_tuning.py --axis threads
+# Functional app checks load the model; these timings are not speed results:
+.venv/bin/python scripts/verify_helper_tuning.py
+```
+
+`--draft-threads N` changes the helper's generation and input-processing workers; the main model stays at eight CPU threads. The measured depth profiles use eight helper workers. Thread and depth gains are separate experiments and must not be added together.
+
 ## Next steps
 
 The [October 6 parent/fork review](bench/UPSTREAM-SCAN.md) ranks specific Mac experiments and records which improvements are already in this runtime. The isolated Q2_0 Metal candidate passed 124 small GPU correctness checks and 54 full-model answer checks; six baseline/candidate benchmark passes completed. Final writing gains were +0.3% / +3.7% for short/long prompts, while input processing slowed 6-7% and full replies changed little. Background work affected earlier passes. The normal launcher keeps the original engine. [Measured results, evidence and commands](bench/Q2-METAL.md).
@@ -121,6 +134,7 @@ The [October 6 parent/fork review](bench/UPSTREAM-SCAN.md) ranks specific Mac ex
 1. Conversation caching is implemented, benchmarked and enabled. Its matched follow-up results are in [the scoreboard](bench/RESULTS.md) and [experiment notes](bench/NOTES.md).
 2. The smaller prediction helper is implemented and benchmarked. Keep it optional: its benefit depends on sampling and workload. [Prediction results](bench/PREDICTION.md).
    The later [draft vocabulary](bench/DRAFT-VOCAB.md) and [shared helper/layout](bench/SHARED-HELPER.md) experiments use independent controls and retain the normal engine.
+   [Helper depth and worker tuning](bench/HELPER-TUNING.md) adds optional writing and cached-follow-up profiles.
 3. Treat larger contexts and higher-precision full models as separate capacity experiments. Porting Strata's expert scheduler to Metal is a larger engineering project.
 4. Investigate two-device execution later. The AMD desktop's memory does not automatically merge with Mac unified memory; networking and GPU support must be tested separately.
 

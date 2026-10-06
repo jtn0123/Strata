@@ -55,6 +55,8 @@ def main():
         lines.insert(lines.index("## Interpretation"), "[Optimization 4: smaller draft vocabulary](DRAFT-VOCAB.md)\n")
     if (ROOT / "bench/SHARED-HELPER.md").exists():
         lines.insert(lines.index("## Interpretation"), "[Optimization 5: sharing helper weights and GPU placement](SHARED-HELPER.md)\n")
+    if (ROOT / "bench/HELPER-TUNING.md").exists():
+        lines.insert(lines.index("## Interpretation"), "[Optimization 6: helper prediction depth and CPU workers](HELPER-TUNING.md)\n")
     for path in sorted((ROOT / "bench/results").glob("*-integration.json")):
         record = json.loads(path.read_text())
         passed = sum(c["passed"] for c in record["checks"])
