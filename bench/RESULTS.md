@@ -166,6 +166,76 @@ Measured on this 48 GiB M5 Pro. Raw JSON, CSV, native logs, exact prompt IDs and
 | [shared-8-plain](results/20261006T191108Z-shared-8-plain/result.json) | prose / 53 | 36.84 | 0.280 | 189.4 | 36.32 | 1.46 | 0.00 | passed |
 | [shared-8-plain](results/20261006T191108Z-shared-8-plain/result.json) | synthetic / 512 | 36.93 | 0.775 | 660.9 | 36.32 | 1.46 | 0.00 | passed |
 | [shared-8-plain](results/20261006T191108Z-shared-8-plain/result.json) | synthetic / 2048 | 35.66 | 3.268 | 626.9 | 36.32 | 1.46 | 0.00 | passed |
+| [tuning-depth-1-2](results/20261006T211035Z-tuning-depth-1-2/result.json) | chinese / 56 | 36.18 | 0.305 | 184.2 | 31.70 | 1.12 | 0.00 | passed |
+| [tuning-depth-1-2](results/20261006T211035Z-tuning-depth-1-2/result.json) | code / 48 | 45.92 | 0.293 | 164.4 | 31.70 | 1.12 | 0.00 | passed |
+| [tuning-depth-1-2](results/20261006T211035Z-tuning-depth-1-2/result.json) | prose / 53 | 39.95 | 0.301 | 176.3 | 31.70 | 1.12 | 0.00 | passed |
+| [tuning-depth-1-2](results/20261006T211035Z-tuning-depth-1-2/result.json) | synthetic / 512 | 42.81 | 0.932 | 549.6 | 31.70 | 1.12 | 0.00 | passed |
+| [tuning-depth-1-2](results/20261006T211035Z-tuning-depth-1-2/result.json) | synthetic / 2048 | 41.45 | 3.811 | 537.5 | 31.70 | 1.12 | 0.00 | passed |
+| [tuning-depth-2-1](results/20261006T211229Z-tuning-depth-2-1/result.json) | chinese / 56 | 42.04 | 0.309 | 181.6 | 37.68 | 1.12 | 0.00 | passed |
+| [tuning-depth-2-1](results/20261006T211229Z-tuning-depth-2-1/result.json) | code / 48 | 46.43 | 0.293 | 164.1 | 37.68 | 1.12 | 0.00 | passed |
+| [tuning-depth-2-1](results/20261006T211229Z-tuning-depth-2-1/result.json) | prose / 53 | 41.11 | 0.305 | 174.2 | 37.68 | 1.12 | 0.00 | passed |
+| [tuning-depth-2-1](results/20261006T211229Z-tuning-depth-2-1/result.json) | synthetic / 512 | 44.54 | 0.943 | 543.3 | 37.68 | 1.12 | 0.00 | passed |
+| [tuning-depth-2-1](results/20261006T211229Z-tuning-depth-2-1/result.json) | synthetic / 2048 | 41.36 | 3.887 | 527.0 | 37.68 | 1.12 | 0.00 | passed |
+| [tuning-depth-3-3](results/20261006T211405Z-tuning-depth-3-3/result.json) | chinese / 56 | 34.35 | 0.311 | 180.4 | 38.03 | 1.12 | 0.00 | passed |
+| [tuning-depth-3-3](results/20261006T211405Z-tuning-depth-3-3/result.json) | code / 48 | 48.36 | 0.296 | 162.3 | 38.03 | 1.12 | 0.00 | passed |
+| [tuning-depth-3-3](results/20261006T211405Z-tuning-depth-3-3/result.json) | prose / 53 | 36.65 | 0.306 | 173.3 | 38.03 | 1.12 | 0.00 | passed |
+| [tuning-depth-3-3](results/20261006T211405Z-tuning-depth-3-3/result.json) | synthetic / 512 | 41.82 | 0.954 | 536.8 | 38.03 | 1.12 | 0.00 | passed |
+| [tuning-depth-3-3](results/20261006T211405Z-tuning-depth-3-3/result.json) | synthetic / 2048 | 43.05 | 3.918 | 522.8 | 38.03 | 1.12 | 0.00 | passed |
+| [tuning-depth-4-4](results/20261006T211545Z-tuning-depth-4-4/result.json) | chinese / 56 | 29.37 | 0.306 | 183.1 | 38.07 | 1.12 | 0.00 | passed |
+| [tuning-depth-4-4](results/20261006T211545Z-tuning-depth-4-4/result.json) | code / 48 | 46.37 | 0.298 | 161.7 | 38.07 | 1.12 | 0.00 | passed |
+| [tuning-depth-4-4](results/20261006T211545Z-tuning-depth-4-4/result.json) | prose / 53 | 34.29 | 0.305 | 174.2 | 38.07 | 1.12 | 0.00 | passed |
+| [tuning-depth-4-4](results/20261006T211545Z-tuning-depth-4-4/result.json) | synthetic / 512 | 38.05 | 0.945 | 542.1 | 38.07 | 1.12 | 0.00 | passed |
+| [tuning-depth-4-4](results/20261006T211545Z-tuning-depth-4-4/result.json) | synthetic / 2048 | 41.22 | 3.883 | 527.6 | 38.07 | 1.12 | 0.00 | passed |
+| [tuning-depth-5-4](results/20261006T211729Z-tuning-depth-5-4/result.json) | chinese / 56 | 29.34 | 0.312 | 179.9 | 38.15 | 1.10 | 0.00 | passed |
+| [tuning-depth-5-4](results/20261006T211729Z-tuning-depth-5-4/result.json) | code / 48 | 46.56 | 0.293 | 164.2 | 38.15 | 1.10 | 0.00 | passed |
+| [tuning-depth-5-4](results/20261006T211729Z-tuning-depth-5-4/result.json) | prose / 53 | 34.36 | 0.304 | 174.9 | 38.15 | 1.10 | 0.00 | passed |
+| [tuning-depth-5-4](results/20261006T211729Z-tuning-depth-5-4/result.json) | synthetic / 512 | 38.08 | 0.941 | 544.3 | 38.15 | 1.10 | 0.00 | passed |
+| [tuning-depth-5-4](results/20261006T211729Z-tuning-depth-5-4/result.json) | synthetic / 2048 | 40.90 | 3.859 | 530.8 | 38.15 | 1.10 | 0.00 | passed |
+| [tuning-depth-6-3](results/20261006T211913Z-tuning-depth-6-3/result.json) | chinese / 56 | 34.27 | 0.306 | 183.1 | 37.89 | 1.10 | 0.00 | passed |
+| [tuning-depth-6-3](results/20261006T211913Z-tuning-depth-6-3/result.json) | code / 48 | 47.88 | 0.295 | 162.9 | 37.89 | 1.10 | 0.00 | passed |
+| [tuning-depth-6-3](results/20261006T211913Z-tuning-depth-6-3/result.json) | prose / 53 | 36.45 | 0.307 | 173.2 | 37.89 | 1.10 | 0.00 | passed |
+| [tuning-depth-6-3](results/20261006T211913Z-tuning-depth-6-3/result.json) | synthetic / 512 | 41.87 | 0.946 | 541.8 | 37.89 | 1.10 | 0.00 | passed |
+| [tuning-depth-6-3](results/20261006T211913Z-tuning-depth-6-3/result.json) | synthetic / 2048 | 42.61 | 3.856 | 531.2 | 37.89 | 1.10 | 0.00 | passed |
+| [tuning-depth-7-1](results/20261006T212052Z-tuning-depth-7-1/result.json) | chinese / 56 | 42.03 | 0.306 | 183.2 | 37.66 | 1.09 | 0.00 | passed |
+| [tuning-depth-7-1](results/20261006T212052Z-tuning-depth-7-1/result.json) | code / 48 | 46.22 | 0.292 | 164.8 | 37.66 | 1.09 | 0.00 | passed |
+| [tuning-depth-7-1](results/20261006T212052Z-tuning-depth-7-1/result.json) | prose / 53 | 40.73 | 0.303 | 175.3 | 37.66 | 1.09 | 0.00 | passed |
+| [tuning-depth-7-1](results/20261006T212052Z-tuning-depth-7-1/result.json) | synthetic / 512 | 44.44 | 0.945 | 542.1 | 37.66 | 1.09 | 0.00 | passed |
+| [tuning-depth-7-1](results/20261006T212052Z-tuning-depth-7-1/result.json) | synthetic / 2048 | 41.33 | 3.855 | 531.3 | 37.66 | 1.09 | 0.00 | passed |
+| [tuning-depth-8-2](results/20261006T212228Z-tuning-depth-8-2/result.json) | chinese / 56 | 36.12 | 0.307 | 182.5 | 37.88 | 1.09 | 0.00 | passed |
+| [tuning-depth-8-2](results/20261006T212228Z-tuning-depth-8-2/result.json) | code / 48 | 45.91 | 0.293 | 164.1 | 37.88 | 1.09 | 0.00 | passed |
+| [tuning-depth-8-2](results/20261006T212228Z-tuning-depth-8-2/result.json) | prose / 53 | 39.85 | 0.302 | 175.9 | 37.88 | 1.09 | 0.00 | passed |
+| [tuning-depth-8-2](results/20261006T212228Z-tuning-depth-8-2/result.json) | synthetic / 512 | 42.64 | 0.957 | 537.1 | 37.88 | 1.09 | 0.00 | passed |
+| [tuning-depth-8-2](results/20261006T212228Z-tuning-depth-8-2/result.json) | synthetic / 2048 | 41.27 | 3.867 | 529.7 | 37.88 | 1.09 | 0.00 | passed |
+| [tuning-threads-1-8](results/20261006T212441Z-tuning-threads-1-8/result.json) | chinese / 56 | 36.18 | 0.308 | 182.3 | 37.79 | 1.09 | 0.00 | passed |
+| [tuning-threads-1-8](results/20261006T212441Z-tuning-threads-1-8/result.json) | code / 48 | 45.65 | 0.297 | 162.1 | 37.79 | 1.09 | 0.00 | passed |
+| [tuning-threads-1-8](results/20261006T212441Z-tuning-threads-1-8/result.json) | prose / 53 | 39.79 | 0.306 | 173.5 | 37.79 | 1.09 | 0.00 | passed |
+| [tuning-threads-1-8](results/20261006T212441Z-tuning-threads-1-8/result.json) | synthetic / 512 | 42.97 | 0.927 | 553.0 | 37.79 | 1.09 | 0.00 | passed |
+| [tuning-threads-1-8](results/20261006T212441Z-tuning-threads-1-8/result.json) | synthetic / 2048 | 41.45 | 3.831 | 534.6 | 37.79 | 1.09 | 0.00 | passed |
+| [tuning-threads-2-6](results/20261006T212620Z-tuning-threads-2-6/result.json) | chinese / 56 | 36.24 | 0.310 | 181.2 | 37.84 | 1.09 | 0.00 | passed |
+| [tuning-threads-2-6](results/20261006T212620Z-tuning-threads-2-6/result.json) | code / 48 | 45.74 | 0.300 | 160.2 | 37.84 | 1.09 | 0.00 | passed |
+| [tuning-threads-2-6](results/20261006T212620Z-tuning-threads-2-6/result.json) | prose / 53 | 40.23 | 0.304 | 174.4 | 37.84 | 1.09 | 0.00 | passed |
+| [tuning-threads-2-6](results/20261006T212620Z-tuning-threads-2-6/result.json) | synthetic / 512 | 42.90 | 0.974 | 526.1 | 37.84 | 1.09 | 0.00 | passed |
+| [tuning-threads-2-6](results/20261006T212620Z-tuning-threads-2-6/result.json) | synthetic / 2048 | 41.53 | 3.995 | 512.8 | 37.84 | 1.09 | 0.00 | passed |
+| [tuning-threads-3-12](results/20261006T212759Z-tuning-threads-3-12/result.json) | chinese / 56 | 36.17 | 0.306 | 183.5 | 37.70 | 1.08 | 0.00 | passed |
+| [tuning-threads-3-12](results/20261006T212759Z-tuning-threads-3-12/result.json) | code / 48 | 45.65 | 0.295 | 163.2 | 37.70 | 1.08 | 0.00 | passed |
+| [tuning-threads-3-12](results/20261006T212759Z-tuning-threads-3-12/result.json) | prose / 53 | 39.91 | 0.301 | 176.4 | 37.70 | 1.08 | 0.00 | passed |
+| [tuning-threads-3-12](results/20261006T212759Z-tuning-threads-3-12/result.json) | synthetic / 512 | 42.99 | 0.909 | 563.5 | 37.70 | 1.08 | 0.00 | passed |
+| [tuning-threads-3-12](results/20261006T212759Z-tuning-threads-3-12/result.json) | synthetic / 2048 | 41.42 | 3.737 | 548.1 | 37.70 | 1.08 | 0.00 | passed |
+| [tuning-threads-4-12](results/20261006T212936Z-tuning-threads-4-12/result.json) | chinese / 56 | 36.09 | 0.306 | 183.2 | 37.77 | 1.08 | 0.00 | passed |
+| [tuning-threads-4-12](results/20261006T212936Z-tuning-threads-4-12/result.json) | code / 48 | 45.82 | 0.291 | 165.1 | 37.77 | 1.08 | 0.00 | passed |
+| [tuning-threads-4-12](results/20261006T212936Z-tuning-threads-4-12/result.json) | prose / 53 | 39.87 | 0.301 | 176.6 | 37.77 | 1.08 | 0.00 | passed |
+| [tuning-threads-4-12](results/20261006T212936Z-tuning-threads-4-12/result.json) | synthetic / 512 | 42.75 | 0.914 | 560.7 | 37.77 | 1.08 | 0.00 | passed |
+| [tuning-threads-4-12](results/20261006T212936Z-tuning-threads-4-12/result.json) | synthetic / 2048 | 41.39 | 3.731 | 549.0 | 37.77 | 1.08 | 0.00 | passed |
+| [tuning-threads-5-6](results/20261006T213114Z-tuning-threads-5-6/result.json) | chinese / 56 | 36.27 | 0.307 | 182.4 | 37.87 | 1.06 | 0.00 | passed |
+| [tuning-threads-5-6](results/20261006T213114Z-tuning-threads-5-6/result.json) | code / 48 | 46.16 | 0.298 | 161.6 | 37.87 | 1.06 | 0.00 | passed |
+| [tuning-threads-5-6](results/20261006T213114Z-tuning-threads-5-6/result.json) | prose / 53 | 40.00 | 0.305 | 173.9 | 37.87 | 1.06 | 0.00 | passed |
+| [tuning-threads-5-6](results/20261006T213114Z-tuning-threads-5-6/result.json) | synthetic / 512 | 43.13 | 0.956 | 535.8 | 37.87 | 1.06 | 0.00 | passed |
+| [tuning-threads-5-6](results/20261006T213114Z-tuning-threads-5-6/result.json) | synthetic / 2048 | 41.74 | 3.945 | 519.3 | 37.87 | 1.06 | 0.00 | passed |
+| [tuning-threads-6-8](results/20261006T213253Z-tuning-threads-6-8/result.json) | chinese / 56 | 36.03 | 0.310 | 181.1 | 37.86 | 1.06 | 0.00 | passed |
+| [tuning-threads-6-8](results/20261006T213253Z-tuning-threads-6-8/result.json) | code / 48 | 45.64 | 0.293 | 164.0 | 37.86 | 1.06 | 0.00 | passed |
+| [tuning-threads-6-8](results/20261006T213253Z-tuning-threads-6-8/result.json) | prose / 53 | 39.71 | 0.302 | 175.8 | 37.86 | 1.06 | 0.00 | passed |
+| [tuning-threads-6-8](results/20261006T213253Z-tuning-threads-6-8/result.json) | synthetic / 512 | 42.41 | 0.973 | 527.1 | 37.86 | 1.06 | 0.00 | passed |
+| [tuning-threads-6-8](results/20261006T213253Z-tuning-threads-6-8/result.json) | synthetic / 2048 | 41.23 | 3.856 | 531.3 | 37.86 | 1.06 | 0.00 | passed |
 
 ## Optimization 1: conversation caching
 
@@ -190,6 +260,8 @@ Reduction = 100 x (1 - cached duration / uncached duration). Output speed change
 
 [Optimization 5: sharing helper weights and GPU placement](SHARED-HELPER.md)
 
+[Optimization 6: helper prediction depth and CPU workers](HELPER-TUNING.md)
+
 ## Interpretation
 
 - Compare changes within the same model, prompt hash, sampling settings and context. Model names ending Q2_0 or Q4_K_M describe compressed weights, not fewer model layers or experts.
@@ -207,6 +279,10 @@ Reduction = 100 x (1 - cached duration / uncached duration). Output speed change
 - [20261006T141248Z-flash-integration](results/20261006T141248Z-flash-integration.json): 9/9 checks passed.
 - [20261006T155222Z-flash-integration](results/20261006T155222Z-flash-integration.json): 9/9 checks passed.
 - [20261006T185730Z-flash-integration](results/20261006T185730Z-flash-integration.json): 9/9 checks passed.
+- [20261006T213453Z-flash-integration](results/20261006T213453Z-flash-integration.json): 9/9 checks passed.
+- [20261006T213646Z-flash-integration](results/20261006T213646Z-flash-integration.json): 9/9 checks passed.
+- [20261006T213653Z-flash-integration](results/20261006T213653Z-flash-integration.json): 9/9 checks passed.
+- [20261006T213659Z-flash-integration](results/20261006T213659Z-flash-integration.json): 9/9 checks passed.
 - [20261006T112501Z-flash-context-probe](results/20261006T112501Z-flash-context-probe.json): passed, varied records across 2831 input tokens.
 - [20261006T141353Z-flash-cache-api](results/20261006T141353Z-flash-cache-api.json): 2/2 real Strata HTTP follow-ups correct with confirmed native cache reuse.
 

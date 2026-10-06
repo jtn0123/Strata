@@ -150,6 +150,7 @@ def main():
     ap.add_argument("--draft-placement", choices=["gpu", "cpu", "output", "mixed"], default="gpu")
     ap.add_argument("--draft-model", default="mtp")
     ap.add_argument("--threads", type=int, default=8)
+    ap.add_argument("--draft-threads", type=int)
     ap.add_argument("--temperature", type=float, default=0)
     ap.add_argument("--extended-checks", action="store_true")
     ap.add_argument("--repeats", type=int, default=3)
@@ -184,7 +185,8 @@ def run(args):
     base = f"http://127.0.0.1:{port}"
     command = server_command(args.model, port, args.context, args.batch, args.ubatch,
                              args.spec, args.draft, args.cache_type, args.threads, args.draft_placement,
-                             args.draft_model, engine=engine)
+                             args.draft_model, engine=engine,
+                             draft_threads=getattr(args, "draft_threads", None))
     record = {"schema": 1, "run_id": run_id, "status": "running", "settings": vars(args),
               "command": command, "runtime": json.loads((ROOT / "config/runtime.json").read_text()),
               "model": json.loads((ROOT / "config/models.json").read_text())[args.model],

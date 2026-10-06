@@ -18,7 +18,7 @@ def model_path(model_id):
 
 def server_command(model_id, port=8096, context=4096, batch=512, ubatch=128,
                    spec="none", draft=3, cache_type="f16", threads=8, draft_placement="gpu",
-                   draft_model="mtp", engine="baseline"):
+                   draft_model="mtp", engine="baseline", draft_threads=None):
     from engines import engine_binary
     command = [str(engine_binary(engine)), "-m", str(model_path(model_id)), "--host", "127.0.0.1",
                "--port", str(port), "-c", str(context), "-b", str(batch), "-ub", str(ubatch),
@@ -41,6 +41,13 @@ def server_command(model_id, port=8096, context=4096, batch=512, ubatch=128,
         command.extend(["-md", str(model_path(draft_model)), "--spec-draft-ngl", layers])
         if draft_placement == "mixed":
             command.extend(["--spec-draft-cpu-moe", "--no-op-offload"])
+        if draft_threads is not None:
+            if draft_threads < 1:
+                raise ValueError("Use at least one helper CPU thread")
+            command.extend(["--spec-draft-threads", str(draft_threads),
+                            "--spec-draft-threads-batch", str(draft_threads)])
+    elif draft_threads is not None:
+        raise ValueError("Helper CPU threads require prediction enabled")
     return command
 
 
