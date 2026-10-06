@@ -1,0 +1,99 @@
+"""Select an isolated native engine and verify its source/build provenance."""
+import hashlib
+import json
+from pathlib import Path
+import subprocess
+
+from lab import ROOT
+
+ENGINES = ("baseline", "q2-masked")
+
+
+def sha256(path):
+    with Path(path).open("rb") as stream:
+        return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
+def git(path, *args):
+    return subprocess.check_output(["git", "-C", str(path), *args]).strip()
+
+
+def source_info(engine, root=ROOT):
+    runtime = json.loads((root / "config/runtime.json").read_text())
+    revision = runtime["llama_cpp"]["revision"]
+    if engine == "baseline":
+        directory = "vendor/llama.cpp"
+        manifest = None
+    elif engine == "q2-masked":
+        manifest = json.loads((root / "config/q2_experiment.json").read_text())
+        directory = manifest["directory"]
+        if manifest["base_revision"] != revision:
+            raise RuntimeError("Q2 experiment does not match the pinned baseline")
+        if sha256(root / manifest["patch"]) != manifest["patch_sha256"]:
+            raise RuntimeError("Q2 patch hash differs from the experiment manifest")
+    else:
+        raise ValueError(f"Unknown engine: {engine}")
+    path = root / directory
+    if git(path, "rev-parse", "HEAD").decode() != revision:
+        raise RuntimeError(f"Unpinned native checkout: {directory}")
+    status = git(path, "status", "--porcelain", "--untracked-files=all").decode()
+    diff = subprocess.check_output(["git", "-C", str(path), "diff", "HEAD", "--binary"])
+    if manifest:
+        expected_status = "\n".join(f" M {name}" for name in manifest["modified_files"])
+        if status.strip() != expected_status.strip() or git(path, "diff", "--cached"):
+            raise RuntimeError("Candidate contains changes beyond the approved Q2 patch")
+        if hashlib.sha256(diff).hexdigest() != manifest["source_diff_sha256"]:
+            raise RuntimeError("Candidate source diff differs from the approved Q2 patch")
+    elif status or diff:
+        raise RuntimeError("Baseline native checkout must remain unmodified")
+    return {"engine": engine, "directory": directory, "revision": revision,
+            "source_diff_sha256": hashlib.sha256(diff).hexdigest(), "patch": manifest}
+
+
+def engine_binary(engine, root=ROOT):
+    directory = "vendor/llama.cpp" if engine == "baseline" else "vendor/llama-q2-masked"
+    if engine not in ENGINES:
+        raise ValueError(f"Unknown engine: {engine}")
+    return root / directory / "build/bin/llama-server"
+
+
+def artifact_hashes(path):
+    files = [path / "llama-server", *sorted(path.glob("*.dylib"))]
+    return {file.name: sha256(file) for file in files}
+
+
+def write_receipt(engine):
+    info = source_info(engine)
+    binary = engine_binary(engine)
+    if not binary.is_file():
+        raise RuntimeError(f"Native engine is not built: {binary}")
+    info["artifacts"] = artifact_hashes(binary.parent)
+    info["binary_version"] = subprocess.check_output(
+        [str(binary), "--version"], text=True, stderr=subprocess.STDOUT).strip()
+    cache = binary.parent.parent / "CMakeCache.txt"
+    keys = ("CMAKE_BUILD_TYPE", "GGML_METAL", "GGML_METAL_EMBED_LIBRARY", "LLAMA_BUILD_TESTS",
+            "LLAMA_BUILD_TOOLS", "GGML_CPU", "GGML_BLAS", "GGML_NATIVE", "GGML_METAL_USE_BF16")
+    info["build_settings"] = {line.split(":", 1)[0]: line.split("=", 1)[1]
+                              for line in cache.read_text().splitlines()
+                              if any(line.startswith(key + ":") for key in keys)}
+    info["compiler"] = subprocess.check_output(["clang", "--version"], text=True).strip()
+    path = ROOT / info["directory"] / "build/lab-receipt.json"
+    path.write_text(json.dumps(info, indent=2) + "\n")
+    return info
+
+
+def verify_engine(engine, root=ROOT, require_receipt=True):
+    info = source_info(engine, root)
+    binary = engine_binary(engine, root)
+    if not binary.is_file():
+        raise RuntimeError(f"Native engine is not built: {binary}")
+    hashes = artifact_hashes(binary.parent)
+    receipt = binary.parent.parent / "lab-receipt.json"
+    if require_receipt or receipt.exists():
+        saved = json.loads(receipt.read_text())
+        if any(saved.get(key) != value for key, value in info.items()) or saved["artifacts"] != hashes:
+            raise RuntimeError(f"Source or native binaries changed since the build receipt: {engine}")
+    result = {**info, "artifacts": hashes}
+    if receipt.exists():
+        result["build_receipt"] = json.loads(receipt.read_text())
+    return result

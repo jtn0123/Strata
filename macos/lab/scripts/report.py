@@ -49,6 +49,8 @@ def main():
               "", "## Integration checks", ""]
     if (ROOT / "bench/PREDICTION.md").exists():
         lines.insert(lines.index("## Interpretation"), "[Optimization 2: prediction-helper percentages, tradeoffs and decision](PREDICTION.md)\n")
+    if (ROOT / "bench/Q2-METAL.md").exists():
+        lines.insert(lines.index("## Interpretation"), "[Optimization 3: isolated Q2 Metal experiment and benchmark hold](Q2-METAL.md)\n")
     for path in sorted((ROOT / "bench/results").glob("*-integration.json")):
         record = json.loads(path.read_text())
         passed = sum(c["passed"] for c in record["checks"])

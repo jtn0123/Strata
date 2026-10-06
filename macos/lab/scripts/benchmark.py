@@ -16,6 +16,8 @@ import urllib.request
 
 import psutil
 from lab import ROOT, request, server_command
+from engines import ENGINES, verify_engine
+from check_memory import assert_no_model_server
 
 
 def command_output(command):
@@ -134,6 +136,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("model", choices=["small", "flash"])
     ap.add_argument("--label", required=True)
+    ap.add_argument("--engine", choices=ENGINES, default="baseline")
     ap.add_argument("--context", type=int, default=4096)
     ap.add_argument("--batch", type=int, default=512)
     ap.add_argument("--ubatch", type=int, default=128)
@@ -146,20 +149,24 @@ def main():
     ap.add_argument("--temperature", type=float, default=0)
     ap.add_argument("--extended-checks", action="store_true")
     ap.add_argument("--repeats", type=int, default=3)
+    ap.add_argument("--warmups", type=int, default=0)
     ap.add_argument("--predict", type=int, default=128)
     ap.add_argument("--prompts", type=int, nargs="+", default=[512, 2048])
     args = ap.parse_args()
     with (ROOT / "bench/.lock").open("w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        binary = str(ROOT / "vendor/llama.cpp/build/bin/llama-server")
-        if any(p.info["exe"] == binary for p in psutil.process_iter(["exe"])):
-            raise RuntimeError("Stop the running lab model before benchmarking")
+        assert_no_model_server()
         record = run(args)
         if record["status"] != "passed":
             raise SystemExit(1)
 
 
 def run(args):
+    engine = getattr(args, "engine", "baseline")
+    warmups = getattr(args, "warmups", 0)
+    if args.repeats < 1 or warmups < 0:
+        raise ValueError("Use at least one measured repeat and nonnegative warmups")
+    engine_info = verify_engine(engine, require_receipt=(engine != "baseline"))
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + args.label
     folder = ROOT / "bench/results" / run_id
     folder.mkdir()
@@ -169,11 +176,12 @@ def run(args):
     base = f"http://127.0.0.1:{port}"
     command = server_command(args.model, port, args.context, args.batch, args.ubatch,
                              args.spec, args.draft, args.cache_type, args.threads, args.draft_placement,
-                             args.draft_model)
+                             args.draft_model, engine=engine)
     record = {"schema": 1, "run_id": run_id, "status": "running", "settings": vars(args),
               "command": command, "runtime": json.loads((ROOT / "config/runtime.json").read_text()),
               "model": json.loads((ROOT / "config/models.json").read_text())[args.model],
-              "host_before": host_snapshot(), "cases": [], "checks": [],
+              "host_before": host_snapshot(), "cases": [], "warmups": [], "checks": [],
+              "selected_engine": engine_info,
               "method": "Single slot, full Metal offload, fixed seed 1234; sampling temperature is recorded in settings. Exact synthetic chat prompt sizes and fixed output count from settings; no prompt reuse; ignore EOS for timing only. No model downloads during a run. Warm OS file cache is uncontrolled. TTFT includes HTTP and prompt evaluation. Correctness checks use normal EOS handling."}
     record["actual_sources"] = {}
     for name, directory in [("llama_cpp", "llama.cpp"), ("strata_macos", "Strata-macOS")]:
@@ -209,7 +217,7 @@ def run(args):
                 prompt = tokens[:length - 48] + tokens[-48:]
                 prompt_hash = hashlib.sha256(json.dumps(prompt).encode()).hexdigest()
                 (folder / f"prompt-{length}.json").write_text(json.dumps(prompt) + "\n")
-                for repetition in range(args.repeats):
+                for repetition in range(-warmups, args.repeats):
                     payload = {"prompt": prompt, "n_predict": args.predict, "stream": True,
                                "cache_prompt": False, "temperature": args.temperature, "seed": 1234,
                                "ignore_eos": True, "return_tokens": True}
@@ -227,9 +235,10 @@ def run(args):
                             "swap_before_bytes": swap_before, "swap_after_bytes": psutil.swap_memory().used}
                     if timings["prompt_n"] != length or timings["predicted_n"] != args.predict:
                         raise RuntimeError(f"Benchmark token count mismatch: {timings}")
-                    record["cases"].append(case)
+                    record["warmups" if repetition < 0 else "cases"].append(case)
                     save()
-                    print(f"prompt={length} repeat={repetition+1}: {case['generation_tok_s']:.2f} tok/s, TTFT {case['ttft_s']:.2f}s, prompt {case['prompt_tok_s']:.1f} tok/s", flush=True)
+                    phase = f"warmup={repetition + warmups + 1}" if repetition < 0 else f"repeat={repetition+1}"
+                    print(f"prompt={length} {phase}: {case['generation_tok_s']:.2f} tok/s, TTFT {case['ttft_s']:.2f}s, prompt {case['prompt_tok_s']:.1f} tok/s", flush=True)
             for prompt, expected in [("What is 17 multiplied by 23? Reply with only the number.", "391"),
                                      ("The lab's secret label is violet-730. Repeat only that exact label.", "violet-730")]:
                 response = request(base, "/v1/chat/completions", {"model": args.model,

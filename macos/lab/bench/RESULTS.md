@@ -52,6 +52,8 @@ Reduction = 100 x (1 - cached duration / uncached duration). Output speed change
 
 [Optimization 2: prediction-helper percentages, tradeoffs and decision](PREDICTION.md)
 
+[Optimization 3: isolated Q2 Metal experiment and benchmark hold](Q2-METAL.md)
+
 ## Interpretation
 
 - Compare changes within the same model, prompt hash, sampling settings and context. Model names ending Q2_0 or Q4_K_M describe compressed weights, not fewer model layers or experts.
