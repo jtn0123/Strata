@@ -10,11 +10,13 @@ From this folder:
 .venv/bin/python scripts/run.py flash
 ```
 
-Open **http://127.0.0.1:8095**. OpenAI-compatible clients use **http://127.0.0.1:8095/v1**; the native engine is on **http://127.0.0.1:8096/v1**. Ctrl-C stops both processes. Double-click `Start Strata.command` to launch the full model, or `Stop Strata.command` to release its memory. The normal profile uses 4K context, processing batch 512 and no MTP. To use the small development model:
+Open **http://127.0.0.1:8095**. OpenAI-compatible clients use **http://127.0.0.1:8095/v1**; the native engine is on **http://127.0.0.1:8096/v1**. Ctrl-C stops both processes. Double-click `Start Strata.command` to launch the full model, or `Stop Strata.command` to release its memory. The normal profile uses 4K context, processing batch 512, conversation caching and no MTP. To use the small development model:
 
 ```sh
 .venv/bin/python scripts/run.py small
 ```
+
+Use `scripts/run.py flash --no-prompt-cache` to restore v1's uncached conversation behavior. Caching reuses the common prefix in one engine slot; switching to a different conversation may replace it. It adds no separate multi-chat RAM cache. It can change rounding and generated token choices, so semantic answer checks accompany the timing comparison.
 
 No login service or system-wide Python packages are installed. Native and Strata source checkouts are under `vendor/`; model files and virtual environment stay outside git.
 
@@ -38,10 +40,13 @@ Sources, dependencies and model revisions are pinned in `config/` and `requireme
 .venv/bin/python scripts/benchmark.py small --label small-ubatch512 --ubatch 512
 .venv/bin/python scripts/benchmark.py flash --label flash-baseline
 .venv/bin/python scripts/benchmark.py flash --label flash-mtp-cpu --ubatch 512 --spec draft-mtp --draft 3 --draft-placement cpu
+.venv/bin/python scripts/benchmark_cache.py flash
 .venv/bin/python scripts/report.py
 ```
 
 Run one configuration at a time on AC power, with no downloads during speed measurements. Each run starts and stops its own engine on an unused local port. Results include exact commands, model hashes/revisions, hardware/power snapshots, load time, first-token delay, input/output token speeds, raw responses, memory/swap samples, native logs and CSV. A failed attempt also leaves a result record. Existing records are never replaced. [Scoreboard](bench/RESULTS.md).
+
+Stop the web app with `Stop Strata.command` before benchmarking. The conversation benchmark refuses to start a second lab model. It compares caching off and on through the real adapter, using identical follow-up prompts. It alternates pair order, excludes warm-up pairs, checks ledger recall and changed/new conversations, and records percentage changes. Its baseline uses the same working v1 settings: full Metal, 4K context, batch 512, F16 cache and no MTP. These results are separate from the synthetic fresh-prompt benchmark, which continues to disable prompt reuse.
 
 With the web app running, verify the real API and adapter:
 
@@ -65,9 +70,9 @@ The GPU draft exceeded the default GPU memory budget on this Mac. A CPU draft pa
 
 ## Next steps
 
-1. Preserve the small baseline, then load and benchmark full Q2_0 at short context with SSD lookup enabled.
-2. Change one setting at a time: processing batch, MTP, then context size. Keep correctness checks and memory limits in every run.
-3. Increase context only after a stable no-swap configuration. Treat higher-precision full models as separate capacity experiments.
-4. Investigate two-device execution later after measuring the Mac. The AMD desktop's memory does not automatically merge with Mac unified memory; networking and GPU support must be tested separately.
+1. Conversation caching is implemented, benchmarked and enabled. Its matched follow-up results are in [the scoreboard](bench/RESULTS.md) and [experiment notes](bench/NOTES.md).
+2. Reduce the prediction helper's extra memory, then compare speed, swap and answer quality against the adopted profile. MTP remains off until its overall tradeoff improves.
+3. Treat larger contexts and higher-precision full models as separate capacity experiments. Porting Strata's expert scheduler to Metal is a larger engineering project.
+4. Investigate two-device execution later. The AMD desktop's memory does not automatically merge with Mac unified memory; networking and GPU support must be tested separately.
 
 The attached port plan predates native MTP support in the runtime pinned here. Avoid rebuilding those kernels or a custom draft loop until current upstream behavior has been tested. References: [Strata Mac fork](https://github.com/jinzy0623/Strata-macOS), [llama.cpp v0.6.0](https://github.com/ggml-org/llama.cpp/releases/tag/v0.6.0), [full model](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF), [draft files](https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/tree/main/MTP).

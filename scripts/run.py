@@ -26,6 +26,7 @@ def main():
     ap.add_argument("--spec", default="none", choices=["none", "draft-mtp"])
     ap.add_argument("--draft", type=int, default=3)
     ap.add_argument("--draft-placement", choices=["gpu", "cpu"], default="cpu")
+    ap.add_argument("--prompt-cache", action=argparse.BooleanOptionalAction, default=True)
     args = ap.parse_args()
     def interrupted(signum, frame):
         raise KeyboardInterrupt
@@ -41,7 +42,7 @@ def main():
                            "model": args.model, "port": args.port, "native_port": args.native_port,
                            "log_directory": str(folder)}, indent=2) + "\n")
     config = {"native_url": f"http://127.0.0.1:{args.native_port}", "model_name": args.model,
-              "host": "127.0.0.1", "fit_max_tokens": True}
+              "host": "127.0.0.1", "fit_max_tokens": True, "prompt_cache": args.prompt_cache}
     config_path = folder / "strata.json"
     config_path.write_text(json.dumps(config, indent=2) + "\n")
     native, app, monitor = None, None, None

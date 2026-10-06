@@ -40,13 +40,15 @@ class NativeTemplate:
 
 
 class NativeEngine:
-    def __init__(self, base, props, model_id):
+    def __init__(self, base, props, model_id, prompt_cache=True):
         self.base = base
+        self.prompt_cache = prompt_cache
         self.max_context = props["default_generation_settings"]["n_ctx"]
         self.last = {}
         self.info = {"backend": "metal-native-http", "version": props["build_info"],
                      "expert_streaming": False, "lazy_embeddings": model_id == "flash",
-                     "runtime": "llama.cpp", "model_path": props["model_path"]}
+                     "runtime": "llama.cpp", "model_path": props["model_path"],
+                     "prompt_cache": prompt_cache}
 
     def generate(self, ids, max_new, sampling, cancel):
         if cancel.is_set():
@@ -54,7 +56,7 @@ class NativeEngine:
         url = urlparse(self.base)
         connection = http.client.HTTPConnection(url.hostname, url.port, timeout=600)
         payload = {"prompt": ids, "n_predict": max_new, "stream": True, "return_tokens": True,
-                   "cache_prompt": False, "temperature": sampling.get("temperature", 0.8),
+                   "cache_prompt": self.prompt_cache, "temperature": sampling.get("temperature", 0.8),
                    "repeat_penalty": sampling.get("repetition_penalty", 1.0)}
         for key in ("top_p", "top_k", "min_p", "frequency_penalty", "presence_penalty", "seed"):
             if sampling.get(key) is not None:
@@ -108,7 +110,7 @@ class NativeEngine:
                     self.last = {"generated": count, "prompt_tokens": len(ids),
                                  "prompt_ms": timing.get("prompt_ms"),
                                  "decode_ms": timing.get("predicted_ms"),
-                                 "native_timings": timing}
+                                 "native_timings": timing, "reused": timing.get("cache_n", 0)}
                     break
         finally:
             stopped.set()
@@ -144,5 +146,8 @@ def create_backend(config):
             stops.add(ids[0])
     if not stops:
         raise ValueError("No supported Qwen end-of-turn token found")
-    return BackendBundle(NativeEngine(base, props, config["model_name"]), tokenizer,
+    prompt_cache = config.get("prompt_cache", True)
+    if not isinstance(prompt_cache, bool):
+        raise ValueError("prompt_cache must be a boolean")
+    return BackendBundle(NativeEngine(base, props, config["model_name"], prompt_cache), tokenizer,
                          NativeTemplate(base), stops)

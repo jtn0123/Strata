@@ -4,7 +4,7 @@ October 6, 2026. Apple M5 Pro, 48 GiB, AC power, normal power mode. No GPU memor
 
 ## Normal profile
 
-Full Qwen3.8-Flash-Next GSQ-RCO Q2_0, all 512 experts per layer, lazy SSD lookup table, Metal, 4K context, one request at a time, processing batch 512, no MTP. `Start Strata.command` and `Stop Strata.command` launch and stop this profile.
+Full Qwen3.8-Flash-Next GSQ-RCO Q2_0, all 512 experts per layer, lazy SSD lookup table, Metal, 4K context, one request at a time, processing batch 512, conversation caching enabled, no MTP. `Start Strata.command` and `Stop Strata.command` launch and stop this profile. `scripts/run.py flash --no-prompt-cache` restores the uncached v1 conversation behavior.
 
 ## What the measurements changed
 
@@ -21,6 +21,22 @@ Full Qwen3.8-Flash-Next GSQ-RCO Q2_0, all 512 experts per layer, lazy SSD lookup
 Both the small and full models passed nine real API/adapter checks: Unicode, native/adapter token parity, OpenAI streamed and non-streamed chat, Anthropic chat, explicit tool/overflow rejection, cancellation and client disconnect recovery. Strata's real browser chat returned 391 for 17 x 23 with each model. Preview screenshot capture failed; browser evidence is DOM-based.
 
 A separate 2831-token prompt with 128 distinct records correctly retrieved the requested label. Its complete request and response are saved as a context probe. This exercises varied lookup keys beyond the repeated text used for timing.
+
+## Optimization 1: reuse conversation history
+
+The only inference behavior changed is the adapter's `cache_prompt` setting. This reuses a matching prefix in the existing native engine slot. It does not add a separate multi-conversation RAM cache, change model precision, enable MTP or change GPU memory limits. The adapter reports its configured cache setting through Strata's `/metrics` engine information.
+
+The [full-model paired comparison](results/20261006T141016Z-flash-conversation-cache/comparison.json) uses five measured pairs at each history size, plus excluded warm-ups. Each mode starts from an identical uncached first turn, then receives exactly the same follow-up tokens. Pair order alternates. Settings match the working v1 profile: batch 512, 4K, F16, full Metal, no MTP. These matched follow-ups are the baseline for the percentages; the earlier synthetic fresh-prompt benchmark is a different workload and remains unchanged.
+
+- Short history (545-token follow-up): median first token 0.951 -> 0.259 seconds, 72.8% less waiting. Total answer time 1.581 -> 0.883 seconds, 44.1% less time. Reused 503 prompt tokens.
+- Longer history (2069-token follow-up): median first token 3.351 -> 0.272 seconds, 91.9% less waiting. Total answer time 3.972 -> 0.898 seconds, 77.4% less time. Reused 2027 prompt tokens.
+- Output speed changed +1.0% on the short workload and -0.7% on the longer one, about 37-38 tokens/s overall. This is a startup improvement, not evidence of faster token generation.
+- All 15 paired/changed/new-conversation checks passed. All sampled outputs matched the uncached token IDs exactly. This limited check does not prove general answer quality or bit-for-bit equivalence on every prompt.
+- Swap growth was zero; approximately 1.04 GiB was already swapped at the start. The memory guard did not fire. Memory samples cover both modes in one process; equal paired RSS is not an isolated proof that cache allocations cost zero memory.
+- [Nine API/adapter checks](results/20261006T141248Z-flash-integration.json) passed with caching enabled, including cancellation and disconnect recovery.
+- [Real Strata HTTP API proof](results/20261006T141353Z-flash-cache-api.json) confirmed correct streamed follow-up answers and native metric deltas of 503 and 2027 reused tokens. These two extra timings are functional evidence, not paired benchmark medians.
+
+Keep conversation caching enabled. The gain applies when conversation history matches the engine's current slot; fresh or interleaved unrelated chats may have little reusable history. Longer answers receive a smaller percentage reduction in total time because generation speed is unchanged. The next isolated experiment is reducing the prediction helper's extra memory.
 
 ## Limits and next experiment
 
