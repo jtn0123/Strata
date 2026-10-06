@@ -262,6 +262,8 @@ Reduction = 100 x (1 - cached duration / uncached duration). Output speed change
 
 [Optimization 6: helper prediction depth and CPU workers](HELPER-TUNING.md)
 
+[Optimization 7: few-row GPU math, updated writing and follow-up profiles](METAL-MMA.md)
+
 ## Interpretation
 
 - Compare changes within the same model, prompt hash, sampling settings and context. Model names ending Q2_0 or Q4_K_M describe compressed weights, not fewer model layers or experts.

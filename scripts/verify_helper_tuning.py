@@ -15,17 +15,18 @@ from engines import verify_engine
 from lab import ROOT
 
 
-def check(depth, threads):
+def check(depth, threads, engine="mtp-shared"):
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    folder = ROOT / "bench/features" / f"{stamp}-tuning-app-{depth}-{threads}"
+    prefix = "tuning" if engine == "mtp-shared" else "mma"
+    folder = ROOT / "bench/features" / f"{stamp}-{prefix}-app-{depth}-{threads}"
     folder.mkdir()
     before = set((ROOT / "bench/results").glob("*-flash-integration.json"))
-    command = [sys.executable, "scripts/run.py", "flash", "--engine", "mtp-shared",
+    command = [sys.executable, "scripts/run.py", "flash", "--engine", engine,
                "--spec", "draft-mtp", "--draft-model", "mtp_shared_packed_q3", "--draft", str(depth),
                "--draft-placement", "mixed", "--draft-threads", str(threads)]
     models = json.loads((ROOT / "config/models.json").read_text())
-    record = {"kind": "helper-tuning-app-proof", "status": "running", "depth": depth,
-              "draft_threads": threads, "launch_command": command, "engine": verify_engine("mtp-shared"),
+    record = {"kind": "helper-tuning-app-proof" if engine == "mtp-shared" else "metal-few-row-app-proof", "status": "running", "depth": depth,
+              "draft_threads": threads, "launch_command": command, "engine": verify_engine(engine),
               "models": {k: models[k] for k in ("flash", "mtp_shared_packed_q3")},
               "note": "Functional API tests only; these timings are excluded from speed comparisons."}
     process = None
@@ -65,7 +66,7 @@ def check(depth, threads):
                 record.update(status="failed", error=record["memory"]["guard"])
         assert_no_model_server()
         record.update(servers_stopped=True, artifacts=str(folder.relative_to(ROOT)))
-        output = ROOT / "bench/results" / f"{stamp}-tuning-app-{depth}-{threads}.json"
+        output = ROOT / "bench/results" / f"{stamp}-{prefix}-app-{depth}-{threads}.json"
         output.write_text(json.dumps(record, indent=2) + "\n")
         print(f"Saved {output}", flush=True)
     if record["status"] != "passed":
@@ -76,13 +77,14 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--depths", type=int, nargs="+", default=[1, 3, 4])
     ap.add_argument("--draft-threads", type=int, default=8)
+    ap.add_argument("--engine", choices=["mtp-shared", "mtp-mma"], default="mtp-shared")
     args = ap.parse_args()
     if not args.depths or min(args.depths) < 1 or max(args.depths) > 4 or not 1 <= args.draft_threads <= 18:
         ap.error("Use depths 1-4 and helper thread counts 1-18")
     with (ROOT / "bench/.lock").open("w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         for depth in args.depths:
-            check(depth, args.draft_threads)
+            check(depth, args.draft_threads, args.engine)
 
 
 if __name__ == "__main__":

@@ -7,8 +7,17 @@ import subprocess
 from lab import ROOT
 
 EXPERIMENTS = {"q2-masked": "q2_experiment.json", "draft-vocab": "draft_vocab_experiment.json",
-               "mtp-shared": "mtp_shared_experiment.json"}
+               "mtp-shared": "mtp_shared_experiment.json", "mtp-mma": "mtp_mma_experiment.json"}
 ENGINES = ("baseline", *EXPERIMENTS)
+
+
+def supports_feature(engine, feature, root=ROOT):
+    if engine == feature:
+        return True
+    if engine not in EXPERIMENTS:
+        return False
+    manifest = json.loads((root / "config" / EXPERIMENTS[engine]).read_text())
+    return feature in manifest.get("features", [])
 
 
 def sha256(path):
