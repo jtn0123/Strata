@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "kind": "integration",
+  "model": "small",
+  "checks": [
+    {
+      "name": "Unicode tokenizer roundtrip",
+      "passed": true,
+      "detail": {
+        "text": "Hello, caf\u00e9 \ud83c\udf0d \u4e2d\u6587",
+        "tokens": [
+          9419,
+          11,
+          50203,
+          10838,
+          234,
+          235,
+          220,
+          99986
+        ]
+      }
+    },
+    {
+      "name": "Native/Strata adapter greedy token parity",
+      "passed": true,
+      "detail": {
+        "native_token_ids": [
+          18,
+          24,
+          16,
+          248046
+        ],
+        "adapter_token_ids": [
+          18,
+          24,
+          16,
+          248046
+        ],
+        "text": "391"
+      }
+    },
+    {
+      "name": "OpenAI non-stream content and EOS",
+      "passed": true,
+      "detail": {
+        "id": "chatcmpl-12b06f92dd8b4969a5f77f24",
+        "object": "chat.completion",
+        "created": 1791284833,
+        "model": "small",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "391"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 29,
+          "completion_tokens": 4,
+          "total_tokens": 33
+        }
+      }
+    },
+    {
+      "name": "OpenAI streaming completion",
+      "passed": true,
+      "detail": {
+        "content": "391",
+        "done": true
+      }
+    },
+    {
+      "name": "Anthropic content and EOS",
+      "passed": true,
+      "detail": {
+        "id": "msg_0fdc019a3cab46e6bd7ab010",
+        "type": "message",
+        "role": "assistant",
+        "model": "small",
+        "content": [
+          {
+            "type": "text",
+            "text": "391"
+          }
+        ],
+        "stop_reason": "end_turn",
+        "stop_sequence": null,
+        "usage": {
+          "input_tokens": 29,
+          "output_tokens": 4
+        }
+      }
+    },
+    {
+      "name": "Tools rejected explicitly",
+      "passed": true,
+      "detail": {
+        "error": {
+          "type": "invalid_request_error",
+          "message": "This lab adapter has verified text chat only; tool calls need separate parser validation"
+        }
+      }
+    },
+    {
+      "name": "Context overflow rejected explicitly",
+      "passed": true,
+      "detail": {
+        "error": {
+          "type": "invalid_request_error",
+          "message": "prompt (12012 tokens) leaves no room to answer in the context (4096); requests are never truncated"
+        }
+      }
+    },
+    {
+      "name": "Cancellation and subsequent request",
+      "passed": true,
+      "detail": {
+        "cancel_seconds": 7.587499931105413e-05,
+        "subsequent_response": {
+          "id": "chatcmpl-e17ed72c60494b2296e43a0b",
+          "object": "chat.completion",
+          "created": 1791284834,
+          "model": "small",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "391"
+              },
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 29,
+            "completion_tokens": 4,
+            "total_tokens": 33
+          }
+        }
+      }
+    },
+    {
+      "name": "Client disconnect and subsequent request",
+      "passed": true,
+      "detail": {
+        "id": "chatcmpl-8f483da9f78f45b188795b7f",
+        "object": "chat.completion",
+        "created": 1791284834,
+        "model": "small",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "391"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 29,
+          "completion_tokens": 4,
+          "total_tokens": 33
+        }
+      }
+    }
+  ],
+  "note": "Real local native engine and Strata app. Functional tests can run during downloads; their timings are not benchmark results.",
+  "passed": true
+}
