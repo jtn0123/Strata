@@ -1,0 +1,296 @@
+{
+  "kind": "metal-few-row-app-proof",
+  "status": "passed",
+  "depth": 3,
+  "draft_threads": 8,
+  "launch_command": [
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/.venv/bin/python",
+    "scripts/run.py",
+    "flash",
+    "--engine",
+    "m5-lab",
+    "--spec",
+    "draft-mtp",
+    "--draft-model",
+    "mtp_shared_packed_q3",
+    "--draft",
+    "3",
+    "--draft-placement",
+    "mixed",
+    "--draft-threads",
+    "8",
+    "--draft-p-min",
+    "0.0",
+    "--tensor-api",
+    "on",
+    "--m5-tuning",
+    "nt2"
+  ],
+  "engine": {
+    "engine": "m5-lab",
+    "directory": "vendor/llama-m5-lab",
+    "revision": "d81235049384534c167caea52b85a694f6103d14",
+    "source_diff_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+    "patch": {
+      "schema": 1,
+      "id": "m5-lab",
+      "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+      "directory": "vendor/llama-m5-lab",
+      "patch": "patches/mtp-m5-lab.patch",
+      "patch_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+      "source_diff_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+      "modified_files": [
+        "ggml/src/ggml-metal/ggml-metal-common.cpp",
+        "ggml/src/ggml-metal/ggml-metal-common.h",
+        "ggml/src/ggml-metal/ggml-metal-context.m",
+        "ggml/src/ggml-metal/ggml-metal-device.cpp",
+        "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+        "src/llama-context.cpp",
+        "src/llama-cparams.h",
+        "src/models/qwen4exp.cpp",
+        "tests/test-backend-ops.cpp"
+      ],
+      "features": [
+        "mtp-shared",
+        "m5-tuning",
+        "m5-profile"
+      ],
+      "components": [
+        {
+          "patch": "patches/mtp-shared-mma.patch",
+          "sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3"
+        },
+        {
+          "patch": "patches/m5-lab-controls.patch",
+          "sha256": "a10ca5f9b146b082036eed369cef288baaa3182457c3d6dffe9008690b460b1a"
+        }
+      ],
+      "scope": "Existing shared-helper/MMA code plus disabled-by-default row/tiling controls and optional command-buffer GPU timestamps. No shader, weight, expert scheduler or GPU memory limit change."
+    },
+    "artifacts": {
+      "llama-server": "57918d880004f93eeb94d2fe0618ac098ef1e141693459c67ebb3603acea7e77",
+      "libggml-base.0.26.0.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+      "libggml-base.0.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+      "libggml-base.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+      "libggml-blas.0.26.0.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+      "libggml-blas.0.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+      "libggml-blas.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+      "libggml-cpu.0.26.0.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+      "libggml-cpu.0.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+      "libggml-cpu.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+      "libggml-metal.0.26.0.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+      "libggml-metal.0.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+      "libggml-metal.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+      "libggml.0.26.0.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+      "libggml.0.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+      "libggml.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+      "libllama-common.0.6.0.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+      "libllama-common.0.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+      "libllama-common.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+      "libllama-server-impl.dylib": "cba05a99af451b10d428eca49c11e58465ff5771bcee5a3a868bf35091f0b6c4",
+      "libllama.0.6.0.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+      "libllama.0.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+      "libllama.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+      "libmtmd.0.6.0.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb",
+      "libmtmd.0.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb",
+      "libmtmd.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb"
+    },
+    "build_receipt": {
+      "engine": "m5-lab",
+      "directory": "vendor/llama-m5-lab",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+      "patch": {
+        "schema": 1,
+        "id": "m5-lab",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-lab",
+        "patch": "patches/mtp-m5-lab.patch",
+        "patch_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+        "source_diff_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-shared-mma.patch",
+            "sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3"
+          },
+          {
+            "patch": "patches/m5-lab-controls.patch",
+            "sha256": "a10ca5f9b146b082036eed369cef288baaa3182457c3d6dffe9008690b460b1a"
+          }
+        ],
+        "scope": "Existing shared-helper/MMA code plus disabled-by-default row/tiling controls and optional command-buffer GPU timestamps. No shader, weight, expert scheduler or GPU memory limit change."
+      },
+      "artifacts": {
+        "llama-server": "57918d880004f93eeb94d2fe0618ac098ef1e141693459c67ebb3603acea7e77",
+        "libggml-base.0.26.0.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+        "libggml-base.0.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+        "libggml-base.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+        "libggml-blas.0.26.0.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+        "libggml-blas.0.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+        "libggml-blas.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+        "libggml-cpu.0.26.0.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+        "libggml-cpu.0.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+        "libggml-cpu.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+        "libggml-metal.0.26.0.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+        "libggml-metal.0.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+        "libggml-metal.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+        "libggml.0.26.0.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+        "libggml.0.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+        "libggml.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+        "libllama-common.0.6.0.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+        "libllama-common.0.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+        "libllama-common.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+        "libllama-server-impl.dylib": "cba05a99af451b10d428eca49c11e58465ff5771bcee5a3a868bf35091f0b6c4",
+        "libllama.0.6.0.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+        "libllama.0.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+        "libllama.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+        "libmtmd.0.6.0.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb",
+        "libmtmd.0.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb",
+        "libmtmd.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb"
+      },
+      "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+      "build_settings": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GGML_BLAS": "ON",
+        "GGML_CPU": "ON",
+        "GGML_METAL": "ON",
+        "GGML_METAL_EMBED_LIBRARY": "ON",
+        "GGML_NATIVE": "ON",
+        "LLAMA_BUILD_TESTS": "ON",
+        "LLAMA_BUILD_TOOLS": "ON"
+      },
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+    }
+  },
+  "draft_p_min": 0.0,
+  "tensor_api": "on",
+  "m5_tuning": "nt2",
+  "models": {
+    "flash": {
+      "repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+      "revision": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+      "files": [
+        {
+          "path": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+          "size_bytes": 37623740192,
+          "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+        },
+        {
+          "path": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+          "size_bytes": 28800138432,
+          "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+        }
+      ]
+    },
+    "mtp_shared_packed_q3": {
+      "derived": {
+        "source_model": "mtp_shared_q3",
+        "source_sha256": "6b8a04dfd4c60e1bde4b25de96f0d7b0a9a39c2b90cba43e27e199c2d839713d",
+        "layout": "CPU expert tables first, GPU dense tensors last",
+        "required_engine": "mtp-shared",
+        "receipt": "bench/results/20261006T183818Z-prepare-shared-layout/preparation.json"
+      },
+      "files": [
+        {
+          "path": "mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf",
+          "size_bytes": 1251560832,
+          "sha256": "e7e8a4187cbca95f51d82c618e76fe6057a25ba376599fd11bbd2e2c48380954"
+        }
+      ]
+    }
+  },
+  "note": "Functional API tests only; these timings are excluded from speed comparisons.",
+  "integration": "bench/results/20261007T021220Z-flash-integration.json",
+  "checks_total": 9,
+  "checks_passed": 9,
+  "command": [
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin/llama-server",
+    "-m",
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "8096",
+    "-c",
+    "4096",
+    "-b",
+    "512",
+    "-ub",
+    "512",
+    "-t",
+    "8",
+    "-tb",
+    "8",
+    "-ngl",
+    "all",
+    "-fit",
+    "off",
+    "-fa",
+    "on",
+    "-lm",
+    "mmap",
+    "-lzm",
+    "on",
+    "-np",
+    "1",
+    "-ctk",
+    "f16",
+    "-ctv",
+    "f16",
+    "--cache-ram",
+    "0",
+    "--spec-type",
+    "draft-mtp",
+    "--spec-draft-n-max",
+    "3",
+    "--metrics",
+    "--jinja",
+    "--no-webui",
+    "--alias",
+    "flash",
+    "--verbosity",
+    "4",
+    "--cors-origins",
+    "localhost",
+    "-md",
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/models/mtp_shared_packed_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf",
+    "--spec-draft-ngl",
+    "all",
+    "--spec-draft-cpu-moe",
+    "--no-op-offload",
+    "--spec-draft-threads",
+    "8",
+    "--spec-draft-threads-batch",
+    "8",
+    "--spec-draft-p-min",
+    "0.0"
+  ],
+  "memory": {
+    "guard": null,
+    "peak_rss_bytes": 40003420160,
+    "minimum_available_bytes": 3654451200,
+    "peak_swap_bytes": 634912768,
+    "swap_growth_bytes": 0,
+    "system_disk_read_bytes": 9654272,
+    "sampling_interval_s": 0.25,
+    "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+  },
+  "servers_stopped": true,
+  "artifacts": "bench/features/20261007T021215Z-mma-app-3-8"
+}

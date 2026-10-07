@@ -2,7 +2,7 @@
 
 Local, measured experiments for an Apple M5 Pro with 48 GiB unified memory. This workspace keeps Strata's existing Mac interface and uses a revision-pinned native llama.cpp Metal server behind it. All inference stays on the Mac.
 
-[The first M5 measurements are complete](bench/M5-RESULTS.md). Twenty full-model benchmark passes record zero swap growth. Keep Tensor API enabled and writing at depth three. Depth six raises the short cached-ledger result from 68.98 to 75.50 TPS (+9.44%) over a fresh depth-four control, with complete replies 4.88% quicker; long cached replies are essentially tied and fresh writing is slower. The [remaining M5 plan](bench/M5-NEXT.md) covers confidence, helper workers and matrix settings. `M5 Experiment Plan.command` displays the plan without starting inference. Compressed-weight kernel work follows more focused profiling.
+[The first M5 measurements are complete](bench/M5-RESULTS.md). Twenty full-model benchmark passes record zero swap growth. Keep Tensor API enabled and writing at depth three. Depth six raises the short cached-ledger result from 68.98 to 75.50 TPS (+9.44%) over a fresh depth-four control, with complete replies 4.88% quicker; long cached replies are essentially tied and fresh writing is slower. The subsequent [M5 GPU tuning batch](bench/M5-GPU-TUNING.md) completes another 24 passes with zero new swap: two-tile limits add only +0.39% code TPS and about +0.59% synthetic TPS; threshold and worker overrides do not help. The [remaining M5 plan](bench/M5-NEXT.md) covers confidence and helper workers. `M5 Experiment Plan.command` displays the plan without starting inference. Compressed-weight kernel work follows more focused profiling.
 
 ## Run
 
@@ -119,6 +119,8 @@ To run the packed mixed profile manually:
 The [helper tuning results](bench/HELPER-TUNING.md) compare prediction depth and CPU workers against fresh controls in the earlier shared engine. The later [few-row GPU math comparison](bench/METAL-MMA.md) upgrades the optional writing launcher to the `mtp-mma` engine and three predicted tokens: about 49 TPS for synthetic writing and 56 TPS for code. The fast follow-up launcher uses the same new engine with four predicted tokens: about 69 TPS on the longer cached-ledger test. The original shared launcher remains at two tokens, and the ordinary launcher retains prediction off. Stop the active model before switching launchers.
 
 `Start Strata - Short Structured Follow-ups Test.command` is an optional depth-six trial for short cached structured answers. It passed nine real API checks. Its 75.50 TPS result comes from 25-token ledger answers with 512 tokens of cached history; it is not a general chat or writing rate. The ordinary, writing and existing fast-follow-up launchers keep their settings. [Matched comparisons and limits](bench/M5-RESULTS.md).
+
+`Start Strata - M5 Two-Tile Trial.command` is a separate optional depth-three writing trial using the isolated engine. Its matched code result is 56.46 to 56.68 TPS (+0.39%); synthetic generation improves about +0.59%. It passed nine real API check groups. The gain is small, so existing launchers keep their settings. [GPU tuning results](bench/M5-GPU-TUNING.md).
 
 To reproduce the separate tuning sweeps, first print their plans, then add `--run` to benchmark:
 
