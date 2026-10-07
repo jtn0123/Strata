@@ -95,7 +95,7 @@ Both diagnostics record zero swap growth. Their totals include warmup, prompt pr
 
 ## Next experiments
 
-At the end of this first batch, eight comparisons remained. The subsequent [M5 GPU tuning batch](M5-GPU-TUNING.md) completes build parity, BF16/Q2 row thresholds, tile width and matrix worker split. Three prepared comparisons now remain: confidence for writing/follow-ups and helper CPU workers. A future diagnostic should tag request phases and relevant tensor shapes/types before implementing compressed-weight cooperative-input kernels. No compressed-weight shader or separate Neural Engine runtime was implemented or tested in this batch.
+At the end of this first batch, eight comparisons remained. The subsequent [M5 GPU tuning batch](M5-GPU-TUNING.md) completes build parity, BF16/Q2 row thresholds, tile width and matrix worker split. The later [helper/confidence batch](M5-HELPER-RESULTS.md) completes writing/follow-up confidence and helper CPU workers; all twelve prepared comparisons are now complete. A future diagnostic should tag request phases and relevant tensor shapes/types before implementing compressed-weight cooperative-input kernels. No compressed-weight shader or separate Neural Engine runtime was implemented or tested in this batch.
 
 ## Raw evidence
 

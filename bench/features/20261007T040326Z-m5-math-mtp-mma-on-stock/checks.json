@@ -1,0 +1,197 @@
+{
+  "schema": 1,
+  "kind": "m5-synthetic-correctness",
+  "status": "passed",
+  "engine": {
+    "engine": "mtp-mma",
+    "directory": "vendor/llama-mtp-mma",
+    "revision": "d81235049384534c167caea52b85a694f6103d14",
+    "source_diff_sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3",
+    "patch": {
+      "schema": 1,
+      "id": "mtp-mma",
+      "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+      "directory": "vendor/llama-mtp-mma",
+      "patch": "patches/mtp-shared-mma.patch",
+      "patch_sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3",
+      "source_diff_sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3",
+      "modified_files": [
+        "ggml/src/ggml-metal/ggml-metal-common.cpp",
+        "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+        "src/llama-context.cpp",
+        "src/llama-cparams.h",
+        "src/models/qwen4exp.cpp",
+        "tests/test-backend-ops.cpp"
+      ],
+      "features": [
+        "mtp-shared"
+      ],
+      "components": [
+        {
+          "patch": "patches/mtp-shared-weights.patch",
+          "sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a"
+        },
+        {
+          "patch": "patches/metal-mma-types-upstream.patch",
+          "sha256": "5e1b5354768370e5960e2eb3f66f46dd0fbc8f4396c34e99dfac89f49f1cf53c"
+        }
+      ],
+      "upstream": {
+        "repository": "https://github.com/pratiknarola-t/llama.cpp",
+        "revision": "b0cb151326e6b436c265c641f23235864f7de090",
+        "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30065",
+        "license_file": "patches/LLAMA-LICENSE.txt"
+      },
+      "scope": "Unchanged shared helper patch plus unchanged upstream few-row dense MUL_MAT dispatch/kernel/test additions. No MUL_MAT_ID expert kernel change; no memory limit override."
+    },
+    "artifacts": {
+      "llama-server": "3929bd1340d72a4d208ba6c50eaa7a537e24815c00e9078c784cc2ff42815963",
+      "libggml-base.0.26.0.dylib": "8afd36425a51a37d4d3b414e2ab2b5a2cda69d29c5540a5a447c4a6b6d56aef5",
+      "libggml-base.0.dylib": "8afd36425a51a37d4d3b414e2ab2b5a2cda69d29c5540a5a447c4a6b6d56aef5",
+      "libggml-base.dylib": "8afd36425a51a37d4d3b414e2ab2b5a2cda69d29c5540a5a447c4a6b6d56aef5",
+      "libggml-blas.0.26.0.dylib": "ecb2b284d5fd9ebda32e474021bf2ac646428e7f31f2f1fbff5eb2d03dcf5fb6",
+      "libggml-blas.0.dylib": "ecb2b284d5fd9ebda32e474021bf2ac646428e7f31f2f1fbff5eb2d03dcf5fb6",
+      "libggml-blas.dylib": "ecb2b284d5fd9ebda32e474021bf2ac646428e7f31f2f1fbff5eb2d03dcf5fb6",
+      "libggml-cpu.0.26.0.dylib": "1900a146e5a609b37543300e137e61e038ec21919f24b8a33b747e5cfecf2bcd",
+      "libggml-cpu.0.dylib": "1900a146e5a609b37543300e137e61e038ec21919f24b8a33b747e5cfecf2bcd",
+      "libggml-cpu.dylib": "1900a146e5a609b37543300e137e61e038ec21919f24b8a33b747e5cfecf2bcd",
+      "libggml-metal.0.26.0.dylib": "8575fa62cc24abb421151a041f206f869769962c49a04e9b6f5d1815cad26808",
+      "libggml-metal.0.dylib": "8575fa62cc24abb421151a041f206f869769962c49a04e9b6f5d1815cad26808",
+      "libggml-metal.dylib": "8575fa62cc24abb421151a041f206f869769962c49a04e9b6f5d1815cad26808",
+      "libggml.0.26.0.dylib": "07019e507d3d90316b2ca7acdc7c6121645b2d83e63caf3948e27ca7e8558b99",
+      "libggml.0.dylib": "07019e507d3d90316b2ca7acdc7c6121645b2d83e63caf3948e27ca7e8558b99",
+      "libggml.dylib": "07019e507d3d90316b2ca7acdc7c6121645b2d83e63caf3948e27ca7e8558b99",
+      "libllama-common.0.6.0.dylib": "1f9514c38123e46bfe2fb4abc198ca20ac7022f52bc3a558e525da9f3cfb24b7",
+      "libllama-common.0.dylib": "1f9514c38123e46bfe2fb4abc198ca20ac7022f52bc3a558e525da9f3cfb24b7",
+      "libllama-common.dylib": "1f9514c38123e46bfe2fb4abc198ca20ac7022f52bc3a558e525da9f3cfb24b7",
+      "libllama-server-impl.dylib": "1e087f285fb81986a17beac2c7ee9aa2db7bf04f569dc0c4ab69bc48f8817657",
+      "libllama.0.6.0.dylib": "ed0637c57cbf717f205165dce0e74b1aad3b732e1e3e101dcb5642e34c34a619",
+      "libllama.0.dylib": "ed0637c57cbf717f205165dce0e74b1aad3b732e1e3e101dcb5642e34c34a619",
+      "libllama.dylib": "ed0637c57cbf717f205165dce0e74b1aad3b732e1e3e101dcb5642e34c34a619",
+      "libmtmd.0.6.0.dylib": "552d93946163c6f27ac889adf07d796488e7510566349c29d29dbfe485734a8d",
+      "libmtmd.0.dylib": "552d93946163c6f27ac889adf07d796488e7510566349c29d29dbfe485734a8d",
+      "libmtmd.dylib": "552d93946163c6f27ac889adf07d796488e7510566349c29d29dbfe485734a8d"
+    },
+    "build_receipt": {
+      "engine": "mtp-mma",
+      "directory": "vendor/llama-mtp-mma",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3",
+      "patch": {
+        "schema": 1,
+        "id": "mtp-mma",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-mtp-mma",
+        "patch": "patches/mtp-shared-mma.patch",
+        "patch_sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3",
+        "source_diff_sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-shared-weights.patch",
+            "sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a"
+          },
+          {
+            "patch": "patches/metal-mma-types-upstream.patch",
+            "sha256": "5e1b5354768370e5960e2eb3f66f46dd0fbc8f4396c34e99dfac89f49f1cf53c"
+          }
+        ],
+        "upstream": {
+          "repository": "https://github.com/pratiknarola-t/llama.cpp",
+          "revision": "b0cb151326e6b436c265c641f23235864f7de090",
+          "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30065",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        },
+        "scope": "Unchanged shared helper patch plus unchanged upstream few-row dense MUL_MAT dispatch/kernel/test additions. No MUL_MAT_ID expert kernel change; no memory limit override."
+      },
+      "artifacts": {
+        "llama-server": "3929bd1340d72a4d208ba6c50eaa7a537e24815c00e9078c784cc2ff42815963",
+        "libggml-base.0.26.0.dylib": "8afd36425a51a37d4d3b414e2ab2b5a2cda69d29c5540a5a447c4a6b6d56aef5",
+        "libggml-base.0.dylib": "8afd36425a51a37d4d3b414e2ab2b5a2cda69d29c5540a5a447c4a6b6d56aef5",
+        "libggml-base.dylib": "8afd36425a51a37d4d3b414e2ab2b5a2cda69d29c5540a5a447c4a6b6d56aef5",
+        "libggml-blas.0.26.0.dylib": "ecb2b284d5fd9ebda32e474021bf2ac646428e7f31f2f1fbff5eb2d03dcf5fb6",
+        "libggml-blas.0.dylib": "ecb2b284d5fd9ebda32e474021bf2ac646428e7f31f2f1fbff5eb2d03dcf5fb6",
+        "libggml-blas.dylib": "ecb2b284d5fd9ebda32e474021bf2ac646428e7f31f2f1fbff5eb2d03dcf5fb6",
+        "libggml-cpu.0.26.0.dylib": "1900a146e5a609b37543300e137e61e038ec21919f24b8a33b747e5cfecf2bcd",
+        "libggml-cpu.0.dylib": "1900a146e5a609b37543300e137e61e038ec21919f24b8a33b747e5cfecf2bcd",
+        "libggml-cpu.dylib": "1900a146e5a609b37543300e137e61e038ec21919f24b8a33b747e5cfecf2bcd",
+        "libggml-metal.0.26.0.dylib": "8575fa62cc24abb421151a041f206f869769962c49a04e9b6f5d1815cad26808",
+        "libggml-metal.0.dylib": "8575fa62cc24abb421151a041f206f869769962c49a04e9b6f5d1815cad26808",
+        "libggml-metal.dylib": "8575fa62cc24abb421151a041f206f869769962c49a04e9b6f5d1815cad26808",
+        "libggml.0.26.0.dylib": "07019e507d3d90316b2ca7acdc7c6121645b2d83e63caf3948e27ca7e8558b99",
+        "libggml.0.dylib": "07019e507d3d90316b2ca7acdc7c6121645b2d83e63caf3948e27ca7e8558b99",
+        "libggml.dylib": "07019e507d3d90316b2ca7acdc7c6121645b2d83e63caf3948e27ca7e8558b99",
+        "libllama-common.0.6.0.dylib": "1f9514c38123e46bfe2fb4abc198ca20ac7022f52bc3a558e525da9f3cfb24b7",
+        "libllama-common.0.dylib": "1f9514c38123e46bfe2fb4abc198ca20ac7022f52bc3a558e525da9f3cfb24b7",
+        "libllama-common.dylib": "1f9514c38123e46bfe2fb4abc198ca20ac7022f52bc3a558e525da9f3cfb24b7",
+        "libllama-server-impl.dylib": "1e087f285fb81986a17beac2c7ee9aa2db7bf04f569dc0c4ab69bc48f8817657",
+        "libllama.0.6.0.dylib": "ed0637c57cbf717f205165dce0e74b1aad3b732e1e3e101dcb5642e34c34a619",
+        "libllama.0.dylib": "ed0637c57cbf717f205165dce0e74b1aad3b732e1e3e101dcb5642e34c34a619",
+        "libllama.dylib": "ed0637c57cbf717f205165dce0e74b1aad3b732e1e3e101dcb5642e34c34a619",
+        "libmtmd.0.6.0.dylib": "552d93946163c6f27ac889adf07d796488e7510566349c29d29dbfe485734a8d",
+        "libmtmd.0.dylib": "552d93946163c6f27ac889adf07d796488e7510566349c29d29dbfe485734a8d",
+        "libmtmd.dylib": "552d93946163c6f27ac889adf07d796488e7510566349c29d29dbfe485734a8d"
+      },
+      "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+      "build_settings": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GGML_BLAS": "ON",
+        "GGML_CPU": "ON",
+        "GGML_METAL": "ON",
+        "GGML_METAL_EMBED_LIBRARY": "ON",
+        "GGML_NATIVE": "ON",
+        "LLAMA_BUILD_TESTS": "ON",
+        "LLAMA_BUILD_TOOLS": "ON"
+      },
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+    }
+  },
+  "tester_sha256": "0049b25dbe99d70ca2ced886d53b9fd3cdf1a3c629f95404eceebd40da8246c7",
+  "metal_environment": {
+    "tensor_api": "on",
+    "tuning": "stock",
+    "profile": false,
+    "variables": {
+      "GGML_METAL_TENSOR_ENABLE": "1"
+    }
+  },
+  "params": "type_a=(q2_0|q3_K|bf16|iq4_nl|iq4_xs|q5_K),type_b=f32,.*n=(1|2|3|4|5|6|7|8|9|13|16|32),",
+  "models_loaded": false,
+  "timings_excluded_from_speed_results": true,
+  "check": {
+    "name": "math",
+    "command": [
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-mtp-mma/build/bin/test-backend-ops",
+      "test",
+      "-b",
+      "MTL0",
+      "-o",
+      "MUL_MAT,MUL_MAT_ID",
+      "-p",
+      "type_a=(q2_0|q3_K|bf16|iq4_nl|iq4_xs|q5_K),type_b=f32,.*n=(1|2|3|4|5|6|7|8|9|13|16|32),",
+      "-j",
+      "1"
+    ],
+    "passed": true,
+    "counts": [
+      [
+        572,
+        572
+      ]
+    ],
+    "exit_code": 0,
+    "peak_rss_bytes": 328040448,
+    "system_swap_growth_bytes": 0,
+    "guard": null
+  }
+}

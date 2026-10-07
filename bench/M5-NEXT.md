@@ -1,12 +1,12 @@
-# M5 experiments: two measured batches and remaining tests
+# M5 experiments: three measured batches and next diagnostics
 
-Prepared October 6, 2026 for the 48 GiB, 20-GPU-core M5 Pro. The user subsequently authorized testing after memory cleanup. [Tensor API and prediction-depth results](M5-RESULTS.md) cover the first four comparisons; [GPU matrix tuning results](M5-GPU-TUNING.md) cover build parity and four matrix comparisons. Nine of twelve experiments are complete. Three remain: confidence for writing/follow-ups and helper CPU workers. Colima and Grafana remain stopped. No model server is left running, and there is no scheduled run or background waiter.
+Prepared October 6, 2026 for the 48 GiB, 20-GPU-core M5 Pro. The user subsequently authorized testing after memory cleanup. [Tensor API and prediction-depth results](M5-RESULTS.md) cover the first four comparisons; [GPU matrix tuning results](M5-GPU-TUNING.md) cover build parity and four matrix comparisons. [Helper workers and confidence results](M5-HELPER-RESULTS.md) complete the final three comparisons. All twelve experiments are complete. Colima and Grafana remain stopped. No model server is left running, and there is no scheduled run or background waiter.
 
 The isolated `m5-lab` server and operation tester were built with one compiler worker. All 40 offline workflow checks pass. Existing native engines, model files, model/runtime pins, GPU memory limits and the ordinary/writing/follow-up launchers are preserved. All stock and candidate GPU correctness checks, both timing profiles and all matrix comparisons now pass. Row-threshold and GPU-worker overrides do not improve speed. A two-tile limit gives a small generation gain and passed the real API checks; it has a separate optional trial launcher. The existing launchers keep their settings, including the earlier optional short structured depth-six trial.
 
 [Final build/source receipt and saved-header weight inventory](features/20261007T002056Z-m5-preparation.json), [offline checks](features/20261006-m5-offline.log), [plan-only output](features/20261006-m5-plans.log). Receipt timestamps are UTC; preparation happened October 6 locally. The earlier preparation receipt is retained as build history.
 
-## Ready to test
+## Completed comparison plan
 
 The [plan](../config/m5_test_plan.json) defines twelve single-variable comparisons. Each brackets candidates with fresh controls, excludes one warmup per pass, measures two repeats and records raw token responses, prompt hashes, source/binary receipts, CPU/RAM snapshots, load time, input/output TPS, first-token delay, total reply time, acceptance and percentage changes. Fresh replies use 128 output tokens. Cached lookup replies stop normally and are much shorter; their TPS is not a general writing rate. Historical numbers are not pooled into new percentages.
 
@@ -29,7 +29,7 @@ Each comparison changes only its named setting. Both prediction controls use tod
 
 GPU correctness checks against the CPU reference run before speed trials and verify the requested Tensor API mode. The selected weight formats include Q2_0, Q3_K, BF16, IQ4_NL, IQ4_XS and the Q5_K shared output head, with rows through 32. The operation tester loads synthetic tensors, not model weights. New speed comparisons stop if answers fail, source/binary changes, or any new swap is observed. The native memory guard stops at more than 128 MiB new system swap or less than 512 MiB available RAM for four seconds. A guard stop is recorded as a failed experiment, not a performance result.
 
-The existing API checker accepts depth five/six, confidence and explicit tensor/tuning settings. Depth six passed nine real app checks and is exposed only by the optional short structured follow-up trial. Writing stays at depth three and the existing fast-follow-up launcher stays at four. The two-tile trial passed nine real API check groups with zero new swap. Confidence and helper CPU-worker candidates still need their GPU, speed and app checks. Matrix settings are not combined with depth six or other new presets.
+The existing API checker accepts depth five/six, confidence and explicit tensor/tuning settings. Depth six passed nine real app checks and is exposed only by the optional short structured follow-up trial. Writing stays at depth three and the existing fast-follow-up launcher stays at four. The two-tile trial passed nine real API check groups with zero new swap. Confidence and helper CPU-worker comparisons are complete; the optional prose-confidence and twelve-worker trials each pass nine real API check groups. Matrix settings are not combined with depth six or other new presets.
 
 ## Diagnostics before kernel changes
 
@@ -68,6 +68,6 @@ The initial testing batch used diagnostics, Tensor API comparisons and predictio
 .venv/bin/python scripts/benchmark_m5.py --experiment depth-writing depth-followup --run
 ```
 
-Choose later experiments explicitly, one at a time. Isolated build parity and all prepared matrix comparisons are complete; confidence and helper CPU workers remain. The runner refuses `--run` without an experiment selection. It does not monitor VoltTracker, automatically resume, restart Colima or stop unrelated processes. More profiling must separate prompt processing from generation before attributing the combined command-buffer totals to a decoding bottleneck.
+Choose later experiments explicitly, one at a time. All twelve prepared comparisons are complete. Choose explicit reproductions or add a new measured hypothesis. The runner refuses `--run` without an experiment selection. It does not monitor VoltTracker, automatically resume, restart Colima or stop unrelated processes. More profiling must separate prompt processing from generation before attributing the combined command-buffer totals to a decoding bottleneck.
 
-[Isolated native patch manifest](../config/m5_lab_experiment.json). Preparation receipts and offline checks are under `bench/features/`; future measurements will create new result directories.
+[Isolated native patch manifest](../config/m5_lab_experiment.json). Preparation receipts and offline checks are under `bench/features/`; new measurements create new result directories.
