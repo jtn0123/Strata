@@ -18,8 +18,12 @@ def model_path(model_id):
 
 def server_command(model_id, port=8096, context=4096, batch=512, ubatch=128,
                    spec="none", draft=3, cache_type="f16", threads=8, draft_placement="gpu",
-                   draft_model="mtp", engine="baseline", draft_threads=None):
+                   draft_model="mtp", engine="baseline", draft_threads=None, draft_p_min=None):
     from engines import engine_binary, supports_feature
+    from metal_environment import validate_confidence
+    validate_confidence(draft_p_min)
+    if draft_p_min is not None and spec != "draft-mtp":
+        raise ValueError("Draft confidence requires prediction enabled")
     command = [str(engine_binary(engine)), "-m", str(model_path(model_id)), "--host", "127.0.0.1",
                "--port", str(port), "-c", str(context), "-b", str(batch), "-ub", str(ubatch),
                "-t", str(threads), "-tb", str(threads), "-ngl", "all", "-fit", "off",
@@ -46,6 +50,8 @@ def server_command(model_id, port=8096, context=4096, batch=512, ubatch=128,
                 raise ValueError("Use at least one helper CPU thread")
             command.extend(["--spec-draft-threads", str(draft_threads),
                             "--spec-draft-threads-batch", str(draft_threads)])
+        if draft_p_min is not None:
+            command.extend(["--spec-draft-p-min", str(draft_p_min)])
     elif draft_threads is not None:
         raise ValueError("Helper CPU threads require prediction enabled")
     return command

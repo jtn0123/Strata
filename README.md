@@ -2,6 +2,8 @@
 
 Local, measured experiments for an Apple M5 Pro with 48 GiB unified memory. This workspace keeps Strata's existing Mac interface and uses a revision-pinned native llama.cpp Metal server behind it. All inference stays on the Mac.
 
+[The next M5 experiments are prepared](bench/M5-NEXT.md). The isolated timing/tuning build is compiled; Tensor API on/off, depth five/six, confidence, helper workers and matrix settings have fresh-control plans. GPU tests and model benchmarks are paused until the user gives the go-ahead after VoltTracker. `M5 Experiment Plan.command` displays the plan without starting inference. Compressed-weight kernel work is staged to follow the profiling results.
+
 ## Run
 
 From this folder:

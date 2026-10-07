@@ -1,0 +1,148 @@
+diff --git a/ggml/src/ggml-metal/ggml-metal-common.cpp b/ggml/src/ggml-metal/ggml-metal-common.cpp
+--- a/ggml/src/ggml-metal/ggml-metal-common.cpp
++++ b/ggml/src/ggml-metal/ggml-metal-common.cpp
+@@ -5,6 +5,7 @@
+ #include "ggml-impl.h"
+ #include "ggml-backend-impl.h"
+ 
++#include <cstdlib>
+ #include <vector>
+ 
+ // must stay in sync with the kernel_fwht_<type>_<N> templates in misc.metal. Widths up to
+@@ -117,16 +118,30 @@
+ }
+ 
+ // the fewest src1 rows at which the few-row MMA kernels beat the mat-vec kernels (measured on an M3 Ultra)
++int ggml_metal_m5_lab_int(const char * name, int fallback, int minimum, int maximum) {
++    const char * value = std::getenv(name);
++    if (!value) {
++        return fallback;
++    }
++    char * end = nullptr;
++    const long result = std::strtol(value, &end, 10);
++    GGML_ASSERT(end != value && *end == '\0' && result >= minimum && result <= maximum);
++    return (int) result;
++}
++
+ static int64_t ggml_metal_mul_mv_mma_rows_min(enum ggml_type type) {
++    static const int bf16_min = ggml_metal_m5_lab_int("GGML_M5_LAB_BF16_MIN_ROWS", 4, 1, 16);
++    static const int q2_min = ggml_metal_m5_lab_int("GGML_M5_LAB_Q2_MIN_ROWS", 3, 1, 16);
+     switch (type) {
+         case GGML_TYPE_F32:
+             return 6;
+         case GGML_TYPE_TQ2_0:
+             return 5;
+         case GGML_TYPE_BF16:
+-            return 4;
++            return bf16_min;
++        case GGML_TYPE_Q2_0:
++            return q2_min;
+         case GGML_TYPE_F16:
+-        case GGML_TYPE_Q2_0:
+         case GGML_TYPE_Q4_K:
+         case GGML_TYPE_Q5_0:
+         case GGML_TYPE_Q5_1:
+diff --git a/ggml/src/ggml-metal/ggml-metal-common.h b/ggml/src/ggml-metal/ggml-metal-common.h
+--- a/ggml/src/ggml-metal/ggml-metal-common.h
++++ b/ggml/src/ggml-metal/ggml-metal-common.h
+@@ -65,6 +65,8 @@
+ // the src1 tiles of the few-row MMA kernels for mat-mul op: one 8-row tile, or two above 8 rows
+ int ggml_metal_mul_mv_mma_rt(const struct ggml_tensor * op);
+ 
++int ggml_metal_m5_lab_int(const char * name, int fallback, int minimum, int maximum);
++
+ // the weights of K per simdgroup step of the few-row MMA kernel for a src0 type and rt src1 tiles, 0 if none takes the type
+ int64_t ggml_metal_mul_mv_mma_k_step(enum ggml_type type, int rt);
+ 
+diff --git a/ggml/src/ggml-metal/ggml-metal-context.m b/ggml/src/ggml-metal/ggml-metal-context.m
+--- a/ggml/src/ggml-metal/ggml-metal-context.m
++++ b/ggml/src/ggml-metal/ggml-metal-context.m
+@@ -42,6 +42,8 @@
+     bool use_graph_optimize;
+ 
+     int debug_graph;
++    bool m5_lab_profile;
++    uint64_t m5_lab_graph_id;
+ 
+     struct ggml_metal_fusion_info * finfo;
+ 
+@@ -140,6 +142,7 @@
+         res->d_queue = dispatch_queue_create("ggml-metal", DISPATCH_QUEUE_CONCURRENT);
+ 
+         res->use_concurrency = getenv("GGML_METAL_CONCURRENCY_DISABLE") == nil;
++        res->m5_lab_profile = getenv("GGML_M5_LAB_PROFILE") != NULL;
+ 
+         {
+             const char * val = getenv("GGML_METAL_GRAPH_DEBUG");
+@@ -499,6 +502,9 @@
+ 
+     @autoreleasepool {
+         ctx->gf = gf;
++        if (ctx->m5_lab_profile) {
++            ctx->m5_lab_graph_id++;
++        }
+ 
+         if (ctx->n_cb == 0) {
+             // single-threaded encoding: the whole graph is encoded by one command buffer
+@@ -766,6 +772,34 @@
+         ggml_metal_op_free(ctx_op);
+ 
+         if (cb_idx < 2 || ctx->abort_callback == NULL) {
++            if (ctx->m5_lab_profile && idx_end > idx_start) {
++                const uintptr_t context_id = (uintptr_t) ctx;
++                const uint64_t graph_id = ctx->m5_lab_graph_id;
++                const int node_count = idx_end - idx_start;
++                int counts[GGML_OP_COUNT] = {0};
++                for (int i = idx_start; i < idx_end; ++i) {
++                    counts[ctx->gf->nodes[i]->op]++;
++                }
++                NSMutableString * ops = [NSMutableString stringWithString:@"{"];
++                bool first = true;
++                for (int i = 0; i < GGML_OP_COUNT; ++i) {
++                    if (counts[i] == 0) {
++                        continue;
++                    }
++                    [ops appendFormat:@"%s\"%s\":%d", first ? "" : ",", ggml_op_name(i), counts[i]];
++                    first = false;
++                }
++                [ops appendString:@"}"];
++                [cmd_buf addCompletedHandler:^(id<MTLCommandBuffer> completed) {
++                    const double start = completed.GPUStartTime;
++                    const double end = completed.GPUEndTime;
++                    const bool complete = completed.status == MTLCommandBufferStatusCompleted;
++                    const bool valid = complete && end > start && start > 0;
++                    fprintf(stderr, "M5_PROFILE {\"context\":\"%lx\",\"graph\":%llu,\"cb\":%d,\"original_nodes\":%d,\"gpu_start_s\":%.9f,\"gpu_end_s\":%.9f,\"gpu_ms\":%.6f,\"valid\":%s,\"completed\":%s,\"op_counts\":%s}\n",
++                            (unsigned long) context_id, (unsigned long long) graph_id, cb_idx, node_count,
++                            start, end, (end - start)*1000.0, valid ? "true" : "false", complete ? "true" : "false", [ops UTF8String]);
++                }];
++            }
+             [cmd_buf commit];
+         }
+     });
+diff --git a/ggml/src/ggml-metal/ggml-metal-device.cpp b/ggml/src/ggml-metal/ggml-metal-device.cpp
+--- a/ggml/src/ggml-metal/ggml-metal-device.cpp
++++ b/ggml/src/ggml-metal/ggml-metal-device.cpp
+@@ -841,6 +841,9 @@
+ // fewer src0 rows need more simdgroups per threadgroup (a finer K split) to fill the GPU.
+ // the tiles become narrower when the K-slice reduction buffer is too large or when too few threadgroups fill the GPU.
+ static ggml_metal_mma_tiling ggml_metal_op_mul_mat_mma_tiling(const ggml_tensor * op) {
++    static const int nsg_override = ggml_metal_m5_lab_int("GGML_M5_LAB_NSG", 0, 0, 32);
++    static const int nt_max = ggml_metal_m5_lab_int("GGML_M5_LAB_NT_MAX", GGML_METAL_MMA_NT_MAX, 1, GGML_METAL_MMA_NT_MAX);
++    GGML_ASSERT((nt_max & (nt_max - 1)) == 0 && (nsg_override == 0 || (nsg_override & (nsg_override - 1)) == 0));
+     const ggml_type type = op->src[0]->type;
+     const int64_t   ne00 = op->src[0]->ne[0];
+     const int64_t   ne01 = op->src[0]->ne[1];
+@@ -856,11 +859,11 @@
+     } else if (ne01 <= GGML_METAL_MMA_MANY_ROWS) {
+         nsg = GGML_METAL_MMA_NSG_MID_ROWS;
+     }
+-    res.nsg = ggml_metal_halve_to_limit(nsg, n_steps);
++    res.nsg = ggml_metal_halve_to_limit(nsg_override ? nsg_override : nsg, n_steps);
+ 
+     const int64_t nt_smem   = GGML_METAL_MMA_SMEM_MAX/(int64_t) ggml_metal_mul_mv_mma_smem(res.nsg, 1, res.rt);
+     const int64_t nt_rows   = ne01/(GGML_METAL_MIN_THREADGROUPS*GGML_METAL_MMA_TILE);
+-    res.nt = ggml_metal_halve_to_limit(GGML_METAL_MMA_NT_MAX, std::min(nt_smem, nt_rows));
++    res.nt = ggml_metal_halve_to_limit(nt_max, std::min(nt_smem, nt_rows));
+ 
+     return res;
+ }

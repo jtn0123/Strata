@@ -19,6 +19,7 @@ from lab import ROOT, request, server_command
 from engines import ENGINES, verify_engine
 from draft_vocab import experiment_environment
 from check_memory import assert_no_model_server
+from metal_environment import TUNING, configure
 
 
 def command_output(command):
@@ -39,8 +40,10 @@ def host_snapshot():
 
 
 class Monitor:
-    def __init__(self, process, path):
+    def __init__(self, process, path, swap_guard_bytes=2 * 1024**3, minimum_available_bytes=384 * 1024**2):
         self.process, self.path = process, path
+        self.swap_guard_bytes = swap_guard_bytes
+        self.minimum_available_bytes = minimum_available_bytes
         self.done = threading.Event()
         self.initial_swap = psutil.swap_memory().used
         self.first_sample, self.latest_sample, self.guard = None, None, None
@@ -69,12 +72,13 @@ class Monitor:
                     self.peak_swap = max(self.peak_swap, swap.used)
                     stream.write(json.dumps(sample) + "\n")
                     stream.flush()
-                    if vm.available < 384 * 1024**2:
+                    if vm.available < self.minimum_available_bytes:
                         low_since = low_since or time.monotonic()
                     else:
                         low_since = None
-                    if swap.used - self.initial_swap > 2 * 1024**3 or (low_since and time.monotonic() - low_since > 4):
-                        self.guard = "Stopped: swap grew by over 2 GiB or available memory stayed below 384 MiB for 4 seconds"
+                    if swap.used - self.initial_swap > self.swap_guard_bytes or (low_since and time.monotonic() - low_since > 4):
+                        self.guard = (f"Stopped: swap grew by over {self.swap_guard_bytes/1024**2:.0f} MiB "
+                                      f"or available memory stayed below {self.minimum_available_bytes/1024**2:.0f} MiB for 4 seconds")
                         self.process.terminate()
                         return
                 except psutil.NoSuchProcess:
@@ -151,6 +155,9 @@ def main():
     ap.add_argument("--draft-model", default="mtp")
     ap.add_argument("--threads", type=int, default=8)
     ap.add_argument("--draft-threads", type=int)
+    ap.add_argument("--draft-p-min", type=float)
+    ap.add_argument("--tensor-api", choices=["auto", "on", "off"], default="auto")
+    ap.add_argument("--m5-tuning", choices=TUNING, default="stock")
     ap.add_argument("--temperature", type=float, default=0)
     ap.add_argument("--extended-checks", action="store_true")
     ap.add_argument("--repeats", type=int, default=3)
@@ -176,6 +183,8 @@ def run(args):
     if vocab_mode != "off" and args.spec != "draft-mtp":
         raise ValueError("A draft vocabulary can only be used with prediction enabled")
     env, vocab_info = experiment_environment(engine, vocab_mode)
+    env, metal_info = configure(env, engine, getattr(args, "tensor_api", "auto"),
+                                getattr(args, "m5_tuning", "stock"))
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + args.label
     folder = ROOT / "bench/results" / run_id
     folder.mkdir()
@@ -186,13 +195,15 @@ def run(args):
     command = server_command(args.model, port, args.context, args.batch, args.ubatch,
                              args.spec, args.draft, args.cache_type, args.threads, args.draft_placement,
                              args.draft_model, engine=engine,
-                             draft_threads=getattr(args, "draft_threads", None))
+                             draft_threads=getattr(args, "draft_threads", None),
+                             draft_p_min=getattr(args, "draft_p_min", None))
     record = {"schema": 1, "run_id": run_id, "status": "running", "settings": vars(args),
               "command": command, "runtime": json.loads((ROOT / "config/runtime.json").read_text()),
               "model": json.loads((ROOT / "config/models.json").read_text())[args.model],
               "host_before": host_snapshot(), "cases": [], "warmups": [], "checks": [],
               "selected_engine": engine_info,
               "draft_vocabulary": vocab_info,
+              "metal_environment": metal_info,
               "method": "Single slot, full Metal offload, fixed seed 1234; sampling temperature is recorded in settings. Exact synthetic chat prompt sizes and fixed output count from settings; no prompt reuse; ignore EOS for timing only. No model downloads during a run. Warm OS file cache is uncontrolled. TTFT includes HTTP and prompt evaluation. Correctness checks use normal EOS handling."}
     record["actual_sources"] = {}
     for name, directory in [("llama_cpp", "llama.cpp"), ("strata_macos", "Strata-macOS")]:
@@ -214,7 +225,9 @@ def run(args):
         try:
             started = time.monotonic()
             process = subprocess.Popen(command, stdout=log, stderr=log, env=env)
-            monitor = Monitor(process, folder / "memory.jsonl")
+            monitor = Monitor(process, folder / "memory.jsonl",
+                              getattr(args, "swap_guard_bytes", 2 * 1024**3),
+                              getattr(args, "minimum_available_bytes", 384 * 1024**2))
             monitor.thread.start()
             record["ready_s"] = wait_ready(process, base)
             record["props"] = request(base, "/props")

@@ -1,0 +1,73 @@
+# M5 experiments prepared, testing paused
+
+Prepared October 6, 2026 for the 48 GiB, 20-GPU-core M5 Pro. The user's VoltTracker GitHub work must finish before testing starts. There is no scheduled run, background waiter, model server or GPU math test started by this preparation. Colima was observed stopped and was not restarted.
+
+The isolated `m5-lab` server and operation tester are built with one compiler worker. All 40 offline workflow checks pass. Existing native engines, model files, model/runtime pins, GPU memory limits and the ordinary/writing/follow-up launchers are preserved. Only offline workflow checks and compilation have run for this stage. Shader behavior, GPU timestamp availability and full-model performance remain untested.
+
+[Final build/source receipt and saved-header weight inventory](features/20261007T002056Z-m5-preparation.json), [offline checks](features/20261006-m5-offline.log), [plan-only output](features/20261006-m5-plans.log). Receipt timestamps are UTC; preparation happened October 6 locally. The earlier preparation receipt is retained as build history.
+
+## Ready to test
+
+The [plan](../config/m5_test_plan.json) defines twelve single-variable comparisons. Each brackets candidates with fresh controls, excludes one warmup per pass, measures two repeats and records raw token responses, prompt hashes, source/binary receipts, CPU/RAM snapshots, load time, input/output TPS, first-token delay, total reply time, acceptance and percentage changes. Fresh replies use 128 output tokens. Cached lookup replies stop normally and are much shorter; their TPS is not a general writing rate. Historical numbers are not pooled into new percentages.
+
+| Experiment | Control | Candidates | Engine |
+| --- | --- | --- | --- |
+| GPU Tensor API, writing | on, depth 3 | off | current `mtp-mma` |
+| GPU Tensor API, follow-ups | on, depth 4 | off | current `mtp-mma` |
+| Prediction, writing | depth 3 | 5, 6 | current `mtp-mma` |
+| Prediction, follow-ups | depth 4 | 5, 6 | current `mtp-mma` |
+| Confidence, writing | 0.0, depth 3 | 0.2, 0.4 | current `mtp-mma` |
+| Confidence, follow-ups | 0.0, depth 4 | 0.2, 0.4 | current `mtp-mma` |
+| Helper CPU workers | 8, depth 3 | 6, 12 | current `mtp-mma` |
+| Isolated build parity | current `mtp-mma` | `m5-lab`, controls disabled | both |
+| BF16 few-row threshold | 4 rows | 3 rows | `m5-lab` |
+| Q2_0 few-row threshold | 3 rows | 2 rows | `m5-lab` |
+| Matrix tile width limit | existing choice, maximum 4 | maximum 1, 2 | `m5-lab` |
+| Matrix worker split | existing choice | requested 4, 8 SIMD groups | `m5-lab` |
+
+Each comparison changes only its named setting. Both prediction controls use today's faster GPU math. Larger predictions automatically allocate more recurrent rollback slots, so memory is recorded rather than assumed unchanged. Confidence filtering can reduce batch sizes enough to lose matrix efficiency. The tiling requests remain bounded by K length, threadgroup memory and hardware thread limits; actual choices may be smaller than the requested maximum.
+
+GPU correctness checks against the CPU reference run before speed trials and verify the requested Tensor API mode. The selected weight formats include Q2_0, Q3_K, BF16, IQ4_NL, IQ4_XS and the Q5_K shared output head, with rows through 32. The operation tester loads synthetic tensors, not model weights. New speed comparisons stop if answers fail, source/binary changes, or any new swap is observed. The native memory guard stops at more than 128 MiB new system swap or less than 512 MiB available RAM for four seconds. A guard stop is recorded as a failed experiment, not a performance result.
+
+The existing API checker now accepts depth five/six, confidence and explicit tensor/tuning settings. Run it for settings that win before adopting them. None of these candidates has been adopted.
+
+## Diagnostics before kernel changes
+
+`profile_m5.py` uses the isolated engine's disabled-by-default command-buffer completion timestamps. It records GPU intervals, graph/context IDs and original operation counts, alongside native cumulative helper wall-time statistics. Two prompt lengths, 512 and 2048, distinguish prompt processing from the short generation portion. All profiling timings remain separate from speed results.
+
+This measures command-buffer elapsed intervals, not time per individual operation or AI-accelerator occupancy. Graph counts precede fusion. Context IDs do not identify target/helper roles by themselves. Gaps outside recorded buffers can contain CPU work, scheduling or other GPU activity; they do not prove the GPU is idle. Helper wall time includes synchronization and overlaps GPU intervals, so it must not be added to GPU time. Full Instruments/kernel-counter profiling would need additional tooling; only Command Line Tools are installed, and no Xcode or toolchain download was started.
+
+Tensor API on/off measures the contribution of the available tensor path. It does not disable all GPU matrix instructions, and it does not control the separate Neural Engine. Pipeline availability and actual throughput still require the pending GPU/model tests.
+
+## Compressed-weight work staged for the following iteration
+
+Preparation reads the saved GGUF header inventory and records weight-format byte counts and example shapes in the preparation receipt. It does not read, duplicate or requantize weight payloads. Byte counts indicate storage, not the time a calculation takes.
+
+Apple's [macOS 27 tensor guidance](https://developer.apple.com/videos/play/wwdc2026/330/) describes dequantizing custom formats directly into cooperative tensor inputs, avoiding an intermediate threadgroup-memory round trip. The current dense tensor kernel still stages unpacked values in threadgroup memory. The Q2_0 and mixed GGUF formats are not automatically interchangeable with Apple's native quantized tensor layouts.
+
+After profiling identifies a useful shape/format, implement one isolated cooperative-input kernel. Preserve GGUF bytes and lazy lookup behavior; start with synthetic CPU-reference tests, odd/aligned dimensions and fallback cases, then a matching end-to-end comparison. Register pressure, precision and dispatch thresholds need measurement. No compressed-weight shader has been implemented or performance gain claimed in this stage. The separate Neural Engine remains a conversion/runtime research task.
+
+## Commands
+
+These commands only display plans or record preparation:
+
+```sh
+.venv/bin/python scripts/prepare_m5.py
+.venv/bin/python scripts/verify_m5.py
+.venv/bin/python scripts/profile_m5.py
+.venv/bin/python scripts/benchmark_m5.py
+```
+
+Double-click `M5 Experiment Plan.command` to display the comparisons without loading a model. Rebuilding, if needed, uses `scripts/prepare_m5.py --build --jobs 1` and does not run GPU tests.
+
+After the user gives the testing go-ahead, start with diagnostics and the Tensor API comparisons, then prediction depth. These commands do execute GPU work and load the full model:
+
+```sh
+.venv/bin/python scripts/profile_m5.py --run
+.venv/bin/python scripts/benchmark_m5.py --experiment tensor-writing tensor-followup --run
+.venv/bin/python scripts/benchmark_m5.py --experiment depth-writing depth-followup --run
+```
+
+Choose later experiments explicitly, one at a time. The runner refuses `--run` without an experiment selection. It does not monitor VoltTracker, automatically resume, restart Colima or stop unrelated processes.
+
+[Isolated native patch manifest](../config/m5_lab_experiment.json). Preparation receipts and offline checks are under `bench/features/`; future measurements will create new result directories.

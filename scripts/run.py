@@ -16,6 +16,7 @@ from lab import ROOT, server_command
 from engines import ENGINES, verify_engine
 from draft_vocab import experiment_environment
 from check_memory import assert_no_model_server
+from metal_environment import TUNING, configure
 
 
 def assert_ports_available(ports):
@@ -41,11 +42,15 @@ def main():
     ap.add_argument("--draft-placement", choices=["gpu", "cpu", "output", "mixed"], default="cpu")
     ap.add_argument("--draft-model", default="mtp")
     ap.add_argument("--draft-threads", type=int, help="CPU workers for the prediction helper only")
+    ap.add_argument("--draft-p-min", type=float)
+    ap.add_argument("--tensor-api", choices=["auto", "on", "off"], default="auto")
+    ap.add_argument("--m5-tuning", choices=TUNING, default="stock")
     ap.add_argument("--prompt-cache", action=argparse.BooleanOptionalAction, default=True)
     args = ap.parse_args()
     if args.draft_vocab != "off" and args.spec != "draft-mtp":
         ap.error("The draft vocabulary requires --spec draft-mtp")
     native_env, vocab_info = experiment_environment(args.engine, args.draft_vocab)
+    native_env, metal_info = configure(native_env, args.engine, args.tensor_api, args.m5_tuning)
     assert_no_model_server()
     engine_info = verify_engine(args.engine, require_receipt=(args.engine != "baseline"))
     def interrupted(signum, frame):
@@ -69,10 +74,12 @@ def main():
             command = server_command(args.model, args.native_port, args.context, ubatch=args.ubatch,
                                      cache_type=args.cache_type, spec=args.spec, draft=args.draft,
                                      draft_placement=args.draft_placement, draft_model=args.draft_model,
-                                     engine=args.engine, draft_threads=args.draft_threads)
+                                     engine=args.engine, draft_threads=args.draft_threads,
+                                     draft_p_min=args.draft_p_min)
             (folder / "command.json").write_text(json.dumps(command, indent=2) + "\n")
             (folder / "engine.json").write_text(json.dumps(engine_info, indent=2) + "\n")
             (folder / "draft-vocabulary.json").write_text(json.dumps(vocab_info, indent=2) + "\n")
+            (folder / "metal-environment.json").write_text(json.dumps(metal_info, indent=2) + "\n")
             native = subprocess.Popen(command, stdout=log, stderr=log, env=native_env)
             monitor = Monitor(native, folder / "memory.jsonl")
             monitor.thread.start()

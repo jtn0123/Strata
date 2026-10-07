@@ -15,7 +15,7 @@ from engines import verify_engine
 from lab import ROOT
 
 
-def check(depth, threads, engine="mtp-shared"):
+def check(depth, threads, engine="mtp-shared", draft_p_min=None, tensor_api="auto", tuning="stock"):
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     prefix = "tuning" if engine == "mtp-shared" else "mma"
     folder = ROOT / "bench/features" / f"{stamp}-{prefix}-app-{depth}-{threads}"
@@ -24,9 +24,13 @@ def check(depth, threads, engine="mtp-shared"):
     command = [sys.executable, "scripts/run.py", "flash", "--engine", engine,
                "--spec", "draft-mtp", "--draft-model", "mtp_shared_packed_q3", "--draft", str(depth),
                "--draft-placement", "mixed", "--draft-threads", str(threads)]
+    if draft_p_min is not None:
+        command.extend(["--draft-p-min", str(draft_p_min)])
+    command.extend(["--tensor-api", tensor_api, "--m5-tuning", tuning])
     models = json.loads((ROOT / "config/models.json").read_text())
     record = {"kind": "helper-tuning-app-proof" if engine == "mtp-shared" else "metal-few-row-app-proof", "status": "running", "depth": depth,
               "draft_threads": threads, "launch_command": command, "engine": verify_engine(engine),
+              "draft_p_min": draft_p_min, "tensor_api": tensor_api, "m5_tuning": tuning,
               "models": {k: models[k] for k in ("flash", "mtp_shared_packed_q3")},
               "note": "Functional API tests only; these timings are excluded from speed comparisons."}
     process = None
@@ -77,14 +81,20 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--depths", type=int, nargs="+", default=[1, 3, 4])
     ap.add_argument("--draft-threads", type=int, default=8)
-    ap.add_argument("--engine", choices=["mtp-shared", "mtp-mma"], default="mtp-shared")
+    ap.add_argument("--engine", choices=["mtp-shared", "mtp-mma", "m5-lab"], default="mtp-shared")
+    ap.add_argument("--draft-p-min", type=float)
+    ap.add_argument("--tensor-api", choices=["auto", "on", "off"], default="auto")
+    from metal_environment import TUNING, configure, validate_confidence
+    ap.add_argument("--m5-tuning", choices=TUNING, default="stock")
     args = ap.parse_args()
-    if not args.depths or min(args.depths) < 1 or max(args.depths) > 4 or not 1 <= args.draft_threads <= 18:
-        ap.error("Use depths 1-4 and helper thread counts 1-18")
+    if not args.depths or min(args.depths) < 1 or max(args.depths) > 6 or not 1 <= args.draft_threads <= 18:
+        ap.error("Use depths 1-6 and helper thread counts 1-18")
+    configure({}, args.engine, args.tensor_api, args.m5_tuning)
+    validate_confidence(args.draft_p_min)
     with (ROOT / "bench/.lock").open("w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         for depth in args.depths:
-            check(depth, args.draft_threads, args.engine)
+            check(depth, args.draft_threads, args.engine, args.draft_p_min, args.tensor_api, args.m5_tuning)
 
 
 if __name__ == "__main__":
