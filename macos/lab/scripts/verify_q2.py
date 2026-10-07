@@ -11,13 +11,13 @@ from engines import verify_engine
 from lab import ROOT
 
 
-def check_case(binary, folder, name, params):
+def check_case(binary, folder, name, params, env=None):
     command = [str(binary), "test", "-b", "MTL0", "-o", "MUL_MAT,MUL_MAT_ID", "-p", params, "-j", "1"]
     log_path = folder / f"{name}.log"
     initial_swap = psutil.swap_memory().used
     peak_rss, peak_swap, guard = 0, initial_swap, None
     with log_path.open("w") as log:
-        process = subprocess.Popen(command, stdout=log, stderr=log)
+        process = subprocess.Popen(command, stdout=log, stderr=log, env=env)
         try:
             proc = psutil.Process(process.pid)
             while process.poll() is None:

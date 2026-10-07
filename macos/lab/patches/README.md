@@ -1,5 +1,11 @@
 # Isolated native experiments
 
+## Prepared M5 tuning and diagnostics
+
+[m5-lab-controls.patch](m5-lab-controls.patch) adds disabled-by-default controls for BF16/Q2_0 row thresholds and bounded few-row tile/worker choices, plus optional GPU command-buffer timestamps. [mtp-m5-lab.patch](mtp-m5-lab.patch) combines these additions with the already measured shared-helper/MMA source. [The manifest](../config/m5_lab_experiment.json) pins every component, the full diff and the modified file list. Existing checkouts and launchers are preserved.
+
+The candidate is compiled, with no GPU or model tests run at this preparation stage. It does not add a compressed-weight shader, change weights, change routed expert kernels or raise memory limits. [The test plan and validation limits](../bench/M5-NEXT.md) separate prepared comparisons from later measured/adopted improvements. This is private-fork laboratory work; no upstream PR is submitted.
+
 `q2-masked-metal.patch` is an unchanged copy of Tim / Meld Labs' first patch from [meld-turbo](https://github.com/MeldlabsAI/meld-turbo/blob/ef2101f5f2517204e1d755522d0b84346c4c9f0a/patches/0001-metal-Q2_0-matvec-via-masked-pre-scaled-y-one-FMA-pe.patch), repository revision `ef2101f5f2517204e1d755522d0b84346c4c9f0a`, patch commit `c31f8234172cf1fe27f24370df8ab2cf0ec4ad47`. The original author and commit metadata remain in the patch; its MIT notice is in [MELD-LICENSE.txt](MELD-LICENSE.txt).
 
 The patch replaces bit-by-bit conditional addition with pre-scaled inputs and masked multiplications for Q2_0 matrix-vector operations. It keeps the stored weights unchanged. Floating-point accumulation order changes, so output tokens can differ despite numerical checks passing.

@@ -7,7 +7,8 @@ import subprocess
 from lab import ROOT
 
 EXPERIMENTS = {"q2-masked": "q2_experiment.json", "draft-vocab": "draft_vocab_experiment.json",
-               "mtp-shared": "mtp_shared_experiment.json", "mtp-mma": "mtp_mma_experiment.json"}
+               "mtp-shared": "mtp_shared_experiment.json", "mtp-mma": "mtp_mma_experiment.json",
+               "m5-lab": "m5_lab_experiment.json"}
 ENGINES = ("baseline", *EXPERIMENTS)
 
 

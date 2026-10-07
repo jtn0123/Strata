@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "status": "prepared; GPU checks, model loads and benchmarks await user go-ahead after VoltTracker",
+  "experiments": [
+    {"id": "tensor-writing", "axis": "tensor_api", "engine": "mtp-mma", "depth": 3, "control": "on", "candidates": ["off"]},
+    {"id": "tensor-followup", "axis": "tensor_api", "engine": "mtp-mma", "depth": 4, "control": "on", "candidates": ["off"]},
+    {"id": "depth-writing", "axis": "draft", "engine": "mtp-mma", "depth": 3, "control": 3, "candidates": [5, 6]},
+    {"id": "depth-followup", "axis": "draft", "engine": "mtp-mma", "depth": 4, "control": 4, "candidates": [5, 6]},
+    {"id": "confidence-writing", "axis": "draft_p_min", "engine": "mtp-mma", "depth": 3, "control": 0.0, "candidates": [0.2, 0.4]},
+    {"id": "confidence-followup", "axis": "draft_p_min", "engine": "mtp-mma", "depth": 4, "control": 0.0, "candidates": [0.2, 0.4]},
+    {"id": "helper-workers", "axis": "draft_threads", "engine": "mtp-mma", "depth": 3, "control": 8, "candidates": [6, 12]},
+    {"id": "engine-parity", "axis": "engine", "engine": "mtp-mma", "depth": 3, "control": "mtp-mma", "candidates": ["m5-lab"]},
+    {"id": "bf16-threshold", "axis": "m5_tuning", "engine": "m5-lab", "depth": 3, "control": "stock", "candidates": ["bf16-row3"]},
+    {"id": "q2-threshold", "axis": "m5_tuning", "engine": "m5-lab", "depth": 3, "control": "stock", "candidates": ["q2-row2"]},
+    {"id": "matrix-width", "axis": "m5_tuning", "engine": "m5-lab", "depth": 3, "control": "stock", "candidates": ["nt1", "nt2"]},
+    {"id": "matrix-workers", "axis": "m5_tuning", "engine": "m5-lab", "depth": 3, "control": "stock", "candidates": ["nsg4", "nsg8"]}
+  ],
+  "diagnostics": {"engine": "m5-lab", "depths": [3, 4], "prompt_budgets": [512, 2048], "output_tokens": 32},
+  "later": [
+    {"id": "compressed-weight-feed", "status": "inventory and design staged; kernel implementation follows measured bottleneck", "scope": "Keep current GGUF bytes; investigate custom dequantization into cooperative tensor inputs, without requantizing or duplicating full weights."},
+    {"id": "neural-engine", "status": "research only; separate conversion/runtime required", "scope": "The separate Neural Engine is not enabled by the Metal tensor switch."}
+  ]
+}
