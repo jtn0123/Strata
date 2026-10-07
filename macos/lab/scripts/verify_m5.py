@@ -43,7 +43,7 @@ def check(engine, tensor_api, tuning="stock"):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--engine", choices=["mtp-mma", "m5-lab"], default="m5-lab")
+    ap.add_argument("--engine", choices=["mtp-mma", "m5-lab", "m5-trace"], default="m5-lab")
     ap.add_argument("--tensor-api", choices=["on", "off"], nargs="+", default=["on", "off"])
     ap.add_argument("--tuning", choices=TUNING, nargs="+", default=["stock"])
     ap.add_argument("--run", action="store_true")

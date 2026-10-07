@@ -1,0 +1,980 @@
+ggml_metal_device_init: testing tensor API for f16 support
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'dummy_kernel', name = 'dummy_kernel'
+ggml_metal_library_compile_pipeline: loaded dummy_kernel                                  0x10421f210 | th_max = 1024 | th_width =   32
+ggml_metal_device_init: testing tensor API for bfloat support
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'dummy_kernel', name = 'dummy_kernel'
+ggml_metal_library_compile_pipeline: loaded dummy_kernel                                  0x10421f550 | th_max = 1024 | th_width =   32
+ggml_metal_library_init: using embedded metal library
+ggml_metal_library_compile_all: compiled 'fa_aux' library in 0.314 sec
+ggml_metal_library_compile_all: compiled 'fa_f16' library in 1.640 sec
+ggml_metal_library_compile_all: compiled 'fa_f32' library in 0.915 sec
+ggml_metal_library_compile_all: compiled 'fa_q4_0' library in 1.015 sec
+ggml_metal_library_compile_all: compiled 'fa_q4_1' library in 1.001 sec
+ggml_metal_library_compile_all: compiled 'fa_q5_0' library in 0.946 sec
+ggml_metal_library_compile_all: compiled 'fa_q5_1' library in 0.945 sec
+ggml_metal_library_compile_all: compiled 'fa_q8_0' library in 1.010 sec
+ggml_metal_library_compile_all: compiled 'fa_vec_f16' library in 2.337 sec
+ggml_metal_library_compile_all: compiled 'fa_vec_f32' library in 1.097 sec
+ggml_metal_library_compile_all: compiled 'fa_vec_q4_0' library in 2.289 sec
+ggml_metal_library_compile_all: compiled 'fa_vec_q4_1' library in 2.642 sec
+ggml_metal_library_compile_all: compiled 'fa_vec_q5_0' library in 2.153 sec
+ggml_metal_library_compile_all: compiled 'fa_vec_q5_1' library in 2.177 sec
+ggml_metal_library_compile_all: compiled 'fa_vec_q8_0' library in 2.187 sec
+ggml_metal_library_compile_all: compiled 'mul_mv' library in 2.153 sec
+ggml_metal_library_compile_all: compiled 'mul_mv_mma' library in 1.382 sec
+ggml_metal_library_compile_all: compiled 'mul_mm' library in 1.640 sec
+ggml_metal_library_compile_all: compiled 'quantize' library in 1.381 sec
+ggml_metal_library_compile_all: compiled 'softmax' library in 0.113 sec
+ggml_metal_library_compile_all: compiled 'norm' library in 0.137 sec
+ggml_metal_library_compile_all: compiled 'unary' library in 0.141 sec
+ggml_metal_library_compile_all: compiled 'binbcast' library in 1.021 sec
+ggml_metal_library_compile_all: compiled 'reduce' library in 0.911 sec
+ggml_metal_library_compile_all: compiled 'tri' library in 0.106 sec
+ggml_metal_library_compile_all: compiled 'ssm' library in 0.943 sec
+ggml_metal_library_compile_all: compiled 'wkv' library in 0.318 sec
+ggml_metal_library_compile_all: compiled 'gated_delta_net' library in 0.941 sec
+ggml_metal_library_compile_all: compiled 'solve_tri' library in 1.484 sec
+ggml_metal_library_compile_all: compiled 'rope' library in 2.149 sec
+ggml_metal_library_compile_all: compiled 'conv' library in 2.333 sec
+ggml_metal_library_compile_all: compiled 'upscale' library in 2.149 sec
+ggml_metal_library_compile_all: compiled 'argsort' library in 2.173 sec
+ggml_metal_library_compile_all: compiled 'pool' library in 2.183 sec
+ggml_metal_library_compile_all: compiled 'misc' library in 2.284 sec
+ggml_metal_library_compile_all: loaded 35 libraries from embedded data in 2.642 sec (max single = 2.642 sec)
+ggml_metal_rsets_init: creating a residency set collection (keep_alive = 180 s)
+ggml_metal_device_init: GPU name:   MTL0 (Apple M5 Pro)
+ggml_metal_device_init: GPU family: MTLGPUFamilyApple10  (1010)
+ggml_metal_device_init: GPU family: MTLGPUFamilyMetal4  (5002)
+ggml_metal_device_init: simdgroup reduction   = true
+ggml_metal_device_init: simdgroup matrix mul. = true
+ggml_metal_device_init: has unified memory    = true
+ggml_metal_device_init: has bfloat            = true
+ggml_metal_device_init: has tensor            = true
+ggml_metal_device_init: use residency sets    = true
+ggml_metal_device_init: use shared buffers    = true
+ggml_metal_device_init: recommendedMaxWorkingSetSize  = 40200.90 MB
+ggml_metal_init: allocating
+ggml_metal_init: found device: Apple M5 Pro
+ggml_metal_init: picking default device: Apple M5 Pro
+ggml_metal_init: use fusion         = true
+ggml_metal_init: use concurrency    = true
+ggml_metal_init: use graph optimize = true
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=2_ne12=1_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=2_ne12=1_r2=1_r3=1_split=0     0x7c5e184000 | th_max = 1024 | th_width =   32
+Testing 3 devices
+
+Backend 1/3: MTL0
+  Device description: Apple M5 Pro
+  Device memory: 38338 MB (38338 MB free)
+
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=1,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_ext_bf16_f32_r1_2', name = 'kernel_mul_mv_ext_bf16_f32_r1_2_nsg=2_nxpsg=16_ne12=1_r2=1_r3=1'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_ext_bf16_f32_r1_2_nsg=2_nxpsg=16_ne12=1_r2=1_r3=1     0x7c5e184a80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=2,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_ext_bf16_f32_r1_3', name = 'kernel_mul_mv_ext_bf16_f32_r1_3_nsg=2_nxpsg=8_ne12=1_r2=1_r3=1'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_ext_bf16_f32_r1_3_nsg=2_nxpsg=8_ne12=1_r2=1_r3=1     0x7c5e184700 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=3,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_bf16_f32_nt1_rt1', name = 'kernel_mul_mv_mma_bf16_f32_nt1_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_bf16_f32_nt1_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e184380 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=4,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=5,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=6,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=7,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=8,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_bf16_f32_nt1_rt2', name = 'kernel_mul_mv_mma_bf16_f32_nt1_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_bf16_f32_nt1_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e185180 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=9,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=4_ne12=1_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=4_ne12=1_r2=1_r3=1_split=0     0x7c5e185500 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=1,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_bf16_f32_nt1_rt1', name = 'kernel_mul_mv_mma_bf16_f32_nt1_rt1_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_bf16_f32_nt1_rt1_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e184e00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=8,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_q2_0_f32', name = 'kernel_mul_mv_q2_0_f32_nsg=2_ne12=1_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_q2_0_f32_nsg=2_ne12=1_r2=1_r3=1_split=0     0x7c5e185c00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_ext_q2_0_f32_r1_2', name = 'kernel_mul_mv_ext_q2_0_f32_r1_2_nsg=2_nxpsg=16_ne12=1_r2=1_r3=1'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_ext_q2_0_f32_r1_2_nsg=2_nxpsg=16_ne12=1_r2=1_r3=1     0x7c5e185880 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=2,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e185f80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=3,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=4,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=5,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=6,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=7,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=8,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e186a00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=9,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e186680 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=8,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_q3_K_f32', name = 'kernel_mul_mv_q3_K_f32_nsg=2_ne12=1_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_q3_K_f32_nsg=2_ne12=1_r2=1_r3=1_split=0     0x7c5e186d80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q3_K,type_b=f32,m=16,n=1,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q3_K_f32_nt1_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e186300 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q3_K,type_b=f32,m=16,n=2,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=16,n=3,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=16,n=4,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=16,n=5,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=16,n=6,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=16,n=7,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=16,n=8,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q3_K_f32_nt1_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e187100 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q3_K,type_b=f32,m=16,n=9,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=16,n=1,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt1_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q3_K_f32_nt1_rt1_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e187800 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q3_K,type_b=f32,m=16,n=8,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_q5_K_f32', name = 'kernel_mul_mv_q5_K_f32_nsg=2_ne12=1_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_q5_K_f32_nsg=2_ne12=1_r2=1_r3=1_split=0     0x7c5e228380 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=16,n=1,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=256_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt1_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=256_add=0     0x7c5e228700 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=16,n=2,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=16,n=3,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=16,n=4,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=16,n=5,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=16,n=6,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=16,n=7,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=16,n=8,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=256_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt1_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=256_add=0     0x7c5e228000 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=16,n=9,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=16,n=1,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt1_nsg=32_ne12=1_r2=1_r3=1_ne00=4096_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt1_rt1_nsg=32_ne12=1_r2=1_r3=1_ne00=4096_add=0     0x7c5e228e00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=16,n=8,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_iq4_nl_f32', name = 'kernel_mul_mv_iq4_nl_f32_nsg=2_ne12=1_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_iq4_nl_f32_nsg=2_ne12=1_r2=1_r3=1_split=0     0x7c5e229180 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=16,n=1,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_ext_iq4_nl_f32_r1_2', name = 'kernel_mul_mv_ext_iq4_nl_f32_r1_2_nsg=2_nxpsg=16_ne12=1_r2=1_r3=1'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_ext_iq4_nl_f32_r1_2_nsg=2_nxpsg=16_ne12=1_r2=1_r3=1     0x7c5e228a80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=16,n=2,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt1', name = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_nl_f32_nt1_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e229500 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=16,n=3,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=16,n=4,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=16,n=5,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=16,n=6,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=16,n=7,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=16,n=8,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt2', name = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_nl_f32_nt1_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e229f80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=16,n=9,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=16,n=1,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt1', name = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt1_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_nl_f32_nt1_rt1_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e229c00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=16,n=8,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_iq4_xs_f32', name = 'kernel_mul_mv_iq4_xs_f32_nsg=2_ne12=1_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_iq4_xs_f32_nsg=2_ne12=1_r2=1_r3=1_split=0     0x7c5e22a300 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=16,n=1,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt1', name = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_xs_f32_nt1_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e229880 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=16,n=2,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=16,n=3,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=16,n=4,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=16,n=5,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=16,n=6,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=16,n=7,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=16,n=8,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt2', name = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_xs_f32_nt1_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e22a680 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=16,n=9,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=16,n=1,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt1', name = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt1_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_xs_f32_nt1_rt1_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e22ad80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=16,n=8,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=4096,n=1,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1023,n=1,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt4_rt1', name = 'kernel_mul_mv_mma_q5_K_f32_nt4_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=1024_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt4_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=1024_add=0     0x7c5e22b480 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=4096,n=2,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=4096_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt1_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=4096_add=0     0x7c5e22b100 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1023,n=2,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=4096,n=3,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1023,n=3,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=4096,n=4,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1023,n=4,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=4096,n=5,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1023,n=5,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=4096,n=6,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1023,n=6,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=4096,n=7,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1023,n=7,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=4096,n=8,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1023,n=8,k=4096,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=48,n=2,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1000,n=2,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=3000,n=2,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=4100,n=2,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_ext_bf16_f32_r1_2', name = 'kernel_mul_mv_ext_bf16_f32_r1_2_nsg=2_nxpsg=16_ne12=6_r2=2_r3=1'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_ext_bf16_f32_r1_2_nsg=2_nxpsg=16_ne12=6_r2=2_r3=1     0x7c5e22b800 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=64,n=2,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=1_ne12=1_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=1_ne12=1_r2=1_r3=1_split=0     0x7c5e22bb80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=100,n=2,k=96,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=48,n=2,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=1000,n=2,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=3000,n=2,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=4100,n=2,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_ext_q2_0_f32_r1_2', name = 'kernel_mul_mv_ext_q2_0_f32_r1_2_nsg=2_nxpsg=16_ne12=6_r2=2_r3=1'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_ext_q2_0_f32_r1_2_nsg=2_nxpsg=16_ne12=6_r2=2_r3=1     0x7c5e187480 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=64,n=2,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=48,n=2,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q3_K_f32_nt1_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2b8700 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q3_K,type_b=f32,m=1000,n=2,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q3_K_f32_nt2_rt1', name = 'kernel_mul_mv_mma_q3_K_f32_nt2_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q3_K_f32_nt2_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2b8000 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q3_K,type_b=f32,m=3000,n=2,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q3_K_f32_nt4_rt1', name = 'kernel_mul_mv_mma_q3_K_f32_nt4_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q3_K_f32_nt4_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2b8380 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q3_K,type_b=f32,m=4100,n=2,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt1_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q3_K_f32_nt1_rt1_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0     0x7c5e2b8a80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q3_K,type_b=f32,m=64,n=2,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt1_nsg=32_ne12=1_r2=1_r3=1_ne00=2560_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt1_rt1_nsg=32_ne12=1_r2=1_r3=1_ne00=2560_add=0     0x7c5e2b8e00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=48,n=2,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=1024_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt1_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=1024_add=0     0x7c5e2b9180 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=2,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt2_rt1', name = 'kernel_mul_mv_mma_q5_K_f32_nt2_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=512_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt2_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=512_add=0     0x7c5e2b9500 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=3000,n=2,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt4_rt1', name = 'kernel_mul_mv_mma_q5_K_f32_nt4_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=256_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt4_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=256_add=0     0x7c5e2b9880 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=4100,n=2,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt1_nsg=4_ne12=6_r2=2_r3=1_ne00=256_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt1_rt1_nsg=4_ne12=6_r2=2_r3=1_ne00=256_add=0     0x7c5e2b9c00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=64,n=2,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=48,n=2,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=1000,n=2,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=3000,n=2,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=4100,n=2,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_ext_iq4_nl_f32_r1_2', name = 'kernel_mul_mv_ext_iq4_nl_f32_r1_2_nsg=2_nxpsg=16_ne12=6_r2=2_r3=1'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_ext_iq4_nl_f32_r1_2_nsg=2_nxpsg=16_ne12=6_r2=2_r3=1     0x7c5e2ba300 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=64,n=2,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=100,n=2,k=96,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=48,n=2,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt1', name = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_xs_f32_nt1_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2baa00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=1000,n=2,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_xs_f32_nt2_rt1', name = 'kernel_mul_mv_mma_iq4_xs_f32_nt2_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_xs_f32_nt2_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2ba680 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=3000,n=2,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_xs_f32_nt4_rt1', name = 'kernel_mul_mv_mma_iq4_xs_f32_nt4_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_xs_f32_nt4_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2b9f80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=4100,n=2,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt1', name = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt1_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_xs_f32_nt1_rt1_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0     0x7c5e2bad80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=64,n=2,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt4_rt1', name = 'kernel_mul_mv_mma_q5_K_f32_nt4_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=512_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt4_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=512_add=0     0x7c5e2bb100 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=8192,n=2,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=2,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=1280,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=2,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0,src1=[0,1]): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=48,n=3,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1000,n=3,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=3000,n=3,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=4100,n=3,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_ext_bf16_f32_r1_3', name = 'kernel_mul_mv_ext_bf16_f32_r1_3_nsg=2_nxpsg=8_ne12=6_r2=2_r3=1'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_ext_bf16_f32_r1_3_nsg=2_nxpsg=8_ne12=6_r2=2_r3=1     0x7c5e2bb800 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=64,n=3,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=100,n=3,k=96,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=48,n=3,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2bbb80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=1000,n=3,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt2_rt1', name = 'kernel_mul_mv_mma_q2_0_f32_nt2_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt2_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2bb480 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=3000,n=3,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt4_rt1', name = 'kernel_mul_mv_mma_q2_0_f32_nt4_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt4_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2ec380 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=4100,n=3,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0     0x7c5e2ec700 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=64,n=3,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=48,n=3,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=1000,n=3,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=3000,n=3,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=4100,n=3,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=64,n=3,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=48,n=3,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=3,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=3000,n=3,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=4100,n=3,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=64,n=3,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=48,n=3,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt1', name = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_nl_f32_nt1_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2ece00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=1000,n=3,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_nl_f32_nt2_rt1', name = 'kernel_mul_mv_mma_iq4_nl_f32_nt2_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_nl_f32_nt2_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2ec000 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=3000,n=3,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_nl_f32_nt4_rt1', name = 'kernel_mul_mv_mma_iq4_nl_f32_nt4_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_nl_f32_nt4_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2eca80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=4100,n=3,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt1', name = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt1_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_nl_f32_nt1_rt1_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0     0x7c5e2ed180 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=64,n=3,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=100,n=3,k=96,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=48,n=3,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=1000,n=3,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=3000,n=3,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=4100,n=3,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=64,n=3,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=8192,n=3,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=3,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=1280,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=3,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0,src1=[0,1]): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=48,n=5,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_bf16_f32_nt1_rt1', name = 'kernel_mul_mv_mma_bf16_f32_nt1_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_bf16_f32_nt1_rt1_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2ed880 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1000,n=5,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_bf16_f32_nt2_rt1', name = 'kernel_mul_mv_mma_bf16_f32_nt2_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_bf16_f32_nt2_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2ed500 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=3000,n=5,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_bf16_f32_nt4_rt1', name = 'kernel_mul_mv_mma_bf16_f32_nt4_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_bf16_f32_nt4_rt1_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2edc00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=4100,n=5,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_bf16_f32_nt1_rt1', name = 'kernel_mul_mv_mma_bf16_f32_nt1_rt1_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_bf16_f32_nt1_rt1_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0     0x7c5e2ee680 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=64,n=5,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=100,n=5,k=96,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=48,n=5,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=1000,n=5,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=3000,n=5,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=4100,n=5,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=64,n=5,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=48,n=5,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=1000,n=5,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=3000,n=5,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=4100,n=5,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=64,n=5,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=48,n=5,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=5,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=3000,n=5,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=4100,n=5,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=64,n=5,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=48,n=5,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=1000,n=5,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=3000,n=5,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=4100,n=5,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=64,n=5,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=100,n=5,k=96,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=48,n=5,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=1000,n=5,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=3000,n=5,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=4100,n=5,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=64,n=5,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=8192,n=5,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=5,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=1280,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=5,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0,src1=[0,1]): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=48,n=8,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1000,n=8,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=3000,n=8,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=4100,n=8,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=64,n=8,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=100,n=8,k=96,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=48,n=8,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=1000,n=8,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=3000,n=8,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=4100,n=8,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=64,n=8,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=48,n=8,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=1000,n=8,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=3000,n=8,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=4100,n=8,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=64,n=8,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=48,n=8,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=8,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=3000,n=8,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=4100,n=8,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=64,n=8,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=48,n=8,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=1000,n=8,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=3000,n=8,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=4100,n=8,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=64,n=8,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=100,n=8,k=96,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=48,n=8,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=1000,n=8,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=3000,n=8,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=4100,n=8,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=64,n=8,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=8192,n=8,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=8,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=1280,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=8,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0,src1=[0,1]): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_bf16_f32_nt1_rt2', name = 'kernel_mul_mv_mma_bf16_f32_nt1_rt2_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_bf16_f32_nt1_rt2_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2edf80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=48,n=9,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_bf16_f32_nt1_rt2', name = 'kernel_mul_mv_mma_bf16_f32_nt1_rt2_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_bf16_f32_nt1_rt2_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2ee300 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1000,n=9,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_bf16_f32_nt2_rt2', name = 'kernel_mul_mv_mma_bf16_f32_nt2_rt2_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_bf16_f32_nt2_rt2_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2eea00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=3000,n=9,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_bf16_f32_nt4_rt2', name = 'kernel_mul_mv_mma_bf16_f32_nt4_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_bf16_f32_nt4_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2eed80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=4100,n=9,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_bf16_f32_nt1_rt2', name = 'kernel_mul_mv_mma_bf16_f32_nt1_rt2_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_bf16_f32_nt1_rt2_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0     0x7c5e2ef800 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=64,n=9,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mm_bf16_f32', name = 'kernel_mul_mm_bf16_f32_bci=0_bco=1_ne12=1_ne13=1_r2=1_r3=1'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mm_bf16_f32_bci=0_bco=1_ne12=1_ne13=1_r2=1_r3=1     0x7c5e2ef100 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=100,n=9,k=96,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2efb80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=48,n=9,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e2ef480 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=1000,n=9,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt2_rt2', name = 'kernel_mul_mv_mma_q2_0_f32_nt2_rt2_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt2_rt2_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e304380 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=3000,n=9,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt4_rt2', name = 'kernel_mul_mv_mma_q2_0_f32_nt4_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt4_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e304700 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=4100,n=9,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0     0x7c5e304000 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=64,n=9,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt2_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q3_K_f32_nt1_rt2_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e304a80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q3_K,type_b=f32,m=48,n=9,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt2_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q3_K_f32_nt1_rt2_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e304e00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q3_K,type_b=f32,m=1000,n=9,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q3_K_f32_nt2_rt2', name = 'kernel_mul_mv_mma_q3_K_f32_nt2_rt2_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q3_K_f32_nt2_rt2_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e305180 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q3_K,type_b=f32,m=3000,n=9,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q3_K_f32_nt4_rt2', name = 'kernel_mul_mv_mma_q3_K_f32_nt4_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q3_K_f32_nt4_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e305500 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q3_K,type_b=f32,m=4100,n=9,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q3_K_f32_nt1_rt2_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q3_K_f32_nt1_rt2_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0     0x7c5e305880 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q3_K,type_b=f32,m=64,n=9,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt2_nsg=32_ne12=1_r2=1_r3=1_ne00=2560_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt1_rt2_nsg=32_ne12=1_r2=1_r3=1_ne00=2560_add=0     0x7c5e305c00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=48,n=9,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt2_nsg=16_ne12=1_r2=1_r3=1_ne00=1024_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt1_rt2_nsg=16_ne12=1_r2=1_r3=1_ne00=1024_add=0     0x7c5e305f80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=9,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt2_rt2', name = 'kernel_mul_mv_mma_q5_K_f32_nt2_rt2_nsg=8_ne12=1_r2=1_r3=1_ne00=512_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt2_rt2_nsg=8_ne12=1_r2=1_r3=1_ne00=512_add=0     0x7c5e306300 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=3000,n=9,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt4_rt2', name = 'kernel_mul_mv_mma_q5_K_f32_nt4_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=256_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt4_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=256_add=0     0x7c5e306680 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=4100,n=9,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q5_K_f32_nt1_rt2_nsg=4_ne12=6_r2=2_r3=1_ne00=256_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt1_rt2_nsg=4_ne12=6_r2=2_r3=1_ne00=256_add=0     0x7c5e306a00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=64,n=9,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt2', name = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt2_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_nl_f32_nt1_rt2_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e306d80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=48,n=9,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt2', name = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt2_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_nl_f32_nt1_rt2_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e307100 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=1000,n=9,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_nl_f32_nt2_rt2', name = 'kernel_mul_mv_mma_iq4_nl_f32_nt2_rt2_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_nl_f32_nt2_rt2_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e307480 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=3000,n=9,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_nl_f32_nt4_rt2', name = 'kernel_mul_mv_mma_iq4_nl_f32_nt4_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_nl_f32_nt4_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e307800 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=4100,n=9,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt2', name = 'kernel_mul_mv_mma_iq4_nl_f32_nt1_rt2_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_nl_f32_nt1_rt2_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0     0x7c5e307b80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=64,n=9,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mm_iq4_nl_f32', name = 'kernel_mul_mm_iq4_nl_f32_bci=0_bco=1_ne12=1_ne13=1_r2=1_r3=1'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mm_iq4_nl_f32_bci=0_bco=1_ne12=1_ne13=1_r2=1_r3=1     0x7c5e31c380 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=100,n=9,k=96,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt2', name = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt2_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_xs_f32_nt1_rt2_nsg=32_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e31c700 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=48,n=9,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt2', name = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt2_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_xs_f32_nt1_rt2_nsg=16_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e31c000 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=1000,n=9,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_xs_f32_nt2_rt2', name = 'kernel_mul_mv_mma_iq4_xs_f32_nt2_rt2_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_xs_f32_nt2_rt2_nsg=8_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e31ca80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=3000,n=9,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_xs_f32_nt4_rt2', name = 'kernel_mul_mv_mma_iq4_xs_f32_nt4_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_xs_f32_nt4_rt2_nsg=4_ne12=1_r2=1_r3=1_ne00=0_add=0     0x7c5e31ce00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=4100,n=9,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt2', name = 'kernel_mul_mv_mma_iq4_xs_f32_nt1_rt2_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_iq4_xs_f32_nt1_rt2_nsg=4_ne12=6_r2=2_r3=1_ne00=0_add=0     0x7c5e31d180 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=64,n=9,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q5_K_f32_nt4_rt2', name = 'kernel_mul_mv_mma_q5_K_f32_nt4_rt2_nsg=8_ne12=1_r2=1_r3=1_ne00=512_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q5_K_f32_nt4_rt2_nsg=8_ne12=1_r2=1_r3=1_ne00=512_add=0     0x7c5e31d500 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q5_K,type_b=f32,m=8192,n=9,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=9,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=1280,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=9,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0,src1=[0,1]): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=48,n=13,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1000,n=13,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=3000,n=13,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=4100,n=13,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=64,n=13,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=100,n=13,k=96,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=48,n=13,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=1000,n=13,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=3000,n=13,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=4100,n=13,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=64,n=13,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=48,n=13,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=1000,n=13,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=3000,n=13,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=4100,n=13,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=64,n=13,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=48,n=13,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=13,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=3000,n=13,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=4100,n=13,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=64,n=13,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=48,n=13,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=1000,n=13,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=3000,n=13,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=4100,n=13,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=64,n=13,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=100,n=13,k=96,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=48,n=13,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=1000,n=13,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=3000,n=13,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=4100,n=13,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=64,n=13,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=8192,n=13,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=13,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=1280,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=13,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0,src1=[0,1]): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=48,n=16,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1000,n=16,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=3000,n=16,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=4100,n=16,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=64,n=16,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=100,n=16,k=96,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=48,n=16,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=1000,n=16,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=3000,n=16,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=4100,n=16,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=64,n=16,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=48,n=16,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=1000,n=16,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=3000,n=16,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=4100,n=16,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=64,n=16,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=48,n=16,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=16,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=3000,n=16,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=4100,n=16,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=64,n=16,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=48,n=16,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=1000,n=16,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=3000,n=16,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=4100,n=16,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=64,n=16,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=100,n=16,k=96,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=48,n=16,k=2560,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=1000,n=16,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=3000,n=16,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=4100,n=16,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=64,n=16,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=8192,n=16,k=512,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=16,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=1280,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=1000,n=16,k=1024,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0,src1=[0,1]): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_q2_0_f32', name = 'kernel_mul_mv_q2_0_f32_nsg=2_ne12=2_r2=2_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_q2_0_f32_nsg=2_ne12=2_r2=2_r3=1_split=0     0x7c5e31d880 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=256,bs=[1,1],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_q2_0_f32', name = 'kernel_mul_mv_q2_0_f32_nsg=2_ne12=1_r2=1_r3=2_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_q2_0_f32_nsg=2_ne12=1_r2=1_r3=2_split=0     0x7c5e31dc00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=256,bs=[1,1],nr=[1,2],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_q2_0_f32', name = 'kernel_mul_mv_q2_0_f32_nsg=2_ne12=3_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_q2_0_f32_nsg=2_ne12=3_r2=1_r3=1_split=0     0x7c5e31df80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=256,bs=[3,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_q2_0_f32', name = 'kernel_mul_mv_q2_0_f32_nsg=2_ne12=6_r2=2_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_q2_0_f32_nsg=2_ne12=6_r2=2_r3=1_split=0     0x7c5e31e300 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=256,bs=[3,1],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=256,bs=[3,2],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_q2_0_f32', name = 'kernel_mul_mv_q2_0_f32_nsg=2_ne12=3_r2=1_r3=2_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_q2_0_f32_nsg=2_ne12=3_r2=1_r3=2_split=0     0x7c5e31ed80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=256,bs=[3,2],nr=[1,2],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_q2_0_f32', name = 'kernel_mul_mv_q2_0_f32_nsg=2_ne12=6_r2=2_r3=2_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_q2_0_f32_nsg=2_ne12=6_r2=2_r3=2_split=0     0x7c5e31e680 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=256,bs=[3,2],nr=[2,2],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=4_ne12=6_r2=2_r3=2_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=4_ne12=6_r2=2_r3=2_ne00=0_add=0     0x7c5e31ea00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=4,k=256,bs=[3,2],nr=[2,2],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=16,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=2_r2=2_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=2_r2=2_r3=1_ne00=0_add=0     0x7c5e31f480 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=16,k=256,bs=[1,1],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=1_r2=1_r3=2_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=1_r2=1_r3=2_ne00=0_add=0     0x7c5e31f800 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=16,k=256,bs=[1,1],nr=[1,2],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=3_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=3_r2=1_r3=1_ne00=0_add=0     0x7c5e31f100 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=16,k=256,bs=[3,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=16,k=256,bs=[3,1],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=16,k=256,bs=[3,2],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=16,k=256,bs=[3,2],nr=[2,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=3_r2=1_r3=2_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=3_r2=1_r3=2_ne00=0_add=0     0x7c5e31fb80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=16,k=256,bs=[3,2],nr=[1,2],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=6_r2=2_r3=2_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=6_r2=2_r3=2_ne00=0_add=0     0x7c5e354380 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=16,k=256,bs=[3,2],nr=[2,2],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_q2_0_f32', name = 'kernel_mul_mv_q2_0_f32_nsg=2_ne12=2_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_q2_0_f32_nsg=2_ne12=2_r2=1_r3=1_split=0     0x7c5e354000 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=256,bs=[2,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=256,bs=[2,3],nr=[1,1],per=[0,1,3,2],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=256,bs=[2,3],nr=[1,1],per=[0,3,2,1],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=4_ne12=2_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=4_ne12=2_r2=1_r3=1_ne00=0_add=0     0x7c5e354e00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=4,k=256,bs=[2,3],nr=[1,1],per=[0,3,2,1],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=8,k=256,bs=[2,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=8,k=256,bs=[2,3],nr=[1,1],per=[0,1,3,2],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=8,k=256,bs=[2,3],nr=[1,1],per=[0,3,2,1],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=2_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=4_ne12=2_r2=1_r3=1_ne00=0_add=0     0x7c5e354700 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=16,k=256,bs=[2,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=16,k=256,bs=[2,3],nr=[1,1],per=[0,1,3,2],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=16,k=256,bs=[2,3],nr=[1,1],per=[0,3,2,1],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=1024,bs=[3,2],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=16_ne12=3_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=16_ne12=3_r2=1_r3=1_ne00=0_add=0     0x7c5e355500 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=8,k=1024,bs=[3,2],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=16_ne12=3_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt2_nsg=16_ne12=3_r2=1_r3=1_ne00=0_add=0     0x7c5e355180 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=16,k=1024,bs=[3,2],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1', name = 'kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=4_ne12=1536_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_q2_0_f32_nt1_rt1_nsg=4_ne12=1536_r2=1_r3=1_ne00=0_add=0     0x7c5e354a80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=8,k=256,bs=[1536,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=2_ne12=2_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=2_ne12=2_r2=1_r3=1_split=0     0x7c5e355880 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=1,k=256,bs=[2,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=1,k=256,bs=[2,3],nr=[1,1],per=[0,1,3,2],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=1,k=256,bs=[2,3],nr=[1,1],per=[0,3,2,1],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_bf16_f32_nt1_rt1', name = 'kernel_mul_mv_mma_bf16_f32_nt1_rt1_nsg=4_ne12=2_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_bf16_f32_nt1_rt1_nsg=4_ne12=2_r2=1_r3=1_ne00=0_add=0     0x7c5e356300 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=8,k=256,bs=[2,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=8,k=256,bs=[2,3],nr=[1,1],per=[0,1,3,2],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=8,k=256,bs=[2,3],nr=[1,1],per=[0,3,2,1],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_mma_bf16_f32_nt1_rt2', name = 'kernel_mul_mv_mma_bf16_f32_nt1_rt2_nsg=4_ne12=2_r2=1_r3=1_ne00=0_add=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_mma_bf16_f32_nt1_rt2_nsg=4_ne12=2_r2=1_r3=1_ne00=0_add=0     0x7c5e356680 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=16,k=256,bs=[2,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=16,k=256,bs=[2,3],nr=[1,1],per=[0,1,3,2],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=16,k=256,bs=[2,3],nr=[1,1],per=[0,3,2,1],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=64,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q2_0,type_b=f32,m=16,n=1,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q3_K,type_b=f32,m=16,n=1,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=q5_K,type_b=f32,m=16,n=1,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=16,n=1,k=32,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_nl,type_b=f32,m=16,n=1,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=iq4_xs,type_b=f32,m=16,n=1,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_short', name = 'kernel_mul_mv_bf16_f32_short_nsg=1_ne12=1_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_short_nsg=1_ne12=1_r2=1_r3=1_split=0     0x7c5e355f80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=1,k=1,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=16,n=1,k=256,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[1,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=2_ne12=1_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=2_ne12=1_r2=1_r3=1_split=0     0x7c5e355c00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[1,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=4_ne12=1_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=4_ne12=1_r2=1_r3=1_split=0     0x7c5e357100 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[1,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[1,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[1,1],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=1_ne12=4_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=1_ne12=4_r2=4_r3=1_split=0     0x7c5e357480 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[1,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=4_ne12=4_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=4_ne12=4_r2=4_r3=1_split=0     0x7c5e357800 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[1,1],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=2_ne12=4_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=2_ne12=4_r2=4_r3=1_split=0     0x7c5e357b80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[1,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=4_ne12=4_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=4_ne12=4_r2=4_r3=1_split=0     0x7c5e187b80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[1,1],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[1,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[1,1],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[1,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[1,1],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=1_ne12=2_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=1_ne12=2_r2=1_r3=1_split=0     0x7c5e22aa00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[2,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=4_ne12=2_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=4_ne12=2_r2=1_r3=1_split=0     0x7c5e368000 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[2,1],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=2_ne12=2_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=2_ne12=2_r2=1_r3=1_split=0     0x7c5e368a80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[2,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=4_ne12=2_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=4_ne12=2_r2=1_r3=1_split=0     0x7c5e368e00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[2,1],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[2,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[2,1],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[2,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[2,1],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=1_ne12=8_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=1_ne12=8_r2=4_r3=1_split=0     0x7c5e369180 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[2,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=4_ne12=8_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=4_ne12=8_r2=4_r3=1_split=0     0x7c5e369500 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[2,1],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=2_ne12=8_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=2_ne12=8_r2=4_r3=1_split=0     0x7c5e369880 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[2,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=4_ne12=8_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=4_ne12=8_r2=4_r3=1_split=0     0x7c5e369c00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[2,1],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[2,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[2,1],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[2,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[2,1],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=1_ne12=4_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=1_ne12=4_r2=1_r3=1_split=0     0x7c5e369f80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[4,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=4_ne12=4_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=4_ne12=4_r2=1_r3=1_split=0     0x7c5e36a300 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[4,1],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=2_ne12=4_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=2_ne12=4_r2=1_r3=1_split=0     0x7c5e36a680 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[4,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=4_ne12=4_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=4_ne12=4_r2=1_r3=1_split=0     0x7c5e36aa00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[4,1],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[4,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[4,1],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[4,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[4,1],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=1_ne12=16_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=1_ne12=16_r2=4_r3=1_split=0     0x7c5e36ad80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[4,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=4_ne12=16_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=4_ne12=16_r2=4_r3=1_split=0     0x7c5e36b100 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[4,1],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=2_ne12=16_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=2_ne12=16_r2=4_r3=1_split=0     0x7c5e36b480 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[4,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=4_ne12=16_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=4_ne12=16_r2=4_r3=1_split=0     0x7c5e36b800 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[4,1],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[4,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[4,1],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[4,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[4,1],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=1_ne12=8_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=1_ne12=8_r2=1_r3=1_split=0     0x7c5e36bb80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[8,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=4_ne12=8_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=4_ne12=8_r2=1_r3=1_split=0     0x7c5e368700 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[8,1],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=2_ne12=8_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=2_ne12=8_r2=1_r3=1_split=0     0x7c5e368380 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[8,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=4_ne12=8_r2=1_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=4_ne12=8_r2=1_r3=1_split=0     0x7c5e374000 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[8,1],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[8,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[8,1],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[8,1],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[8,1],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=1_ne12=32_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=1_ne12=32_r2=4_r3=1_split=0     0x7c5e374a80 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[8,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32_4', name = 'kernel_mul_mv_bf16_f32_4_nsg=4_ne12=32_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_4_nsg=4_ne12=32_r2=4_r3=1_split=0     0x7c5e374e00 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[8,1],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=2_ne12=32_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=2_ne12=32_r2=4_r3=1_split=0     0x7c5e375180 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[8,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_bf16_f32', name = 'kernel_mul_mv_bf16_f32_nsg=4_ne12=32_r2=4_r3=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_bf16_f32_nsg=4_ne12=32_r2=4_r3=1_split=0     0x7c5e375500 | th_max = 1024 | th_width =   32
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[8,1],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[8,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[8,1],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[8,1],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[8,1],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[1,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[1,3],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[1,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[1,3],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[1,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[1,3],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[1,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[1,3],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[1,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[1,3],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[1,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[1,3],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[1,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[1,3],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[1,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[1,3],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[2,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[2,3],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[2,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[2,3],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[2,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[2,3],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[2,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[2,3],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[2,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[2,3],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[2,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[2,3],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[2,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[2,3],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[2,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[2,3],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[4,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[4,3],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[4,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[4,3],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[4,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[4,3],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[4,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[4,3],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[4,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[4,3],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[4,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[4,3],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[4,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[4,3],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[4,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[4,3],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[8,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[8,3],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[8,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[8,3],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[8,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[8,3],nr=[1,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[8,3],nr=[1,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[8,3],nr=[1,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=128,bs=[8,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1056,bs=[8,3],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1056,n=1,k=129,bs=[8,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=128,n=1,k=1057,bs=[8,3],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=128,bs=[8,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1056,bs=[8,3],nr=[4,1],per=[0,1,2,3],k_v=2112,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=1057,n=1,k=129,bs=[8,3],nr=[4,1],per=[0,2,1,3],k_v=0,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+  MUL_MAT(type_a=bf16,type_b=f32,m=129,n=1,k=1057,bs=[8,3],nr=[4,1],per=[0,1,2,3],k_v=2113,o=1,src_overlap=0,m_v=0,pad=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_id_bf16_f32', name = 'kernel_mul_mv_id_bf16_f32_nsg=1_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_id_bf16_f32_nsg=1_split=0      0x7c5e374380 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=bf16,type_b=f32,n_mats=4,n_used=2,b=0,m=64,n=16,k=3,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_id_q2_0_f32', name = 'kernel_mul_mv_id_q2_0_f32_nsg=2_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_id_q2_0_f32_nsg=2_split=0      0x7c5e375880 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=2,b=0,m=64,n=16,k=192,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_id_q3_K_f32', name = 'kernel_mul_mv_id_q3_K_f32_nsg=2_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_id_q3_K_f32_nsg=2_split=0      0x7c5e374700 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=q3_K,type_b=f32,n_mats=4,n_used=2,b=0,m=64,n=16,k=768,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_id_q5_K_f32', name = 'kernel_mul_mv_id_q5_K_f32_nsg=2_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_id_q5_K_f32_nsg=2_split=0      0x7c5e375c00 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=q5_K,type_b=f32,n_mats=4,n_used=2,b=0,m=64,n=16,k=768,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_id_iq4_nl_f32', name = 'kernel_mul_mv_id_iq4_nl_f32_nsg=2_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_id_iq4_nl_f32_nsg=2_split=0     0x7c5e375f80 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=iq4_nl,type_b=f32,n_mats=4,n_used=2,b=0,m=64,n=16,k=96,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_id_iq4_xs_f32', name = 'kernel_mul_mv_id_iq4_xs_f32_nsg=2_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_id_iq4_xs_f32_nsg=2_split=0     0x7c5e376300 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=iq4_xs,type_b=f32,n_mats=4,n_used=2,b=0,m=64,n=16,k=768,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=1,b=0,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=1,b=0,m=512,n=4,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=1,b=0,m=512,n=5,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mm_id_map0_ne20_1', name = 'kernel_mul_mm_id_map0_ne20_1_ne02=4'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mm_id_map0_ne20_1_ne02=4          0x7c5e376680 | th_max = 1024 | th_width =   32
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mm_id_q2_0_f32', name = 'kernel_mul_mm_id_q2_0_f32_bci=0_amax=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mm_id_q2_0_f32_bci=0_amax=0       0x7c5e377100 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=1,b=0,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=1,b=1,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=1,b=1,m=512,n=4,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=1,b=1,m=512,n=5,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=1,b=1,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=4,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=5,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mm_id_map0_ne20_2', name = 'kernel_mul_mm_id_map0_ne20_2_ne02=4'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mm_id_map0_ne20_2_ne02=4          0x7c5e376d80 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=2,b=1,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=2,b=1,m=512,n=4,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=2,b=1,m=512,n=5,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=2,b=1,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=4,b=0,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=4,b=0,m=512,n=4,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=4,b=0,m=512,n=5,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mm_id_map0_ne20_4', name = 'kernel_mul_mm_id_map0_ne20_4_ne02=4'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mm_id_map0_ne20_4_ne02=4          0x7c5e377480 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=4,b=0,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=4,b=1,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=4,b=1,m=512,n=4,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=4,b=1,m=512,n=5,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=4,b=1,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=1,b=0,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=1,b=0,m=512,n=4,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=1,b=0,m=512,n=5,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mm_id_map0_ne20_1', name = 'kernel_mul_mm_id_map0_ne20_1_ne02=8'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mm_id_map0_ne20_1_ne02=8          0x7c5e376a00 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=1,b=0,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=1,b=1,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=1,b=1,m=512,n=4,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=1,b=1,m=512,n=5,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=1,b=1,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=2,b=0,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=2,b=0,m=512,n=4,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=2,b=0,m=512,n=5,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mm_id_map0_ne20_2', name = 'kernel_mul_mm_id_map0_ne20_2_ne02=8'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mm_id_map0_ne20_2_ne02=8          0x7c5e356d80 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=2,b=0,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=2,b=1,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=2,b=1,m=512,n=4,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=2,b=1,m=512,n=5,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=2,b=1,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=4,b=0,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=4,b=0,m=512,n=4,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=4,b=0,m=512,n=5,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mm_id_map0_ne20_4', name = 'kernel_mul_mm_id_map0_ne20_4_ne02=8'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mm_id_map0_ne20_4_ne02=8          0x7c5e377b80 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=4,b=0,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=4,b=1,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=4,b=1,m=512,n=4,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=4,b=1,m=512,n=5,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=8,n_used=4,b=1,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q2_0,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q3_K,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mm_id_q3_K_f32', name = 'kernel_mul_mm_id_q3_K_f32_bci=0_amax=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mm_id_q3_K_f32_bci=0_amax=0       0x7c5e380380 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=q3_K,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=q5_K,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mm_id_q5_K_f32', name = 'kernel_mul_mm_id_q5_K_f32_bci=0_amax=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mm_id_q5_K_f32_bci=0_amax=0       0x7c5e380700 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=q5_K,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=iq4_nl,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mm_id_iq4_nl_f32', name = 'kernel_mul_mm_id_iq4_nl_f32_bci=0_amax=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mm_id_iq4_nl_f32_bci=0_amax=0     0x7c5e380000 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=iq4_nl,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+  MUL_MAT_ID(type_a=iq4_xs,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mm_id_iq4_xs_f32', name = 'kernel_mul_mm_id_iq4_xs_f32_bci=0_amax=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mm_id_iq4_xs_f32_bci=0_amax=0     0x7c5e380a80 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=iq4_xs,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mv_id_bf16_f32_4', name = 'kernel_mul_mv_id_bf16_f32_4_nsg=2_split=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mv_id_bf16_f32_4_nsg=2_split=0     0x7c5e381180 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=bf16,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=1,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_library_compile_pipeline: compiling pipeline: base = 'kernel_mul_mm_id_bf16_f32', name = 'kernel_mul_mm_id_bf16_f32_bci=0_amax=0'
+ggml_metal_library_compile_pipeline: loaded kernel_mul_mm_id_bf16_f32_bci=0_amax=0       0x7c5e380e00 | th_max = 1024 | th_width =   32
+  MUL_MAT_ID(type_a=bf16,type_b=f32,n_mats=4,n_used=2,b=0,m=512,n=32,k=256,amax=1.000000,m_v=0): [1;32mOK[0m
+ggml_metal_free: deallocating
+  572/572 tests passed
+  Backend MTL0: [1;32mOK[0m
+Backend 2/3: BLAS
+  Skipping
+Backend 3/3: CPU
+  Skipping
+3/3 backends passed
+[1;32mOK[0m

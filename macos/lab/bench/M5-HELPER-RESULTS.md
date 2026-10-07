@@ -95,7 +95,7 @@ The worker controls are stable, while short cached replies still have large repe
 
 ## Next work
 
-All twelve prepared comparisons are complete. Larger GPU work should first add request-phase and tensor-shape timing evidence, separating prompt processing from generation and dense from routed-expert operations. Then choose one compressed-weight/dequantization kernel with a measured decoding cost. Hardware AI-accelerator occupancy is still unmeasured; no new compressed-weight shader or separate Neural Engine runtime is implemented. All model servers, Colima and Grafana are stopped after this batch. No VM or service was restarted.
+All twelve prepared comparisons are complete. The subsequent [phase/shape profiling stage](M5-PHASE-PROFILE.md) now separates prompt processing, generation and model roles, and records matrix shapes. Main-model GPU-buffer intervals cover 68-73% of generation wall time in four diagnostic requests. Individual kernel cost remains unmeasured. Then choose one compressed-weight/dequantization kernel with a measured decoding cost. Hardware AI-accelerator occupancy is still unmeasured; no new compressed-weight shader or separate Neural Engine runtime is implemented. All model servers, Colima and Grafana are stopped after this batch. No VM or service was restarted.
 
 ## Raw evidence
 

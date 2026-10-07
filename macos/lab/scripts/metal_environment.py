@@ -15,8 +15,8 @@ TUNING = {
 def configure(environment, engine, tensor_api="auto", tuning="stock", profile=False):
     if tensor_api not in ("auto", "on", "off") or tuning not in TUNING:
         raise ValueError("Unknown Metal experiment setting")
-    if (tuning != "stock" or profile) and engine != "m5-lab":
-        raise ValueError("GPU tuning and timing diagnostics require the isolated m5-lab engine")
+    if (tuning != "stock" or profile) and engine not in ("m5-lab", "m5-trace"):
+        raise ValueError("GPU tuning and timing diagnostics require an isolated M5 engine")
     env = {k: v for k, v in environment.items()
            if not k.startswith(("GGML_METAL_", "GGML_M5_LAB_")) and k != "METAL_CAPTURE_ENABLED"}
     flags = dict(TUNING[tuning])

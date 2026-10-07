@@ -6,7 +6,7 @@ import fcntl
 import json
 import subprocess
 
-from engines import sha256, source_info, verify_engine, write_receipt
+from engines import EXPERIMENTS, sha256, source_info, verify_engine, write_receipt
 from lab import ROOT
 
 
@@ -28,13 +28,14 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--build", action="store_true")
     ap.add_argument("--jobs", type=int, default=1)
+    ap.add_argument("--engine", choices=["m5-lab", "m5-trace"], default="m5-lab")
     args = ap.parse_args(argv)
     if not 1 <= args.jobs <= 2:
         ap.error("Use one or two build workers")
     with (ROOT / "bench/.lock").open("w") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         runtime = json.loads((ROOT / "config/runtime.json").read_text())
-        manifest = json.loads((ROOT / "config/m5_lab_experiment.json").read_text())
+        manifest = json.loads((ROOT / "config" / EXPERIMENTS[args.engine]).read_text())
         for component in manifest["components"]:
             if sha256(ROOT / component["patch"]) != component["sha256"]:
                 raise RuntimeError("Component patch changed")
@@ -48,13 +49,13 @@ def main(argv=None):
                 call(["git", "-C", path, "remote", "set-url", "origin", runtime["llama_cpp"]["repository"]])
                 call(["git", "-C", path, "remote", "set-url", "--push", "origin", "no_push"])
                 call(["git", "-C", path, "apply", ROOT / manifest["patch"]])
-            source_info("m5-lab")
+            source_info(args.engine)
             cmake = ROOT / ".venv/bin/cmake"
             flags = [f for f in runtime["build_flags"] if not f.startswith("-DLLAMA_BUILD_TESTS=")]
             call([cmake, "-S", path, "-B", path / "build", *flags, "-DLLAMA_BUILD_TESTS=ON"])
             call([cmake, "--build", path / "build", "--target", "llama-server", "test-backend-ops", "-j", args.jobs])
-            write_receipt("m5-lab")
-        candidate = verify_engine("m5-lab") if (path / "build/lab-receipt.json").exists() else source_info("m5-lab")
+            write_receipt(args.engine)
+        candidate = verify_engine(args.engine) if (path / "build/lab-receipt.json").exists() else source_info(args.engine)
         if any(verify_engine(name) != pin for name, pin in controls.items()):
             raise RuntimeError("An existing control changed during preparation")
         record = {"schema": 1, "kind": "m5-preparation", "status": "built-awaiting-tests" if args.build else "prepared",
