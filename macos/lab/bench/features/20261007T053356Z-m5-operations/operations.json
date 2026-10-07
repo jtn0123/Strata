@@ -1,0 +1,685 @@
+{
+  "schema": 1,
+  "kind": "m5-isolated-operation-latency",
+  "status": "passed",
+  "build": {
+    "schema": 1,
+    "engine": {
+      "engine": "m5-lab",
+      "directory": "vendor/llama-m5-lab",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+      "patch": {
+        "schema": 1,
+        "id": "m5-lab",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-lab",
+        "patch": "patches/mtp-m5-lab.patch",
+        "patch_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+        "source_diff_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-shared-mma.patch",
+            "sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3"
+          },
+          {
+            "patch": "patches/m5-lab-controls.patch",
+            "sha256": "a10ca5f9b146b082036eed369cef288baaa3182457c3d6dffe9008690b460b1a"
+          }
+        ],
+        "scope": "Existing shared-helper/MMA code plus disabled-by-default row/tiling controls and optional command-buffer GPU timestamps. No shader, weight, expert scheduler or GPU memory limit change."
+      },
+      "artifacts": {
+        "llama-server": "57918d880004f93eeb94d2fe0618ac098ef1e141693459c67ebb3603acea7e77",
+        "libggml-base.0.26.0.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+        "libggml-base.0.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+        "libggml-base.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+        "libggml-blas.0.26.0.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+        "libggml-blas.0.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+        "libggml-blas.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+        "libggml-cpu.0.26.0.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+        "libggml-cpu.0.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+        "libggml-cpu.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+        "libggml-metal.0.26.0.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+        "libggml-metal.0.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+        "libggml-metal.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+        "libggml.0.26.0.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+        "libggml.0.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+        "libggml.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+        "libllama-common.0.6.0.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+        "libllama-common.0.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+        "libllama-common.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+        "libllama-server-impl.dylib": "cba05a99af451b10d428eca49c11e58465ff5771bcee5a3a868bf35091f0b6c4",
+        "libllama.0.6.0.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+        "libllama.0.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+        "libllama.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+        "libmtmd.0.6.0.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb",
+        "libmtmd.0.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb",
+        "libmtmd.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb"
+      },
+      "build_receipt": {
+        "engine": "m5-lab",
+        "directory": "vendor/llama-m5-lab",
+        "revision": "d81235049384534c167caea52b85a694f6103d14",
+        "source_diff_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+        "patch": {
+          "schema": 1,
+          "id": "m5-lab",
+          "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+          "directory": "vendor/llama-m5-lab",
+          "patch": "patches/mtp-m5-lab.patch",
+          "patch_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+          "source_diff_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+          "modified_files": [
+            "ggml/src/ggml-metal/ggml-metal-common.cpp",
+            "ggml/src/ggml-metal/ggml-metal-common.h",
+            "ggml/src/ggml-metal/ggml-metal-context.m",
+            "ggml/src/ggml-metal/ggml-metal-device.cpp",
+            "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+            "src/llama-context.cpp",
+            "src/llama-cparams.h",
+            "src/models/qwen4exp.cpp",
+            "tests/test-backend-ops.cpp"
+          ],
+          "features": [
+            "mtp-shared",
+            "m5-tuning",
+            "m5-profile"
+          ],
+          "components": [
+            {
+              "patch": "patches/mtp-shared-mma.patch",
+              "sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3"
+            },
+            {
+              "patch": "patches/m5-lab-controls.patch",
+              "sha256": "a10ca5f9b146b082036eed369cef288baaa3182457c3d6dffe9008690b460b1a"
+            }
+          ],
+          "scope": "Existing shared-helper/MMA code plus disabled-by-default row/tiling controls and optional command-buffer GPU timestamps. No shader, weight, expert scheduler or GPU memory limit change."
+        },
+        "artifacts": {
+          "llama-server": "57918d880004f93eeb94d2fe0618ac098ef1e141693459c67ebb3603acea7e77",
+          "libggml-base.0.26.0.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+          "libggml-base.0.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+          "libggml-base.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+          "libggml-blas.0.26.0.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+          "libggml-blas.0.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+          "libggml-blas.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+          "libggml-cpu.0.26.0.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+          "libggml-cpu.0.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+          "libggml-cpu.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+          "libggml-metal.0.26.0.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+          "libggml-metal.0.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+          "libggml-metal.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+          "libggml.0.26.0.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+          "libggml.0.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+          "libggml.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+          "libllama-common.0.6.0.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+          "libllama-common.0.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+          "libllama-common.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+          "libllama-server-impl.dylib": "cba05a99af451b10d428eca49c11e58465ff5771bcee5a3a868bf35091f0b6c4",
+          "libllama.0.6.0.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+          "libllama.0.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+          "libllama.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+          "libmtmd.0.6.0.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb",
+          "libmtmd.0.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb",
+          "libmtmd.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb"
+        },
+        "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+        "build_settings": {
+          "CMAKE_BUILD_TYPE": "Release",
+          "GGML_BLAS": "ON",
+          "GGML_CPU": "ON",
+          "GGML_METAL": "ON",
+          "GGML_METAL_EMBED_LIBRARY": "ON",
+          "GGML_NATIVE": "ON",
+          "LLAMA_BUILD_TESTS": "ON",
+          "LLAMA_BUILD_TOOLS": "ON"
+        },
+        "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+      }
+    },
+    "source_sha256": "1aa421998c3a5a075617e9e1adcbc60a8ad94fb678d8c87ab60d49e8be9c1a41",
+    "native_tester_sha256": "817d066b55e9bde54595f8f6c263e70ebf887831a1283a8ee56c146f404241b0",
+    "common_archive_sha256": "a0a0ec277cfbbc338963f28993536b20c4fb77db4a99716806e0f13671cc5ae7",
+    "binary_sha256": "834800e571636d25108702ef2f96ec79c6724bdd3dc8db61c04f1ee9dc20141d",
+    "command": [
+      "/usr/bin/c++",
+      "-O3",
+      "-DNDEBUG",
+      "-std=gnu++17",
+      "-arch",
+      "arm64",
+      "-DGGML_BACKEND_SHARED",
+      "-DGGML_SHARED",
+      "-DGGML_USE_BLAS",
+      "-DGGML_USE_CPU",
+      "-DGGML_USE_METAL",
+      "-DLLAMA_SHARED",
+      "-DLLAMA_SUBPROCESS",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/ggml/include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/common",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/vendor",
+      "-DM5_NATIVE_TEST_SOURCE=\"/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/tests/test-backend-ops.cpp\"",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/native/m5_operation_probe.cpp",
+      "-o",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+      "-Wl,-rpath,/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin/libllama-common.0.6.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin/libllama.0.6.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin/libggml.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin/libggml-cpu.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin/libggml-blas.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin/libggml-metal.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin/libggml-base.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/common/libllama-common-base.a"
+    ],
+    "scope": "New diagnostic executable links the existing pinned libraries. No engine, shader or model changes."
+  },
+  "rows": [
+    2,
+    3
+  ],
+  "samples": 40,
+  "passes_per_family": 0,
+  "checks_only": true,
+  "runner_sha256": "9188f41590fea6f553ce39e54190673ed706e7f5888e6661588d47b1fec31cec",
+  "preflight": {
+    "memory": {
+      "total": 51539607552,
+      "available": 39498661888,
+      "percent": 23.4,
+      "used": 8868610048,
+      "free": 4133257216,
+      "active": 5512691712,
+      "inactive": 35284647936,
+      "wired": 3355918336
+    },
+    "swap": {
+      "total": 2147483648,
+      "used": 886308864,
+      "free": 1261174784,
+      "percent": 41.3,
+      "sin": 1689916456960,
+      "sout": 1454850048
+    },
+    "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 88%",
+    "largest_process_groups": [
+      {
+        "name": "java",
+        "rss_bytes": 594984960
+      },
+      {
+        "name": "T3 Code (Alpha) Helper (Renderer)",
+        "rss_bytes": 536592384
+      },
+      {
+        "name": "codex",
+        "rss_bytes": 443793408
+      },
+      {
+        "name": "T3 Code (Alpha)",
+        "rss_bytes": 398426112
+      },
+      {
+        "name": "2.1.292",
+        "rss_bytes": 311771136
+      },
+      {
+        "name": "corespotlightd",
+        "rss_bytes": 95289344
+      },
+      {
+        "name": "T3 Code (Alpha) Helper",
+        "rss_bytes": 72859648
+      },
+      {
+        "name": "WeatherMenu",
+        "rss_bytes": 38895616
+      },
+      {
+        "name": "SkyComputerUseClient",
+        "rss_bytes": 37928960
+      },
+      {
+        "name": "codex-code-mode-host",
+        "rss_bytes": 37404672
+      },
+      {
+        "name": "Finder",
+        "rss_bytes": 34619392
+      },
+      {
+        "name": "mdworker_shared",
+        "rss_bytes": 34144256
+      }
+    ],
+    "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth."
+  },
+  "host": {
+    "os": "macOS-27.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "chip": "Apple M5 Pro",
+    "ram_bytes": 51539607552,
+    "cpu_count": 18,
+    "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=36831331)\t80%; AC attached; not charging present: true",
+    "power_settings": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n womp                 0\n displaysleep         10\n networkoversleep     0\n sleep                1\n lessbright           0\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                0\n tcpkeepalive         1\n disksleep            10",
+    "thermal_status": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+    "gpu_wired_limit": "iogpu.wired_limit_mb: 0",
+    "vm_stat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                   252104.\nPages active:                                 336585.\nPages inactive:                              2153636.\nPages speculative:                              4938.\nPages throttled:                                   0.\nPages wired down:                             204841.\nPages purgeable:                                1947.\n\"Translation faults\":                     1663574400.\nPages copy-on-write:                        55819946.\nPages zero filled:                         859729240.\nPages reactivated:                         107596450.\nPages purged:                               17744730.\nFile-backed pages:                           2302782.\nAnonymous pages:                              192377.\nPages stored in compressor:                   279817.\nPages occupied by compressor:                 133119.\nDecompressions:                             71434741.\nCompressions:                               85873184.\nPageins:                                   103144349.\nPageouts:                                      88797.\nSwapins:                                      390737.\nSwapouts:                                     709154.\nPages tagged:                                 125498.\nPages tagged resident:                         93137.\nPages tagged compressed:                       32361.\nPages tag-storage:                             98304.\nPages tag-storage holding tags:                 7143.\nPages tag-storage free:                         2728.\nPages tag-storage non-tag pageable:            88372.\nPages tag-storage non-tag wired:                   8.\nBytes of compressed tags:                    5155904.\nTagged compressions:                         2372267.\nTagged decompressions:                       2199924.",
+    "swap": {
+      "total": 2147483648,
+      "used": 886308864,
+      "free": 1261174784,
+      "percent": 41.3,
+      "sin": 1689917014016,
+      "sout": 1454850048
+    },
+    "available_bytes": 39498186752
+  },
+  "checks": [
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-down",
+        "2",
+        "1",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 306855936,
+        "minimum_available_bytes": 38702170112,
+        "peak_swap_bytes": 886308864,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 1390579712,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-down-2-independent.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-down",
+        "2",
+        "1",
+        "shared"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 319045632,
+        "minimum_available_bytes": 38702170112,
+        "peak_swap_bytes": 886308864,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 217088,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-down-2-shared.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-down",
+        "3",
+        "1",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 313540608,
+        "minimum_available_bytes": 39041515520,
+        "peak_swap_bytes": 886308864,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 491520,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-down-3-independent.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-down",
+        "3",
+        "1",
+        "shared"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 318095360,
+        "minimum_available_bytes": 39027703808,
+        "peak_swap_bytes": 886308864,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 180224,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-down-3-shared.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-up",
+        "2",
+        "1",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 320454656,
+        "minimum_available_bytes": 39040876544,
+        "peak_swap_bytes": 886308864,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 1163264,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-up-2-independent.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-up",
+        "2",
+        "1",
+        "shared"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 320667648,
+        "minimum_available_bytes": 39040122880,
+        "peak_swap_bytes": 886308864,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 65536,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-up-2-shared.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-up",
+        "3",
+        "1",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 317947904,
+        "minimum_available_bytes": 39039909888,
+        "peak_swap_bytes": 886308864,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 360448,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-up-3-independent.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-up",
+        "3",
+        "1",
+        "shared"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 318193664,
+        "minimum_available_bytes": 39049379840,
+        "peak_swap_bytes": 886308864,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 180224,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-up-3-shared.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "head",
+        "2",
+        "1",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 649396224,
+        "minimum_available_bytes": 38695550976,
+        "peak_swap_bytes": 886308864,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 9736192,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-head-2-independent.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "head",
+        "3",
+        "1",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 649265152,
+        "minimum_available_bytes": 38725468160,
+        "peak_swap_bytes": 886308864,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 757760,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-head-3-independent.log"
+    }
+  ],
+  "passes": [],
+  "models_loaded": false,
+  "no_inference_gain_claim": true,
+  "unchanged_engines": [
+    "baseline",
+    "q2-masked",
+    "draft-vocab",
+    "mtp-shared",
+    "mtp-mma",
+    "m5-lab",
+    "m5-trace"
+  ],
+  "summary": [],
+  "postflight": {
+    "memory": {
+      "total": 51539607552,
+      "available": 39458357248,
+      "percent": 23.4,
+      "used": 8915664896,
+      "free": 2744811520,
+      "active": 5562810368,
+      "inactive": 36609114112,
+      "wired": 3352854528
+    },
+    "swap": {
+      "total": 2147483648,
+      "used": 886308864,
+      "free": 1261174784,
+      "percent": 41.3,
+      "sin": 1691334574080,
+      "sout": 1454850048
+    },
+    "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 88%",
+    "largest_process_groups": [
+      {
+        "name": "java",
+        "rss_bytes": 594542592
+      },
+      {
+        "name": "T3 Code (Alpha) Helper (Renderer)",
+        "rss_bytes": 544358400
+      },
+      {
+        "name": "T3 Code (Alpha)",
+        "rss_bytes": 399704064
+      },
+      {
+        "name": "codex",
+        "rss_bytes": 374095872
+      },
+      {
+        "name": "2.1.292",
+        "rss_bytes": 313442304
+      },
+      {
+        "name": "mdworker_shared",
+        "rss_bytes": 95715328
+      },
+      {
+        "name": "corespotlightd",
+        "rss_bytes": 95289344
+      },
+      {
+        "name": "T3 Code (Alpha) Helper",
+        "rss_bytes": 73547776
+      },
+      {
+        "name": "Finder",
+        "rss_bytes": 39469056
+      },
+      {
+        "name": "WeatherMenu",
+        "rss_bytes": 39010304
+      },
+      {
+        "name": "SkyComputerUseClient",
+        "rss_bytes": 37928960
+      },
+      {
+        "name": "codex-code-mode-host",
+        "rss_bytes": 35586048
+      }
+    ],
+    "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth."
+  }
+}

@@ -1,0 +1,5322 @@
+{
+  "schema": 1,
+  "kind": "m5-isolated-operation-latency",
+  "status": "passed",
+  "build": {
+    "schema": 1,
+    "engine": {
+      "engine": "m5-lab",
+      "directory": "vendor/llama-m5-lab",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+      "patch": {
+        "schema": 1,
+        "id": "m5-lab",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-lab",
+        "patch": "patches/mtp-m5-lab.patch",
+        "patch_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+        "source_diff_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-shared-mma.patch",
+            "sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3"
+          },
+          {
+            "patch": "patches/m5-lab-controls.patch",
+            "sha256": "a10ca5f9b146b082036eed369cef288baaa3182457c3d6dffe9008690b460b1a"
+          }
+        ],
+        "scope": "Existing shared-helper/MMA code plus disabled-by-default row/tiling controls and optional command-buffer GPU timestamps. No shader, weight, expert scheduler or GPU memory limit change."
+      },
+      "artifacts": {
+        "llama-server": "57918d880004f93eeb94d2fe0618ac098ef1e141693459c67ebb3603acea7e77",
+        "libggml-base.0.26.0.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+        "libggml-base.0.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+        "libggml-base.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+        "libggml-blas.0.26.0.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+        "libggml-blas.0.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+        "libggml-blas.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+        "libggml-cpu.0.26.0.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+        "libggml-cpu.0.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+        "libggml-cpu.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+        "libggml-metal.0.26.0.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+        "libggml-metal.0.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+        "libggml-metal.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+        "libggml.0.26.0.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+        "libggml.0.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+        "libggml.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+        "libllama-common.0.6.0.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+        "libllama-common.0.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+        "libllama-common.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+        "libllama-server-impl.dylib": "cba05a99af451b10d428eca49c11e58465ff5771bcee5a3a868bf35091f0b6c4",
+        "libllama.0.6.0.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+        "libllama.0.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+        "libllama.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+        "libmtmd.0.6.0.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb",
+        "libmtmd.0.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb",
+        "libmtmd.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb"
+      },
+      "build_receipt": {
+        "engine": "m5-lab",
+        "directory": "vendor/llama-m5-lab",
+        "revision": "d81235049384534c167caea52b85a694f6103d14",
+        "source_diff_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+        "patch": {
+          "schema": 1,
+          "id": "m5-lab",
+          "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+          "directory": "vendor/llama-m5-lab",
+          "patch": "patches/mtp-m5-lab.patch",
+          "patch_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+          "source_diff_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+          "modified_files": [
+            "ggml/src/ggml-metal/ggml-metal-common.cpp",
+            "ggml/src/ggml-metal/ggml-metal-common.h",
+            "ggml/src/ggml-metal/ggml-metal-context.m",
+            "ggml/src/ggml-metal/ggml-metal-device.cpp",
+            "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+            "src/llama-context.cpp",
+            "src/llama-cparams.h",
+            "src/models/qwen4exp.cpp",
+            "tests/test-backend-ops.cpp"
+          ],
+          "features": [
+            "mtp-shared",
+            "m5-tuning",
+            "m5-profile"
+          ],
+          "components": [
+            {
+              "patch": "patches/mtp-shared-mma.patch",
+              "sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3"
+            },
+            {
+              "patch": "patches/m5-lab-controls.patch",
+              "sha256": "a10ca5f9b146b082036eed369cef288baaa3182457c3d6dffe9008690b460b1a"
+            }
+          ],
+          "scope": "Existing shared-helper/MMA code plus disabled-by-default row/tiling controls and optional command-buffer GPU timestamps. No shader, weight, expert scheduler or GPU memory limit change."
+        },
+        "artifacts": {
+          "llama-server": "57918d880004f93eeb94d2fe0618ac098ef1e141693459c67ebb3603acea7e77",
+          "libggml-base.0.26.0.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+          "libggml-base.0.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+          "libggml-base.dylib": "60bb4a6b1155dd491919b4ffbc07056d1b18c6cdd8434d8390997c98e10c140a",
+          "libggml-blas.0.26.0.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+          "libggml-blas.0.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+          "libggml-blas.dylib": "aba4ca4fa0f78cbeb15333cc75eb7d33d28ce68c2b2db95f48efa9c1c1d943e1",
+          "libggml-cpu.0.26.0.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+          "libggml-cpu.0.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+          "libggml-cpu.dylib": "a5ece1718f0f3153e7469b238ae6cf19a9873fcd6cd03824b37e918fd8b0897d",
+          "libggml-metal.0.26.0.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+          "libggml-metal.0.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+          "libggml-metal.dylib": "c662c20596409b1136e6008678360160eea821c29b38f4345c8e61ecff085f5f",
+          "libggml.0.26.0.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+          "libggml.0.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+          "libggml.dylib": "c6ad6ae28627b99040ca2fffbf17b278a00e0d8b49aa11f23bbae31f0f7068dd",
+          "libllama-common.0.6.0.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+          "libllama-common.0.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+          "libllama-common.dylib": "651d5aab680e4a3708701cc969eef5f0d695b801e2a4e94bad3bcc8cc9fc21ee",
+          "libllama-server-impl.dylib": "cba05a99af451b10d428eca49c11e58465ff5771bcee5a3a868bf35091f0b6c4",
+          "libllama.0.6.0.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+          "libllama.0.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+          "libllama.dylib": "bd381a8d451b909db70de0c39311b0e6cdccdc216f6c18edd85f2b1e343fbb08",
+          "libmtmd.0.6.0.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb",
+          "libmtmd.0.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb",
+          "libmtmd.dylib": "a26cae48e3a68a0baa93f59c5ae465e6a49e740ed65005e5cd93e924233913eb"
+        },
+        "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+        "build_settings": {
+          "CMAKE_BUILD_TYPE": "Release",
+          "GGML_BLAS": "ON",
+          "GGML_CPU": "ON",
+          "GGML_METAL": "ON",
+          "GGML_METAL_EMBED_LIBRARY": "ON",
+          "GGML_NATIVE": "ON",
+          "LLAMA_BUILD_TESTS": "ON",
+          "LLAMA_BUILD_TOOLS": "ON"
+        },
+        "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+      }
+    },
+    "source_sha256": "1aa421998c3a5a075617e9e1adcbc60a8ad94fb678d8c87ab60d49e8be9c1a41",
+    "native_tester_sha256": "817d066b55e9bde54595f8f6c263e70ebf887831a1283a8ee56c146f404241b0",
+    "common_archive_sha256": "a0a0ec277cfbbc338963f28993536b20c4fb77db4a99716806e0f13671cc5ae7",
+    "binary_sha256": "834800e571636d25108702ef2f96ec79c6724bdd3dc8db61c04f1ee9dc20141d",
+    "command": [
+      "/usr/bin/c++",
+      "-O3",
+      "-DNDEBUG",
+      "-std=gnu++17",
+      "-arch",
+      "arm64",
+      "-DGGML_BACKEND_SHARED",
+      "-DGGML_SHARED",
+      "-DGGML_USE_BLAS",
+      "-DGGML_USE_CPU",
+      "-DGGML_USE_METAL",
+      "-DLLAMA_SHARED",
+      "-DLLAMA_SUBPROCESS",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/ggml/include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/common",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/vendor",
+      "-DM5_NATIVE_TEST_SOURCE=\"/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/tests/test-backend-ops.cpp\"",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/native/m5_operation_probe.cpp",
+      "-o",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+      "-Wl,-rpath,/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin/libllama-common.0.6.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin/libllama.0.6.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin/libggml.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin/libggml-cpu.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin/libggml-blas.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin/libggml-metal.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/bin/libggml-base.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-lab/build/common/libllama-common-base.a"
+    ],
+    "scope": "New diagnostic executable links the existing pinned libraries. No engine, shader or model changes."
+  },
+  "rows": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "samples": 40,
+  "passes_per_family": 3,
+  "preflight": {
+    "memory": {
+      "total": 51539607552,
+      "available": 38232801280,
+      "percent": 25.8,
+      "used": 10536468480,
+      "free": 6866796544,
+      "active": 6995607552,
+      "inactive": 30980227072,
+      "wired": 3540860928
+    },
+    "swap": {
+      "total": 2147483648,
+      "used": 823066624,
+      "free": 1324417024,
+      "percent": 38.3,
+      "sin": 1643176951808,
+      "sout": 1445281792
+    },
+    "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 89%",
+    "largest_process_groups": [
+      {
+        "name": "mediaanalysisd",
+        "rss_bytes": 1084260352
+      },
+      {
+        "name": "codex",
+        "rss_bytes": 737771520
+      },
+      {
+        "name": "T3 Code (Alpha) Helper (Renderer)",
+        "rss_bytes": 579993600
+      },
+      {
+        "name": "2.1.292",
+        "rss_bytes": 487047168
+      },
+      {
+        "name": "T3 Code (Alpha)",
+        "rss_bytes": 465731584
+      },
+      {
+        "name": "node",
+        "rss_bytes": 259751936
+      },
+      {
+        "name": "node_repl",
+        "rss_bytes": 211025920
+      },
+      {
+        "name": "SkyComputerUseClient",
+        "rss_bytes": 185221120
+      },
+      {
+        "name": "Proton Pass Helper (Renderer)",
+        "rss_bytes": 167313408
+      },
+      {
+        "name": "corespotlightd",
+        "rss_bytes": 137035776
+      },
+      {
+        "name": "spotlightknowledged.updater",
+        "rss_bytes": 115392512
+      },
+      {
+        "name": "T3 Code (Alpha) Helper",
+        "rss_bytes": 102137856
+      }
+    ],
+    "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth."
+  },
+  "host": {
+    "os": "macOS-27.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "chip": "Apple M5 Pro",
+    "ram_bytes": 51539607552,
+    "cpu_count": 18,
+    "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=36831331)\t80%; AC attached; not charging present: true",
+    "power_settings": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n womp                 0\n displaysleep         10\n networkoversleep     0\n sleep                1\n lessbright           0\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                0\n tcpkeepalive         1\n disksleep            10",
+    "thermal_status": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+    "gpu_wired_limit": "iogpu.wired_limit_mb: 0",
+    "vm_stat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                   418915.\nPages active:                                 427104.\nPages inactive:                              1890934.\nPages speculative:                             23561.\nPages throttled:                                   0.\nPages wired down:                             216128.\nPages purgeable:                               18780.\n\"Translation faults\":                     1630542407.\nPages copy-on-write:                        55117372.\nPages zero filled:                         841958273.\nPages reactivated:                         105965771.\nPages purged:                               17658183.\nFile-backed pages:                           2016752.\nAnonymous pages:                              324847.\nPages stored in compressor:                   227379.\nPages occupied by compressor:                 108581.\nDecompressions:                             70184059.\nCompressions:                               84372784.\nPageins:                                   100291613.\nPageouts:                                      88213.\nSwapins:                                      390471.\nSwapouts:                                     705294.\nPages tagged:                                 138224.\nPages tagged resident:                        113700.\nPages tagged compressed:                       24524.\nPages tag-storage:                             98304.\nPages tag-storage holding tags:                 7896.\nPages tag-storage free:                         1222.\nPages tag-storage non-tag pageable:            88953.\nPages tag-storage non-tag wired:                   8.\nBytes of compressed tags:                    3612544.\nTagged compressions:                         2321575.\nTagged decompressions:                       2158082.",
+    "swap": {
+      "total": 2147483648,
+      "used": 823066624,
+      "free": 1324417024,
+      "percent": 38.3,
+      "sin": 1643177787392,
+      "sout": 1445281792
+    },
+    "available_bytes": 38232211456
+  },
+  "checks": [
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-down",
+        "1",
+        "1",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 333594624,
+        "minimum_available_bytes": 36398284800,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 16527360,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-down-1-independent.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-down",
+        "4",
+        "1",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 316768256,
+        "minimum_available_bytes": 37785010176,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 98304,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-down-4-independent.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-down",
+        "4",
+        "1",
+        "shared"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 316801024,
+        "minimum_available_bytes": 37732384768,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 16384,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-down-4-shared.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-down",
+        "5",
+        "1",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 319488000,
+        "minimum_available_bytes": 37748293632,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 0,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-down-5-independent.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-down",
+        "5",
+        "1",
+        "shared"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 318947328,
+        "minimum_available_bytes": 37728157696,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 0,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-down-5-shared.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-up",
+        "1",
+        "1",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 315801600,
+        "minimum_available_bytes": 37739986944,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 4096,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-up-1-independent.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-up",
+        "4",
+        "1",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 318423040,
+        "minimum_available_bytes": 37764694016,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 16384,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-up-4-independent.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-up",
+        "4",
+        "1",
+        "shared"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 315719680,
+        "minimum_available_bytes": 37709987840,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 0,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-up-4-shared.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-up",
+        "5",
+        "1",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 317341696,
+        "minimum_available_bytes": 37734694912,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 0,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-up-5-independent.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "expert-up",
+        "5",
+        "1",
+        "shared"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 318783488,
+        "minimum_available_bytes": 37704810496,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 0,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-expert-up-5-shared.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "head",
+        "1",
+        "1",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 648151040,
+        "minimum_available_bytes": 33938685952,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 867311616,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-head-1-independent.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "head",
+        "4",
+        "1",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 652607488,
+        "minimum_available_bytes": 36597956608,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 593920,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-head-4-independent.log"
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "test",
+        "head",
+        "5",
+        "1",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": false,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 653443072,
+        "minimum_available_bytes": 35051470848,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 95571968,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "check-head-5-independent.log"
+    }
+  ],
+  "passes": [
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "perf",
+        "expert-down",
+        "1,2,3,4,5",
+        "40",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": true,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1",
+          "GGML_M5_LAB_PROFILE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 16714760192,
+        "minimum_available_bytes": 22410543104,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 339968,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "perf-1-expert-down.log",
+      "diagnostics": {
+        "summary": [
+          {
+            "family": "expert-down",
+            "rows": 1,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.0384585,
+            "gpu_mean_ms": 0.042421875,
+            "gpu_p10_ms": 0.038,
+            "gpu_p90_ms": 0.05425,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 1,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.1561875,
+            "gpu_mean_ms": 0.15657705,
+            "gpu_p10_ms": 0.155292,
+            "gpu_p90_ms": 0.158083,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 2,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.0665,
+            "gpu_mean_ms": 0.0683063,
+            "gpu_p10_ms": 0.066125,
+            "gpu_p90_ms": 0.066792,
+            "unique_experts_mean": 19.85
+          },
+          {
+            "family": "expert-down",
+            "rows": 2,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.0635,
+            "gpu_mean_ms": 0.0634625,
+            "gpu_p10_ms": 0.063042,
+            "gpu_p90_ms": 0.06375,
+            "unique_experts_mean": 19.85
+          },
+          {
+            "family": "expert-down",
+            "rows": 2,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.065042,
+            "gpu_mean_ms": 0.066588575,
+            "gpu_p10_ms": 0.064667,
+            "gpu_p90_ms": 0.065458,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 2,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.0624375,
+            "gpu_mean_ms": 0.06246985,
+            "gpu_p10_ms": 0.062208,
+            "gpu_p90_ms": 0.062708,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 3,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.0945,
+            "gpu_mean_ms": 0.09449475,
+            "gpu_p10_ms": 0.094042,
+            "gpu_p90_ms": 0.094833,
+            "unique_experts_mean": 29.55
+          },
+          {
+            "family": "expert-down",
+            "rows": 3,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.091333,
+            "gpu_mean_ms": 0.091606275,
+            "gpu_p10_ms": 0.091,
+            "gpu_p90_ms": 0.092917,
+            "unique_experts_mean": 29.55
+          },
+          {
+            "family": "expert-down",
+            "rows": 3,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.092375,
+            "gpu_mean_ms": 0.0939062,
+            "gpu_p10_ms": 0.092333,
+            "gpu_p90_ms": 0.092625,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 3,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.09,
+            "gpu_mean_ms": 0.090019775,
+            "gpu_p10_ms": 0.089667,
+            "gpu_p90_ms": 0.090375,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 4,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.12275,
+            "gpu_mean_ms": 0.12735,
+            "gpu_p10_ms": 0.12225,
+            "gpu_p90_ms": 0.12325,
+            "unique_experts_mean": 38.95
+          },
+          {
+            "family": "expert-down",
+            "rows": 4,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.1199165,
+            "gpu_mean_ms": 0.120251025,
+            "gpu_p10_ms": 0.119167,
+            "gpu_p90_ms": 0.1215,
+            "unique_experts_mean": 38.95
+          },
+          {
+            "family": "expert-down",
+            "rows": 4,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.120146,
+            "gpu_mean_ms": 0.12017915,
+            "gpu_p10_ms": 0.119875,
+            "gpu_p90_ms": 0.120333,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 4,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.117646,
+            "gpu_mean_ms": 0.117672925,
+            "gpu_p10_ms": 0.117417,
+            "gpu_p90_ms": 0.117958,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 5,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.150875,
+            "gpu_mean_ms": 0.1557104,
+            "gpu_p10_ms": 0.150458,
+            "gpu_p90_ms": 0.151333,
+            "unique_experts_mean": 48.125
+          },
+          {
+            "family": "expert-down",
+            "rows": 5,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.1492915,
+            "gpu_mean_ms": 0.148705175,
+            "gpu_p10_ms": 0.146792,
+            "gpu_p90_ms": 0.149958,
+            "unique_experts_mean": 48.125
+          },
+          {
+            "family": "expert-down",
+            "rows": 5,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.147375,
+            "gpu_mean_ms": 0.150072925,
+            "gpu_p10_ms": 0.147167,
+            "gpu_p90_ms": 0.147625,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 5,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.145375,
+            "gpu_mean_ms": 0.145453125,
+            "gpu_p10_ms": 0.14525,
+            "gpu_p90_ms": 0.145667,
+            "unique_experts_mean": 10
+          }
+        ],
+        "graphs": 1161,
+        "weight_bytes": 235929600,
+        "shapes": [
+          {
+            "dst": [
+              2560,
+              10,
+              1,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 1,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              1,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              2,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 2,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              2,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              2,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 2,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              2,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              3,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 3,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              3,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              3,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 3,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              3,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              4,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 4,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              4,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              4,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 4,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              4,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              5,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 5,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              5,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              5,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 5,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              5,
+              1
+            ],
+            "type": "q2_0"
+          }
+        ],
+        "pipeline_compilations": [
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "kernel_mul_mv_id_q2_0_f32",
+            "name": "kernel_mul_mv_id_q2_0_f32_nsg=2_split=0"
+          },
+          {
+            "base": "kernel_unary_f32_f32_4",
+            "name": "kernel_unary_f32_f32_4_op=13_cnt=0"
+          }
+        ],
+        "note": "One matrix operation per timed command buffer. Isolated elapsed GPU latency, not active utilization or model TPS. Cache pressure is an explicit 128 MiB SQR input, not a guaranteed cold cache. Routing is synthetic, not measured model routing."
+      }
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "perf",
+        "expert-up",
+        "1,2,3,4,5",
+        "40",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": true,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1",
+          "GGML_M5_LAB_PROFILE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 17505222656,
+        "minimum_available_bytes": 22410543104,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 212992,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "perf-1-expert-up.log",
+      "diagnostics": {
+        "summary": [
+          {
+            "family": "expert-up",
+            "rows": 1,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.03025,
+            "gpu_mean_ms": 0.036780175,
+            "gpu_p10_ms": 0.029625,
+            "gpu_p90_ms": 0.031375,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 1,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.10268749999999999,
+            "gpu_mean_ms": 0.10386042499999999,
+            "gpu_p10_ms": 0.102,
+            "gpu_p90_ms": 0.105333,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 2,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.049375,
+            "gpu_mean_ms": 0.049970775,
+            "gpu_p10_ms": 0.0485,
+            "gpu_p90_ms": 0.050417,
+            "unique_experts_mean": 19.85
+          },
+          {
+            "family": "expert-up",
+            "rows": 2,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.042104,
+            "gpu_mean_ms": 0.041898975000000005,
+            "gpu_p10_ms": 0.0405,
+            "gpu_p90_ms": 0.042833,
+            "unique_experts_mean": 19.85
+          },
+          {
+            "family": "expert-up",
+            "rows": 2,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.04225,
+            "gpu_mean_ms": 0.04226875,
+            "gpu_p10_ms": 0.041875,
+            "gpu_p90_ms": 0.042625,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 2,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.039,
+            "gpu_mean_ms": 0.039014599999999997,
+            "gpu_p10_ms": 0.03875,
+            "gpu_p90_ms": 0.03925,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 3,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.067917,
+            "gpu_mean_ms": 0.068007275,
+            "gpu_p10_ms": 0.066417,
+            "gpu_p90_ms": 0.069542,
+            "unique_experts_mean": 29.55
+          },
+          {
+            "family": "expert-up",
+            "rows": 3,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.059479,
+            "gpu_mean_ms": 0.059256249999999996,
+            "gpu_p10_ms": 0.057125,
+            "gpu_p90_ms": 0.060625,
+            "unique_experts_mean": 29.55
+          },
+          {
+            "family": "expert-up",
+            "rows": 3,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.058021,
+            "gpu_mean_ms": 0.058056250000000004,
+            "gpu_p10_ms": 0.05775,
+            "gpu_p90_ms": 0.058333,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 3,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.055125,
+            "gpu_mean_ms": 0.05511355,
+            "gpu_p10_ms": 0.05475,
+            "gpu_p90_ms": 0.055458,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 4,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.08672949999999999,
+            "gpu_mean_ms": 0.0868687,
+            "gpu_p10_ms": 0.08425,
+            "gpu_p90_ms": 0.08925,
+            "unique_experts_mean": 38.95
+          },
+          {
+            "family": "expert-up",
+            "rows": 4,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.0765625,
+            "gpu_mean_ms": 0.076662525,
+            "gpu_p10_ms": 0.075167,
+            "gpu_p90_ms": 0.0785,
+            "unique_experts_mean": 38.95
+          },
+          {
+            "family": "expert-up",
+            "rows": 4,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.0732085,
+            "gpu_mean_ms": 0.0775834,
+            "gpu_p10_ms": 0.07275,
+            "gpu_p90_ms": 0.073583,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 4,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.071021,
+            "gpu_mean_ms": 0.070981175,
+            "gpu_p10_ms": 0.070458,
+            "gpu_p90_ms": 0.071375,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 5,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.1055625,
+            "gpu_mean_ms": 0.10857499999999999,
+            "gpu_p10_ms": 0.102708,
+            "gpu_p90_ms": 0.107625,
+            "unique_experts_mean": 48.125
+          },
+          {
+            "family": "expert-up",
+            "rows": 5,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.0935835,
+            "gpu_mean_ms": 0.09328335,
+            "gpu_p10_ms": 0.090625,
+            "gpu_p90_ms": 0.095,
+            "unique_experts_mean": 48.125
+          },
+          {
+            "family": "expert-up",
+            "rows": 5,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.089,
+            "gpu_mean_ms": 0.08901555,
+            "gpu_p10_ms": 0.088708,
+            "gpu_p90_ms": 0.08925,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 5,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.08677099999999999,
+            "gpu_mean_ms": 0.086862475,
+            "gpu_p10_ms": 0.0865,
+            "gpu_p90_ms": 0.08725,
+            "unique_experts_mean": 10
+          }
+        ],
+        "graphs": 1161,
+        "weight_bytes": 235929600,
+        "shapes": [
+          {
+            "dst": [
+              640,
+              10,
+              1,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 1,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              1,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              2,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 2,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              2,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              2,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 2,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              2,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              3,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 3,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              3,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              3,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 3,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              3,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              4,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 4,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              4,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              4,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 4,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              4,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              5,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 5,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              5,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              5,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 5,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              5,
+              1
+            ],
+            "type": "q2_0"
+          }
+        ],
+        "pipeline_compilations": [
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "kernel_mul_mv_id_q2_0_f32",
+            "name": "kernel_mul_mv_id_q2_0_f32_nsg=2_split=0"
+          },
+          {
+            "base": "kernel_unary_f32_f32_4",
+            "name": "kernel_unary_f32_f32_4_op=13_cnt=0"
+          }
+        ],
+        "note": "One matrix operation per timed command buffer. Isolated elapsed GPU latency, not active utilization or model TPS. Cache pressure is an explicit 128 MiB SQR input, not a guaranteed cold cache. Routing is synthetic, not measured model routing."
+      }
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "perf",
+        "head",
+        "1,2,3,4,5",
+        "40",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": true,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1",
+          "GGML_M5_LAB_PROFILE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 17650810880,
+        "minimum_available_bytes": 31951126528,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 3317760,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "perf-1-head.log",
+      "diagnostics": {
+        "summary": [
+          {
+            "family": "head",
+            "rows": 1,
+            "routing": "none",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 1.5469374999999999,
+            "gpu_mean_ms": 1.592744825,
+            "gpu_p10_ms": 1.521167,
+            "gpu_p90_ms": 1.737375,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 1,
+            "routing": "none",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 1.5082710000000001,
+            "gpu_mean_ms": 1.514700025,
+            "gpu_p10_ms": 1.497958,
+            "gpu_p90_ms": 1.519375,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 2,
+            "routing": "none",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 2.1746045,
+            "gpu_mean_ms": 2.2397896250000002,
+            "gpu_p10_ms": 2.146625,
+            "gpu_p90_ms": 2.349875,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 2,
+            "routing": "none",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 2.140646,
+            "gpu_mean_ms": 2.188773975,
+            "gpu_p10_ms": 2.134875,
+            "gpu_p90_ms": 2.32875,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 3,
+            "routing": "none",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 2.161875,
+            "gpu_mean_ms": 2.24339895,
+            "gpu_p10_ms": 2.144875,
+            "gpu_p90_ms": 2.362625,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 3,
+            "routing": "none",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 2.2780625,
+            "gpu_mean_ms": 2.26211355,
+            "gpu_p10_ms": 2.143583,
+            "gpu_p90_ms": 2.362875,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 4,
+            "routing": "none",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 2.155792,
+            "gpu_mean_ms": 2.2104781,
+            "gpu_p10_ms": 2.1485,
+            "gpu_p90_ms": 2.336458,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 4,
+            "routing": "none",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 2.151979,
+            "gpu_mean_ms": 2.205381275,
+            "gpu_p10_ms": 2.142917,
+            "gpu_p90_ms": 2.332125,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 5,
+            "routing": "none",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 2.1674165,
+            "gpu_mean_ms": 2.217433375,
+            "gpu_p10_ms": 2.158167,
+            "gpu_p90_ms": 2.344625,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 5,
+            "routing": "none",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 2.1631665,
+            "gpu_mean_ms": 2.2361292,
+            "gpu_p10_ms": 2.153417,
+            "gpu_p90_ms": 2.3465,
+            "unique_experts_mean": 0
+          }
+        ],
+        "graphs": 645,
+        "weight_bytes": 437043200,
+        "shapes": [
+          {
+            "dst": [
+              248320,
+              1,
+              1,
+              1
+            ],
+            "family": "head",
+            "routing": "none",
+            "rows": 1,
+            "src0": [
+              2560,
+              248320,
+              1,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              1,
+              1
+            ],
+            "type": "q5_K"
+          },
+          {
+            "dst": [
+              248320,
+              2,
+              1,
+              1
+            ],
+            "family": "head",
+            "routing": "none",
+            "rows": 2,
+            "src0": [
+              2560,
+              248320,
+              1,
+              1
+            ],
+            "src1": [
+              2560,
+              2,
+              1,
+              1
+            ],
+            "type": "q5_K"
+          },
+          {
+            "dst": [
+              248320,
+              3,
+              1,
+              1
+            ],
+            "family": "head",
+            "routing": "none",
+            "rows": 3,
+            "src0": [
+              2560,
+              248320,
+              1,
+              1
+            ],
+            "src1": [
+              2560,
+              3,
+              1,
+              1
+            ],
+            "type": "q5_K"
+          },
+          {
+            "dst": [
+              248320,
+              4,
+              1,
+              1
+            ],
+            "family": "head",
+            "routing": "none",
+            "rows": 4,
+            "src0": [
+              2560,
+              248320,
+              1,
+              1
+            ],
+            "src1": [
+              2560,
+              4,
+              1,
+              1
+            ],
+            "type": "q5_K"
+          },
+          {
+            "dst": [
+              248320,
+              5,
+              1,
+              1
+            ],
+            "family": "head",
+            "routing": "none",
+            "rows": 5,
+            "src0": [
+              2560,
+              248320,
+              1,
+              1
+            ],
+            "src1": [
+              2560,
+              5,
+              1,
+              1
+            ],
+            "type": "q5_K"
+          }
+        ],
+        "pipeline_compilations": [
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "kernel_mul_mv_q5_K_f32",
+            "name": "kernel_mul_mv_q5_K_f32_nsg=2_ne12=1_r2=1_r3=1_split=0"
+          },
+          {
+            "base": "kernel_unary_f32_f32_4",
+            "name": "kernel_unary_f32_f32_4_op=13_cnt=0"
+          },
+          {
+            "base": "kernel_mul_mv_mma_q5_K_f32_nt4_rt1",
+            "name": "kernel_mul_mv_mma_q5_K_f32_nt4_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=2560_add=0"
+          }
+        ],
+        "note": "One matrix operation per timed command buffer. Isolated elapsed GPU latency, not active utilization or model TPS. Cache pressure is an explicit 128 MiB SQR input, not a guaranteed cold cache. Routing is synthetic, not measured model routing."
+      }
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "perf",
+        "head",
+        "5,4,3,2,1",
+        "40",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": true,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1",
+          "GGML_M5_LAB_PROFILE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 15731310592,
+        "minimum_available_bytes": 21711208448,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 93708288,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "perf-2-head.log",
+      "diagnostics": {
+        "summary": [
+          {
+            "family": "head",
+            "rows": 1,
+            "routing": "none",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 1.533229,
+            "gpu_mean_ms": 1.57182395,
+            "gpu_p10_ms": 1.520875,
+            "gpu_p90_ms": 1.728917,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 1,
+            "routing": "none",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 1.5196455,
+            "gpu_mean_ms": 1.56405,
+            "gpu_p10_ms": 1.50575,
+            "gpu_p90_ms": 1.715208,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 2,
+            "routing": "none",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 2.1502915,
+            "gpu_mean_ms": 2.20897085,
+            "gpu_p10_ms": 2.142833,
+            "gpu_p90_ms": 2.335542,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 2,
+            "routing": "none",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 2.146229,
+            "gpu_mean_ms": 2.199325,
+            "gpu_p10_ms": 2.1375,
+            "gpu_p90_ms": 2.329042,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 3,
+            "routing": "none",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 2.153521,
+            "gpu_mean_ms": 2.20655735,
+            "gpu_p10_ms": 2.145875,
+            "gpu_p90_ms": 2.338292,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 3,
+            "routing": "none",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 2.1486665,
+            "gpu_mean_ms": 2.19829895,
+            "gpu_p10_ms": 2.140917,
+            "gpu_p90_ms": 2.338667,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 4,
+            "routing": "none",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 2.1544165,
+            "gpu_mean_ms": 2.160346825,
+            "gpu_p10_ms": 2.147833,
+            "gpu_p90_ms": 2.163042,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 4,
+            "routing": "none",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 2.1420000000000003,
+            "gpu_mean_ms": 2.142768725,
+            "gpu_p10_ms": 2.136625,
+            "gpu_p90_ms": 2.149458,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 5,
+            "routing": "none",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 2.1500209999999997,
+            "gpu_mean_ms": 2.150861525,
+            "gpu_p10_ms": 2.146083,
+            "gpu_p90_ms": 2.155625,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 5,
+            "routing": "none",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 2.1469585,
+            "gpu_mean_ms": 2.14693755,
+            "gpu_p10_ms": 2.14075,
+            "gpu_p90_ms": 2.150167,
+            "unique_experts_mean": 0
+          }
+        ],
+        "graphs": 645,
+        "weight_bytes": 437043200,
+        "shapes": [
+          {
+            "dst": [
+              248320,
+              5,
+              1,
+              1
+            ],
+            "family": "head",
+            "routing": "none",
+            "rows": 5,
+            "src0": [
+              2560,
+              248320,
+              1,
+              1
+            ],
+            "src1": [
+              2560,
+              5,
+              1,
+              1
+            ],
+            "type": "q5_K"
+          },
+          {
+            "dst": [
+              248320,
+              4,
+              1,
+              1
+            ],
+            "family": "head",
+            "routing": "none",
+            "rows": 4,
+            "src0": [
+              2560,
+              248320,
+              1,
+              1
+            ],
+            "src1": [
+              2560,
+              4,
+              1,
+              1
+            ],
+            "type": "q5_K"
+          },
+          {
+            "dst": [
+              248320,
+              3,
+              1,
+              1
+            ],
+            "family": "head",
+            "routing": "none",
+            "rows": 3,
+            "src0": [
+              2560,
+              248320,
+              1,
+              1
+            ],
+            "src1": [
+              2560,
+              3,
+              1,
+              1
+            ],
+            "type": "q5_K"
+          },
+          {
+            "dst": [
+              248320,
+              2,
+              1,
+              1
+            ],
+            "family": "head",
+            "routing": "none",
+            "rows": 2,
+            "src0": [
+              2560,
+              248320,
+              1,
+              1
+            ],
+            "src1": [
+              2560,
+              2,
+              1,
+              1
+            ],
+            "type": "q5_K"
+          },
+          {
+            "dst": [
+              248320,
+              1,
+              1,
+              1
+            ],
+            "family": "head",
+            "routing": "none",
+            "rows": 1,
+            "src0": [
+              2560,
+              248320,
+              1,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              1,
+              1
+            ],
+            "type": "q5_K"
+          }
+        ],
+        "pipeline_compilations": [
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "kernel_mul_mv_mma_q5_K_f32_nt4_rt1",
+            "name": "kernel_mul_mv_mma_q5_K_f32_nt4_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=2560_add=0"
+          },
+          {
+            "base": "kernel_unary_f32_f32_4",
+            "name": "kernel_unary_f32_f32_4_op=13_cnt=0"
+          },
+          {
+            "base": "kernel_mul_mv_q5_K_f32",
+            "name": "kernel_mul_mv_q5_K_f32_nsg=2_ne12=1_r2=1_r3=1_split=0"
+          }
+        ],
+        "note": "One matrix operation per timed command buffer. Isolated elapsed GPU latency, not active utilization or model TPS. Cache pressure is an explicit 128 MiB SQR input, not a guaranteed cold cache. Routing is synthetic, not measured model routing."
+      }
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "perf",
+        "expert-up",
+        "5,4,3,2,1",
+        "40",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": true,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1",
+          "GGML_M5_LAB_PROFILE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 17375805440,
+        "minimum_available_bytes": 31719276544,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 184320,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "perf-2-expert-up.log",
+      "diagnostics": {
+        "summary": [
+          {
+            "family": "expert-up",
+            "rows": 1,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.030729,
+            "gpu_mean_ms": 0.038507275,
+            "gpu_p10_ms": 0.03,
+            "gpu_p90_ms": 0.03175,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 1,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.025875,
+            "gpu_mean_ms": 0.02748335,
+            "gpu_p10_ms": 0.024958,
+            "gpu_p90_ms": 0.02725,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 2,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.0500835,
+            "gpu_mean_ms": 0.051643775,
+            "gpu_p10_ms": 0.049167,
+            "gpu_p90_ms": 0.051,
+            "unique_experts_mean": 19.85
+          },
+          {
+            "family": "expert-up",
+            "rows": 2,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.042896000000000004,
+            "gpu_mean_ms": 0.047319825,
+            "gpu_p10_ms": 0.04075,
+            "gpu_p90_ms": 0.044958,
+            "unique_experts_mean": 19.85
+          },
+          {
+            "family": "expert-up",
+            "rows": 2,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.0421875,
+            "gpu_mean_ms": 0.050136400000000005,
+            "gpu_p10_ms": 0.041625,
+            "gpu_p90_ms": 0.042917,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 2,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.039021,
+            "gpu_mean_ms": 0.039677025,
+            "gpu_p10_ms": 0.038667,
+            "gpu_p90_ms": 0.039375,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 3,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.0690415,
+            "gpu_mean_ms": 0.0688781,
+            "gpu_p10_ms": 0.06725,
+            "gpu_p90_ms": 0.07025,
+            "unique_experts_mean": 29.55
+          },
+          {
+            "family": "expert-up",
+            "rows": 3,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.0595835,
+            "gpu_mean_ms": 0.059511475,
+            "gpu_p10_ms": 0.057167,
+            "gpu_p90_ms": 0.061333,
+            "unique_experts_mean": 29.55
+          },
+          {
+            "family": "expert-up",
+            "rows": 3,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.0579375,
+            "gpu_mean_ms": 0.064066625,
+            "gpu_p10_ms": 0.057625,
+            "gpu_p90_ms": 0.058542,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 3,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.055125,
+            "gpu_mean_ms": 0.05509165,
+            "gpu_p10_ms": 0.054708,
+            "gpu_p90_ms": 0.055375,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 4,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.08797949999999999,
+            "gpu_mean_ms": 0.088078125,
+            "gpu_p10_ms": 0.085917,
+            "gpu_p90_ms": 0.09025,
+            "unique_experts_mean": 38.95
+          },
+          {
+            "family": "expert-up",
+            "rows": 4,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.077083,
+            "gpu_mean_ms": 0.077226075,
+            "gpu_p10_ms": 0.075375,
+            "gpu_p90_ms": 0.079208,
+            "unique_experts_mean": 38.95
+          },
+          {
+            "family": "expert-up",
+            "rows": 4,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.073375,
+            "gpu_mean_ms": 0.0734104,
+            "gpu_p10_ms": 0.073,
+            "gpu_p90_ms": 0.07375,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 4,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.07118749999999999,
+            "gpu_mean_ms": 0.07109684999999999,
+            "gpu_p10_ms": 0.070583,
+            "gpu_p90_ms": 0.071458,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 5,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.1063125,
+            "gpu_mean_ms": 0.106151075,
+            "gpu_p10_ms": 0.102875,
+            "gpu_p90_ms": 0.10875,
+            "unique_experts_mean": 48.125
+          },
+          {
+            "family": "expert-up",
+            "rows": 5,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.32035399999999997,
+            "gpu_mean_ms": 0.2663406,
+            "gpu_p10_ms": 0.09475,
+            "gpu_p90_ms": 0.429708,
+            "unique_experts_mean": 48.125
+          },
+          {
+            "family": "expert-up",
+            "rows": 5,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.08925,
+            "gpu_mean_ms": 0.089332275,
+            "gpu_p10_ms": 0.088917,
+            "gpu_p90_ms": 0.089708,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 5,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.086917,
+            "gpu_mean_ms": 0.08691354999999999,
+            "gpu_p10_ms": 0.086625,
+            "gpu_p90_ms": 0.08725,
+            "unique_experts_mean": 10
+          }
+        ],
+        "graphs": 1161,
+        "weight_bytes": 235929600,
+        "shapes": [
+          {
+            "dst": [
+              640,
+              10,
+              5,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 5,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              5,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              5,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 5,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              5,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              4,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 4,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              4,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              4,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 4,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              4,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              3,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 3,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              3,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              3,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 3,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              3,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              2,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 2,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              2,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              2,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 2,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              2,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              1,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 1,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              1,
+              1
+            ],
+            "type": "q2_0"
+          }
+        ],
+        "pipeline_compilations": [
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "kernel_mul_mv_id_q2_0_f32",
+            "name": "kernel_mul_mv_id_q2_0_f32_nsg=2_split=0"
+          },
+          {
+            "base": "kernel_unary_f32_f32_4",
+            "name": "kernel_unary_f32_f32_4_op=13_cnt=0"
+          }
+        ],
+        "note": "One matrix operation per timed command buffer. Isolated elapsed GPU latency, not active utilization or model TPS. Cache pressure is an explicit 128 MiB SQR input, not a guaranteed cold cache. Routing is synthetic, not measured model routing."
+      }
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "perf",
+        "expert-down",
+        "5,4,3,2,1",
+        "40",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": true,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1",
+          "GGML_M5_LAB_PROFILE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 17197285376,
+        "minimum_available_bytes": 31902679040,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 28672,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "perf-2-expert-down.log",
+      "diagnostics": {
+        "summary": [
+          {
+            "family": "expert-down",
+            "rows": 1,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.038271,
+            "gpu_mean_ms": 0.038248975,
+            "gpu_p10_ms": 0.037875,
+            "gpu_p90_ms": 0.038625,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 1,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.035417,
+            "gpu_mean_ms": 0.03548225,
+            "gpu_p10_ms": 0.034958,
+            "gpu_p90_ms": 0.035875,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 2,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.066458,
+            "gpu_mean_ms": 0.071072975,
+            "gpu_p10_ms": 0.066083,
+            "gpu_p90_ms": 0.067042,
+            "unique_experts_mean": 19.85
+          },
+          {
+            "family": "expert-down",
+            "rows": 2,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.063104,
+            "gpu_mean_ms": 0.0630948,
+            "gpu_p10_ms": 0.06275,
+            "gpu_p90_ms": 0.063375,
+            "unique_experts_mean": 19.85
+          },
+          {
+            "family": "expert-down",
+            "rows": 2,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.064917,
+            "gpu_mean_ms": 0.064966625,
+            "gpu_p10_ms": 0.064625,
+            "gpu_p90_ms": 0.065375,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 2,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.062542,
+            "gpu_mean_ms": 0.06257705,
+            "gpu_p10_ms": 0.062333,
+            "gpu_p90_ms": 0.062833,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 3,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.09425,
+            "gpu_mean_ms": 0.09423125,
+            "gpu_p10_ms": 0.093792,
+            "gpu_p90_ms": 0.094583,
+            "unique_experts_mean": 29.55
+          },
+          {
+            "family": "expert-down",
+            "rows": 3,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.091125,
+            "gpu_mean_ms": 0.091090625,
+            "gpu_p10_ms": 0.090667,
+            "gpu_p90_ms": 0.091458,
+            "unique_experts_mean": 29.55
+          },
+          {
+            "family": "expert-down",
+            "rows": 3,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.0925,
+            "gpu_mean_ms": 0.09250625,
+            "gpu_p10_ms": 0.09225,
+            "gpu_p90_ms": 0.092667,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 3,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.09025,
+            "gpu_mean_ms": 0.09024589999999999,
+            "gpu_p10_ms": 0.089958,
+            "gpu_p90_ms": 0.0905,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 4,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.122583,
+            "gpu_mean_ms": 0.130725025,
+            "gpu_p10_ms": 0.122125,
+            "gpu_p90_ms": 0.122917,
+            "unique_experts_mean": 38.95
+          },
+          {
+            "family": "expert-down",
+            "rows": 4,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.118917,
+            "gpu_mean_ms": 0.12578129999999998,
+            "gpu_p10_ms": 0.118625,
+            "gpu_p90_ms": 0.120875,
+            "unique_experts_mean": 38.95
+          },
+          {
+            "family": "expert-down",
+            "rows": 4,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.12027099999999999,
+            "gpu_mean_ms": 0.1203344,
+            "gpu_p10_ms": 0.12,
+            "gpu_p90_ms": 0.120583,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 4,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.117958,
+            "gpu_mean_ms": 0.11796039999999999,
+            "gpu_p10_ms": 0.11775,
+            "gpu_p90_ms": 0.118167,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 5,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.15075,
+            "gpu_mean_ms": 0.15976565,
+            "gpu_p10_ms": 0.15025,
+            "gpu_p90_ms": 0.151375,
+            "unique_experts_mean": 48.125
+          },
+          {
+            "family": "expert-down",
+            "rows": 5,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.1534585,
+            "gpu_mean_ms": 0.444589625,
+            "gpu_p10_ms": 0.146708,
+            "gpu_p90_ms": 0.905167,
+            "unique_experts_mean": 48.125
+          },
+          {
+            "family": "expert-down",
+            "rows": 5,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.147917,
+            "gpu_mean_ms": 0.157063475,
+            "gpu_p10_ms": 0.147583,
+            "gpu_p90_ms": 0.148333,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 5,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.145896,
+            "gpu_mean_ms": 0.150325,
+            "gpu_p10_ms": 0.145625,
+            "gpu_p90_ms": 0.146208,
+            "unique_experts_mean": 10
+          }
+        ],
+        "graphs": 1161,
+        "weight_bytes": 235929600,
+        "shapes": [
+          {
+            "dst": [
+              2560,
+              10,
+              5,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 5,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              5,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              5,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 5,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              5,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              4,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 4,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              4,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              4,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 4,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              4,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              3,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 3,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              3,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              3,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 3,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              3,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              2,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 2,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              2,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              2,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 2,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              2,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              1,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 1,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              1,
+              1
+            ],
+            "type": "q2_0"
+          }
+        ],
+        "pipeline_compilations": [
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "kernel_mul_mv_id_q2_0_f32",
+            "name": "kernel_mul_mv_id_q2_0_f32_nsg=2_split=0"
+          },
+          {
+            "base": "kernel_unary_f32_f32_4",
+            "name": "kernel_unary_f32_f32_4_op=13_cnt=0"
+          }
+        ],
+        "note": "One matrix operation per timed command buffer. Isolated elapsed GPU latency, not active utilization or model TPS. Cache pressure is an explicit 128 MiB SQR input, not a guaranteed cold cache. Routing is synthetic, not measured model routing."
+      }
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "perf",
+        "expert-down",
+        "1,2,3,4,5",
+        "40",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": true,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1",
+          "GGML_M5_LAB_PROFILE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 17453072384,
+        "minimum_available_bytes": 25389809664,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 16384,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "perf-3-expert-down.log",
+      "diagnostics": {
+        "summary": [
+          {
+            "family": "expert-down",
+            "rows": 1,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.038146,
+            "gpu_mean_ms": 0.038455224999999996,
+            "gpu_p10_ms": 0.03775,
+            "gpu_p90_ms": 0.0385,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 1,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.1569795,
+            "gpu_mean_ms": 0.210107325,
+            "gpu_p10_ms": 0.155333,
+            "gpu_p90_ms": 0.174917,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 2,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.0664585,
+            "gpu_mean_ms": 0.07266355000000001,
+            "gpu_p10_ms": 0.066125,
+            "gpu_p90_ms": 0.067,
+            "unique_experts_mean": 19.85
+          },
+          {
+            "family": "expert-down",
+            "rows": 2,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.063417,
+            "gpu_mean_ms": 0.0658802,
+            "gpu_p10_ms": 0.063,
+            "gpu_p90_ms": 0.063875,
+            "unique_experts_mean": 19.85
+          },
+          {
+            "family": "expert-down",
+            "rows": 2,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.064875,
+            "gpu_mean_ms": 0.07112602500000001,
+            "gpu_p10_ms": 0.0645,
+            "gpu_p90_ms": 0.065667,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 2,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.0625,
+            "gpu_mean_ms": 0.0651323,
+            "gpu_p10_ms": 0.062042,
+            "gpu_p90_ms": 0.063042,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 3,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.09475,
+            "gpu_mean_ms": 0.0992406,
+            "gpu_p10_ms": 0.09425,
+            "gpu_p90_ms": 0.095292,
+            "unique_experts_mean": 29.55
+          },
+          {
+            "family": "expert-down",
+            "rows": 3,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.091625,
+            "gpu_mean_ms": 0.094170925,
+            "gpu_p10_ms": 0.091042,
+            "gpu_p90_ms": 0.093542,
+            "unique_experts_mean": 29.55
+          },
+          {
+            "family": "expert-down",
+            "rows": 3,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.0924375,
+            "gpu_mean_ms": 0.1047604,
+            "gpu_p10_ms": 0.092,
+            "gpu_p90_ms": 0.092875,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 3,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.089917,
+            "gpu_mean_ms": 0.09256879999999999,
+            "gpu_p10_ms": 0.089625,
+            "gpu_p90_ms": 0.090167,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 4,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.12260399999999999,
+            "gpu_mean_ms": 0.134408275,
+            "gpu_p10_ms": 0.122375,
+            "gpu_p90_ms": 0.124208,
+            "unique_experts_mean": 38.95
+          },
+          {
+            "family": "expert-down",
+            "rows": 4,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.1202085,
+            "gpu_mean_ms": 0.12922714999999999,
+            "gpu_p10_ms": 0.118875,
+            "gpu_p90_ms": 0.122375,
+            "unique_experts_mean": 38.95
+          },
+          {
+            "family": "expert-down",
+            "rows": 4,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.119979,
+            "gpu_mean_ms": 0.12911562499999998,
+            "gpu_p10_ms": 0.11975,
+            "gpu_p90_ms": 0.12025,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 4,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.11781249999999999,
+            "gpu_mean_ms": 0.122245775,
+            "gpu_p10_ms": 0.1175,
+            "gpu_p90_ms": 0.11825,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 5,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.151167,
+            "gpu_mean_ms": 0.15575315,
+            "gpu_p10_ms": 0.150833,
+            "gpu_p90_ms": 0.151667,
+            "unique_experts_mean": 48.125
+          },
+          {
+            "family": "expert-down",
+            "rows": 5,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.149271,
+            "gpu_mean_ms": 0.1588781,
+            "gpu_p10_ms": 0.147208,
+            "gpu_p90_ms": 0.150792,
+            "unique_experts_mean": 48.125
+          },
+          {
+            "family": "expert-down",
+            "rows": 5,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.147542,
+            "gpu_mean_ms": 0.150366625,
+            "gpu_p10_ms": 0.147375,
+            "gpu_p90_ms": 0.147792,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-down",
+            "rows": 5,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.1454165,
+            "gpu_mean_ms": 0.15104265,
+            "gpu_p10_ms": 0.145042,
+            "gpu_p90_ms": 0.146125,
+            "unique_experts_mean": 10
+          }
+        ],
+        "graphs": 1161,
+        "weight_bytes": 235929600,
+        "shapes": [
+          {
+            "dst": [
+              2560,
+              10,
+              1,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 1,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              1,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              2,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 2,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              2,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              2,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 2,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              2,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              3,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 3,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              3,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              3,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 3,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              3,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              4,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 4,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              4,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              4,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 4,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              4,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              5,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 5,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              5,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              2560,
+              10,
+              5,
+              1
+            ],
+            "family": "expert-down",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 5,
+            "src0": [
+              640,
+              2560,
+              512,
+              1
+            ],
+            "src1": [
+              640,
+              10,
+              5,
+              1
+            ],
+            "type": "q2_0"
+          }
+        ],
+        "pipeline_compilations": [
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "kernel_mul_mv_id_q2_0_f32",
+            "name": "kernel_mul_mv_id_q2_0_f32_nsg=2_split=0"
+          },
+          {
+            "base": "kernel_unary_f32_f32_4",
+            "name": "kernel_unary_f32_f32_4_op=13_cnt=0"
+          }
+        ],
+        "note": "One matrix operation per timed command buffer. Isolated elapsed GPU latency, not active utilization or model TPS. Cache pressure is an explicit 128 MiB SQR input, not a guaranteed cold cache. Routing is synthetic, not measured model routing."
+      }
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "perf",
+        "expert-up",
+        "1,2,3,4,5",
+        "40",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": true,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1",
+          "GGML_M5_LAB_PROFILE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 17499963392,
+        "minimum_available_bytes": 20624883712,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 0,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "perf-3-expert-up.log",
+      "diagnostics": {
+        "summary": [
+          {
+            "family": "expert-up",
+            "rows": 1,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.030625,
+            "gpu_mean_ms": 0.030998925,
+            "gpu_p10_ms": 0.030083,
+            "gpu_p90_ms": 0.031625,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 1,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.1025835,
+            "gpu_mean_ms": 0.13625627499999998,
+            "gpu_p10_ms": 0.10175,
+            "gpu_p90_ms": 0.111958,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 2,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.049875,
+            "gpu_mean_ms": 0.051278125,
+            "gpu_p10_ms": 0.04825,
+            "gpu_p90_ms": 0.051042,
+            "unique_experts_mean": 19.85
+          },
+          {
+            "family": "expert-up",
+            "rows": 2,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.043,
+            "gpu_mean_ms": 0.0460771,
+            "gpu_p10_ms": 0.0415,
+            "gpu_p90_ms": 0.044542,
+            "unique_experts_mean": 19.85
+          },
+          {
+            "family": "expert-up",
+            "rows": 2,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.0424585,
+            "gpu_mean_ms": 0.042417750000000004,
+            "gpu_p10_ms": 0.042,
+            "gpu_p90_ms": 0.042833,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 2,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.038958,
+            "gpu_mean_ms": 0.04584685,
+            "gpu_p10_ms": 0.038667,
+            "gpu_p90_ms": 0.039542,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 3,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.068625,
+            "gpu_mean_ms": 0.077456275,
+            "gpu_p10_ms": 0.067,
+            "gpu_p90_ms": 0.070417,
+            "unique_experts_mean": 29.55
+          },
+          {
+            "family": "expert-up",
+            "rows": 3,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.0601875,
+            "gpu_mean_ms": 0.06237805,
+            "gpu_p10_ms": 0.0575,
+            "gpu_p90_ms": 0.062375,
+            "unique_experts_mean": 29.55
+          },
+          {
+            "family": "expert-up",
+            "rows": 3,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.057875,
+            "gpu_mean_ms": 0.05797605,
+            "gpu_p10_ms": 0.057375,
+            "gpu_p90_ms": 0.058458,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 3,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.055104,
+            "gpu_mean_ms": 0.059459375,
+            "gpu_p10_ms": 0.054625,
+            "gpu_p90_ms": 0.055542,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 4,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.08802099999999999,
+            "gpu_mean_ms": 0.09576145,
+            "gpu_p10_ms": 0.0855,
+            "gpu_p90_ms": 0.0895,
+            "unique_experts_mean": 38.95
+          },
+          {
+            "family": "expert-up",
+            "rows": 4,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.078125,
+            "gpu_mean_ms": 0.079219775,
+            "gpu_p10_ms": 0.075708,
+            "gpu_p90_ms": 0.08,
+            "unique_experts_mean": 38.95
+          },
+          {
+            "family": "expert-up",
+            "rows": 4,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.073625,
+            "gpu_mean_ms": 0.07808854999999999,
+            "gpu_p10_ms": 0.073167,
+            "gpu_p90_ms": 0.074,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 4,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.07097899999999999,
+            "gpu_mean_ms": 0.075340625,
+            "gpu_p10_ms": 0.070458,
+            "gpu_p90_ms": 0.071417,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 5,
+            "routing": "independent",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.1063125,
+            "gpu_mean_ms": 0.113025025,
+            "gpu_p10_ms": 0.1045,
+            "gpu_p90_ms": 0.110125,
+            "unique_experts_mean": 48.125
+          },
+          {
+            "family": "expert-up",
+            "rows": 5,
+            "routing": "independent",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.09564600000000001,
+            "gpu_mean_ms": 0.104470875,
+            "gpu_p10_ms": 0.093167,
+            "gpu_p90_ms": 0.098375,
+            "unique_experts_mean": 48.125
+          },
+          {
+            "family": "expert-up",
+            "rows": 5,
+            "routing": "shared",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 0.089042,
+            "gpu_mean_ms": 0.0938552,
+            "gpu_p10_ms": 0.088875,
+            "gpu_p90_ms": 0.089292,
+            "unique_experts_mean": 10
+          },
+          {
+            "family": "expert-up",
+            "rows": 5,
+            "routing": "shared",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 0.0869375,
+            "gpu_mean_ms": 0.089752075,
+            "gpu_p10_ms": 0.086417,
+            "gpu_p90_ms": 0.087375,
+            "unique_experts_mean": 10
+          }
+        ],
+        "graphs": 1161,
+        "weight_bytes": 235929600,
+        "shapes": [
+          {
+            "dst": [
+              640,
+              10,
+              1,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 1,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              1,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              2,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 2,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              2,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              2,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 2,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              2,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              3,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 3,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              3,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              3,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 3,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              3,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              4,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 4,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              4,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              4,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 4,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              4,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              5,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "independent",
+            "rows": 5,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              5,
+              1
+            ],
+            "type": "q2_0"
+          },
+          {
+            "dst": [
+              640,
+              10,
+              5,
+              1
+            ],
+            "family": "expert-up",
+            "ids_row_stride_bytes": 2048,
+            "routing": "shared",
+            "rows": 5,
+            "src0": [
+              2560,
+              640,
+              512,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              5,
+              1
+            ],
+            "type": "q2_0"
+          }
+        ],
+        "pipeline_compilations": [
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "kernel_mul_mv_id_q2_0_f32",
+            "name": "kernel_mul_mv_id_q2_0_f32_nsg=2_split=0"
+          },
+          {
+            "base": "kernel_unary_f32_f32_4",
+            "name": "kernel_unary_f32_f32_4_op=13_cnt=0"
+          }
+        ],
+        "note": "One matrix operation per timed command buffer. Isolated elapsed GPU latency, not active utilization or model TPS. Cache pressure is an explicit 128 MiB SQR input, not a guaranteed cold cache. Routing is synthetic, not measured model routing."
+      }
+    },
+    {
+      "command": [
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-ops/probe",
+        "perf",
+        "head",
+        "1,2,3,4,5",
+        "40",
+        "independent"
+      ],
+      "metal_environment": {
+        "tensor_api": "on",
+        "tuning": "stock",
+        "profile": true,
+        "variables": {
+          "GGML_METAL_TENSOR_ENABLE": "1",
+          "GGML_M5_LAB_PROFILE": "1"
+        }
+      },
+      "exit_code": 0,
+      "memory": {
+        "guard": null,
+        "peak_rss_bytes": 17704239104,
+        "minimum_available_bytes": 20867088384,
+        "peak_swap_bytes": 823066624,
+        "swap_growth_bytes": 0,
+        "system_disk_read_bytes": 139255808,
+        "sampling_interval_s": 0.25,
+        "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+      },
+      "log": "perf-3-head.log",
+      "diagnostics": {
+        "summary": [
+          {
+            "family": "head",
+            "rows": 1,
+            "routing": "none",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 1.530771,
+            "gpu_mean_ms": 1.584230275,
+            "gpu_p10_ms": 1.52,
+            "gpu_p90_ms": 1.71975,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 1,
+            "routing": "none",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 1.513229,
+            "gpu_mean_ms": 1.555162475,
+            "gpu_p10_ms": 1.503125,
+            "gpu_p90_ms": 1.704625,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 2,
+            "routing": "none",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 2.1461875,
+            "gpu_mean_ms": 2.200292675,
+            "gpu_p10_ms": 2.140417,
+            "gpu_p90_ms": 2.331625,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 2,
+            "routing": "none",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 2.1455415,
+            "gpu_mean_ms": 2.1930823,
+            "gpu_p10_ms": 2.136875,
+            "gpu_p90_ms": 2.328333,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 3,
+            "routing": "none",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 2.154521,
+            "gpu_mean_ms": 2.219031275,
+            "gpu_p10_ms": 2.145,
+            "gpu_p90_ms": 2.336625,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 3,
+            "routing": "none",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 2.1468125000000002,
+            "gpu_mean_ms": 2.1958532,
+            "gpu_p10_ms": 2.13875,
+            "gpu_p90_ms": 2.331917,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 4,
+            "routing": "none",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 2.1555834999999997,
+            "gpu_mean_ms": 2.20837605,
+            "gpu_p10_ms": 2.1495,
+            "gpu_p90_ms": 2.337625,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 4,
+            "routing": "none",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 2.1504165,
+            "gpu_mean_ms": 2.204540625,
+            "gpu_p10_ms": 2.145375,
+            "gpu_p90_ms": 2.331792,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 5,
+            "routing": "none",
+            "cache": "pressure-128MiB",
+            "samples": 40,
+            "gpu_median_ms": 2.1636249999999997,
+            "gpu_mean_ms": 2.2257083,
+            "gpu_p10_ms": 2.158,
+            "gpu_p90_ms": 2.3455,
+            "unique_experts_mean": 0
+          },
+          {
+            "family": "head",
+            "rows": 5,
+            "routing": "none",
+            "cache": "unflushed",
+            "samples": 40,
+            "gpu_median_ms": 2.1578749999999998,
+            "gpu_mean_ms": 2.2019313,
+            "gpu_p10_ms": 2.152875,
+            "gpu_p90_ms": 2.336583,
+            "unique_experts_mean": 0
+          }
+        ],
+        "graphs": 645,
+        "weight_bytes": 437043200,
+        "shapes": [
+          {
+            "dst": [
+              248320,
+              1,
+              1,
+              1
+            ],
+            "family": "head",
+            "routing": "none",
+            "rows": 1,
+            "src0": [
+              2560,
+              248320,
+              1,
+              1
+            ],
+            "src1": [
+              2560,
+              1,
+              1,
+              1
+            ],
+            "type": "q5_K"
+          },
+          {
+            "dst": [
+              248320,
+              2,
+              1,
+              1
+            ],
+            "family": "head",
+            "routing": "none",
+            "rows": 2,
+            "src0": [
+              2560,
+              248320,
+              1,
+              1
+            ],
+            "src1": [
+              2560,
+              2,
+              1,
+              1
+            ],
+            "type": "q5_K"
+          },
+          {
+            "dst": [
+              248320,
+              3,
+              1,
+              1
+            ],
+            "family": "head",
+            "routing": "none",
+            "rows": 3,
+            "src0": [
+              2560,
+              248320,
+              1,
+              1
+            ],
+            "src1": [
+              2560,
+              3,
+              1,
+              1
+            ],
+            "type": "q5_K"
+          },
+          {
+            "dst": [
+              248320,
+              4,
+              1,
+              1
+            ],
+            "family": "head",
+            "routing": "none",
+            "rows": 4,
+            "src0": [
+              2560,
+              248320,
+              1,
+              1
+            ],
+            "src1": [
+              2560,
+              4,
+              1,
+              1
+            ],
+            "type": "q5_K"
+          },
+          {
+            "dst": [
+              248320,
+              5,
+              1,
+              1
+            ],
+            "family": "head",
+            "routing": "none",
+            "rows": 5,
+            "src0": [
+              2560,
+              248320,
+              1,
+              1
+            ],
+            "src1": [
+              2560,
+              5,
+              1,
+              1
+            ],
+            "type": "q5_K"
+          }
+        ],
+        "pipeline_compilations": [
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "dummy_kernel",
+            "name": "dummy_kernel"
+          },
+          {
+            "base": "kernel_mul_mv_q5_K_f32",
+            "name": "kernel_mul_mv_q5_K_f32_nsg=2_ne12=1_r2=1_r3=1_split=0"
+          },
+          {
+            "base": "kernel_unary_f32_f32_4",
+            "name": "kernel_unary_f32_f32_4_op=13_cnt=0"
+          },
+          {
+            "base": "kernel_mul_mv_mma_q5_K_f32_nt4_rt1",
+            "name": "kernel_mul_mv_mma_q5_K_f32_nt4_rt1_nsg=8_ne12=1_r2=1_r3=1_ne00=2560_add=0"
+          }
+        ],
+        "note": "One matrix operation per timed command buffer. Isolated elapsed GPU latency, not active utilization or model TPS. Cache pressure is an explicit 128 MiB SQR input, not a guaranteed cold cache. Routing is synthetic, not measured model routing."
+      }
+    }
+  ],
+  "models_loaded": false,
+  "no_inference_gain_claim": true,
+  "unchanged_engines": [
+    "baseline",
+    "q2-masked",
+    "draft-vocab",
+    "mtp-shared",
+    "mtp-mma",
+    "m5-lab",
+    "m5-trace"
+  ],
+  "summary": [
+    {
+      "family": "expert-down",
+      "rows": 1,
+      "routing": "independent",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.038271,
+      "pass_medians_ms": [
+        0.0384585,
+        0.038271,
+        0.038146
+      ],
+      "pass_spread_percent": 0.8192208881665275,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-down",
+      "rows": 1,
+      "routing": "independent",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.1561875,
+      "pass_medians_ms": [
+        0.1561875,
+        0.035417,
+        0.1569795
+      ],
+      "pass_spread_percent": 343.232063698224,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-down",
+      "rows": 2,
+      "routing": "independent",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.0664585,
+      "pass_medians_ms": [
+        0.0665,
+        0.066458,
+        0.0664585
+      ],
+      "pass_spread_percent": 0.0631978091426122,
+      "unique_experts_mean": 19.85
+    },
+    {
+      "family": "expert-down",
+      "rows": 2,
+      "routing": "independent",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.063417,
+      "pass_medians_ms": [
+        0.0635,
+        0.063104,
+        0.063417
+      ],
+      "pass_spread_percent": 0.627535496957421,
+      "unique_experts_mean": 19.85
+    },
+    {
+      "family": "expert-down",
+      "rows": 2,
+      "routing": "shared",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.064917,
+      "pass_medians_ms": [
+        0.065042,
+        0.064917,
+        0.064875
+      ],
+      "pass_spread_percent": 0.25741811175337137,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-down",
+      "rows": 2,
+      "routing": "shared",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.0625,
+      "pass_medians_ms": [
+        0.0624375,
+        0.062542,
+        0.0625
+      ],
+      "pass_spread_percent": 0.167367367367377,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-down",
+      "rows": 3,
+      "routing": "independent",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.0945,
+      "pass_medians_ms": [
+        0.0945,
+        0.09425,
+        0.09475
+      ],
+      "pass_spread_percent": 0.5305039787798504,
+      "unique_experts_mean": 29.55
+    },
+    {
+      "family": "expert-down",
+      "rows": 3,
+      "routing": "independent",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.091333,
+      "pass_medians_ms": [
+        0.091333,
+        0.091125,
+        0.091625
+      ],
+      "pass_spread_percent": 0.5486968449931462,
+      "unique_experts_mean": 29.55
+    },
+    {
+      "family": "expert-down",
+      "rows": 3,
+      "routing": "shared",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.0924375,
+      "pass_medians_ms": [
+        0.092375,
+        0.0925,
+        0.0924375
+      ],
+      "pass_spread_percent": 0.13531799729364913,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-down",
+      "rows": 3,
+      "routing": "shared",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.09,
+      "pass_medians_ms": [
+        0.09,
+        0.09025,
+        0.089917
+      ],
+      "pass_spread_percent": 0.37034153719541774,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-down",
+      "rows": 4,
+      "routing": "independent",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.12260399999999999,
+      "pass_medians_ms": [
+        0.12275,
+        0.122583,
+        0.12260399999999999
+      ],
+      "pass_spread_percent": 0.13623422497410775,
+      "unique_experts_mean": 38.95
+    },
+    {
+      "family": "expert-down",
+      "rows": 4,
+      "routing": "independent",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.1199165,
+      "pass_medians_ms": [
+        0.1199165,
+        0.118917,
+        0.1202085
+      ],
+      "pass_spread_percent": 1.0860516158328837,
+      "unique_experts_mean": 38.95
+    },
+    {
+      "family": "expert-down",
+      "rows": 4,
+      "routing": "shared",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.120146,
+      "pass_medians_ms": [
+        0.120146,
+        0.12027099999999999,
+        0.119979
+      ],
+      "pass_spread_percent": 0.24337592412004838,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-down",
+      "rows": 4,
+      "routing": "shared",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.11781249999999999,
+      "pass_medians_ms": [
+        0.117646,
+        0.117958,
+        0.11781249999999999
+      ],
+      "pass_spread_percent": 0.26520238682148367,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-down",
+      "rows": 5,
+      "routing": "independent",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.150875,
+      "pass_medians_ms": [
+        0.150875,
+        0.15075,
+        0.151167
+      ],
+      "pass_spread_percent": 0.27661691542288924,
+      "unique_experts_mean": 48.125
+    },
+    {
+      "family": "expert-down",
+      "rows": 5,
+      "routing": "independent",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.1492915,
+      "pass_medians_ms": [
+        0.1492915,
+        0.1534585,
+        0.149271
+      ],
+      "pass_spread_percent": 2.805300426740631,
+      "unique_experts_mean": 48.125
+    },
+    {
+      "family": "expert-down",
+      "rows": 5,
+      "routing": "shared",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.147542,
+      "pass_medians_ms": [
+        0.147375,
+        0.147917,
+        0.147542
+      ],
+      "pass_spread_percent": 0.3677692960135648,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-down",
+      "rows": 5,
+      "routing": "shared",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.1454165,
+      "pass_medians_ms": [
+        0.145375,
+        0.145896,
+        0.1454165
+      ],
+      "pass_spread_percent": 0.35838349097161437,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-up",
+      "rows": 1,
+      "routing": "independent",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.030625,
+      "pass_medians_ms": [
+        0.03025,
+        0.030729,
+        0.030625
+      ],
+      "pass_spread_percent": 1.5834710743801717,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-up",
+      "rows": 1,
+      "routing": "independent",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.1025835,
+      "pass_medians_ms": [
+        0.10268749999999999,
+        0.025875,
+        0.1025835
+      ],
+      "pass_spread_percent": 296.8599033816425,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-up",
+      "rows": 2,
+      "routing": "independent",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.049875,
+      "pass_medians_ms": [
+        0.049375,
+        0.0500835,
+        0.049875
+      ],
+      "pass_spread_percent": 1.4349367088607679,
+      "unique_experts_mean": 19.85
+    },
+    {
+      "family": "expert-up",
+      "rows": 2,
+      "routing": "independent",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.042896000000000004,
+      "pass_medians_ms": [
+        0.042104,
+        0.042896000000000004,
+        0.043
+      ],
+      "pass_spread_percent": 2.12806384191524,
+      "unique_experts_mean": 19.85
+    },
+    {
+      "family": "expert-up",
+      "rows": 2,
+      "routing": "shared",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.04225,
+      "pass_medians_ms": [
+        0.04225,
+        0.0421875,
+        0.0424585
+      ],
+      "pass_spread_percent": 0.642370370370382,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-up",
+      "rows": 2,
+      "routing": "shared",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.039,
+      "pass_medians_ms": [
+        0.039,
+        0.039021,
+        0.038958
+      ],
+      "pass_spread_percent": 0.16171261358386424,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-up",
+      "rows": 3,
+      "routing": "independent",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.068625,
+      "pass_medians_ms": [
+        0.067917,
+        0.0690415,
+        0.068625
+      ],
+      "pass_spread_percent": 1.6556973953502085,
+      "unique_experts_mean": 29.55
+    },
+    {
+      "family": "expert-up",
+      "rows": 3,
+      "routing": "independent",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.0595835,
+      "pass_medians_ms": [
+        0.059479,
+        0.0595835,
+        0.0601875
+      ],
+      "pass_spread_percent": 1.1911767178331756,
+      "unique_experts_mean": 29.55
+    },
+    {
+      "family": "expert-up",
+      "rows": 3,
+      "routing": "shared",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.0579375,
+      "pass_medians_ms": [
+        0.058021,
+        0.0579375,
+        0.057875
+      ],
+      "pass_spread_percent": 0.2522678185745253,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-up",
+      "rows": 3,
+      "routing": "shared",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.055125,
+      "pass_medians_ms": [
+        0.055125,
+        0.055125,
+        0.055104
+      ],
+      "pass_spread_percent": 0.038109756097570724,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-up",
+      "rows": 4,
+      "routing": "independent",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.08797949999999999,
+      "pass_medians_ms": [
+        0.08672949999999999,
+        0.08797949999999999,
+        0.08802099999999999
+      ],
+      "pass_spread_percent": 1.4891127009840854,
+      "unique_experts_mean": 38.95
+    },
+    {
+      "family": "expert-up",
+      "rows": 4,
+      "routing": "independent",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.077083,
+      "pass_medians_ms": [
+        0.0765625,
+        0.077083,
+        0.078125
+      ],
+      "pass_spread_percent": 2.0408163265306145,
+      "unique_experts_mean": 38.95
+    },
+    {
+      "family": "expert-up",
+      "rows": 4,
+      "routing": "shared",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.073375,
+      "pass_medians_ms": [
+        0.0732085,
+        0.073375,
+        0.073625
+      ],
+      "pass_spread_percent": 0.5689230075742513,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-up",
+      "rows": 4,
+      "routing": "shared",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.071021,
+      "pass_medians_ms": [
+        0.071021,
+        0.07118749999999999,
+        0.07097899999999999
+      ],
+      "pass_spread_percent": 0.2937488552952283,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-up",
+      "rows": 5,
+      "routing": "independent",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.1063125,
+      "pass_medians_ms": [
+        0.1055625,
+        0.1063125,
+        0.1063125
+      ],
+      "pass_spread_percent": 0.7104795737122638,
+      "unique_experts_mean": 48.125
+    },
+    {
+      "family": "expert-up",
+      "rows": 5,
+      "routing": "independent",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.09564600000000001,
+      "pass_medians_ms": [
+        0.0935835,
+        0.32035399999999997,
+        0.09564600000000001
+      ],
+      "pass_spread_percent": 242.31889168496582,
+      "unique_experts_mean": 48.125
+    },
+    {
+      "family": "expert-up",
+      "rows": 5,
+      "routing": "shared",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 0.089042,
+      "pass_medians_ms": [
+        0.089,
+        0.08925,
+        0.089042
+      ],
+      "pass_spread_percent": 0.2808988764045006,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "expert-up",
+      "rows": 5,
+      "routing": "shared",
+      "cache": "unflushed",
+      "gpu_median_ms": 0.086917,
+      "pass_medians_ms": [
+        0.08677099999999999,
+        0.086917,
+        0.0869375
+      ],
+      "pass_spread_percent": 0.1918843853361274,
+      "unique_experts_mean": 10
+    },
+    {
+      "family": "head",
+      "rows": 1,
+      "routing": "none",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 1.533229,
+      "pass_medians_ms": [
+        1.5469374999999999,
+        1.533229,
+        1.530771
+      ],
+      "pass_spread_percent": 1.0561017944551887,
+      "unique_experts_mean": 0
+    },
+    {
+      "family": "head",
+      "rows": 1,
+      "routing": "none",
+      "cache": "unflushed",
+      "gpu_median_ms": 1.513229,
+      "pass_medians_ms": [
+        1.5082710000000001,
+        1.5196455,
+        1.513229
+      ],
+      "pass_spread_percent": 0.7541416628709108,
+      "unique_experts_mean": 0
+    },
+    {
+      "family": "head",
+      "rows": 2,
+      "routing": "none",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 2.1502915,
+      "pass_medians_ms": [
+        2.1746045,
+        2.1502915,
+        2.1461875
+      ],
+      "pass_spread_percent": 1.3240688430065095,
+      "unique_experts_mean": 0
+    },
+    {
+      "family": "head",
+      "rows": 2,
+      "routing": "none",
+      "cache": "unflushed",
+      "gpu_median_ms": 2.1455415,
+      "pass_medians_ms": [
+        2.140646,
+        2.146229,
+        2.1455415
+      ],
+      "pass_spread_percent": 0.26080912023753733,
+      "unique_experts_mean": 0
+    },
+    {
+      "family": "head",
+      "rows": 3,
+      "routing": "none",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 2.154521,
+      "pass_medians_ms": [
+        2.161875,
+        2.153521,
+        2.154521
+      ],
+      "pass_spread_percent": 0.38792284820998724,
+      "unique_experts_mean": 0
+    },
+    {
+      "family": "head",
+      "rows": 3,
+      "routing": "none",
+      "cache": "unflushed",
+      "gpu_median_ms": 2.1486665,
+      "pass_medians_ms": [
+        2.2780625,
+        2.1486665,
+        2.1468125000000002
+      ],
+      "pass_spread_percent": 6.1137151008762824,
+      "unique_experts_mean": 0
+    },
+    {
+      "family": "head",
+      "rows": 4,
+      "routing": "none",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 2.1555834999999997,
+      "pass_medians_ms": [
+        2.155792,
+        2.1544165,
+        2.1555834999999997
+      ],
+      "pass_spread_percent": 0.06384559345882224,
+      "unique_experts_mean": 0
+    },
+    {
+      "family": "head",
+      "rows": 4,
+      "routing": "none",
+      "cache": "unflushed",
+      "gpu_median_ms": 2.1504165,
+      "pass_medians_ms": [
+        2.151979,
+        2.1420000000000003,
+        2.1504165
+      ],
+      "pass_spread_percent": 0.46587301587299734,
+      "unique_experts_mean": 0
+    },
+    {
+      "family": "head",
+      "rows": 5,
+      "routing": "none",
+      "cache": "pressure-128MiB",
+      "gpu_median_ms": 2.1636249999999997,
+      "pass_medians_ms": [
+        2.1674165,
+        2.1500209999999997,
+        2.1636249999999997
+      ],
+      "pass_spread_percent": 0.809085120563946,
+      "unique_experts_mean": 0
+    },
+    {
+      "family": "head",
+      "rows": 5,
+      "routing": "none",
+      "cache": "unflushed",
+      "gpu_median_ms": 2.1578749999999998,
+      "pass_medians_ms": [
+        2.1631665,
+        2.1469585,
+        2.1578749999999998
+      ],
+      "pass_spread_percent": 0.7549284254912081,
+      "unique_experts_mean": 0
+    }
+  ],
+  "postflight": {
+    "memory": {
+      "total": 51539607552,
+      "available": 37137842176,
+      "percent": 27.9,
+      "used": 11661672448,
+      "free": 18637242368,
+      "active": 8146403328,
+      "inactive": 18432819200,
+      "wired": 3515269120
+    },
+    "swap": {
+      "total": 2147483648,
+      "used": 823066624,
+      "free": 1324417024,
+      "percent": 38.3,
+      "sin": 1645406928896,
+      "sout": 1445298176
+    },
+    "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 89%",
+    "largest_process_groups": [
+      {
+        "name": "mediaanalysisd",
+        "rss_bytes": 1084260352
+      },
+      {
+        "name": "codex",
+        "rss_bytes": 830275584
+      },
+      {
+        "name": "T3 Code (Alpha) Helper (Renderer)",
+        "rss_bytes": 596230144
+      },
+      {
+        "name": "T3 Code (Alpha)",
+        "rss_bytes": 538574848
+      },
+      {
+        "name": "2.1.292",
+        "rss_bytes": 487571456
+      },
+      {
+        "name": "node",
+        "rss_bytes": 259768320
+      },
+      {
+        "name": "node_repl",
+        "rss_bytes": 211025920
+      },
+      {
+        "name": "SkyComputerUseClient",
+        "rss_bytes": 185221120
+      },
+      {
+        "name": "Proton Pass Helper (Renderer)",
+        "rss_bytes": 167313408
+      },
+      {
+        "name": "corespotlightd",
+        "rss_bytes": 134840320
+      },
+      {
+        "name": "spotlightknowledged.updater",
+        "rss_bytes": 115523584
+      },
+      {
+        "name": "java",
+        "rss_bytes": 101548032
+      }
+    ],
+    "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth."
+  }
+}

@@ -1,4 +1,4 @@
-# M5 experiments: completed settings and phase profiling
+# M5 experiments: completed settings and operation measurements
 
 Prepared October 6, 2026 for the 48 GiB, 20-GPU-core M5 Pro. The user subsequently authorized testing after memory cleanup. [Tensor API and prediction-depth results](M5-RESULTS.md) cover the first four comparisons; [GPU matrix tuning results](M5-GPU-TUNING.md) cover build parity and four matrix comparisons. [Helper workers and confidence results](M5-HELPER-RESULTS.md) complete the final three comparisons. All twelve experiments are complete. Colima and Grafana remain stopped. No model server is left running, and there is no scheduled run or background waiter.
 
@@ -33,7 +33,11 @@ The existing API checker accepts depth five/six, confidence and explicit tensor/
 
 ## Completed diagnostics and next kernel comparison
 
-The [phase/shape diagnostic results](M5-PHASE-PROFILE.md) add a separate `m5-trace` engine. Request phases and model roles are now explicit; matrix shapes are inventoried once per llama graph call and inactive nodes are counted separately. Main-model GPU-buffer intervals cover 68-73% of generation wall time in four measured requests. Existing engines remain unchanged. Compare the actual routed-expert and dense/output-head shapes next; per-kernel cost and accelerator occupancy still need evidence.
+The [phase/shape diagnostic results](M5-PHASE-PROFILE.md) add a separate `m5-trace` engine. Request phases and model roles are explicit; matrix shapes are inventoried once per llama graph call and inactive nodes are counted separately. Main-model GPU-buffer intervals cover 68-73% of generation wall time in four measured requests.
+
+The [operation measurements](M5-OPERATION-PROFILE.md) now compare the recorded expert Q2_0 and output-head Q5_K shapes without editing any of the seven engines. All 23 full-size CPU-reference checks pass. Expert math is larger among these selected families, but their isolated latencies project to only 34-42% of the main GPU interval. Next capture actual expert reuse during verification and broaden cost coverage to the remaining shared matrices and attention/state work before choosing a shader. Accelerator occupancy remains unmeasured. The [Astra plan](research/20261006-astra-future-plan.md) ranks later candidates.
+
+The unchanged writing control has one clean fresh launch at 47.6-48.9 synthetic TPS and 54.2 code TPS. Its second launch adds 60.3 MiB swap during overlapping build activity and is excluded. This incomplete refresh is not a candidate comparison or a new gain. A future shader needs a fresh complete matched control/candidate run while background builds are quiet.
 
 `profile_m5.py` uses the isolated engine's disabled-by-default command-buffer completion timestamps. It records GPU intervals, graph/context IDs and original operation counts, alongside native cumulative helper wall-time statistics. Two prompt lengths, 512 and 2048, distinguish prompt processing from the short generation portion. All profiling timings remain separate from speed results.
 
@@ -70,6 +74,6 @@ The initial testing batch used diagnostics, Tensor API comparisons and predictio
 .venv/bin/python scripts/benchmark_m5.py --experiment depth-writing depth-followup --run
 ```
 
-Choose later experiments explicitly, one at a time. All twelve prepared comparisons are complete. Choose explicit reproductions or add a new measured hypothesis. The runner refuses `--run` without an experiment selection. It does not monitor VoltTracker, automatically resume, restart Colima or stop unrelated processes. Phase separation is complete in the new trace; per-kernel evidence is still required before selecting a decoding kernel change.
+Choose later experiments explicitly, one at a time. All twelve prepared comparisons are complete. Choose explicit reproductions or add a new measured hypothesis. The settings runner refuses `--run` without an experiment selection. Operation diagnostics and the unchanged writing control also require their own `--run`; their default commands only show plans. They do not monitor VoltTracker, automatically resume, restart Colima or stop unrelated processes. Phase separation and selected matrix measurements are complete; broader cost and real-routing evidence remain before selecting a decoding kernel change.
 
 [Isolated native patch manifest](../config/m5_lab_experiment.json). Preparation receipts and offline checks are under `bench/features/`; new measurements create new result directories.

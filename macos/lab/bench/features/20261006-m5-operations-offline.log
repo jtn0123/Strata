@@ -1,0 +1,59 @@
+.......Plan: depth (2, 1, 3, 4, 4, 3, 1, 2)
+.................usage: python -m unittest [-h]
+                          [--experiment {tensor-writing,tensor-followup,depth-writing,depth-followup,confidence-writing,confidence-followup,helper-workers,engine-parity,bf16-threshold,q2-threshold,matrix-width,matrix-workers} [{tensor-writing,tensor-followup,depth-writing,depth-followup,confidence-writing,confidence-followup,helper-workers,engine-parity,bf16-threshold,q2-threshold,matrix-width,matrix-workers} ...]]
+                          [--repeats REPEATS] [--run]
+python -m unittest: error: Select --experiment explicitly for a testing run
+.....Preparation only. Add --run to benchmark.
+Operation plan: ('expert-down', 'expert-up', 'head'); rows [1, 2, 3, 4, 5]; 3 passes, 40 samples/scenario.
+Plan only. --build compiles diagnostics; --run performs GPU/CPU checks and latency measurements.
+Phase diagnostic plan: depths [3, 4]; untouched control then labeled trace; 512/2048 input, 128 output.
+Plan only. No GPU work or model load. Add --run to execute.
+tensor-writing: tensor_api ['on', 'off', 'off', 'on']
+tensor-followup: tensor_api ['on', 'off', 'off', 'on']
+depth-writing: draft [3, 5, 6, 6, 5, 3]
+depth-followup: draft [4, 5, 6, 6, 5, 4]
+confidence-writing: draft_p_min [0.0, 0.2, 0.4, 0.4, 0.2, 0.0]
+confidence-followup: draft_p_min [0.0, 0.2, 0.4, 0.4, 0.2, 0.0]
+helper-workers: draft_threads [8, 6, 12, 12, 6, 8]
+engine-parity: engine ['mtp-mma', 'm5-lab', 'm5-lab', 'mtp-mma']
+bf16-threshold: m5_tuning ['stock', 'bf16-row3', 'bf16-row3', 'stock']
+q2-threshold: m5_tuning ['stock', 'q2-row2', 'q2-row2', 'stock']
+matrix-width: m5_tuning ['stock', 'nt1', 'nt2', 'nt2', 'nt1', 'stock']
+matrix-workers: m5_tuning ['stock', 'nsg4', 'nsg8', 'nsg8', 'nsg4', 'stock']
+Preparation only. No GPU test or model load. Add --run after VoltTracker is finished and testing is authorized.
+GPU correctness plan: m5-lab, Tensor API ['on', 'off'], tuning ['stock']
+Preparation only. No GPU test or model load. Add --run after the testing go-ahead.
+Diagnostic plan: depths [3, 4], Tensor API on, 512/2048 input tokens, 32 output tokens.
+Preparation only. No model load. Add --run after the testing go-ahead.
+tensor-writing: tensor_api ['on', 'off', 'off', 'on']
+tensor-followup: tensor_api ['on', 'off', 'off', 'on']
+depth-writing: draft [3, 5, 6, 6, 5, 3]
+depth-followup: draft [4, 5, 6, 6, 5, 4]
+confidence-writing: draft_p_min [0.0, 0.2, 0.4, 0.4, 0.2, 0.0]
+confidence-followup: draft_p_min [0.0, 0.2, 0.4, 0.4, 0.2, 0.0]
+helper-workers: draft_threads [8, 6, 12, 12, 6, 8]
+engine-parity: engine ['mtp-mma', 'm5-lab', 'm5-lab', 'mtp-mma']
+bf16-threshold: m5_tuning ['stock', 'bf16-row3', 'bf16-row3', 'stock']
+q2-threshold: m5_tuning ['stock', 'q2-row2', 'q2-row2', 'stock']
+matrix-width: m5_tuning ['stock', 'nt1', 'nt2', 'nt2', 'nt1', 'stock']
+matrix-workers: m5_tuning ['stock', 'nsg4', 'nsg8', 'nsg8', 'nsg4', 'stock']
+Plan: [(1, 'control'), (1, 'candidate'), (1, 'candidate'), (1, 'control'), (3, 'control'), (3, 'candidate'), (3, 'candidate'), (3, 'control'), (4, 'control'), (4, 'candidate'), (4, 'candidate'), (4, 'control')]
+..........Preparation only. Add --run to benchmark.
+Plan: baseline / q2-masked / q2-masked / baseline; full Flash-Next Q2_0; 512 output tokens; 3 repeats per prompt.
+ON HOLD. No model loading or benchmarks. After approval, rerun with --run.
+Prepared shared helper: 0.000 GB; saved 0.0 MiB
+Packed helper verified: 32 unchanged tensors; GPU dense region 0.00 MiB
+Prepared mtp_q3: 0.000 GB; SHA256 f9ae7575a0f06b6d5775b51a6e1740197a9e1300be9a6fe701969967ea0e6095
+Saved /var/folders/k5/wc0mdfp571x8q991krfk2v2r0000gn/T/tmpoptvinyt/bench/results/20261007T052308Z-prepare-mtp_q3/preparation.json
+.........
+----------------------------------------------------------------------
+Ran 48 tests in 0.580s
+
+OK
+Prepared shared helper: 0.000 GB; saved 0.0 MiB
+Packed helper verified: 32 unchanged tensors; GPU dense region 0.00 MiB
+Prepared shared helper: 0.000 GB; saved 0.0 MiB
+Packed helper verified: 32 unchanged tensors; GPU dense region 0.00 MiB
+Prepared shared helper: 0.000 GB; saved 0.0 MiB
+Packed helper verified: 32 unchanged tensors; GPU dense region 0.00 MiB
+Prepared shared helper: 0.000 GB; saved 0.0 MiB
