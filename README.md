@@ -2,7 +2,7 @@
 
 Local, measured experiments for an Apple M5 Pro with 48 GiB unified memory. This workspace keeps Strata's existing Mac interface and uses a revision-pinned native llama.cpp Metal server behind it. All inference stays on the Mac.
 
-[The next M5 experiments are prepared](bench/M5-NEXT.md). The isolated timing/tuning build is compiled; Tensor API on/off, depth five/six, confidence, helper workers and matrix settings have fresh-control plans. GPU tests and model benchmarks are paused until the user gives the go-ahead after VoltTracker. `M5 Experiment Plan.command` displays the plan without starting inference. Compressed-weight kernel work is staged to follow the profiling results.
+[The first M5 measurements are complete](bench/M5-RESULTS.md). Twenty full-model benchmark passes record zero swap growth. Keep Tensor API enabled and writing at depth three. Depth six raises the short cached-ledger result from 68.98 to 75.50 TPS (+9.44%) over a fresh depth-four control, with complete replies 4.88% quicker; long cached replies are essentially tied and fresh writing is slower. The [remaining M5 plan](bench/M5-NEXT.md) covers confidence, helper workers and matrix settings. `M5 Experiment Plan.command` displays the plan without starting inference. Compressed-weight kernel work follows more focused profiling.
 
 ## Run
 
@@ -117,6 +117,8 @@ To run the packed mixed profile manually:
 ```
 
 The [helper tuning results](bench/HELPER-TUNING.md) compare prediction depth and CPU workers against fresh controls in the earlier shared engine. The later [few-row GPU math comparison](bench/METAL-MMA.md) upgrades the optional writing launcher to the `mtp-mma` engine and three predicted tokens: about 49 TPS for synthetic writing and 56 TPS for code. The fast follow-up launcher uses the same new engine with four predicted tokens: about 69 TPS on the longer cached-ledger test. The original shared launcher remains at two tokens, and the ordinary launcher retains prediction off. Stop the active model before switching launchers.
+
+`Start Strata - Short Structured Follow-ups Test.command` is an optional depth-six trial for short cached structured answers. It passed nine real API checks. Its 75.50 TPS result comes from 25-token ledger answers with 512 tokens of cached history; it is not a general chat or writing rate. The ordinary, writing and existing fast-follow-up launchers keep their settings. [Matched comparisons and limits](bench/M5-RESULTS.md).
 
 To reproduce the separate tuning sweeps, first print their plans, then add `--run` to benchmark:
 

@@ -1,8 +1,8 @@
-# M5 experiments prepared, testing paused
+# M5 experiments: first results and remaining tests
 
-Prepared October 6, 2026 for the 48 GiB, 20-GPU-core M5 Pro. The user's VoltTracker GitHub work must finish before testing starts. There is no scheduled run, background waiter, model server or GPU math test started by this preparation. Colima was observed stopped and was not restarted.
+Prepared October 6, 2026 for the 48 GiB, 20-GPU-core M5 Pro. The user subsequently authorized testing after memory cleanup. Tensor API on/off and prediction-depth comparisons, both stock timing profiles, and the depth-six app check are complete. [Measured results](M5-RESULTS.md) record the first four experiments; the remaining eight are still prepared. Colima and Grafana remain stopped. No model server is left running, and there is no scheduled run or background waiter.
 
-The isolated `m5-lab` server and operation tester are built with one compiler worker. All 40 offline workflow checks pass. Existing native engines, model files, model/runtime pins, GPU memory limits and the ordinary/writing/follow-up launchers are preserved. Only offline workflow checks and compilation have run for this stage. Shader behavior, GPU timestamp availability and full-model performance remain untested.
+The isolated `m5-lab` server and operation tester were built with one compiler worker. All 40 offline workflow checks pass. Existing native engines, model files, model/runtime pins, GPU memory limits and the ordinary/writing/follow-up launchers are preserved. Stock GPU correctness and command-buffer timestamps now pass. The new threshold/tile presets remain untested. A separate optional short structured follow-up launcher uses the measured depth-six setting.
 
 [Final build/source receipt and saved-header weight inventory](features/20261007T002056Z-m5-preparation.json), [offline checks](features/20261006-m5-offline.log), [plan-only output](features/20261006-m5-plans.log). Receipt timestamps are UTC; preparation happened October 6 locally. The earlier preparation receipt is retained as build history.
 
@@ -29,7 +29,7 @@ Each comparison changes only its named setting. Both prediction controls use tod
 
 GPU correctness checks against the CPU reference run before speed trials and verify the requested Tensor API mode. The selected weight formats include Q2_0, Q3_K, BF16, IQ4_NL, IQ4_XS and the Q5_K shared output head, with rows through 32. The operation tester loads synthetic tensors, not model weights. New speed comparisons stop if answers fail, source/binary changes, or any new swap is observed. The native memory guard stops at more than 128 MiB new system swap or less than 512 MiB available RAM for four seconds. A guard stop is recorded as a failed experiment, not a performance result.
 
-The existing API checker now accepts depth five/six, confidence and explicit tensor/tuning settings. Run it for settings that win before adopting them. None of these candidates has been adopted.
+The existing API checker accepts depth five/six, confidence and explicit tensor/tuning settings. Depth six passed nine real app checks and is exposed only by the optional short structured follow-up trial. Writing stays at depth three and the existing fast-follow-up launcher stays at four. Confidence, worker, parity and matrix candidates still need their GPU, speed and app checks.
 
 ## Diagnostics before kernel changes
 
@@ -60,7 +60,7 @@ These commands only display plans or record preparation:
 
 Double-click `M5 Experiment Plan.command` to display the comparisons without loading a model. Rebuilding, if needed, uses `scripts/prepare_m5.py --build --jobs 1` and does not run GPU tests.
 
-After the user gives the testing go-ahead, start with diagnostics and the Tensor API comparisons, then prediction depth. These commands do execute GPU work and load the full model:
+The initial testing batch used diagnostics, Tensor API comparisons and prediction depth. These commands reproduce those tests and do execute GPU work and load the full model:
 
 ```sh
 .venv/bin/python scripts/profile_m5.py --run
@@ -68,6 +68,6 @@ After the user gives the testing go-ahead, start with diagnostics and the Tensor
 .venv/bin/python scripts/benchmark_m5.py --experiment depth-writing depth-followup --run
 ```
 
-Choose later experiments explicitly, one at a time. The runner refuses `--run` without an experiment selection. It does not monitor VoltTracker, automatically resume, restart Colima or stop unrelated processes.
+Choose later experiments explicitly, one at a time. Start with isolated build parity before tuning its matrix thresholds or tiles. The runner refuses `--run` without an experiment selection. It does not monitor VoltTracker, automatically resume, restart Colima or stop unrelated processes. More profiling must separate prompt processing from generation before attributing the combined command-buffer totals to a decoding bottleneck.
 
 [Isolated native patch manifest](../config/m5_lab_experiment.json). Preparation receipts and offline checks are under `bench/features/`; future measurements will create new result directories.
