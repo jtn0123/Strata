@@ -10,6 +10,8 @@ The [helper/confidence batch](bench/M5-HELPER-RESULTS.md) completes all twelve c
 
 The [expert/output-table measurement](bench/M5-OPERATION-PROFILE.md) passes 23 full-size CPU-reference checks and measures 5520 matrix buffers. Expert math is the larger tested matrix family, but the selected operations project to only 34-42% of the recorded main GPU interval. Actual expert reuse and the remaining work need evidence before choosing a shader. One clean unchanged writing launch measures 47.6-48.9 synthetic TPS and 54.2 code TPS; the second launch is excluded for 60.3 MiB new swap during overlapping build activity. This is an incomplete baseline refresh and no new speed gain. All seven engines and launchers remain unchanged. The [Astra research plan](bench/research/20261006-astra-future-plan.md) records later candidates.
 
+The user has placed further testing on hold. [Six future experiment templates](bench/M5-FUTURE-TEMPLATES.md) are prepared: expert reuse, broader GPU timing, 8K context, bounded Mac SSD prefetch, one measured GPU kernel and larger-model paging. The first two have compiled diagnostic tooling and CPU-only checks; their GPU/model behavior is untested. Later templates explicitly label remaining implementation work. Empty result sheets track matched TPS/latency percentages, quality and memory. No model/GPU test or automatic trigger runs during preparation.
+
 ## Run
 
 From this folder:

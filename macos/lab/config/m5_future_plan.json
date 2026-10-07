@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "testing_status": "on hold until the user gives the testing go-ahead",
+  "automatic_execution": false,
+  "control": {
+    "engine": "mtp-mma", "model": "flash", "draft_model": "mtp_shared_packed_q3",
+    "context": 4096, "batch": 512, "ubatch": 512, "cache_type": "f16",
+    "draft": 3, "draft_threads": 8, "draft_p_min": 0.0, "tensor_api": "on",
+    "temperature": 0.6, "seed": 1234, "fresh_output_tokens": 128,
+    "matched_inputs": [512, 2048], "warmups_per_workload": 1, "repeats_per_launch": 2
+  },
+  "comparison": {
+    "order": ["control", "candidate", "candidate", "control"],
+    "new_swap_required_bytes": 0, "emergency_swap_guard_bytes": 134217728,
+    "minimum_available_during_run_bytes": 1073741824,
+    "minimum_available_before_full_model_bytes": 36507222016,
+    "metrics": ["generation_tok_s", "prompt_tok_s", "ttft_s", "wall_s", "draft_acceptance_percent", "minimum_available_bytes", "swap_growth_bytes"],
+    "adoption_gate": "At least 5 percent median complete-task improvement on the chosen workload, or useful capacity gain with an explicitly accepted speed tradeoff; no unexplained quality failure or new swap. Report control drift and all raw passes.",
+    "percentage_rules": "TPS gain = 100*(candidate/control-1). Time reduction = 100*(1-candidate/control). Requires finite positive matched metrics. Do not add percentages from separate experiments.",
+    "historical_reference_only": "bench/features/20261007T052606Z-m5-decision-baseline/review.json"
+  },
+  "experiments": [
+    {
+      "id": "expert-reuse", "title": "Measure real expert reuse", "priority": 1,
+      "implementation": "Diagnostic entry point and capture/parser staged; native CPU self-test passes. No model or GPU run yet.",
+      "kind": "diagnostic", "depends_on": [],
+      "hypothesis": "Four/five verification tokens may reuse enough selected experts to justify sparse matrix work.",
+      "only_change": "Install a read-only evaluation callback for ten expert IDs per token; preserve weight bytes and all launchers.",
+      "control_engine": "m5-trace", "candidate_engine": null,
+      "plan_command": [".venv/bin/python", "scripts/profile_m5_routes.py"],
+      "future_run_command": [".venv/bin/python", "scripts/profile_m5_routes.py", "--mode", "routes", "--depths", "3", "4", "--run"],
+      "prerequisites": ["Testing go-ahead", "Verified diagnostic build", "34 GiB available RAM", "No full-model server running"],
+      "proof": ["Matched greedy text and token IDs including warmups", "All 48 main expert layers captured", "Ten distinct IDs per token in 0..511", "2048-byte routing row stride", "Target/helper roles separate", "Zero new swap"],
+      "result_fields": ["active_experts", "assignments_per_active_expert", "reuse_percent", "expert_token_histogram", "per_layer_coverage"],
+      "stop_if": ["Missing or invalid IDs", "Greedy outputs differ", "New swap or low-RAM guard"],
+      "limits": "Callbacks split/synchronize graphs. Exclude their timing from TPS history. A high reuse rate alone does not prove a fast kernel."
+    },
+    {
+      "id": "split-gpu-cost", "title": "Locate the remaining GPU work", "priority": 2,
+      "implementation": "Split callback, buffer attribution and parser staged; real GPU behavior untested.",
+      "kind": "diagnostic", "depends_on": [],
+      "hypothesis": "Shared matrices, attention/state or other operations account for the gap left by isolated matrix timings.",
+      "only_change": "Deliberately split scheduled computational nodes into diagnostic intervals; never enable this in app launchers.",
+      "control_engine": "m5-trace", "candidate_engine": null,
+      "plan_command": [".venv/bin/python", "scripts/profile_m5_routes.py", "--mode", "split"],
+      "future_run_command": [".venv/bin/python", "scripts/profile_m5_routes.py", "--mode", "split", "--depths", "3", "--run"],
+      "prerequisites": ["Testing go-ahead", "Small-model plumbing smoke first", "34 GiB available RAM"],
+      "proof": ["Matched greedy text/token output", "CPU monotonic boundaries assign every computational GPU buffer once", "Main/helper and prompt/generation separated", "No additional math op in an isolated interval", "Explicit instrumentation overhead versus fresh control", "Zero new swap"],
+      "result_fields": ["expert_matrix_ms", "vocabulary_ms", "other_matrix_ms", "attention_state_ms", "other_ops_ms", "unattributed_buffers", "instrumentation_overhead"],
+      "stop_if": ["Output mismatch", "Unattributed computational buffers", "Callback event cap or excessive logs", "Memory guard"],
+      "limits": "Splitting removes fusion and adds synchronization/command-buffer overhead. Costs rank diagnostic paths, not original kernel time or accelerator occupancy."
+    },
+    {
+      "id": "context-8k", "title": "Try more useful context", "priority": 3,
+      "implementation": "Protocol and fixture design prepared. Native context setting exists; long-context harness and quality checks still require implementation/validation.",
+      "kind": "capacity", "depends_on": [],
+      "hypothesis": "8K context may fit with useful headroom and allow larger documents without unacceptable latency or quality loss.",
+      "only_change": "Context capacity 4096 to 8192. Keep F16 cache, engine, helper depth and workers fixed.",
+      "control_engine": "mtp-mma", "candidate_engine": "mtp-mma", "axis": "context", "control_value": 4096, "candidate_value": 8192,
+      "plan_command": null, "future_run_command": null,
+      "prerequisites": ["Testing go-ahead", "Capacity fixture implemented", "Quiet host and verified sources", "Memory budget derived from actual allocation logs"],
+      "proof": ["ABBA timing on identical 512/2048-token inputs and 128-token outputs", "Separate 6144-token retrieval fixture at 8K with room for output", "Facts at beginning/middle/end and distractors; verify exact answers", "Target/helper KV, recurrent state, QSA and scratch allocations logged separately", "Zero new swap"],
+      "result_fields": ["matched_tps", "matched_ttft", "matched_reply_time", "6144_token_retrieval_accuracy", "cache_and_state_bytes", "peak_memory"],
+      "stop_if": ["Memory guard", "Retrieval/rollback failure", "No useful headroom"],
+      "limits": "Higher configured capacity is not proof of long-input quality. The 6144-token case has no 4K TPS comparison. A separate quantized-cache trial may follow; do not combine it with this test."
+    },
+    {
+      "id": "macos-row-prefetch", "title": "Overlap bounded SSD lookup reads", "priority": 4,
+      "implementation": "Design template only. No prefetch code or candidate build exists.",
+      "kind": "native-candidate", "depends_on": ["split-gpu-cost"],
+      "hypothesis": "If model-specific lazy-row waits are material, bounded asynchronous page advice may hide part of them.",
+      "only_change": "Add macOS handling for already-known lazy lookup rows; preserve shard bytes and mmap/lazy behavior.",
+      "control_engine": "mtp-mma", "candidate_engine": null,
+      "plan_command": null, "future_run_command": null,
+      "candidate_design": {"pending_work_limit_bytes": 100663296, "maximum_in_flight_batches": 1, "whole_shard_preload": false, "fallback": "Existing demand-paged lookup"},
+      "prerequisites": ["File-specific lookup/fault/wait evidence", "macOS API and offset/length validation", "Isolated engine manifest and real implementation", "Testing go-ahead"],
+      "proof": ["Exact output/data parity", "Bounds, alignment, shard lifetime, duplicate-row and failure-path checks", "Bounded resident pages and outstanding work", "Matched warm-request ABBA timing", "Label cold observations separately; no system cache purge", "Zero new swap"],
+      "result_fields": ["file_specific_read_bytes", "lookup_wait_ms", "faults", "resident_lookup_bytes", "matched_tps", "ttft", "reply_time"],
+      "stop_if": ["Lookup waits insignificant", "Paging/advice increases memory pressure", "No repeatable complete-task gain after two narrow approaches"],
+      "limits": "System-wide disk reads cannot establish lookup wait. The 96 MiB cap is a proposed bound, not an implemented cache or established optimum."
+    },
+    {
+      "id": "targeted-gpu-kernel", "title": "Optimize one measured GPU operation", "priority": 5,
+      "implementation": "Design template only; target family is intentionally unset until diagnostic evidence is available.",
+      "kind": "native-candidate", "depends_on": ["expert-reuse", "split-gpu-cost"],
+      "hypothesis": "One demonstrated expensive shape can use less dequantization/memory work or better cooperative matrix input.",
+      "only_change": "One dispatch/kernel in an isolated engine, keeping GGUF bytes and fallback behavior.",
+      "control_engine": "mtp-mma", "candidate_engine": null,
+      "plan_command": null, "future_run_command": null,
+      "candidate_design": {"target_family": null, "selected_shapes": [], "new_weight_copy": false, "model_requantization": false, "fallback": "Existing stock kernel"},
+      "prerequisites": ["Measured family/shape and real routing", "CPU-reference/fallback test inventory", "Actual candidate patch, manifest and build receipt", "Testing go-ahead"],
+      "proof": ["CPU-reference math, odd/aligned shapes and inactive-expert cases", "Actual dispatch proof", "Original controls preserved", "Fresh ABBA model comparisons and semantic checks", "Matched TPS, first-token and full-reply percentages", "Zero new swap"],
+      "result_fields": ["kernel_latency", "dispatch_proof", "math_error", "matched_tps", "ttft", "reply_time", "quality_checks"],
+      "stop_if": ["Math/quality failure", "Gain disappears end to end", "Two narrow approaches repeatedly under 2-3 percent"],
+      "limits": "A synthetic kernel win is not a model TPS win. Do not force a sparse few-row workload into MMA merely because the hardware supports matrix acceleration."
+    },
+    {
+      "id": "expert-paging-capacity", "title": "Explore larger-model capacity", "priority": 6,
+      "implementation": "Feasibility template only; pager, precision upgrade and larger model downloads are absent.",
+      "kind": "capacity-research", "depends_on": ["expert-reuse", "context-8k"],
+      "hypothesis": "A bounded expert residency map could trade SSD traffic and speed for larger or higher-precision weights.",
+      "only_change": "Expert residency/paging policy in a separate prototype after a complete capacity budget.",
+      "control_engine": "mtp-mma", "candidate_engine": null,
+      "plan_command": null, "future_run_command": null,
+      "candidate_design": {"target_model": null, "target_precision": null, "resident_budget_bytes": null, "minimum_acceptable_tok_s": null, "second_device_required": false},
+      "prerequisites": ["User-selected capacity goal and acceptable minimum speed", "Measured expert hot set/miss curve", "Storage and OS headroom budget", "Correctness-tested resident-slot map", "Testing go-ahead before downloads or model runs"],
+      "proof": ["Mapping, eviction, in-flight references and fallback correctness", "Prefill and verification miss handling", "Read bytes/latency and resident-set peak", "Zero OS swap growth", "Actual quality/precision benefit and sustained response speed"],
+      "result_fields": ["resident_expert_bytes", "cache_hit_percent", "ssd_bytes_per_token", "miss_wait_ms", "target_precision", "sustained_tps", "quality"],
+      "stop_if": ["Memory accounting depends on OS swap", "Resident mapping race or corruption", "Minimum useful speed cannot be met"],
+      "limits": "Capacity may improve while TPS falls. Mac unified memory does not pool with another PC. This plan does not allocate, download or page model weights."
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "experiment": {
+    "id": "macos-row-prefetch",
+    "title": "Overlap bounded SSD lookup reads",
+    "priority": 4,
+    "implementation": "Design template only. No prefetch code or candidate build exists.",
+    "kind": "native-candidate",
+    "depends_on": [
+      "split-gpu-cost"
+    ],
+    "hypothesis": "If model-specific lazy-row waits are material, bounded asynchronous page advice may hide part of them.",
+    "only_change": "Add macOS handling for already-known lazy lookup rows; preserve shard bytes and mmap/lazy behavior.",
+    "control_engine": "mtp-mma",
+    "candidate_engine": null,
+    "plan_command": null,
+    "future_run_command": null,
+    "candidate_design": {
+      "pending_work_limit_bytes": 100663296,
+      "maximum_in_flight_batches": 1,
+      "whole_shard_preload": false,
+      "fallback": "Existing demand-paged lookup"
+    },
+    "prerequisites": [
+      "File-specific lookup/fault/wait evidence",
+      "macOS API and offset/length validation",
+      "Isolated engine manifest and real implementation",
+      "Testing go-ahead"
+    ],
+    "proof": [
+      "Exact output/data parity",
+      "Bounds, alignment, shard lifetime, duplicate-row and failure-path checks",
+      "Bounded resident pages and outstanding work",
+      "Matched warm-request ABBA timing",
+      "Label cold observations separately; no system cache purge",
+      "Zero new swap"
+    ],
+    "result_fields": [
+      "file_specific_read_bytes",
+      "lookup_wait_ms",
+      "faults",
+      "resident_lookup_bytes",
+      "matched_tps",
+      "ttft",
+      "reply_time"
+    ],
+    "stop_if": [
+      "Lookup waits insignificant",
+      "Paging/advice increases memory pressure",
+      "No repeatable complete-task gain after two narrow approaches"
+    ],
+    "limits": "System-wide disk reads cannot establish lookup wait. The 96 MiB cap is a proposed bound, not an implemented cache or established optimum."
+  },
+  "control": {
+    "engine": "mtp-mma",
+    "model": "flash",
+    "draft_model": "mtp_shared_packed_q3",
+    "context": 4096,
+    "batch": 512,
+    "ubatch": 512,
+    "cache_type": "f16",
+    "draft": 3,
+    "draft_threads": 8,
+    "draft_p_min": 0.0,
+    "tensor_api": "on",
+    "temperature": 0.6,
+    "seed": 1234,
+    "fresh_output_tokens": 128,
+    "matched_inputs": [
+      512,
+      2048
+    ],
+    "warmups_per_workload": 1,
+    "repeats_per_launch": 2
+  },
+  "comparison": {
+    "order": [
+      "control",
+      "candidate",
+      "candidate",
+      "control"
+    ],
+    "new_swap_required_bytes": 0,
+    "emergency_swap_guard_bytes": 134217728,
+    "minimum_available_during_run_bytes": 1073741824,
+    "minimum_available_before_full_model_bytes": 36507222016,
+    "metrics": [
+      "generation_tok_s",
+      "prompt_tok_s",
+      "ttft_s",
+      "wall_s",
+      "draft_acceptance_percent",
+      "minimum_available_bytes",
+      "swap_growth_bytes"
+    ],
+    "adoption_gate": "At least 5 percent median complete-task improvement on the chosen workload, or useful capacity gain with an explicitly accepted speed tradeoff; no unexplained quality failure or new swap. Report control drift and all raw passes.",
+    "percentage_rules": "TPS gain = 100*(candidate/control-1). Time reduction = 100*(1-candidate/control). Requires finite positive matched metrics. Do not add percentages from separate experiments.",
+    "historical_reference_only": "bench/features/20261007T052606Z-m5-decision-baseline/review.json"
+  }
+}
