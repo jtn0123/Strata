@@ -6,7 +6,7 @@ Local, measured experiments for an Apple M5 Pro with 48 GiB unified memory. This
 
 The subsequent [M5 GPU tuning batch](bench/M5-GPU-TUNING.md) completes another 24 passes with zero new swap: two-tile limits add only +0.39% code TPS and about +0.59% synthetic TPS; threshold and worker overrides do not help.
 
-The [helper/confidence batch](bench/M5-HELPER-RESULTS.md) completes all twelve comparisons: twelve helper workers add +0.94% code TPS and finish the long fresh-input reply 2.21% sooner; confidence 0.4 adds +1.83% on one prose prompt but regresses other tasks. Both have separate optional launchers; existing defaults remain. The [M5 plan](bench/M5-NEXT.md) records the completed tests and next diagnostics. `M5 Experiment Plan.command` displays the plan without starting inference. Compressed-weight kernel work follows more focused profiling.
+The [helper/confidence batch](bench/M5-HELPER-RESULTS.md) completes all twelve comparisons: twelve helper workers add +0.94% code TPS and finish the long fresh-input reply 2.21% sooner; confidence 0.4 adds +1.83% on one prose prompt but regresses other tasks. Both have separate optional launchers; existing defaults remain. The [M5 plan](bench/M5-NEXT.md) records the completed tests and next diagnostics. `M5 Experiment Plan.command` displays the plan without starting inference. The [phase/shape diagnostic](bench/M5-PHASE-PROFILE.md) now separates prompt and generation: main-model GPU-buffer intervals cover 68-73% of generation wall time on four diagnostic requests. All matched control/trace outputs agree, and the six prior engines remain unchanged. This establishes a GPU-path investigation target, not a new TPS gain. Next compare the observed routed-expert and dense/output-head kernels.
 
 ## Run
 

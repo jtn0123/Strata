@@ -1,4 +1,4 @@
-# M5 experiments: three measured batches and next diagnostics
+# M5 experiments: completed settings and phase profiling
 
 Prepared October 6, 2026 for the 48 GiB, 20-GPU-core M5 Pro. The user subsequently authorized testing after memory cleanup. [Tensor API and prediction-depth results](M5-RESULTS.md) cover the first four comparisons; [GPU matrix tuning results](M5-GPU-TUNING.md) cover build parity and four matrix comparisons. [Helper workers and confidence results](M5-HELPER-RESULTS.md) complete the final three comparisons. All twelve experiments are complete. Colima and Grafana remain stopped. No model server is left running, and there is no scheduled run or background waiter.
 
@@ -31,11 +31,13 @@ GPU correctness checks against the CPU reference run before speed trials and ver
 
 The existing API checker accepts depth five/six, confidence and explicit tensor/tuning settings. Depth six passed nine real app checks and is exposed only by the optional short structured follow-up trial. Writing stays at depth three and the existing fast-follow-up launcher stays at four. The two-tile trial passed nine real API check groups with zero new swap. Confidence and helper CPU-worker comparisons are complete; the optional prose-confidence and twelve-worker trials each pass nine real API check groups. Matrix settings are not combined with depth six or other new presets.
 
-## Diagnostics before kernel changes
+## Completed diagnostics and next kernel comparison
+
+The [phase/shape diagnostic results](M5-PHASE-PROFILE.md) add a separate `m5-trace` engine. Request phases and model roles are now explicit; matrix shapes are inventoried once per llama graph call and inactive nodes are counted separately. Main-model GPU-buffer intervals cover 68-73% of generation wall time in four measured requests. Existing engines remain unchanged. Compare the actual routed-expert and dense/output-head shapes next; per-kernel cost and accelerator occupancy still need evidence.
 
 `profile_m5.py` uses the isolated engine's disabled-by-default command-buffer completion timestamps. It records GPU intervals, graph/context IDs and original operation counts, alongside native cumulative helper wall-time statistics. Two prompt lengths, 512 and 2048, distinguish prompt processing from the short generation portion. All profiling timings remain separate from speed results.
 
-This measures command-buffer elapsed intervals, not time per individual operation or AI-accelerator occupancy. Graph counts precede fusion. Context IDs do not identify target/helper roles by themselves. Gaps outside recorded buffers can contain CPU work, scheduling or other GPU activity; they do not prove the GPU is idle. Helper wall time includes synchronization and overlaps GPU intervals, so it must not be added to GPU time. Full Instruments/kernel-counter profiling would need additional tooling; only Command Line Tools are installed, and no Xcode or toolchain download was started.
+This measures command-buffer elapsed intervals, not time per individual operation or AI-accelerator occupancy. Graph counts precede fusion. The older context IDs do not identify target/helper roles by themselves; the new trace labels roles from the native context type. Gaps outside recorded buffers can contain CPU work, scheduling or other GPU activity; they do not prove the GPU is idle. Helper wall time includes synchronization and overlaps GPU intervals, so it must not be added to GPU time. Full Instruments/kernel-counter profiling would need additional tooling; only Command Line Tools are installed, and no Xcode or toolchain download was started.
 
 Tensor API on/off measures the contribution of the available tensor path. It does not disable all GPU matrix instructions, and it does not control the separate Neural Engine. The GPU/model tests now verify the available path and bounded matrix settings. Hardware accelerator occupancy remains unmeasured.
 
@@ -68,6 +70,6 @@ The initial testing batch used diagnostics, Tensor API comparisons and predictio
 .venv/bin/python scripts/benchmark_m5.py --experiment depth-writing depth-followup --run
 ```
 
-Choose later experiments explicitly, one at a time. All twelve prepared comparisons are complete. Choose explicit reproductions or add a new measured hypothesis. The runner refuses `--run` without an experiment selection. It does not monitor VoltTracker, automatically resume, restart Colima or stop unrelated processes. More profiling must separate prompt processing from generation before attributing the combined command-buffer totals to a decoding bottleneck.
+Choose later experiments explicitly, one at a time. All twelve prepared comparisons are complete. Choose explicit reproductions or add a new measured hypothesis. The runner refuses `--run` without an experiment selection. It does not monitor VoltTracker, automatically resume, restart Colima or stop unrelated processes. Phase separation is complete in the new trace; per-kernel evidence is still required before selecting a decoding kernel change.
 
 [Isolated native patch manifest](../config/m5_lab_experiment.json). Preparation receipts and offline checks are under `bench/features/`; new measurements create new result directories.

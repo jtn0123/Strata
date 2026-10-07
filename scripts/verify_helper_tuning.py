@@ -81,7 +81,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--depths", type=int, nargs="+", default=[1, 3, 4])
     ap.add_argument("--draft-threads", type=int, default=8)
-    ap.add_argument("--engine", choices=["mtp-shared", "mtp-mma", "m5-lab"], default="mtp-shared")
+    ap.add_argument("--engine", choices=["mtp-shared", "mtp-mma", "m5-lab", "m5-trace"], default="mtp-shared")
     ap.add_argument("--draft-p-min", type=float)
     ap.add_argument("--tensor-api", choices=["auto", "on", "off"], default="auto")
     from metal_environment import TUNING, configure, validate_confidence

@@ -70,7 +70,7 @@ The M5 Tensor API remains enabled. These tests do not measure hardware AI-accele
 
 ## Next work
 
-The subsequent [helper/confidence batch](M5-HELPER-RESULTS.md) completes the three comparisons that remained after this stage. All twelve prepared experiments are now complete. For larger GPU changes, add request-phase and tensor-shape timing evidence to separate prompt processing from generation, then choose one compressed-weight/dequantization kernel worth changing. The aggregate GPU timings from the earlier batch cannot identify a decoding bottleneck.
+The subsequent [helper/confidence batch](M5-HELPER-RESULTS.md) completes the three comparisons that remained after this stage. All twelve prepared experiments are now complete. The later [phase/shape diagnostic](M5-PHASE-PROFILE.md) separates prompt processing and generation and records model roles/shapes. Compare the recorded routed-expert and dense/output-head kernels next before choosing a compressed-weight/dequantization change. The aggregate GPU timings from the earlier batch cannot identify a decoding bottleneck.
 
 ## Raw evidence
 
