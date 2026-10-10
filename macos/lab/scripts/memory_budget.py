@@ -63,10 +63,21 @@ def report(inventory, registry, log=None):
     return result
 
 
+def benchmark_path(path, *, must_exist=False):
+    """CLI paths are limited to this lab's benchmark artifacts, including symlink targets."""
+    candidate=path if path.is_absolute() else ROOT/path
+    resolved=candidate.resolve(strict=must_exist)
+    if not resolved.is_relative_to((ROOT/'bench').resolve()):
+        raise ValueError('Memory report paths must stay inside this lab benchmark directory')
+    return resolved
+
+
 def main(argv=None):
     ap=argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--log',type=Path);ap.add_argument('--save',type=Path)
     args=ap.parse_args(argv)
+    if args.log: args.log=benchmark_path(args.log,must_exist=True)
+    if args.save: args.save=benchmark_path(args.save)
     path=ROOT/'bench/results/flash-gguf-inventory.json'
     registry=json.loads((ROOT/'config/models.json').read_text())
     result=report(json.loads(path.read_text()),registry,args.log.read_text() if args.log else None)
@@ -74,7 +85,9 @@ def main(argv=None):
     result['historical_log']=str(args.log) if args.log else None
     if args.save:
         args.save.parent.mkdir(parents=True,exist_ok=True)
-        args.save.write_text(json.dumps(result,indent=2,allow_nan=False)+'\n')
+        # A report must not overwrite an existing result or frozen evidence.
+        with args.save.open('x') as output:
+            output.write(json.dumps(result,indent=2,allow_nan=False)+'\n')
     print(f"Header weights: {result['target_unique_tensor_bytes']/1024**3:.2f} GiB; helper file: {result['helper_file_bytes']/1024**3:.2f} GiB; lazy lookup: {result['lazy_lookup_file_bytes']/1024**3:.2f} GiB on disk.")
     print('Saved allocations explain components; actual 8K fit and peak memory remain untested.')
 
