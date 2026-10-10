@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install pinned Python dependencies
-        run: python -m pip install -r macos/lab/requirements.txt
+        run: python -m pip install --only-binary :all: --require-hashes -r macos/lab/requirements-ci.lock
       - name: Restore pinned source dependencies only
         working-directory: macos/lab
         env:
@@ -31,8 +31,8 @@ jobs:
           LLAMA_REV: d81235049384534c167caea52b85a694f6103d14
         run: |
           mkdir -p vendor/Strata-macOS vendor/llama.cpp
-          curl --fail --location --retry 3 "https://codeload.github.com/jinzy0623/Strata-macOS/tar.gz/$API_SHELL_REV" -o "$RUNNER_TEMP/api-shell.tar.gz"
-          curl --fail --location --retry 3 "https://codeload.github.com/ggml-org/llama.cpp/tar.gz/$LLAMA_REV" -o "$RUNNER_TEMP/llama.tar.gz"
+          curl --fail --location --proto '=https' --proto-redir '=https' --retry 3 "https://codeload.github.com/jinzy0623/Strata-macOS/tar.gz/$API_SHELL_REV" -o "$RUNNER_TEMP/api-shell.tar.gz"
+          curl --fail --location --proto '=https' --proto-redir '=https' --retry 3 "https://codeload.github.com/ggml-org/llama.cpp/tar.gz/$LLAMA_REV" -o "$RUNNER_TEMP/llama.tar.gz"
           tar -xzf "$RUNNER_TEMP/api-shell.tar.gz" --strip-components=1 -C vendor/Strata-macOS
           tar -xzf "$RUNNER_TEMP/llama.tar.gz" --strip-components=1 -C vendor/llama.cpp
       - name: Run load-free inventory
