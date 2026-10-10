@@ -32,6 +32,18 @@ The 12 GB cache qualifies for follow-up within MLX; it does not change P07 or ad
 
 Full native/MLX internal-state, numerical, sampled/API and context qualification plus the [bounded 16 GB cache requirements](macos/lab/bench/results/20261010-mlx-cache-v1/NEXT-PLAN.json) remain future work. R08 helper reuse remains a design awaiting exposed planning cost. Models, vendor sources, virtual environments and binaries remain excluded from Git; importing the lab does not provision another checkout automatically. This preparation-branch work has not been merged into `mac-m5-lab`.
 
+## Native monitoring baseline — October 10
+
+The separate preparation branch now includes [native monitoring](macos/lab/bench/M5-MONITORING.md) for graph setup/reuse, prompt/generation GPU command-buffer intervals, helper catch-up/drafting/acceptance, prompt-checkpoint creation and memory/pressure. The isolated observer retains P07 settings and stays disabled in the ordinary launcher. Helper graph reuse itself is not implemented; its full-model exposure remains unmeasured.
+
+The Qwen3.5-4B Q4_K_M baseline runs four fresh control/observer-off/observer-on/control processes with helper off, F16 KV/4K/batch512, temperature0.6/seed1234 and 128-token caps. All32 answers match exactly, including8 warmups;24 are measured. Code/prose controls measure **77.8864/77.8183 TPS**, **79.463/80.211 ms** first token and **1.71018/1.71243 s** capped replies. All four launches have zero new swap, normal pressure and at least30.132GiB available. These rates belong to the smaller model and do not replace the full P07 results above.
+
+Detailed monitoring costs **2.3511%/2.0986% TPS**, so it is used for diagnosis and disabled for speed comparisons. Small-model generation planning totals only1.086/1.058ms per answer; do not extrapolate to the full helper. GPU elapsed coverage is not hardware/AI accelerator occupancy, overlapping times cannot be summed as removable cost, and allocation logs/RSS are not unique physical RAM.
+
+The frozen full P07 diagnostic campaign refuses the unchanged34GiB admission at33.462GiB available, before a model child or answer. Its refusal is preserved with no automatic retry; a new campaign needs stable actual-supervisor headroom with margin. A single release of the freshly used small-model clean cache gains2.538GiB available outside comparisons, with unchanged model identity and zero new swap; no unrelated process is stopped. The load-free allocation audit retains19 historical reservations and unknown overlap, without lowering admission or claiming fit.
+
+The maintained gate passes197 offline tests. All29 native receipts, both frozen source/model/build closures, all32 outputs, raw diagnostic recomputation and the unchanged launcher verify. An initial JSON/in-memory Counter-key postcheck rejection and its exact correction remain recorded; no inference rerun or timing mutation. A clean committed export passes all197 tests using only pinned vendor sources, and the observer patch applies cleanly to its pinned base; no model/native binary/build copy or GPU test is used. This work is committed and pushed on `mac/next-tests-v1`; it is not merged into `mac-m5-lab` and has no new hosted CI result.
+
 ## Historical checkpoints
 
 The dated experiments below describe their settings and decisions at the time. The current launcher and next research queue are described above; earlier TPS and percentage figures use different workloads and cannot be added together.
