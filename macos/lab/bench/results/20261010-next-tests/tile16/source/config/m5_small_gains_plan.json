@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "created_utc": "2026-10-10T02:14:43.483295+00:00",
+  "user_authorization": "Track small gains as possible additions and test to validate; previously authorized sequential then combined trials.",
+  "candidate_engine": "m5-small-stack",
+  "control_engine": "m5-copy",
+  "control_profile": "conv-direct",
+  "candidates": [
+    {
+      "id": "P11",
+      "features": [
+        "compact"
+      ],
+      "profile": "small-compact",
+      "cohort": "long",
+      "prior": "bench/results/20261009-compact-tiles/component/comparison.json"
+    },
+    {
+      "id": "P07",
+      "features": [
+        "reduce"
+      ],
+      "profile": "small-reduce",
+      "cohort": "short",
+      "prior": "bench/results/20261009T130146Z-m5-ten-expert-reduction/comparison.json"
+    },
+    {
+      "id": "W02",
+      "features": [
+        "top10"
+      ],
+      "profile": "small-top10",
+      "cohort": "short",
+      "prior": "bench/results/20261009T205909Z-m5-parallel-top10/comparison.json"
+    }
+  ],
+  "order": [
+    "control",
+    "candidate",
+    "candidate",
+    "control"
+  ],
+  "repeats_per_launch": 3,
+  "warmups_per_task": 1,
+  "output_tokens": 256,
+  "settings": "Same Qwen3.8-Flash-Next Q2_0/packed shared Q3 helper, mixed placement,8helperCPUworkers,depth3/confidence0,TensorAPIon,F16/4K/batch512,temp0.6/seed1234; short English code/prose and complete contextual long English code/prose; cached512/2048 remain separate.",
+  "independent_unit": "Fresh process launch. Median of three repetitions within launch; average the two launch medians per arm. Raw within-launch and between-launch variation retained. No statistical significance or confidence-interval claim from two launches per arm.",
+  "new_gate": {
+    "no_fixed_minimum_percent": true,
+    "metric_gain": "Positive aggregate benefit strictly above twice absolute own control drift; BOTH candidate launch medians beat BOTH control launch medians on that metric.",
+    "regression": "For TTFT, whole reply and generationTPS, loss greater than max(1percent,twice own control drift) blocks that workload scope.",
+    "general_scope": "Same metric must qualify on both English code and prose; each requires all resource/parity/activation gates. Otherwise report named workload-only benefit.",
+    "confirmation": "First all three independent screens; passing general candidates get exactly one new independent confirmation ABBA. No performance retry if noisy/negative.",
+    "combined": "Freeze only candidates whose same metric qualifies in BOTH new brackets; select newprofile before fresh combinedABBA. Cover short cohort for decode candidates and long cohort for compact. One feature subset only, no searching combinations.",
+    "memory": "No new swap,healthy monitor,exact outputs including warmups/cache. Extra average processRSS above max(128MiB,twice controlRSS spread) blocks memory-clean label; RSS is not unique totalMetal memory. Record nativebuffers and minimumavailable.",
+    "activation": "Candidate once-only actualencoding markers for each enabledfeature,noneforunselectedfeatures orcontrol. Counts proveencoding notshaderfrequency.",
+    "cached_policy": "Cached512/2048 exact outputs and resource guards mandatory. Cached timing is diagnostic, not primary adoption; flag any loss above max(5percent,twice own drift) for independent follow-up before default promotion."
+  },
+  "exclusions": "Stop on resource/parity/activation failures, preserve everyrun. At most one full resource-only retry after fresh headroom/quiet preflight; do not pool partialruns or weaken limits. Changed code/fixture requires amended freshplan before further GPU.",
+  "historical": "Old tests,thresholds,results preserved; newuser-authorized protocol creates newreceipts and never flips oldqualifies flags."
+}

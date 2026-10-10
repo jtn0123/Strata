@@ -1,0 +1,62 @@
+{
+  "schema": 1,
+  "status": "preparation only; no benchmarks started",
+  "baseline_commit": "c615d06e0b1d1ff4fd3a3855202ae4181077ef98",
+  "baseline_engine": "m5-small-stack",
+  "baseline_tuning": "small-reduce",
+  "promoted_launcher_unchanged": true,
+  "english_only": true,
+  "no_automatic_execution": true,
+  "no_additive_percentage_claims": true,
+  "sequence": [
+    {
+      "id": "U10-03",
+      "name": "Bounded whole-input tokenization cache",
+      "implementation": "Opt-in instance-local LRU; exact full text and special-token flags, 2 MiB conservative accounted-object bound and 128 entries. No model/conversation state or persisted cross-session cache.",
+      "test_model": "small: Qwen3.5-4B Q4_K_M",
+      "status": "implemented and load-free tested; Service/real-model parity and latency untested",
+      "freeze_command": [".venv/bin/python", "scripts/benchmark_input_cache.py", "--freeze"],
+      "run_command": [".venv/bin/python", "scripts/benchmark_input_cache.py", "--run"],
+      "measurement": "Four independent native launches ABBA; English code/prose, cold/identical/unique full input; first content and complete Service reply, separate native TPS; one warmup plus three measured repeats per case",
+      "default_enabled": false,
+      "native_TPS_gain_attribution": 0,
+      "promotion": "Fresh independent confirmation, measured repeated-input exposure and exact full-model/API/cancellation/cache follow-up required"
+    },
+    {
+      "id": "U10-02",
+      "name": "Sixteen-row expert prompt tiles",
+      "implementation": "Private m5-tile16 engine; original 16x64 Tensor API products, K order/scaling, route map, 128 threads, scratch/barriers retained. Separate 16-row dispatches, upper input loads skipped. No compact worklist, top10 selector or decode kernel enabled.",
+      "status": "engine and paired complete-block probes built; GPU correctness and speed untested",
+      "freeze_command": [".venv/bin/python", "scripts/benchmark_m5_tile16.py", "--freeze"],
+      "run_command": [".venv/bin/python", "scripts/benchmark_m5_tile16.py", "--run"],
+      "measurement": "All full two-block correctness fixtures on original P07, new engine flag off and flag on; original/candidate/candidate/original synthetic prompt screen with per-MM activation counters and zero new swap",
+      "default_enabled": false,
+      "promotion": "A component pass licenses only a later fresh English full-model prompt/reply trial and independent confirmation",
+      "revisit_difference": "P11/P12 altered compact worklist/grid order with original 32-row tiles. This changes dispatch width, while retaining the existing 16-row arithmetic product. Existing half-tile skipping may eliminate benefit or duplicate weight reads. No gain assumed."
+    },
+    {
+      "id": "U10-01",
+      "name": "Independent MLX feasibility",
+      "status": "pinned source and isolated dependencies installed; syntax and dependency checks pass; runtime/model experiment remains blocked",
+      "receipt": "bench/results/20261010-next-tests/mlx/preparation.json",
+      "ready_for_model_run": false,
+      "next": "Supervise a bounded F32/no-helper/paged feasibility load, after device smoke check and physical memory admission; retain precision and sampler/state boundaries",
+      "default_enabled": false
+    },
+    {
+      "id": "R08",
+      "name": "Helper graph/scheduler reuse",
+      "status": "design awaiting critical-path exposure; not implemented or runnable",
+      "next": "The pinned runtime already reuses graphs. Measure actual helper rebuild/reset/allocation and unavoidable waits before changing scheduler lifetime; preserve asynchronous input synchronization and fusion.",
+      "default_enabled": false
+    }
+  ],
+  "result_directory": "bench/results/20261010-next-tests",
+  "stop_rules": [
+    "Retain any failed/aborted result; no automatic retry, partial resume or cherry-picked passing bracket",
+    "A source/engine/rule change requires a new frozen campaign; never rewrite the historical keeper proof",
+    "Zero new swap and healthy monitoring required; only stop processes owned by a test",
+    "Qualify any gain above twice its own control drift; no fixed minimum percent, exact output and regression guards required",
+    "Do not turn on candidates or change the everyday launcher from preparation/component results"
+  ]
+}

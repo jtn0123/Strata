@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "id": "m5-lab",
+  "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+  "directory": "vendor/llama-m5-lab",
+  "patch": "patches/mtp-m5-lab.patch",
+  "patch_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+  "source_diff_sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585",
+  "modified_files": [
+    "ggml/src/ggml-metal/ggml-metal-common.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.h",
+    "ggml/src/ggml-metal/ggml-metal-context.m",
+    "ggml/src/ggml-metal/ggml-metal-device.cpp",
+    "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+    "src/llama-context.cpp",
+    "src/llama-cparams.h",
+    "src/models/qwen4exp.cpp",
+    "tests/test-backend-ops.cpp"
+  ],
+  "features": [
+    "mtp-shared",
+    "m5-tuning",
+    "m5-profile"
+  ],
+  "components": [
+    {
+      "patch": "patches/mtp-shared-mma.patch",
+      "sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3"
+    },
+    {
+      "patch": "patches/m5-lab-controls.patch",
+      "sha256": "a10ca5f9b146b082036eed369cef288baaa3182457c3d6dffe9008690b460b1a"
+    }
+  ],
+  "scope": "Existing shared-helper/MMA code plus disabled-by-default row/tiling controls and optional command-buffer GPU timestamps. No shader, weight, expert scheduler or GPU memory limit change."
+}

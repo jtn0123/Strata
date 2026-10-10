@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "id": "m5-tile16",
+  "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+  "directory": "vendor/llama-m5-tile16",
+  "patch": "patches/mtp-m5-tile16.patch",
+  "patch_sha256": "2ec90588209158368b5f386ad97faebc88d79520e91272da9e0ba946dfaae7c0",
+  "source_diff_sha256": "2ec90588209158368b5f386ad97faebc88d79520e91272da9e0ba946dfaae7c0",
+  "modified_files": [
+    "ggml/src/ggml-metal/ggml-metal-common.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.h",
+    "ggml/src/ggml-metal/ggml-metal-context.m",
+    "ggml/src/ggml-metal/ggml-metal-device.cpp",
+    "ggml/src/ggml-metal/ggml-metal-device.h",
+    "ggml/src/ggml-metal/ggml-metal-fusion.cpp",
+    "ggml/src/ggml-metal/ggml-metal-fusion.h",
+    "ggml/src/ggml-metal/ggml-metal-impl.h",
+    "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+    "ggml/src/ggml-metal/ggml-metal-ops.h",
+    "ggml/src/ggml-metal/ggml-metal.cpp",
+    "ggml/src/ggml-metal/kernels/argsort.metal",
+    "ggml/src/ggml-metal/kernels/mul_mm.metal",
+    "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+    "ggml/src/ggml-metal/kernels/quantize.metal",
+    "src/llama-context.cpp",
+    "src/llama-cparams.h",
+    "src/models/qwen4exp.cpp",
+    "tests/test-backend-ops.cpp"
+  ],
+  "features": [
+    "mtp-shared",
+    "m5-tuning",
+    "m5-profile",
+    "m5-copy",
+    "m5-reduce",
+    "m5-top10",
+    "m5-compact",
+    "m5-small-stack",
+    "m5-tile16"
+  ],
+  "components": [
+    {
+      "patch": "patches/mtp-m5-small-stack.patch",
+      "sha256": "5249164949d0757c16bdc9fa92f61a9f20859fb5fabc3254650e95024458dac0"
+    }
+  ],
+  "scope": "Held U10-02 prompt-only Q2_0 16-row expert dispatch over the P07-capable small-stack engine. Retains original 16x64 Tensor API product, 128 threads, K order, scaling, barriers, 8192-byte scratch and route map. Splits the original two-half 32-row tile into separate 16-row dispatches and omits unused upper input loads. Tensor API and bounded original compact geometry predicate required; compact worklists excluded; fewer than 32 and more than 512 tokens fall back. Inherited W02/P11 flags remain disabled. No decode TPS or exact-output claim until qualification.",
+  "upstream": {
+    "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+    "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+    "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+    "license_file": "patches/LLAMA-LICENSE.txt"
+  }
+}
