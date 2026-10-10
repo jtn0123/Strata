@@ -1,0 +1,38 @@
+{
+  "schema": 1,
+  "id": "expert-pair-group",
+  "engine": "m5-group",
+  "control": "conv-direct",
+  "candidate": "expert-group",
+  "correctness": "Strict CPU projection NMSE below1e-8/maxabs below1e-4, complete fallback/candidate trace inventory, allcheck outputbits identical, zero new swap.",
+  "operator": {
+    "order": [
+      "conv-direct",
+      "expert-group",
+      "expert-group",
+      "conv-direct"
+    ],
+    "samples_per_case": 60,
+    "triplets_per_graph": 8,
+    "scope": "Sequential expert blocks, each includes gate/up/SwiGLU/down/weighted10 reduction/residual. Two distinct full512 expert weightsets; eight actual routes per realgraph.",
+    "minimum_real_R4_time_reduction_percent": 10,
+    "maximum_real_R5_slowdown_percent": 2,
+    "maximum_distinct_slowdown_percent": 5,
+    "require_gain_above_bracket_drift": true
+  },
+  "model": {
+    "run_only_after_operator_gate": true,
+    "harness": "scripts/benchmark_m5_next.py",
+    "depth": 3,
+    "predict": 256,
+    "repeats": 3,
+    "order": [
+      "conv-direct",
+      "expert-group",
+      "expert-group",
+      "conv-direct"
+    ],
+    "scope": "Fresh code, prose, Chinese, synthetic512/2048 plus cached512/2048, exact tokens/text parity, zero newswap; no defaults changed."
+  },
+  "next_if_operator_fails": "Park grouping. Shared route map or gate/up fusion needs separate normal-dispatch evidence before implementation; do not claim TPS gain from operator timings."
+}

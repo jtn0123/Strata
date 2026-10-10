@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "scope": "Diagnostic baseline; no optimization, promotion or speed gain",
+  "control_engine": "m5-small-stack",
+  "observer_engine": "m5-observe",
+  "tuning": "small-reduce",
+  "order": ["control", "observer-off", "observer-on", "control"],
+  "repeats": 3,
+  "warmups_per_workload": 1,
+  "context": 4096,
+  "batch": 512,
+  "cache_type": "f16",
+  "temperature": 0.6,
+  "seed": 1234,
+  "output_tokens": {"small": 128, "flash": 256},
+  "admission_gib": {"small": 4, "flash": 34},
+  "floor_gib": 1,
+  "swap_growth_allowed_bytes": 0,
+  "pressure_level": 1,
+  "child_timeout_s": 900,
+  "clock_spread_us": 100,
+  "clock_anchor_width_us": 50,
+  "workloads": {
+    "code": "Write Python code for a small LRU cache with get and put methods, a capacity limit, and a demonstration. Explain its correctness and time complexity after the code. Be detailed.",
+    "prose": "Explain how to design a fair computer performance experiment. Cover warmup, input sizes, background activity, repeated trials, latency, throughput and memory. Use about 700 words with concrete examples."
+  },
+  "notes": [
+    "English only. Small model validates monitoring; it cannot establish full-model helper bottlenecks.",
+    "Exact inputs/output IDs/text/finish and request topology required across every arm, including warmups.",
+    "Observer-on timings quantify monitoring perturbation; only uninstrumented controls are throughput baselines.",
+    "Four fresh owned processes; no automatic retry, partial resume, mid-run cleanup or default changes.",
+    "Long prompt and cached continuation remain separate future safety cohorts. No tensor callbacks, extra synchronization or disabled fusion."
+  ]
+}

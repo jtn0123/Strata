@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "m5-route-map",
+  "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+  "directory": "vendor/llama-m5-route-map",
+  "patch": "patches/mtp-m5-route-map.patch",
+  "patch_sha256": "55117924d185e4ee5cdad9f89b11086a7552736725b570b8d1164cecdaa42cfb",
+  "source_diff_sha256": "55117924d185e4ee5cdad9f89b11086a7552736725b570b8d1164cecdaa42cfb",
+  "modified_files": [
+    "ggml/src/ggml-metal/ggml-metal-common.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.h",
+    "ggml/src/ggml-metal/ggml-metal-context.m",
+    "ggml/src/ggml-metal/ggml-metal-device.cpp",
+    "ggml/src/ggml-metal/ggml-metal-device.h",
+    "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+    "ggml/src/ggml-metal/ggml-metal-ops.h",
+    "ggml/src/ggml-metal/ggml-metal.cpp",
+    "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+    "ggml/src/ggml-metal/kernels/quantize.metal",
+    "src/llama-context.cpp",
+    "src/llama-cparams.h",
+    "src/models/qwen4exp.cpp",
+    "tests/test-backend-ops.cpp"
+  ],
+  "features": [
+    "mtp-shared",
+    "m5-tuning",
+    "m5-profile",
+    "m5-copy",
+    "m5-route-map"
+  ],
+  "components": [
+    {
+      "patch": "patches/mtp-m5-copy.patch",
+      "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+    }
+  ],
+  "scope": "Private opt-in M5Pro prompt gate/up pair route-map reuse. Same activation/ID objects, Q2_0[2560,640,512], T32..512, same encoder partition and following SwiGLU consumes both. Borrow only previous TPE/IDS scratch; current amax unchanged. Complete allocation overlap guard and post-barrier scratch tracking. No shader math, graph reorder, model/cache/precision/default changes.",
+  "upstream": {
+    "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+    "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+    "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+    "license_file": "patches/LLAMA-LICENSE.txt"
+  }
+}

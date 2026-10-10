@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "U10-01-warmed-cache-v1",
+  "model": "flash",
+  "dtype": "float32",
+  "budgets_decimal_GB": [6, 12, 12, 6],
+  "output_limit": 128,
+  "max_context_tokens": 512,
+  "prompt_chunk_tokens": 32,
+  "temperature": 0,
+  "seed": 1234,
+  "stop_ids": [248044, 248046],
+  "measured_repeats": 3,
+  "admission_gib": 28,
+  "availability_floor_gib": 8,
+  "child_timeout_s": 900,
+  "mlx_memory_limit_gib": 28,
+  "mlx_allocator_cache_mib": 512,
+  "primary_metric": "decode_tok_s",
+  "rule": "Exact full input/output token, finish and reset-state parity across all launches and repeats. Both 12 GB launch medians must beat both 6 GB controls for both English workloads; positive primary gain must exceed twice symmetric own control drift, with no fixed minimum percentage. TTFT and complete reply may not regress beyond max(1 percent, twice own control drift). Zero new swap, normal pressure, owned cleanup and healthy monitoring. No adoption or percentage addition to P07.",
+  "cache_policy": "Empty expert store at each fresh launch; retain it between answers. Reset conversation before every answer. Exclude first code and prose answers as fixed warmups. No preload or page-cache purge during the bracket. OS file cache is uncontrolled; record load and cold replies separately.",
+  "timing_scope": "Engine prompt-to-first-token and decode, synchronized GPU completion. Prompt rendering/tokenization, conversation reset, detokenization, HTTP and browser overhead are outside reply timing.",
+  "prompts": {
+    "code": "In English, write a Python function that merges overlapping intervals. Explain its sorting step, edge cases, and time complexity. Include runnable code and a worked example.",
+    "prose": "In English, explain how an SSD stores and retrieves data, how it differs from RAM, and why a fast SSD still cannot fully replace RAM for an AI model. Use concrete examples and several clear paragraphs."
+  },
+  "render_prefix": "<|im_start|>user\n",
+  "render_suffix": "<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n"
+}

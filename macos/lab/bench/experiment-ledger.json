@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "updated": "2026-10-10T18:08:51.699009+00:00",
+  "updated": "2026-10-10T19:44:09.351547+00:00",
   "source": "bench/EXPERIMENT-LEDGER.md",
-  "source_sha256": "44ad8c4682110186a4f5fec0166c1059ef216595b73210c090cdca1c95276569",
+  "source_sha256": "9563ac998eed817bbebfd779533c129db947654e250177914812d62115566874",
   "policy": "Read before proposing or retesting. Cite an existing ID, state what materially changed, meet its revisit condition, and append a new result without overwriting old evidence. No benchmarks start automatically.",
   "scope": "Curated decision register with detailed linked raw histories; not an exhaustive index of every compilation error. Historical settings and memory rules differ.",
   "entries": [
@@ -1760,6 +1760,39 @@
           "path": "bench/results/20261010-mlx-cache-v1/memory-preparation/REPORT.md"
         }
       ]
+    },
+    {
+      "id": "R08-OBSERVE-v1",
+      "title": "Native CPU/GPU/helper/memory monitoring baseline",
+      "status": "implemented; small-model baseline passed; full-model admission held before load",
+      "settings": "P07-compatible isolated m5-observe; control/observer-off/observer-on/control; English code/prose; 3 measured repeats plus 1 warmup each; small4B Q4_K_M/helper-off/128 output; fullP07/Q2_0/Q3 helper/256 output frozen",
+      "result": "Small code77.8864 TPS,79.463ms first token,1.71018s capped reply; prose77.8183 TPS,80.211ms,1.71243s. Monitoring TPS overhead2.3511%/2.0986%; disabled build difference within control drift. Graph planning1.086/1.058ms per small generation; full helper exposure unknown.",
+      "validation": "197 offline tests; observer build pinned;32 exact capped outputs,24 measured;4 healthy launches,normal pressure,zero new swap,min30.132GiB available. No new synthetic GPU math/full-helper/state/long/cached qualification.",
+      "revisit": "Full native new campaign requires stable actual-supervisor headroom with margin above unchanged34GiB. Preserve this held attempt; no automatic retry/partial resume. Optimize R08 only after meaningful exposed full-helper planning cost; small planning already negligible.",
+      "adoption": false,
+      "speed_gain_claimed": false,
+      "evidence": [
+        {
+          "label": "Monitoring overview",
+          "path": "bench/M5-MONITORING.md"
+        },
+        {
+          "label": "Small per-area medians",
+          "path": "bench/results/20261010-observe-small-v1/MONITORING.md"
+        },
+        {
+          "label": "Raw small campaign",
+          "path": "bench/results/20261010-observe-small-v1/result.json"
+        },
+        {
+          "label": "Held full baseline",
+          "path": "bench/results/20261010-observe-flash-v1/REPORT.md"
+        },
+        {
+          "label": "Allocation audit",
+          "path": "bench/results/20261010-observe-budget-v1/REPORT.md"
+        }
+      ]
     }
   ],
   "excluded_attempts": [
@@ -2151,15 +2184,50 @@
           "path": "bench/results/20261010-native-mlx-greedy-v2/exclusion.json"
         }
       ]
+    },
+    {
+      "id": "R08-OBSERVE-ADMISSION-v1",
+      "attempt": "Full P07 monitoring baseline refused at33.462GiB available,required34GiB,before model child or request",
+      "disposition_and_retry_condition": "Not a performance or helper correctness result. Preserve attempted campaign; stable actual-supervisor headroom with margin required for a new independent ID. No retry,partial resume or guard reduction.",
+      "evidence": [
+        {
+          "label": "Actual preflight",
+          "path": "bench/results/20261010-observe-flash-v1/00-control/result.json"
+        },
+        {
+          "label": "Exclusion",
+          "path": "bench/results/20261010-observe-flash-v1/exclusion.json"
+        }
+      ]
+    },
+    {
+      "id": "R08-OBSERVE-POSTCHECK-JSON",
+      "attempt": "Load-free post-run equality assertion compared saved JSON string Counter keys with in-memory integer keys",
+      "disposition_and_retry_condition": "Retain original rejection and corrected diagnosis; compare JSON-normalized parser output. All raw diagnostics recompute exactly, no model rerun or timing/result mutation.",
+      "evidence": [
+        {
+          "label": "Original rejection",
+          "path": "bench/results/20261010-observe-small-v1/postcheck-initial-rejection.json"
+        },
+        {
+          "label": "Diagnosis/correction",
+          "path": "bench/results/20261010-observe-small-v1/postcheck-correction.json"
+        },
+        {
+          "label": "Final verification",
+          "path": "bench/results/20261010-observe-small-v1/post-run-verification.json"
+        }
+      ]
     }
   ],
   "remaining_untested": [
     "Q01 corrected QSA mask/cache/reuse and numerical-bound qualification fixture; shortcut disabled",
     "Adaptive/mixed-cap controller and held-out policy calibration; parked until D02 extended exactness is repaired",
     "Quantized prompt cooperative-input kernels focused on English prose and code",
-    "R05 stateless prompt checkpoint savings: source-only lifecycle card; general omission held for false-to-true slot-reuse/split correctness"
+    "R05 stateless prompt checkpoint savings: source-only lifecycle card; general omission held for false-to-true slot-reuse/split correctness",
+    "R08 full-helper planning exposure: monitor implemented/small-model validated; full native diagnostic admission held; graph/scheduler reuse not implemented"
   ],
-  "latest_verification": "bench/results/20261010-mlx-cache-v1/post-run-verification.json",
+  "latest_verification": "bench/results/20261010-observe-small-v1/post-run-verification.json",
   "active_validation": {
     "plan": "config/m5_small_gains_plan.json",
     "tracker": "bench/small-gain-candidates.json",
@@ -2250,5 +2318,20 @@
     "no_further_automatic_attempt": true,
     "guards_changed": false,
     "current_resources": "bench/results/20261010-mlx-cache-v1/memory-preparation/final-resources.json"
+  },
+  "native_monitoring_baseline": {
+    "status": "implemented; small-model baseline passed; full-model admission held before load",
+    "offline_tests": 197,
+    "small_model_exact_answers": 32,
+    "small_model_measured_answers": 24,
+    "small_model_launches": 4,
+    "small_zero_new_swap": true,
+    "full_model_process_launched": false,
+    "full_helper_metrics_measured": false,
+    "adoption": false,
+    "speed_gain_claimed": false,
+    "report": "bench/M5-MONITORING.md",
+    "verification": "bench/results/20261010-observe-small-v1/post-run-verification.json",
+    "native_receipts_verified": 29
   }
 }
