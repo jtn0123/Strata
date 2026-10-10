@@ -1,0 +1,9 @@
+# Fresh native/MLX output screen: admission held again
+
+The one fresh resource-only attempt followed additional user-authorized text-analysis cleanup. It retains the original rejected v1 receipt by exact hash, uses the same full-model English inputs/output cap and native profile, and passes the 190-test offline gate. The new 168-file source archive and copied offline receipt/log are retained with the frozen reference/runtime/model pins.
+
+**The unchanged 34 GiB native preflight refused again before a model process was launched.** Zero model requests, answers or performance samples exist. Post-refusal available RAM was 33.824 GiB, while swap stayed at its old value. This is a resource deferral, not evidence that the model or implementation is incorrect. No guard was relaxed and no partial output was pooled. No further automatic model attempt is queued.
+
+A subsequent read-only setup-memory diagnostic found the supervisor process uses only about 38 MiB after all provenance checks. Garbage collection reclaimed no objects, and Apple's allocator-relief API reported zero released bytes. The larger host-availability dips are not explained by a large supervisor allocation; background availability variation remains the working explanation, not proven per-process causality. Do not introduce an ineffective allocator-relief hook or repeat unchanged cleanup.
+
+[Original failed receipt](result.json), [exclusion classification](exclusion.json), [immutable inputs and pins](frozen.json), [source archive](source/), [setup diagnostic](../20261010-mlx-cache-v1/memory-preparation/setup-memory-diagnostic.json), [resource cleanup](../20261010-mlx-cache-v1/memory-preparation/REPORT.md). The normal P07 launcher and all previously accepted native/MLX measurements remain unchanged. Internal-state, numerical, sampled, conversation, API, long-context and output equivalence remain unqualified by this unrun screen.

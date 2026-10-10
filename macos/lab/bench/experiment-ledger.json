@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "updated": "2026-10-10T14:45:20.513025+00:00",
+  "updated": "2026-10-10T18:08:51.699009+00:00",
   "source": "bench/EXPERIMENT-LEDGER.md",
-  "source_sha256": "be3be87237fc108a41f2997e5261091ff449d6bf75de89787e2894162ca76c06",
+  "source_sha256": "44ad8c4682110186a4f5fec0166c1059ef216595b73210c090cdca1c95276569",
   "policy": "Read before proposing or retesting. Cite an existing ID, state what materially changed, meet its revisit condition, and append a new result without overwriting old evidence. No benchmarks start automatically.",
   "scope": "Curated decision register with detailed linked raw histories; not an exhaustive index of every compilation error. Historical settings and memory rules differ.",
   "entries": [
@@ -1735,6 +1735,31 @@
           "path": "bench/results/20261010-mlx-cache-v1/NEXT-PLAN.json"
         }
       ]
+    },
+    {
+      "id": "U10-01-NATIVE-GREEDY-v1-v2",
+      "title": "First native/MLX English greedy-output screen",
+      "status": "implemented and frozen; two resource preflights refuse before model launch",
+      "settings": "Native small-reduce/F32 KV/512 context/32 batch, temperature-only greedy; helper off; exact prior full-model MLX English token reference; four capped responses planned",
+      "result": "No model/GPU process or request launched in either attempt. Native 34 GiB preflight refuses; post-refusal 33.976/33.824 GiB available. Zero new swap. One fresh resource-only attempt consumed; no further automatic attempt.",
+      "validation": "Original 188 and fresh 190 offline test gates, 168 archived source/config/test files each, exact model/runtime/dependency/reference pins; no output, tensor-state, numerical, quality, API, performance or model-fit qualification.",
+      "revisit": "Preserve both immutable resource refusals. New actual-supervisor admission needs stable headroom with margin; no retry or pooling of these campaigns, no guard reduction.",
+      "adoption": false,
+      "speed_gain_claimed": false,
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/results/20261010-native-mlx-greedy-v1/REPORT.md"
+        },
+        {
+          "label": "Report",
+          "path": "bench/results/20261010-native-mlx-greedy-v2/REPORT.md"
+        },
+        {
+          "label": "Report",
+          "path": "bench/results/20261010-mlx-cache-v1/memory-preparation/REPORT.md"
+        }
+      ]
     }
   ],
   "excluded_attempts": [
@@ -2096,6 +2121,36 @@
           "path": "bench/results/20261010-next-tests-v2/mlx-reply/preparation-attempts.json"
         }
       ]
+    },
+    {
+      "id": "U10-01-NATIVE-ADMISSION-v1",
+      "attempt": "Native 34 GiB preflight refuses before model process, GPU or any request",
+      "disposition_and_retry_condition": "Preserve raw receipt and exclusion; no further automatic retry, no benchmark/output correctness result. A future new campaign needs actual-supervisor resource qualification and must retain these refusals.",
+      "evidence": [
+        {
+          "label": "Original refusal",
+          "path": "bench/results/20261010-native-mlx-greedy-v1/result.json"
+        },
+        {
+          "label": "Classification",
+          "path": "bench/results/20261010-native-mlx-greedy-v1/exclusion.json"
+        }
+      ]
+    },
+    {
+      "id": "U10-01-NATIVE-ADMISSION-v2",
+      "attempt": "Native 34 GiB preflight refuses before model process, GPU or any request",
+      "disposition_and_retry_condition": "Preserve raw receipt and exclusion; no further automatic retry, no benchmark/output correctness result. A future new campaign needs actual-supervisor resource qualification and must retain these refusals.",
+      "evidence": [
+        {
+          "label": "Original refusal",
+          "path": "bench/results/20261010-native-mlx-greedy-v2/result.json"
+        },
+        {
+          "label": "Classification",
+          "path": "bench/results/20261010-native-mlx-greedy-v2/exclusion.json"
+        }
+      ]
     }
   ],
   "remaining_untested": [
@@ -2137,9 +2192,11 @@
       "bench/results/20261009-small-gains/memory-investigation/small-model-cache-trial-20261010T133040486778Z/result.json",
       "bench/results/20261009-small-gains/memory-investigation/idle-build-cache-trial-20261010T133248164957Z/result.json",
       "bench/results/20261010-next-tests-v2/memory-cleanup/ram-audit-20261010T133510405303Z/REPORT.md",
-      "bench/results/20261010-next-tests-v2/memory-cleanup/wifiman-close-20261010T134317139114Z/REPORT.md"
+      "bench/results/20261010-next-tests-v2/memory-cleanup/wifiman-close-20261010T134317139114Z/REPORT.md",
+      "bench/results/20261010-mlx-cache-v1/memory-preparation/REPORT.md"
     ],
-    "latest_cleanup_native_34gib_60s_qualification": false
+    "latest_cleanup_native_34gib_60s_qualification": true,
+    "native_supervisor_admission_passed": false
   },
   "sequential_validation": {
     "status": "completed; P07 installed and application verified",
@@ -2179,5 +2236,19 @@
     "full_tensor_state_equality_established": false,
     "adoption": false,
     "next": "bench/results/20261010-mlx-cache-v1/NEXT-PLAN.json"
+  },
+  "native_mlx_screen_preparation": {
+    "status": "prepared; native admission held twice before any child",
+    "offline_tests": 190,
+    "output_checks_completed": 0,
+    "models_loaded": false,
+    "references": [
+      "bench/results/20261010-native-mlx-greedy-v1/REPORT.md",
+      "bench/results/20261010-native-mlx-greedy-v2/REPORT.md",
+      "bench/results/20261010-mlx-cache-v1/memory-preparation/REPORT.md"
+    ],
+    "no_further_automatic_attempt": true,
+    "guards_changed": false,
+    "current_resources": "bench/results/20261010-mlx-cache-v1/memory-preparation/final-resources.json"
   }
 }
