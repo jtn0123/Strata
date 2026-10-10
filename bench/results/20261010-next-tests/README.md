@@ -35,3 +35,5 @@ R08 helper graph/scheduler reuse remains a design. The current runtime already r
 [Result sheet](results.json) starts with empty metrics. Each runner preserves raw logs, source/build/model provenance, memory samples, failed/aborted outcomes and its frozen protocol. A prior `tracking.json` blocks automatic reruns or selective resumes. Source changes require a new campaign. No daemon or timer starts these tests.
 
 The older 152-file keeper qualification remains evidence for its committed/frozen checkpoint. This preparation changes the lab source inventory and gets a new offline receipt and separate frozen campaigns; it does not re-label the old proof as qualification of new code. No candidate is promoted from a preparation or component result.
+
+The first frozen campaigns were superseded before execution when PR review tightened the memory-report CLI path boundary. Their original files are retained. The current runners use [v2 campaigns](../20261010-next-tests-v2/README.md), with the source fix and three new regression tests included.
