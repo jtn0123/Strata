@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "c96b845b2c87fc80788a07d4e34fcf3cd800e64c",
+    "filename": "src/llama-context.cpp",
+    "status": "modified",
+    "additions": 4,
+    "deletions": 1,
+    "changes": 5,
+    "blob_url": "https://github.com/ggml-org/llama.cpp/blob/cd769d0c9612c7079e6000ab6694aee946e491aa/src%2Fllama-context.cpp",
+    "raw_url": "https://github.com/ggml-org/llama.cpp/raw/cd769d0c9612c7079e6000ab6694aee946e491aa/src%2Fllama-context.cpp",
+    "contents_url": "https://api.github.com/repos/ggml-org/llama.cpp/contents/src%2Fllama-context.cpp?ref=cd769d0c9612c7079e6000ab6694aee946e491aa",
+    "patch": "@@ -700,6 +700,8 @@ void llama_context::sched_reserve() {\n         n_nodes_pp         = ggml_graph_n_nodes(gf);\n         n_inputs_pp        = get_gf_res_reserve()->inputs.size();\n         n_input_tensors_pp = this->n_input_tensors;\n+\n+        graph_has_logits = get_gf_res_reserve()->get_logits() != nullptr;\n     }\n \n     // reserve with tg (token generation) graph to get the number of splits and nodes\n@@ -2140,7 +2142,8 @@ uint32_t llama_context::output_reserve(int32_t n_outputs) {\n     const auto n_embd     = hparams.n_embd;\n     const auto n_embd_out = hparams.n_embd_out();\n \n-    bool has_logits     = true;\n+    // LFM2 builds logits only when embeddings are off, and set_embeddings() does not re-reserve\n+    bool has_logits     = !cparams.embeddings || graph_has_logits;\n     bool has_embd       = cparams.embeddings;\n     bool has_embd_nextn = cparams.embeddings_nextn;\n "
+  },
+  {
+    "sha": "6507f90032a7cff5b064609dcab134891e3e1bea",
+    "filename": "src/llama-context.h",
+    "status": "modified",
+    "additions": 4,
+    "deletions": 0,
+    "changes": 4,
+    "blob_url": "https://github.com/ggml-org/llama.cpp/blob/cd769d0c9612c7079e6000ab6694aee946e491aa/src%2Fllama-context.h",
+    "raw_url": "https://github.com/ggml-org/llama.cpp/raw/cd769d0c9612c7079e6000ab6694aee946e491aa/src%2Fllama-context.h",
+    "contents_url": "https://api.github.com/repos/ggml-org/llama.cpp/contents/src%2Fllama-context.h?ref=cd769d0c9612c7079e6000ab6694aee946e491aa",
+    "patch": "@@ -362,6 +362,10 @@ struct llama_context {\n \n     bool sched_need_reserve = true;\n \n+    // whether the reserve graph has a logits tensor, set in sched_reserve()\n+    // true until then, because the first output_reserve() runs before any graph is reserved\n+    bool graph_has_logits = true;\n+\n     // state of sched_copy_experts, reset before each graph compute\n     struct copy_experts_info {\n         const ggml_tensor *  ids = nullptr;"
+  }
+]
