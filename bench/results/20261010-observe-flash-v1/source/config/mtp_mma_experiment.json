@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "mtp-mma",
+  "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+  "directory": "vendor/llama-mtp-mma",
+  "patch": "patches/mtp-shared-mma.patch",
+  "patch_sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3",
+  "source_diff_sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3",
+  "modified_files": [
+    "ggml/src/ggml-metal/ggml-metal-common.cpp",
+    "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+    "src/llama-context.cpp",
+    "src/llama-cparams.h",
+    "src/models/qwen4exp.cpp",
+    "tests/test-backend-ops.cpp"
+  ],
+  "features": [
+    "mtp-shared"
+  ],
+  "components": [
+    {
+      "patch": "patches/mtp-shared-weights.patch",
+      "sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a"
+    },
+    {
+      "patch": "patches/metal-mma-types-upstream.patch",
+      "sha256": "5e1b5354768370e5960e2eb3f66f46dd0fbc8f4396c34e99dfac89f49f1cf53c"
+    }
+  ],
+  "upstream": {
+    "repository": "https://github.com/pratiknarola-t/llama.cpp",
+    "revision": "b0cb151326e6b436c265c641f23235864f7de090",
+    "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30065",
+    "license_file": "patches/LLAMA-LICENSE.txt"
+  },
+  "scope": "Unchanged shared helper patch plus unchanged upstream few-row dense MUL_MAT dispatch/kernel/test additions. No MUL_MAT_ID expert kernel change; no memory limit override."
+}

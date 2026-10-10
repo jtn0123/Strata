@@ -1,0 +1,274 @@
+{
+  "schema": 1,
+  "model": "Qwen3.5-4B Q4_K_M",
+  "helper_enabled": false,
+  "measured_answers": 24,
+  "warmups": 8,
+  "exact_output_answers": 32,
+  "baseline": [
+    {
+      "workload": "code",
+      "baseline": {
+        "tps": 77.88640890584185,
+        "ttft_s": 0.07946331251878291,
+        "reply_s": 1.7101778539945371
+      },
+      "arm_medians": [
+        {
+          "tps": 78.02636308062827,
+          "ttft_s": 0.07939987501595169,
+          "reply_s": 1.707149749970995
+        },
+        {
+          "tps": 77.76802105492628,
+          "ttft_s": 0.07939112500753254,
+          "reply_s": 1.7125652089598589
+        },
+        {
+          "tps": 76.0552364629165,
+          "ttft_s": 0.08028095803456381,
+          "reply_s": 1.7506094169802964
+        },
+        {
+          "tps": 77.74645473105542,
+          "ttft_s": 0.07952675002161413,
+          "reply_s": 1.7132059580180794
+        }
+      ],
+      "control_drift_percent": {
+        "tps": 0.35938022243551554,
+        "ttft_s": 0.1596648838826742,
+        "reply_s": 0.35412738113400083
+      },
+      "monitoring_perturbation_percent": {
+        "tps": -2.351080847929554,
+        "ttft_s": 1.0289597675501305,
+        "reply_s": 2.3641729947163848
+      },
+      "observer_off_build_difference_percent": {
+        "tps": -0.1520006540020158,
+        "ttft_s": -0.09084382334717533,
+        "reply_s": 0.1395968822625937
+      }
+    },
+    {
+      "workload": "prose",
+      "baseline": {
+        "tps": 77.8183070244244,
+        "ttft_s": 0.08021056250436231,
+        "reply_s": 1.7124339375004638
+      },
+      "arm_medians": [
+        {
+          "tps": 77.72632743714877,
+          "ttft_s": 0.08017954102251679,
+          "reply_s": 1.714382582984399
+        },
+        {
+          "tps": 77.74935810864585,
+          "ttft_s": 0.08017262496287003,
+          "reply_s": 1.7138492080266587
+        },
+        {
+          "tps": 76.18517436506856,
+          "ttft_s": 0.08080012502614409,
+          "reply_s": 1.7479375000111759
+        },
+        {
+          "tps": 77.91028661170004,
+          "ttft_s": 0.08024158398620784,
+          "reply_s": 1.7104852920165285
+        }
+      ],
+      "control_drift_percent": {
+        "tps": 0.23639575517048714,
+        "ttft_s": 0.07735011668529505,
+        "reply_s": 0.2275878141938219
+      },
+      "monitoring_perturbation_percent": {
+        "tps": -2.0986484052438414,
+        "ttft_s": 0.735018560366929,
+        "reply_s": 2.0732807107604057
+      },
+      "observer_off_build_difference_percent": {
+        "tps": -0.08860243612972551,
+        "ttft_s": -0.0472974385265279,
+        "reply_s": 0.08264672260938077
+      }
+    }
+  ],
+  "phase_medians": [
+    {
+      "workload": "code",
+      "phase": "prompt",
+      "measured_answers": 3,
+      "wall_ms": 79.696,
+      "recorded_gpu_percent": 92.23183477313786,
+      "planning_ms": 2.311999967787415,
+      "planning_outside_gpu_ms": 2.311999967787415,
+      "graph_rebuilds": 2,
+      "graph_reuses": 0,
+      "prompt_checkpoint_calls": 1,
+      "stages": {
+        "target/allocate": {
+          "calls": 2,
+          "wall_union_ms": 1.7550000338815153,
+          "outside_recorded_model_gpu_ms": 1.7550000338815153
+        },
+        "target/build": {
+          "calls": 2,
+          "wall_union_ms": 0.5290000117383897,
+          "outside_recorded_model_gpu_ms": 0.5290000117383897
+        },
+        "target/inputs": {
+          "calls": 2,
+          "wall_union_ms": 0.008000002708286047,
+          "outside_recorded_model_gpu_ms": 0.008000002708286047
+        },
+        "target/memory_apply": {
+          "calls": 2,
+          "wall_union_ms": 0.00500003807246685,
+          "outside_recorded_model_gpu_ms": 0.00500003807246685
+        },
+        "target/reset": {
+          "calls": 2,
+          "wall_union_ms": 0.02500001573935151,
+          "outside_recorded_model_gpu_ms": 0.02500001573935151
+        }
+      }
+    },
+    {
+      "workload": "code",
+      "phase": "generation",
+      "measured_answers": 3,
+      "wall_ms": 1669.853,
+      "recorded_gpu_percent": 93.9576615043017,
+      "planning_ms": 1.0860000038519502,
+      "planning_outside_gpu_ms": 1.0860000038519502,
+      "graph_rebuilds": 1,
+      "graph_reuses": 126,
+      "prompt_checkpoint_calls": 0,
+      "stages": {
+        "target/allocate": {
+          "calls": 1,
+          "wall_union_ms": 0.8270000107586384,
+          "outside_recorded_model_gpu_ms": 0.8270000107586384
+        },
+        "target/build": {
+          "calls": 1,
+          "wall_union_ms": 0.24799996754154563,
+          "outside_recorded_model_gpu_ms": 0.24799996754154563
+        },
+        "target/inputs": {
+          "calls": 127,
+          "wall_union_ms": 0.1320003648288548,
+          "outside_recorded_model_gpu_ms": 0.1320003648288548
+        },
+        "target/memory_apply": {
+          "calls": 127,
+          "wall_union_ms": 0.05299999611452222,
+          "outside_recorded_model_gpu_ms": 0.05299999611452222
+        },
+        "target/reset": {
+          "calls": 1,
+          "wall_union_ms": 0.010999967344105244,
+          "outside_recorded_model_gpu_ms": 0.010999967344105244
+        }
+      }
+    },
+    {
+      "workload": "prose",
+      "phase": "prompt",
+      "measured_answers": 3,
+      "wall_ms": 80.231,
+      "recorded_gpu_percent": 92.50897414376567,
+      "planning_ms": 2.2009999956935644,
+      "planning_outside_gpu_ms": 2.2009999956935644,
+      "graph_rebuilds": 2,
+      "graph_reuses": 0,
+      "prompt_checkpoint_calls": 1,
+      "stages": {
+        "target/allocate": {
+          "calls": 2,
+          "wall_union_ms": 1.6700000269338489,
+          "outside_recorded_model_gpu_ms": 1.6700000269338489
+        },
+        "target/build": {
+          "calls": 2,
+          "wall_union_ms": 0.506000011228025,
+          "outside_recorded_model_gpu_ms": 0.506000011228025
+        },
+        "target/inputs": {
+          "calls": 2,
+          "wall_union_ms": 0.009999959729611874,
+          "outside_recorded_model_gpu_ms": 0.009999959729611874
+        },
+        "target/memory_apply": {
+          "calls": 2,
+          "wall_union_ms": 0.004999979864805937,
+          "outside_recorded_model_gpu_ms": 0.004999979864805937
+        },
+        "target/reset": {
+          "calls": 2,
+          "wall_union_ms": 0.024999957531690598,
+          "outside_recorded_model_gpu_ms": 0.024999957531690598
+        }
+      }
+    },
+    {
+      "workload": "prose",
+      "phase": "generation",
+      "measured_answers": 3,
+      "wall_ms": 1667.006,
+      "recorded_gpu_percent": 94.0078222455219,
+      "planning_ms": 1.0580000234767795,
+      "planning_outside_gpu_ms": 1.0580000234767795,
+      "graph_rebuilds": 1,
+      "graph_reuses": 126,
+      "prompt_checkpoint_calls": 0,
+      "stages": {
+        "target/allocate": {
+          "calls": 1,
+          "wall_union_ms": 0.8169999928213656,
+          "outside_recorded_model_gpu_ms": 0.8169999928213656
+        },
+        "target/build": {
+          "calls": 1,
+          "wall_union_ms": 0.2329999697394669,
+          "outside_recorded_model_gpu_ms": 0.2329999697394669
+        },
+        "target/inputs": {
+          "calls": 127,
+          "wall_union_ms": 0.13100006617605686,
+          "outside_recorded_model_gpu_ms": 0.13100006617605686
+        },
+        "target/memory_apply": {
+          "calls": 127,
+          "wall_union_ms": 0.055999960750341415,
+          "outside_recorded_model_gpu_ms": 0.055999960750341415
+        },
+        "target/reset": {
+          "calls": 1,
+          "wall_union_ms": 0.010000017937272787,
+          "outside_recorded_model_gpu_ms": 0.010000017937272787
+        }
+      }
+    }
+  ],
+  "minimum_available_gib": 30.131973266601562,
+  "maximum_server_rss_gib": 2.9728546142578125,
+  "new_swap_bytes": 0,
+  "clock": {
+    "mach_minus_ggml_us": -43725048122.875,
+    "spread_us": 34.791015625,
+    "widest_anchor_us": 1
+  },
+  "inputs": {
+    "00-control/result.json": "b9002ddc2a934773dac626c821dd3f8403efccb7126c2ca8b134eb7516a4e7cd",
+    "01-observer-off/result.json": "a0447bb70af0debeba129672ab7e3c00597b0d1e18f32ed4ae7bab6d704fcd2e",
+    "02-observer-on/result.json": "85d60d4b41891fd41b3ca5ae81271cbe3bb5d87477ff92dead756f1ea6af7cf9",
+    "03-control/result.json": "1c2e3cbe41ad3b53d2994099fa2acdfe3220ec7b6a6e179236852d171dad8fc5"
+  },
+  "runner_sha256": "5d15a1715826b421008543d10e74cd9284453189f309674c1e52a0ab8ddccb3a",
+  "note": "Monitoring-on phase timings describe this small model only. Intervals overlap; GPU coverage is elapsed command-buffer time, not active utilization. Outside recorded GPU is not proven removable time. RSS and allocation logs are not unique physical memory. All answers end at a fixed length cap."
+}
