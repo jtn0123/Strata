@@ -1,0 +1,137 @@
+{
+  "small": {
+    "repository": "unsloth/Qwen3.5-4B-GGUF",
+    "revision": "e87f176479d0855a907a41277aca2f8ee7a09523",
+    "files": [
+      {
+        "path": "Qwen3.5-4B-Q4_K_M.gguf",
+        "size_bytes": 2740937888,
+        "sha256": "00fe7986ff5f6b463e62455821146049db6f9313603938a70800d1fb69ef11a4"
+      }
+    ]
+  },
+  "mtp": {
+    "repository": "unsloth/Qwen3.8-Flash-Next-GGUF",
+    "revision": "766911a6b7369840a91dbcd95f9f997acaab6cd6",
+    "files": [
+      {
+        "path": "MTP/mtp-Qwen3.8-Flash-Next-Q4_K_M.gguf",
+        "size_bytes": 2786204800,
+        "sha256": "8087dbb39fc73f79ac069b1debe4069a44b73ada900c8bd761569d43a5a90231"
+      }
+    ]
+  },
+  "mtp_bf16": {
+    "repository": "unsloth/Qwen3.8-Flash-Next-GGUF",
+    "revision": "766911a6b7369840a91dbcd95f9f997acaab6cd6",
+    "files": [
+      {
+        "path": "MTP/mtp-Qwen3.8-Flash-Next-BF16.gguf",
+        "size_bytes": 7770760320,
+        "sha256": "6b6c9988419c7f756888e034e8083053c73c00da4ffc1f6b9c21f9f3ececbec4"
+      }
+    ]
+  },
+  "flash": {
+    "repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "revision": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+    "files": [
+      {
+        "path": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "size_bytes": 37623740192,
+        "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+      },
+      {
+        "path": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "size_bytes": 28800138432,
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+      }
+    ]
+  },
+  "mtp_q2": {
+    "derived": {
+      "source_model": "mtp_bf16",
+      "source_sha256": "6b6c9988419c7f756888e034e8083053c73c00da4ffc1f6b9c21f9f3ececbec4",
+      "quant": "Q2_K",
+      "pure": true,
+      "runtime_revision": "d81235049384534c167caea52b85a694f6103d14",
+      "receipt": "bench/results/20261006T144829Z-prepare-mtp_q2/preparation.json"
+    },
+    "files": [
+      {
+        "path": "mtp-Qwen3.8-Flash-Next-Q2_K-pure.gguf",
+        "size_bytes": 1490615680,
+        "sha256": "9ecf97ab711eb941719ca4e5c0bf028e16688289d0e733199aaecc393aabc38e"
+      }
+    ]
+  },
+  "mtp_q2_0": {
+    "derived": {
+      "source_model": "mtp_bf16",
+      "source_sha256": "6b6c9988419c7f756888e034e8083053c73c00da4ffc1f6b9c21f9f3ececbec4",
+      "quant": "Q2_0",
+      "pure": true,
+      "runtime_revision": "d81235049384534c167caea52b85a694f6103d14",
+      "receipt": "bench/results/20261006T145324Z-prepare-mtp_q2_0/preparation.json"
+    },
+    "files": [
+      {
+        "path": "mtp-Qwen3.8-Flash-Next-Q2_0-pure.gguf",
+        "size_bytes": 1109653120,
+        "sha256": "6388ac063011eb6bdf227524ec7391dab7b87f904bd8cf341710e67c8e7fd88e"
+      }
+    ]
+  },
+  "mtp_q3": {
+    "derived": {
+      "source_model": "mtp_bf16",
+      "source_sha256": "6b6c9988419c7f756888e034e8083053c73c00da4ffc1f6b9c21f9f3ececbec4",
+      "quant": "Q3_K_S",
+      "pure": true,
+      "runtime_revision": "d81235049384534c167caea52b85a694f6103d14",
+      "receipt": "bench/results/20261006T145628Z-prepare-mtp_q3/preparation.json"
+    },
+    "files": [
+      {
+        "path": "mtp-Qwen3.8-Flash-Next-Q3_K_S-pure.gguf",
+        "size_bytes": 1797864960,
+        "sha256": "717e861aae936ebaa92fd3fb8b10df6d27f919432d4b4109b94b7732228ff728"
+      }
+    ]
+  },
+  "mtp_shared_q3": {
+    "derived": {
+      "source_model": "mtp_q3",
+      "source_sha256": "717e861aae936ebaa92fd3fb8b10df6d27f919432d4b4109b94b7732228ff728",
+      "removed_tensors": [
+        "output.weight",
+        "token_embd.weight"
+      ],
+      "required_engine": "mtp-shared",
+      "receipt": "bench/results/20261006T182700Z-prepare-mtp-shared/preparation.json"
+    },
+    "files": [
+      {
+        "path": "mtp-Qwen3.8-Flash-Next-Q3_K_S-shared.gguf",
+        "size_bytes": 1251560832,
+        "sha256": "6b8a04dfd4c60e1bde4b25de96f0d7b0a9a39c2b90cba43e27e199c2d839713d"
+      }
+    ]
+  },
+  "mtp_shared_packed_q3": {
+    "derived": {
+      "source_model": "mtp_shared_q3",
+      "source_sha256": "6b8a04dfd4c60e1bde4b25de96f0d7b0a9a39c2b90cba43e27e199c2d839713d",
+      "layout": "CPU expert tables first, GPU dense tensors last",
+      "required_engine": "mtp-shared",
+      "receipt": "bench/results/20261006T183818Z-prepare-shared-layout/preparation.json"
+    },
+    "files": [
+      {
+        "path": "mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf",
+        "size_bytes": 1251560832,
+        "sha256": "e7e8a4187cbca95f51d82c618e76fe6057a25ba376599fd11bbd2e2c48380954"
+      }
+    ]
+  }
+}
