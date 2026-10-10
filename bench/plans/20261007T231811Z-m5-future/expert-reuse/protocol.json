@@ -1,0 +1,101 @@
+{
+  "experiment": {
+    "id": "expert-reuse",
+    "title": "Measure real expert reuse",
+    "priority": 3,
+    "implementation": "Diagnostic entry point and capture/parser staged; native CPU self-test passes. No model or GPU run yet.",
+    "kind": "diagnostic",
+    "depends_on": [],
+    "hypothesis": "Four/five verification tokens may reuse enough selected experts to justify sparse matrix work.",
+    "only_change": "Install a read-only evaluation callback for ten expert IDs per token; preserve weight bytes and all launchers.",
+    "control_engine": "m5-trace",
+    "candidate_engine": null,
+    "plan_command": [
+      ".venv/bin/python",
+      "scripts/profile_m5_routes.py"
+    ],
+    "future_run_command": [
+      ".venv/bin/python",
+      "scripts/profile_m5_routes.py",
+      "--mode",
+      "routes",
+      "--depths",
+      "3",
+      "4",
+      "--run"
+    ],
+    "prerequisites": [
+      "Testing go-ahead",
+      "Verified diagnostic build",
+      "34 GiB available RAM",
+      "No full-model server running"
+    ],
+    "proof": [
+      "Matched greedy text and token IDs including warmups",
+      "All 48 main expert layers captured",
+      "Ten distinct IDs per token in 0..511",
+      "2048-byte routing row stride",
+      "Target/helper roles separate",
+      "Zero new swap"
+    ],
+    "result_fields": [
+      "active_experts",
+      "assignments_per_active_expert",
+      "reuse_percent",
+      "expert_token_histogram",
+      "per_layer_coverage"
+    ],
+    "stop_if": [
+      "Missing or invalid IDs",
+      "Greedy outputs differ",
+      "New swap or low-RAM guard"
+    ],
+    "limits": "Callbacks split/synchronize graphs. Exclude their timing from TPS history. A high reuse rate alone does not prove a fast kernel."
+  },
+  "control": {
+    "engine": "mtp-mma",
+    "model": "flash",
+    "draft_model": "mtp_shared_packed_q3",
+    "context": 4096,
+    "batch": 512,
+    "ubatch": 512,
+    "cache_type": "f16",
+    "draft": 3,
+    "draft_threads": 8,
+    "draft_p_min": 0.0,
+    "tensor_api": "on",
+    "temperature": 0.6,
+    "seed": 1234,
+    "fresh_output_tokens": 128,
+    "matched_inputs": [
+      512,
+      2048
+    ],
+    "warmups_per_workload": 1,
+    "repeats_per_launch": 2
+  },
+  "comparison": {
+    "order": [
+      "control",
+      "candidate",
+      "candidate",
+      "control"
+    ],
+    "new_swap_required_bytes": 0,
+    "emergency_swap_guard_bytes": 134217728,
+    "minimum_available_during_run_bytes": 1073741824,
+    "minimum_available_before_full_model_bytes": 36507222016,
+    "metrics": [
+      "generation_tok_s",
+      "prompt_tok_s",
+      "ttft_s",
+      "wall_s",
+      "draft_acceptance_percent",
+      "minimum_available_bytes",
+      "swap_growth_bytes"
+    ],
+    "adoption_gate": "At least 5 percent median complete-task improvement on the chosen workload, or useful capacity gain with an explicitly accepted speed tradeoff; no unexplained quality failure or new swap. Report control drift and all raw passes.",
+    "percentage_rules": "TPS gain = 100*(candidate/control-1). Time reduction = 100*(1-candidate/control). Requires finite positive matched metrics. Do not add percentages from separate experiments.",
+    "historical_reference_only": "bench/features/20261007T052606Z-m5-decision-baseline/review.json"
+  }
+}

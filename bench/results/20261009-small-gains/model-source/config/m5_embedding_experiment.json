@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "m5-embedding",
+  "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+  "directory": "vendor/llama-m5-embedding",
+  "patch": "patches/mtp-m5-embedding.patch",
+  "patch_sha256": "e126217a6ee5dfaa24456cbe9d993c3dee7c87af3c71aa54dcccc8c02c11412e",
+  "source_diff_sha256": "e126217a6ee5dfaa24456cbe9d993c3dee7c87af3c71aa54dcccc8c02c11412e",
+  "modified_files": [
+    "ggml/src/ggml-metal/ggml-metal-common.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.h",
+    "ggml/src/ggml-metal/ggml-metal-context.m",
+    "ggml/src/ggml-metal/ggml-metal-device.cpp",
+    "ggml/src/ggml-metal/ggml-metal-device.h",
+    "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+    "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+    "ggml/src/ggml-metal/kernels/quantize.metal",
+    "src/llama-context.cpp",
+    "src/llama-cparams.h",
+    "src/llama-graph.cpp",
+    "src/models/qwen4exp.cpp",
+    "tests/test-backend-ops.cpp"
+  ],
+  "features": [
+    "mtp-shared",
+    "m5-tuning",
+    "m5-profile",
+    "m5-copy",
+    "m5-embedding"
+  ],
+  "components": [
+    {
+      "patch": "patches/mtp-m5-copy.patch",
+      "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+    }
+  ],
+  "scope": "Isolated upstream embedding gather ordering in common graph and Qwen4exp PLE. No Gemma4 change, helper graph_mtp unchanged. Graph-forward-order preserves inactive branches; weights/precision/placement and ordinary engines unchanged. Normal scheduler topology qualifies any model speed trial.",
+  "upstream": {
+    "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30160",
+    "head": "49b76388035a748ca00cd73c32d67dc9a560d656",
+    "merge": "8e2d31e0eb658d0382d3106a61369dff81f0c080",
+    "license_file": "patches/LLAMA-LICENSE.txt"
+  }
+}

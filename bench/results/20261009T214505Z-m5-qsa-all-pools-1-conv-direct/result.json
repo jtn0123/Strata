@@ -1,0 +1,484 @@
+{
+  "schema": 1,
+  "run_id": "20261009T214505Z-m5-qsa-all-pools-1-conv-direct",
+  "status": "failed",
+  "settings": {
+    "model": "flash",
+    "label": "m5-qsa-all-pools-1-conv-direct",
+    "comparison_profile": "conv-direct",
+    "engine": "m5-copy",
+    "draft_vocab": "off",
+    "context": 4096,
+    "batch": 512,
+    "ubatch": 512,
+    "cache_type": "f16",
+    "spec": "draft-mtp",
+    "draft": 3,
+    "draft_placement": "mixed",
+    "draft_model": "mtp_shared_packed_q3",
+    "threads": 8,
+    "temperature": 0.6,
+    "extended_checks": true,
+    "repeats": 3,
+    "warmups": 1,
+    "predict": 256,
+    "prompts": [
+      512,
+      2048
+    ],
+    "real_workloads": true,
+    "cached_workloads": true,
+    "draft_threads": 8,
+    "draft_p_min": 0.0,
+    "tensor_api": "on",
+    "m5_tuning": "conv-direct",
+    "swap_guard_bytes": 0,
+    "minimum_available_bytes": 1073741824,
+    "require_quiet_host": true
+  },
+  "command": [
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-copy/build/bin/llama-server",
+    "-m",
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "56888",
+    "-c",
+    "4096",
+    "-b",
+    "512",
+    "-ub",
+    "512",
+    "-t",
+    "8",
+    "-tb",
+    "8",
+    "-ngl",
+    "all",
+    "-fit",
+    "off",
+    "-fa",
+    "on",
+    "-lm",
+    "mmap",
+    "-lzm",
+    "on",
+    "-np",
+    "1",
+    "-ctk",
+    "f16",
+    "-ctv",
+    "f16",
+    "--cache-ram",
+    "0",
+    "--spec-type",
+    "draft-mtp",
+    "--spec-draft-n-max",
+    "3",
+    "--metrics",
+    "--jinja",
+    "--no-webui",
+    "--alias",
+    "flash",
+    "--verbosity",
+    "4",
+    "--cors-origins",
+    "localhost",
+    "-md",
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/models/mtp_shared_packed_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf",
+    "--spec-draft-ngl",
+    "all",
+    "--spec-draft-cpu-moe",
+    "--no-op-offload",
+    "--spec-draft-threads",
+    "8",
+    "--spec-draft-threads-batch",
+    "8",
+    "--spec-draft-p-min",
+    "0.0"
+  ],
+  "runtime": {
+    "llama_cpp": {
+      "repository": "https://github.com/ggml-org/llama.cpp.git",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "tag": "v0.6.0"
+    },
+    "strata_macos": {
+      "repository": "https://github.com/jinzy0623/Strata-macOS.git",
+      "revision": "2cc4153409edb3f859187bdf10f13e34972d6ffb"
+    },
+    "build_flags": [
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DGGML_METAL=ON",
+      "-DGGML_METAL_EMBED_LIBRARY=ON",
+      "-DLLAMA_BUILD_TESTS=OFF",
+      "-DLLAMA_BUILD_EXAMPLES=OFF",
+      "-DLLAMA_BUILD_TOOLS=ON"
+    ]
+  },
+  "model": {
+    "repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "revision": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+    "files": [
+      {
+        "path": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "size_bytes": 37623740192,
+        "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+      },
+      {
+        "path": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "size_bytes": 28800138432,
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+      }
+    ]
+  },
+  "host_before": {
+    "os": "macOS-27.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "chip": "Apple M5 Pro",
+    "ram_bytes": 51539607552,
+    "cpu_count": 18,
+    "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=36831331)\t100%; charged; 0:00 remaining present: true",
+    "power_settings": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n womp                 0\n displaysleep         10\n networkoversleep     0\n sleep                1\n lessbright           0\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                0\n tcpkeepalive         1\n disksleep            10",
+    "thermal_status": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+    "gpu_wired_limit": "iogpu.wired_limit_mb: 0",
+    "vm_stat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    39055.\nPages active:                                 524382.\nPages inactive:                              2188560.\nPages speculative:                              1355.\nPages throttled:                                   0.\nPages wired down:                             196923.\nPages purgeable:                               39361.\n\"Translation faults\":                     7205640574.\nPages copy-on-write:                       215940345.\nPages zero filled:                        3323326325.\nPages reactivated:                         189702764.\nPages purged:                               34740463.\nFile-backed pages:                           2388131.\nAnonymous pages:                              326166.\nPages stored in compressor:                   344314.\nPages occupied by compressor:                 134948.\nDecompressions:                            122428770.\nCompressions:                              152232984.\nPageins:                                   245680845.\nPageouts:                                     154606.\nSwapins:                                      586556.\nSwapouts:                                    1024737.\nPages tagged:                                 138142.\nPages tagged resident:                        109105.\nPages tagged compressed:                       29037.\nPages tag-storage:                             98304.\nPages tag-storage holding tags:                 9333.\nPages tag-storage free:                           79.\nPages tag-storage non-tag pageable:            88844.\nPages tag-storage non-tag wired:                   8.\nBytes of compressed tags:                    4723200.\nTagged compressions:                         4129169.\nTagged decompressions:                       3741038.",
+    "swap": {
+      "total": 2147483648,
+      "used": 525336576,
+      "free": 1622147072,
+      "percent": 24.5,
+      "sin": 4025234964480,
+      "sout": 2533064704
+    },
+    "available_bytes": 36520984576
+  },
+  "cases": [],
+  "warmups": [],
+  "checks": [],
+  "selected_engine": {
+    "engine": "m5-copy",
+    "directory": "vendor/llama-m5-copy",
+    "revision": "d81235049384534c167caea52b85a694f6103d14",
+    "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+    "patch": {
+      "schema": 1,
+      "id": "m5-copy",
+      "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+      "directory": "vendor/llama-m5-copy",
+      "patch": "patches/mtp-m5-copy.patch",
+      "patch_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+      "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+      "modified_files": [
+        "ggml/src/ggml-metal/ggml-metal-common.cpp",
+        "ggml/src/ggml-metal/ggml-metal-common.h",
+        "ggml/src/ggml-metal/ggml-metal-context.m",
+        "ggml/src/ggml-metal/ggml-metal-device.cpp",
+        "ggml/src/ggml-metal/ggml-metal-device.h",
+        "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+        "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+        "ggml/src/ggml-metal/kernels/quantize.metal",
+        "src/llama-context.cpp",
+        "src/llama-cparams.h",
+        "src/models/qwen4exp.cpp",
+        "tests/test-backend-ops.cpp"
+      ],
+      "features": [
+        "mtp-shared",
+        "m5-tuning",
+        "m5-profile",
+        "m5-copy"
+      ],
+      "components": [
+        {
+          "patch": "patches/mtp-m5-correctness.patch",
+          "sha256": "f0d397305b8e6dd148bc32eb92ceedbabd7e5f8d5b69a43de4780b468c0fe07b"
+        }
+      ],
+      "scope": "Isolated same-shape wide F32 row copy experiment. Width 0 keeps the existing dispatch; widths 1,4,8 explicitly opt in. Strided rows preserve all source and destination strides. Unaligned vectors and different shapes fall back. No model, cache, rollback or launcher default changes. Separate conv-direct mode skips an intermediate contiguous tensor before the existing strided copy; all rollback slots remain.",
+      "upstream": {
+        "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+        "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+        "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+        "license_file": "patches/LLAMA-LICENSE.txt"
+      }
+    },
+    "artifacts": {
+      "llama-server": "e60bfd1dd90f4a6000f37068605fac8db7cc25d143ca30e11c6b72f8b7af8570",
+      "libggml-base.0.26.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+      "libggml-base.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+      "libggml-base.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+      "libggml-blas.0.26.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+      "libggml-blas.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+      "libggml-blas.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+      "libggml-cpu.0.26.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+      "libggml-cpu.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+      "libggml-cpu.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+      "libggml-metal.0.26.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+      "libggml-metal.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+      "libggml-metal.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+      "libggml.0.26.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+      "libggml.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+      "libggml.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+      "libllama-common.0.6.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+      "libllama-common.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+      "libllama-common.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+      "libllama-server-impl.dylib": "93e778b6fe31a96ea8790af786b29eadda4a8abc7fdbff0774c999e00d558d2b",
+      "libllama.0.6.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+      "libllama.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+      "libllama.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+      "libmtmd.0.6.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+      "libmtmd.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+      "libmtmd.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5"
+    },
+    "build_receipt": {
+      "engine": "m5-copy",
+      "directory": "vendor/llama-m5-copy",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+      "patch": {
+        "schema": 1,
+        "id": "m5-copy",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-copy",
+        "patch": "patches/mtp-m5-copy.patch",
+        "patch_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+        "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal-device.h",
+          "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "ggml/src/ggml-metal/kernels/quantize.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-copy"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-correctness.patch",
+            "sha256": "f0d397305b8e6dd148bc32eb92ceedbabd7e5f8d5b69a43de4780b468c0fe07b"
+          }
+        ],
+        "scope": "Isolated same-shape wide F32 row copy experiment. Width 0 keeps the existing dispatch; widths 1,4,8 explicitly opt in. Strided rows preserve all source and destination strides. Unaligned vectors and different shapes fall back. No model, cache, rollback or launcher default changes. Separate conv-direct mode skips an intermediate contiguous tensor before the existing strided copy; all rollback slots remain.",
+        "upstream": {
+          "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+          "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+          "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        }
+      },
+      "artifacts": {
+        "llama-server": "e60bfd1dd90f4a6000f37068605fac8db7cc25d143ca30e11c6b72f8b7af8570",
+        "libggml-base.0.26.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+        "libggml-base.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+        "libggml-base.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+        "libggml-blas.0.26.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+        "libggml-blas.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+        "libggml-blas.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+        "libggml-cpu.0.26.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+        "libggml-cpu.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+        "libggml-cpu.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+        "libggml-metal.0.26.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+        "libggml-metal.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+        "libggml-metal.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+        "libggml.0.26.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+        "libggml.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+        "libggml.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+        "libllama-common.0.6.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+        "libllama-common.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+        "libllama-common.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+        "libllama-server-impl.dylib": "93e778b6fe31a96ea8790af786b29eadda4a8abc7fdbff0774c999e00d558d2b",
+        "libllama.0.6.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+        "libllama.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+        "libllama.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+        "libmtmd.0.6.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+        "libmtmd.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+        "libmtmd.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5"
+      },
+      "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+      "build_settings": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GGML_BLAS": "ON",
+        "GGML_CPU": "ON",
+        "GGML_METAL": "ON",
+        "GGML_METAL_EMBED_LIBRARY": "ON",
+        "GGML_NATIVE": "ON",
+        "LLAMA_BUILD_TESTS": "ON",
+        "LLAMA_BUILD_TOOLS": "ON"
+      },
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+    }
+  },
+  "draft_vocabulary": null,
+  "metal_environment": {
+    "tensor_api": "on",
+    "tuning": "conv-direct",
+    "profile": false,
+    "variables": {
+      "GGML_M5_LAB_CONV_DIRECT": "1",
+      "GGML_METAL_TENSOR_ENABLE": "1"
+    }
+  },
+  "method": "Single slot, full Metal offload, fixed seed 1234; sampling temperature is recorded in settings. Exact synthetic chat prompt sizes and fixed output count from settings; no prompt reuse; ignore EOS for timing only. No model downloads during a run. Warm OS file cache is uncontrolled. TTFT includes HTTP and prompt evaluation. Correctness checks use normal EOS handling.",
+  "actual_sources": {
+    "llama_cpp": {
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "dirty": ""
+    },
+    "strata_macos": {
+      "revision": "2cc4153409edb3f859187bdf10f13e34972d6ffb",
+      "dirty": ""
+    }
+  },
+  "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+  "draft_model": {
+    "derived": {
+      "source_model": "mtp_shared_q3",
+      "source_sha256": "6b8a04dfd4c60e1bde4b25de96f0d7b0a9a39c2b90cba43e27e199c2d839713d",
+      "layout": "CPU expert tables first, GPU dense tensors last",
+      "required_engine": "mtp-shared",
+      "receipt": "bench/results/20261006T183818Z-prepare-shared-layout/preparation.json"
+    },
+    "files": [
+      {
+        "path": "mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf",
+        "size_bytes": 1251560832,
+        "sha256": "e7e8a4187cbca95f51d82c618e76fe6057a25ba376599fd11bbd2e2c48380954"
+      }
+    ]
+  },
+  "launch_preflight": {
+    "memory": {
+      "total": 51539607552,
+      "available": 36520984576,
+      "percent": 29.1,
+      "used": 11816321024,
+      "free": 641417216,
+      "active": 8590114816,
+      "inactive": 35857367040,
+      "wired": 3226206208
+    },
+    "swap": {
+      "total": 2147483648,
+      "used": 525336576,
+      "free": 1622147072,
+      "percent": 24.5,
+      "sin": 4025234964480,
+      "sout": 2533064704
+    },
+    "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 89%",
+    "largest_process_groups": [
+      {
+        "name": "mediaanalysisd",
+        "rss_bytes": 1330413568
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "rss_bytes": 761544704
+      },
+      {
+        "name": "T3 Code (Alpha) Helper (Renderer)",
+        "rss_bytes": 638959616
+      },
+      {
+        "name": "mdworker_shared",
+        "rss_bytes": 438501376
+      },
+      {
+        "name": "T3 Code (Alpha)",
+        "rss_bytes": 361758720
+      },
+      {
+        "name": "codex",
+        "rss_bytes": 238305280
+      },
+      {
+        "name": "T3 Code (Alpha) Helper",
+        "rss_bytes": 84623360
+      },
+      {
+        "name": "node_repl",
+        "rss_bytes": 83443712
+      },
+      {
+        "name": "NewsTag",
+        "rss_bytes": 61440000
+      },
+      {
+        "name": "textunderstandingd",
+        "rss_bytes": 59457536
+      },
+      {
+        "name": "node",
+        "rss_bytes": 59424768
+      },
+      {
+        "name": "gh",
+        "rss_bytes": 49676288
+      }
+    ],
+    "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth.",
+    "required_available_bytes": 36507222016,
+    "pressure_level": 1,
+    "host_cpu_percent_samples": [
+      1.4,
+      2.3,
+      1.4
+    ],
+    "quiet_host_required": true
+  },
+  "error": "RuntimeError: Server exited during load with code -15; see server.log",
+  "memory": {
+    "guard": "Stopped: swap grew by over 0 MiB or available memory stayed below 1024 MiB for 4 seconds",
+    "monitor_healthy": true,
+    "monitor_error": null,
+    "samples": 8,
+    "live_samples": 7,
+    "baseline_before_launch": true,
+    "child_exited": true,
+    "launch_baseline": {
+      "swap_used_bytes": 525336576,
+      "available_bytes": 36627267584
+    },
+    "peak_rss_bytes": 5114970112,
+    "minimum_available_bytes": 22574235648,
+    "peak_swap_bytes": 525926400,
+    "swap_growth_bytes": 589824,
+    "system_disk_read_bytes": 6942208000,
+    "sampling_interval_s": 0.25,
+    "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+  },
+  "host_after": {
+    "os": "macOS-27.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "chip": "Apple M5 Pro",
+    "ram_bytes": 51539607552,
+    "cpu_count": 18,
+    "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=36831331)\t100%; charged; 0:00 remaining present: true",
+    "power_settings": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n womp                 0\n displaysleep         10\n networkoversleep     0\n sleep                1\n lessbright           0\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                0\n tcpkeepalive         1\n disksleep            10",
+    "thermal_status": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+    "gpu_wired_limit": "iogpu.wired_limit_mb: 0",
+    "vm_stat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    12444.\nPages active:                                 213938.\nPages inactive:                              2488930.\nPages speculative:                             11137.\nPages throttled:                                   0.\nPages wired down:                             201849.\nPages purgeable:                               13648.\n\"Translation faults\":                     7207996804.\nPages copy-on-write:                       215945110.\nPages zero filled:                        3323352752.\nPages reactivated:                         190892845.\nPages purged:                               34740483.\nFile-backed pages:                           2505402.\nAnonymous pages:                              208603.\nPages stored in compressor:                   408870.\nPages occupied by compressor:                 156925.\nDecompressions:                            122436230.\nCompressions:                              152325446.\nPageins:                                   246105191.\nPageouts:                                     154963.\nSwapins:                                      586556.\nSwapouts:                                    1024773.\nPages tagged:                                 135877.\nPages tagged resident:                         99917.\nPages tagged compressed:                       35960.\nPages tag-storage:                             98304.\nPages tag-storage holding tags:                 9269.\nPages tag-storage free:                         1608.\nPages tag-storage non-tag pageable:            87315.\nPages tag-storage non-tag wired:                   8.\nBytes of compressed tags:                    6147136.\nTagged compressions:                         4136856.\nTagged decompressions:                       3741802.",
+    "swap": {
+      "total": 2147483648,
+      "used": 525926400,
+      "free": 1621557248,
+      "percent": 24.5,
+      "sin": 4032187449344,
+      "sout": 2538913792
+    },
+    "available_bytes": 41166503936
+  }
+}

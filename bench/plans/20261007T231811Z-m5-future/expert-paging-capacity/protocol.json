@@ -1,0 +1,101 @@
+{
+  "experiment": {
+    "id": "expert-paging-capacity",
+    "title": "Explore larger-model capacity",
+    "priority": 10,
+    "implementation": "Feasibility template only; pager, precision upgrade and larger model downloads are absent.",
+    "kind": "capacity-research",
+    "depends_on": [
+      "expert-reuse",
+      "context-8k"
+    ],
+    "hypothesis": "A bounded expert residency map could trade SSD traffic and speed for larger or higher-precision weights.",
+    "only_change": "Expert residency/paging policy in a separate prototype after a complete capacity budget.",
+    "control_engine": "mtp-mma",
+    "candidate_engine": null,
+    "plan_command": null,
+    "future_run_command": null,
+    "candidate_design": {
+      "target_model": null,
+      "target_precision": null,
+      "resident_budget_bytes": null,
+      "minimum_acceptable_tok_s": null,
+      "second_device_required": false
+    },
+    "prerequisites": [
+      "User-selected capacity goal and acceptable minimum speed",
+      "Measured expert hot set/miss curve",
+      "Storage and OS headroom budget",
+      "Correctness-tested resident-slot map",
+      "Testing go-ahead before downloads or model runs"
+    ],
+    "proof": [
+      "Mapping, eviction, in-flight references and fallback correctness",
+      "Prefill and verification miss handling",
+      "Read bytes/latency and resident-set peak",
+      "Zero OS swap growth",
+      "Actual quality/precision benefit and sustained response speed"
+    ],
+    "result_fields": [
+      "resident_expert_bytes",
+      "cache_hit_percent",
+      "ssd_bytes_per_token",
+      "miss_wait_ms",
+      "target_precision",
+      "sustained_tps",
+      "quality"
+    ],
+    "stop_if": [
+      "Memory accounting depends on OS swap",
+      "Resident mapping race or corruption",
+      "Minimum useful speed cannot be met"
+    ],
+    "limits": "Capacity may improve while TPS falls. Mac unified memory does not pool with another PC. This plan does not allocate, download or page model weights."
+  },
+  "control": {
+    "engine": "mtp-mma",
+    "model": "flash",
+    "draft_model": "mtp_shared_packed_q3",
+    "context": 4096,
+    "batch": 512,
+    "ubatch": 512,
+    "cache_type": "f16",
+    "draft": 3,
+    "draft_threads": 8,
+    "draft_p_min": 0.0,
+    "tensor_api": "on",
+    "temperature": 0.6,
+    "seed": 1234,
+    "fresh_output_tokens": 128,
+    "matched_inputs": [
+      512,
+      2048
+    ],
+    "warmups_per_workload": 1,
+    "repeats_per_launch": 2
+  },
+  "comparison": {
+    "order": [
+      "control",
+      "candidate",
+      "candidate",
+      "control"
+    ],
+    "new_swap_required_bytes": 0,
+    "emergency_swap_guard_bytes": 134217728,
+    "minimum_available_during_run_bytes": 1073741824,
+    "minimum_available_before_full_model_bytes": 36507222016,
+    "metrics": [
+      "generation_tok_s",
+      "prompt_tok_s",
+      "ttft_s",
+      "wall_s",
+      "draft_acceptance_percent",
+      "minimum_available_bytes",
+      "swap_growth_bytes"
+    ],
+    "adoption_gate": "At least 5 percent median complete-task improvement on the chosen workload, or useful capacity gain with an explicitly accepted speed tradeoff; no unexplained quality failure or new swap. Report control drift and all raw passes.",
+    "percentage_rules": "TPS gain = 100*(candidate/control-1). Time reduction = 100*(1-candidate/control). Requires finite positive matched metrics. Do not add percentages from separate experiments.",
+    "historical_reference_only": "bench/features/20261007T052606Z-m5-decision-baseline/review.json"
+  }
+}

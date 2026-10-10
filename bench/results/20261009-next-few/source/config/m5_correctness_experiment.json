@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "id": "m5-correctness",
+  "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+  "directory": "vendor/llama-m5-correctness",
+  "patch": "patches/mtp-m5-correctness.patch",
+  "patch_sha256": "f0d397305b8e6dd148bc32eb92ceedbabd7e5f8d5b69a43de4780b468c0fe07b",
+  "source_diff_sha256": "f0d397305b8e6dd148bc32eb92ceedbabd7e5f8d5b69a43de4780b468c0fe07b",
+  "modified_files": [
+    "ggml/src/ggml-metal/ggml-metal-common.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.h",
+    "ggml/src/ggml-metal/ggml-metal-context.m",
+    "ggml/src/ggml-metal/ggml-metal-device.cpp",
+    "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+    "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+    "src/llama-context.cpp",
+    "src/llama-cparams.h",
+    "src/models/qwen4exp.cpp",
+    "tests/test-backend-ops.cpp"
+  ],
+  "features": [
+    "mtp-shared",
+    "m5-tuning",
+    "m5-profile"
+  ],
+  "components": [
+    {
+      "patch": "patches/mtp-m5-lab.patch",
+      "sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585"
+    },
+    {
+      "patch": "patches/metal-fused-residual-upstream.patch",
+      "sha256": "8cdab5ab45434718d80eba97bb846f6c157af727098120d03cc89d17266fa753"
+    }
+  ],
+  "scope": "Existing m5-lab source plus the upstream residual-by-identity correctness fix and its mm2+mm regressions. No weight, dispatch threshold, memory limit or launcher default change. GPU/model validation pending.",
+  "upstream": {
+    "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+    "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+    "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+    "license_file": "patches/LLAMA-LICENSE.txt"
+  }
+}

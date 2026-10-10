@@ -1,0 +1,314 @@
+{
+  "status": "passed",
+  "test": "read_cost",
+  "engine": {
+    "engine": "m5-sampling",
+    "directory": "vendor/llama-m5-sampling",
+    "revision": "d81235049384534c167caea52b85a694f6103d14",
+    "source_diff_sha256": "ade59b7a5dafc8bc503ca35efe0d877989e15074b3f659b599a5825533b0d0f2",
+    "patch": {
+      "schema": 1,
+      "id": "m5-sampling",
+      "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+      "directory": "vendor/llama-m5-sampling",
+      "patch": "patches/mtp-m5-sampling.patch",
+      "patch_sha256": "ade59b7a5dafc8bc503ca35efe0d877989e15074b3f659b599a5825533b0d0f2",
+      "source_diff_sha256": "ade59b7a5dafc8bc503ca35efe0d877989e15074b3f659b599a5825533b0d0f2",
+      "modified_files": [
+        "common/sampling.cpp",
+        "ggml/src/ggml-metal/ggml-metal-common.cpp",
+        "ggml/src/ggml-metal/ggml-metal-common.h",
+        "ggml/src/ggml-metal/ggml-metal-context.m",
+        "ggml/src/ggml-metal/ggml-metal-device.cpp",
+        "ggml/src/ggml-metal/ggml-metal-device.h",
+        "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+        "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+        "ggml/src/ggml-metal/kernels/quantize.metal",
+        "src/llama-context.cpp",
+        "src/llama-cparams.h",
+        "src/llama-ext.h",
+        "src/models/qwen4exp.cpp",
+        "tests/test-backend-ops.cpp",
+        "tests/test-backend-sampler.cpp"
+      ],
+      "features": [
+        "mtp-shared",
+        "m5-tuning",
+        "m5-profile",
+        "m5-copy",
+        "m5-sampling"
+      ],
+      "components": [
+        {
+          "patch": "patches/mtp-m5-copy.patch",
+          "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+        }
+      ],
+      "scope": "Opt-in consolidated sampling view with exactly preserved legacy getter calls for controls. No sampler, model, MTP or precision changes.",
+      "upstream": {
+        "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30196",
+        "head": "6071ef3c9931d4af1308ac6bd6721cfabb5318e1",
+        "status_at_capture": "draft-open",
+        "license_file": "patches/LLAMA-LICENSE.txt",
+        "local_adaptation": "Strict cached opt-in; common API grammar tests and paired ready-output overhead probe added."
+      }
+    },
+    "artifacts": {
+      "llama-server": "20b3e609f895f63dd55a596d0d7be340e115238ee67a3f3a2dc7dbe9e4c0e5da",
+      "libggml-base.0.26.0.dylib": "e2d5d55319d63917ddc20b56d179a7c1b0054f97b1db1197133adf88b1d499b4",
+      "libggml-base.0.dylib": "e2d5d55319d63917ddc20b56d179a7c1b0054f97b1db1197133adf88b1d499b4",
+      "libggml-base.dylib": "e2d5d55319d63917ddc20b56d179a7c1b0054f97b1db1197133adf88b1d499b4",
+      "libggml-blas.0.26.0.dylib": "545d97732db7d6b7b925a68b0b383597b5f46479bc06ff11be8277ab9ac098e8",
+      "libggml-blas.0.dylib": "545d97732db7d6b7b925a68b0b383597b5f46479bc06ff11be8277ab9ac098e8",
+      "libggml-blas.dylib": "545d97732db7d6b7b925a68b0b383597b5f46479bc06ff11be8277ab9ac098e8",
+      "libggml-cpu.0.26.0.dylib": "ef2ae9c4a9b35b419356d0e9b49ef842b9f9de91e1efa6a7a4c9f5d3e715ff67",
+      "libggml-cpu.0.dylib": "ef2ae9c4a9b35b419356d0e9b49ef842b9f9de91e1efa6a7a4c9f5d3e715ff67",
+      "libggml-cpu.dylib": "ef2ae9c4a9b35b419356d0e9b49ef842b9f9de91e1efa6a7a4c9f5d3e715ff67",
+      "libggml-metal.0.26.0.dylib": "d5a344494712f41d9fdea54a36bb2dbe31241d45dcdc2bc686a78ecdaffa09a1",
+      "libggml-metal.0.dylib": "d5a344494712f41d9fdea54a36bb2dbe31241d45dcdc2bc686a78ecdaffa09a1",
+      "libggml-metal.dylib": "d5a344494712f41d9fdea54a36bb2dbe31241d45dcdc2bc686a78ecdaffa09a1",
+      "libggml.0.26.0.dylib": "486dcf4f19471688974212ca91d08b77f7368e0c6b3c3a5a8facaff768fb8ef7",
+      "libggml.0.dylib": "486dcf4f19471688974212ca91d08b77f7368e0c6b3c3a5a8facaff768fb8ef7",
+      "libggml.dylib": "486dcf4f19471688974212ca91d08b77f7368e0c6b3c3a5a8facaff768fb8ef7",
+      "libllama-common.0.6.0.dylib": "7f6400b2fa1445d1a3e7028ca51c757c297f5e082632448b0999687adc911f39",
+      "libllama-common.0.dylib": "7f6400b2fa1445d1a3e7028ca51c757c297f5e082632448b0999687adc911f39",
+      "libllama-common.dylib": "7f6400b2fa1445d1a3e7028ca51c757c297f5e082632448b0999687adc911f39",
+      "libllama-server-impl.dylib": "caf68aa0f6ec26264b782c304f1bfad336b0518eb3f9ef0a1b2a9f70f19a8b7b",
+      "libllama.0.6.0.dylib": "6baa694250e6c1c43ce2b7307ebfebf9753ad2cbc96a1baa2252435adf0a9df8",
+      "libllama.0.dylib": "6baa694250e6c1c43ce2b7307ebfebf9753ad2cbc96a1baa2252435adf0a9df8",
+      "libllama.dylib": "6baa694250e6c1c43ce2b7307ebfebf9753ad2cbc96a1baa2252435adf0a9df8",
+      "libmtmd.0.6.0.dylib": "2306cf0d7beb85944117b865245574dc9bb1a6aab1c0e719f6d6fce49b4138a8",
+      "libmtmd.0.dylib": "2306cf0d7beb85944117b865245574dc9bb1a6aab1c0e719f6d6fce49b4138a8",
+      "libmtmd.dylib": "2306cf0d7beb85944117b865245574dc9bb1a6aab1c0e719f6d6fce49b4138a8"
+    },
+    "build_receipt": {
+      "engine": "m5-sampling",
+      "directory": "vendor/llama-m5-sampling",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "ade59b7a5dafc8bc503ca35efe0d877989e15074b3f659b599a5825533b0d0f2",
+      "patch": {
+        "schema": 1,
+        "id": "m5-sampling",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-sampling",
+        "patch": "patches/mtp-m5-sampling.patch",
+        "patch_sha256": "ade59b7a5dafc8bc503ca35efe0d877989e15074b3f659b599a5825533b0d0f2",
+        "source_diff_sha256": "ade59b7a5dafc8bc503ca35efe0d877989e15074b3f659b599a5825533b0d0f2",
+        "modified_files": [
+          "common/sampling.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal-device.h",
+          "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "ggml/src/ggml-metal/kernels/quantize.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/llama-ext.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp",
+          "tests/test-backend-sampler.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-copy",
+          "m5-sampling"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-copy.patch",
+            "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+          }
+        ],
+        "scope": "Opt-in consolidated sampling view with exactly preserved legacy getter calls for controls. No sampler, model, MTP or precision changes.",
+        "upstream": {
+          "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30196",
+          "head": "6071ef3c9931d4af1308ac6bd6721cfabb5318e1",
+          "status_at_capture": "draft-open",
+          "license_file": "patches/LLAMA-LICENSE.txt",
+          "local_adaptation": "Strict cached opt-in; common API grammar tests and paired ready-output overhead probe added."
+        }
+      },
+      "artifacts": {
+        "llama-server": "20b3e609f895f63dd55a596d0d7be340e115238ee67a3f3a2dc7dbe9e4c0e5da",
+        "libggml-base.0.26.0.dylib": "e2d5d55319d63917ddc20b56d179a7c1b0054f97b1db1197133adf88b1d499b4",
+        "libggml-base.0.dylib": "e2d5d55319d63917ddc20b56d179a7c1b0054f97b1db1197133adf88b1d499b4",
+        "libggml-base.dylib": "e2d5d55319d63917ddc20b56d179a7c1b0054f97b1db1197133adf88b1d499b4",
+        "libggml-blas.0.26.0.dylib": "545d97732db7d6b7b925a68b0b383597b5f46479bc06ff11be8277ab9ac098e8",
+        "libggml-blas.0.dylib": "545d97732db7d6b7b925a68b0b383597b5f46479bc06ff11be8277ab9ac098e8",
+        "libggml-blas.dylib": "545d97732db7d6b7b925a68b0b383597b5f46479bc06ff11be8277ab9ac098e8",
+        "libggml-cpu.0.26.0.dylib": "ef2ae9c4a9b35b419356d0e9b49ef842b9f9de91e1efa6a7a4c9f5d3e715ff67",
+        "libggml-cpu.0.dylib": "ef2ae9c4a9b35b419356d0e9b49ef842b9f9de91e1efa6a7a4c9f5d3e715ff67",
+        "libggml-cpu.dylib": "ef2ae9c4a9b35b419356d0e9b49ef842b9f9de91e1efa6a7a4c9f5d3e715ff67",
+        "libggml-metal.0.26.0.dylib": "d5a344494712f41d9fdea54a36bb2dbe31241d45dcdc2bc686a78ecdaffa09a1",
+        "libggml-metal.0.dylib": "d5a344494712f41d9fdea54a36bb2dbe31241d45dcdc2bc686a78ecdaffa09a1",
+        "libggml-metal.dylib": "d5a344494712f41d9fdea54a36bb2dbe31241d45dcdc2bc686a78ecdaffa09a1",
+        "libggml.0.26.0.dylib": "486dcf4f19471688974212ca91d08b77f7368e0c6b3c3a5a8facaff768fb8ef7",
+        "libggml.0.dylib": "486dcf4f19471688974212ca91d08b77f7368e0c6b3c3a5a8facaff768fb8ef7",
+        "libggml.dylib": "486dcf4f19471688974212ca91d08b77f7368e0c6b3c3a5a8facaff768fb8ef7",
+        "libllama-common.0.6.0.dylib": "7f6400b2fa1445d1a3e7028ca51c757c297f5e082632448b0999687adc911f39",
+        "libllama-common.0.dylib": "7f6400b2fa1445d1a3e7028ca51c757c297f5e082632448b0999687adc911f39",
+        "libllama-common.dylib": "7f6400b2fa1445d1a3e7028ca51c757c297f5e082632448b0999687adc911f39",
+        "libllama-server-impl.dylib": "caf68aa0f6ec26264b782c304f1bfad336b0518eb3f9ef0a1b2a9f70f19a8b7b",
+        "libllama.0.6.0.dylib": "6baa694250e6c1c43ce2b7307ebfebf9753ad2cbc96a1baa2252435adf0a9df8",
+        "libllama.0.dylib": "6baa694250e6c1c43ce2b7307ebfebf9753ad2cbc96a1baa2252435adf0a9df8",
+        "libllama.dylib": "6baa694250e6c1c43ce2b7307ebfebf9753ad2cbc96a1baa2252435adf0a9df8",
+        "libmtmd.0.6.0.dylib": "2306cf0d7beb85944117b865245574dc9bb1a6aab1c0e719f6d6fce49b4138a8",
+        "libmtmd.0.dylib": "2306cf0d7beb85944117b865245574dc9bb1a6aab1c0e719f6d6fce49b4138a8",
+        "libmtmd.dylib": "2306cf0d7beb85944117b865245574dc9bb1a6aab1c0e719f6d6fce49b4138a8"
+      },
+      "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+      "build_settings": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GGML_BLAS": "ON",
+        "GGML_CPU": "ON",
+        "GGML_METAL": "ON",
+        "GGML_METAL_EMBED_LIBRARY": "ON",
+        "GGML_NATIVE": "ON",
+        "LLAMA_BUILD_TESTS": "ON",
+        "LLAMA_BUILD_TOOLS": "ON"
+      },
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+    }
+  },
+  "tester_sha256": "cdb04c5a9cf1a8c51275e886d6e5b476b751fb4ec0eb8933d1a0a2988ad531d3",
+  "model": {
+    "path": "/Users/justin/Documents/Github/Strata-Mac-Lab/models/small/Qwen3.5-4B-Q4_K_M.gguf",
+    "size_bytes": 2740937888,
+    "sha256": "00fe7986ff5f6b463e62455821146049db6f9313603938a70800d1fb69ef11a4"
+  },
+  "metal_environment": {
+    "tensor_api": "on",
+    "tuning": "conv-direct",
+    "profile": false,
+    "variables": {
+      "GGML_M5_LAB_CONV_DIRECT": "1",
+      "GGML_METAL_TENSOR_ENABLE": "1"
+    }
+  },
+  "models_loaded": true,
+  "scope": "Small GPU model; CPU overhead is not model TPS.",
+  "memory": {
+    "guard": null,
+    "monitor_healthy": true,
+    "monitor_error": null,
+    "samples": 5,
+    "live_samples": 3,
+    "baseline_before_launch": true,
+    "child_exited": true,
+    "launch_baseline": {
+      "swap_used_bytes": 531234816,
+      "available_bytes": 39074971648
+    },
+    "peak_rss_bytes": 2984804352,
+    "minimum_available_bytes": 37970690048,
+    "peak_swap_bytes": 531234816,
+    "swap_growth_bytes": 0,
+    "system_disk_read_bytes": 0,
+    "sampling_interval_s": 0.25,
+    "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+  },
+  "tokens": [],
+  "costs": [
+    [
+      "0",
+      "0",
+      "200000",
+      "0.100674165"
+    ],
+    [
+      "0",
+      "1",
+      "200000",
+      "0.034588540"
+    ],
+    [
+      "1",
+      "1",
+      "200000",
+      "0.033449790"
+    ],
+    [
+      "1",
+      "0",
+      "200000",
+      "0.099397290"
+    ],
+    [
+      "2",
+      "0",
+      "200000",
+      "0.098266250"
+    ],
+    [
+      "2",
+      "1",
+      "200000",
+      "0.030541460"
+    ],
+    [
+      "3",
+      "1",
+      "200000",
+      "0.034188750"
+    ],
+    [
+      "3",
+      "0",
+      "200000",
+      "0.098409170"
+    ],
+    [
+      "4",
+      "0",
+      "200000",
+      "0.097144790"
+    ],
+    [
+      "4",
+      "1",
+      "200000",
+      "0.030587915"
+    ],
+    [
+      "5",
+      "1",
+      "200000",
+      "0.029647290"
+    ],
+    [
+      "5",
+      "0",
+      "200000",
+      "0.094996455"
+    ],
+    [
+      "6",
+      "0",
+      "200000",
+      "0.097011665"
+    ],
+    [
+      "6",
+      "1",
+      "200000",
+      "0.030350625"
+    ],
+    [
+      "7",
+      "1",
+      "200000",
+      "0.029544170"
+    ],
+    [
+      "7",
+      "0",
+      "200000",
+      "0.096442500"
+    ]
+  ]
+}

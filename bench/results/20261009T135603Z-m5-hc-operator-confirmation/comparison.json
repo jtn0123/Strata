@@ -1,0 +1,974 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "kind": "hc-matched-operator-confirmation",
+  "probe": {
+    "engine": {
+      "engine": "m5-hc",
+      "directory": "vendor/llama-m5-hc",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "5a631f0eaee8e6a0995d7d066c318335bf03f626d9ad481266cfe89136965137",
+      "patch": {
+        "schema": 1,
+        "id": "m5-hc",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-hc",
+        "patch": "patches/mtp-m5-hc.patch",
+        "patch_sha256": "5a631f0eaee8e6a0995d7d066c318335bf03f626d9ad481266cfe89136965137",
+        "source_diff_sha256": "5a631f0eaee8e6a0995d7d066c318335bf03f626d9ad481266cfe89136965137",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal-device.h",
+          "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "ggml/src/ggml-metal/kernels/quantize.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-copy",
+          "m5-hc"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-copy.patch",
+            "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+          }
+        ],
+        "scope": "Opt-in exact-shape shared BF16 projection TensorOps with non-relaxed F32 inputs/outputs, bounded static scratch and existing residual fusion. Each direction independently gated to contiguous one-batch T=4..5. Separate exact-K specialization of the unchanged MMA math. No new model weights or default changes.",
+        "upstream": {
+          "pull_request": "https://github.com/ml-explore/mlx/pull/4640",
+          "merge": "3c40e8f92d0cce0866fc2f436f9b5096cf3b0ea7",
+          "followup_merge": "a87691d2de8b6185fdca6b565c755596f3f66df4",
+          "license_file": "patches/MLX-LICENSE.txt",
+          "adaptation": "Register input and split-K design; mixed F32/BF16/F32 with relaxed_precision=false, masked short token rows, exact shapes and existing residual contract."
+        }
+      },
+      "artifacts": {
+        "llama-server": "79930b976d898746cb350f933b185f5f23105407c0fbe303023b1a22d8e95d86",
+        "libggml-base.0.26.0.dylib": "5066c80d47dea9ba20068cb45161330855c1b107d8eff5a130db1e7793e0ba6b",
+        "libggml-base.0.dylib": "5066c80d47dea9ba20068cb45161330855c1b107d8eff5a130db1e7793e0ba6b",
+        "libggml-base.dylib": "5066c80d47dea9ba20068cb45161330855c1b107d8eff5a130db1e7793e0ba6b",
+        "libggml-blas.0.26.0.dylib": "fe5d8e892e515f1d1c2c8b74449ff2bbf7f440eefdf78a6ec2ce75d6473e426c",
+        "libggml-blas.0.dylib": "fe5d8e892e515f1d1c2c8b74449ff2bbf7f440eefdf78a6ec2ce75d6473e426c",
+        "libggml-blas.dylib": "fe5d8e892e515f1d1c2c8b74449ff2bbf7f440eefdf78a6ec2ce75d6473e426c",
+        "libggml-cpu.0.26.0.dylib": "19bb68f62e726792a7e8fb016f31194ee3c344c64543efb6c9357d1eb27a8404",
+        "libggml-cpu.0.dylib": "19bb68f62e726792a7e8fb016f31194ee3c344c64543efb6c9357d1eb27a8404",
+        "libggml-cpu.dylib": "19bb68f62e726792a7e8fb016f31194ee3c344c64543efb6c9357d1eb27a8404",
+        "libggml-metal.0.26.0.dylib": "31650277c2a5c2f4556d297e137158d2fcac164c7dad6e0c146c233ee425c026",
+        "libggml-metal.0.dylib": "31650277c2a5c2f4556d297e137158d2fcac164c7dad6e0c146c233ee425c026",
+        "libggml-metal.dylib": "31650277c2a5c2f4556d297e137158d2fcac164c7dad6e0c146c233ee425c026",
+        "libggml.0.26.0.dylib": "963bdbc39f065f6f8e1873d402f7506faec7f84b5b674e3a7cb60dc19d9c7bc7",
+        "libggml.0.dylib": "963bdbc39f065f6f8e1873d402f7506faec7f84b5b674e3a7cb60dc19d9c7bc7",
+        "libggml.dylib": "963bdbc39f065f6f8e1873d402f7506faec7f84b5b674e3a7cb60dc19d9c7bc7",
+        "libllama-common.0.6.0.dylib": "9d8eabfa5abfea672670379f41d3678c8a5dd465035bba52606d77db6c5b2ff5",
+        "libllama-common.0.dylib": "9d8eabfa5abfea672670379f41d3678c8a5dd465035bba52606d77db6c5b2ff5",
+        "libllama-common.dylib": "9d8eabfa5abfea672670379f41d3678c8a5dd465035bba52606d77db6c5b2ff5",
+        "libllama-server-impl.dylib": "ac21703795cc2ce3310361720a88cee2914e173e909455092872d3a90086e28f",
+        "libllama.0.6.0.dylib": "2c5e4a1817d6e17e3ada7808adb488897d656cda7484ebc14d5679c89badabcf",
+        "libllama.0.dylib": "2c5e4a1817d6e17e3ada7808adb488897d656cda7484ebc14d5679c89badabcf",
+        "libllama.dylib": "2c5e4a1817d6e17e3ada7808adb488897d656cda7484ebc14d5679c89badabcf",
+        "libmtmd.0.6.0.dylib": "68b141588191f17dabf0ee430d0f84a6c8ac06d022b0e99d2f4d56bad4df2e63",
+        "libmtmd.0.dylib": "68b141588191f17dabf0ee430d0f84a6c8ac06d022b0e99d2f4d56bad4df2e63",
+        "libmtmd.dylib": "68b141588191f17dabf0ee430d0f84a6c8ac06d022b0e99d2f4d56bad4df2e63"
+      },
+      "build_receipt": {
+        "engine": "m5-hc",
+        "directory": "vendor/llama-m5-hc",
+        "revision": "d81235049384534c167caea52b85a694f6103d14",
+        "source_diff_sha256": "5a631f0eaee8e6a0995d7d066c318335bf03f626d9ad481266cfe89136965137",
+        "patch": {
+          "schema": 1,
+          "id": "m5-hc",
+          "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+          "directory": "vendor/llama-m5-hc",
+          "patch": "patches/mtp-m5-hc.patch",
+          "patch_sha256": "5a631f0eaee8e6a0995d7d066c318335bf03f626d9ad481266cfe89136965137",
+          "source_diff_sha256": "5a631f0eaee8e6a0995d7d066c318335bf03f626d9ad481266cfe89136965137",
+          "modified_files": [
+            "ggml/src/ggml-metal/ggml-metal-common.cpp",
+            "ggml/src/ggml-metal/ggml-metal-common.h",
+            "ggml/src/ggml-metal/ggml-metal-context.m",
+            "ggml/src/ggml-metal/ggml-metal-device.cpp",
+            "ggml/src/ggml-metal/ggml-metal-device.h",
+            "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+            "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+            "ggml/src/ggml-metal/kernels/quantize.metal",
+            "src/llama-context.cpp",
+            "src/llama-cparams.h",
+            "src/models/qwen4exp.cpp",
+            "tests/test-backend-ops.cpp"
+          ],
+          "features": [
+            "mtp-shared",
+            "m5-tuning",
+            "m5-profile",
+            "m5-copy",
+            "m5-hc"
+          ],
+          "components": [
+            {
+              "patch": "patches/mtp-m5-copy.patch",
+              "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+            }
+          ],
+          "scope": "Opt-in exact-shape shared BF16 projection TensorOps with non-relaxed F32 inputs/outputs, bounded static scratch and existing residual fusion. Each direction independently gated to contiguous one-batch T=4..5. Separate exact-K specialization of the unchanged MMA math. No new model weights or default changes.",
+          "upstream": {
+            "pull_request": "https://github.com/ml-explore/mlx/pull/4640",
+            "merge": "3c40e8f92d0cce0866fc2f436f9b5096cf3b0ea7",
+            "followup_merge": "a87691d2de8b6185fdca6b565c755596f3f66df4",
+            "license_file": "patches/MLX-LICENSE.txt",
+            "adaptation": "Register input and split-K design; mixed F32/BF16/F32 with relaxed_precision=false, masked short token rows, exact shapes and existing residual contract."
+          }
+        },
+        "artifacts": {
+          "llama-server": "79930b976d898746cb350f933b185f5f23105407c0fbe303023b1a22d8e95d86",
+          "libggml-base.0.26.0.dylib": "5066c80d47dea9ba20068cb45161330855c1b107d8eff5a130db1e7793e0ba6b",
+          "libggml-base.0.dylib": "5066c80d47dea9ba20068cb45161330855c1b107d8eff5a130db1e7793e0ba6b",
+          "libggml-base.dylib": "5066c80d47dea9ba20068cb45161330855c1b107d8eff5a130db1e7793e0ba6b",
+          "libggml-blas.0.26.0.dylib": "fe5d8e892e515f1d1c2c8b74449ff2bbf7f440eefdf78a6ec2ce75d6473e426c",
+          "libggml-blas.0.dylib": "fe5d8e892e515f1d1c2c8b74449ff2bbf7f440eefdf78a6ec2ce75d6473e426c",
+          "libggml-blas.dylib": "fe5d8e892e515f1d1c2c8b74449ff2bbf7f440eefdf78a6ec2ce75d6473e426c",
+          "libggml-cpu.0.26.0.dylib": "19bb68f62e726792a7e8fb016f31194ee3c344c64543efb6c9357d1eb27a8404",
+          "libggml-cpu.0.dylib": "19bb68f62e726792a7e8fb016f31194ee3c344c64543efb6c9357d1eb27a8404",
+          "libggml-cpu.dylib": "19bb68f62e726792a7e8fb016f31194ee3c344c64543efb6c9357d1eb27a8404",
+          "libggml-metal.0.26.0.dylib": "31650277c2a5c2f4556d297e137158d2fcac164c7dad6e0c146c233ee425c026",
+          "libggml-metal.0.dylib": "31650277c2a5c2f4556d297e137158d2fcac164c7dad6e0c146c233ee425c026",
+          "libggml-metal.dylib": "31650277c2a5c2f4556d297e137158d2fcac164c7dad6e0c146c233ee425c026",
+          "libggml.0.26.0.dylib": "963bdbc39f065f6f8e1873d402f7506faec7f84b5b674e3a7cb60dc19d9c7bc7",
+          "libggml.0.dylib": "963bdbc39f065f6f8e1873d402f7506faec7f84b5b674e3a7cb60dc19d9c7bc7",
+          "libggml.dylib": "963bdbc39f065f6f8e1873d402f7506faec7f84b5b674e3a7cb60dc19d9c7bc7",
+          "libllama-common.0.6.0.dylib": "9d8eabfa5abfea672670379f41d3678c8a5dd465035bba52606d77db6c5b2ff5",
+          "libllama-common.0.dylib": "9d8eabfa5abfea672670379f41d3678c8a5dd465035bba52606d77db6c5b2ff5",
+          "libllama-common.dylib": "9d8eabfa5abfea672670379f41d3678c8a5dd465035bba52606d77db6c5b2ff5",
+          "libllama-server-impl.dylib": "ac21703795cc2ce3310361720a88cee2914e173e909455092872d3a90086e28f",
+          "libllama.0.6.0.dylib": "2c5e4a1817d6e17e3ada7808adb488897d656cda7484ebc14d5679c89badabcf",
+          "libllama.0.dylib": "2c5e4a1817d6e17e3ada7808adb488897d656cda7484ebc14d5679c89badabcf",
+          "libllama.dylib": "2c5e4a1817d6e17e3ada7808adb488897d656cda7484ebc14d5679c89badabcf",
+          "libmtmd.0.6.0.dylib": "68b141588191f17dabf0ee430d0f84a6c8ac06d022b0e99d2f4d56bad4df2e63",
+          "libmtmd.0.dylib": "68b141588191f17dabf0ee430d0f84a6c8ac06d022b0e99d2f4d56bad4df2e63",
+          "libmtmd.dylib": "68b141588191f17dabf0ee430d0f84a6c8ac06d022b0e99d2f4d56bad4df2e63"
+        },
+        "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+        "build_settings": {
+          "CMAKE_BUILD_TYPE": "Release",
+          "GGML_BLAS": "ON",
+          "GGML_CPU": "ON",
+          "GGML_METAL": "ON",
+          "GGML_METAL_EMBED_LIBRARY": "ON",
+          "GGML_NATIVE": "ON",
+          "LLAMA_BUILD_TESTS": "ON",
+          "LLAMA_BUILD_TOOLS": "ON"
+        },
+        "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+      }
+    },
+    "source_sha256": "6b1c15f4391c217625f1306b98d28512101e2e4015ae7c3d3e54e390cb3f3d18",
+    "runner_sha256": "f7fd620aeb503f698ea0c3861461eda7386f7289ee1cbe23b9075dfdeb0e1d55",
+    "binary_sha256": "9288d104ce626950ba6585e47c8e038821f96d86ba0a41f4d16e2b55cdb84c3d",
+    "command": [
+      "/usr/bin/c++",
+      "-O3",
+      "-ffp-contract=off",
+      "-std=gnu++17",
+      "-arch",
+      "arm64",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-hc/ggml/include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-hc/vendor",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/native/m5_hc_probe.cpp",
+      "-o",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-hc/hc-probe",
+      "-Wl,-rpath,/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-hc/build/bin",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-hc/build/bin/libggml.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-hc/build/bin/libggml-base.0.26.0.dylib"
+    ]
+  },
+  "models_loaded": false,
+  "tps_measured": false,
+  "experiments": [
+    {
+      "tuning": "hc-special",
+      "order": [
+        "conv-direct",
+        "hc-special",
+        "hc-special",
+        "conv-direct"
+      ],
+      "runs": [
+        "bench/features/20261009T135603958428Z-m5-hc-perf-conv-direct-on",
+        "bench/features/20261009T135606226264Z-m5-hc-perf-hc-special-on",
+        "bench/features/20261009T135608484194Z-m5-hc-perf-hc-special-on",
+        "bench/features/20261009T135610747480Z-m5-hc-perf-conv-direct-on"
+      ],
+      "summary": [
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 1,
+          "layout": "plain",
+          "control_us": 35.905199999999994,
+          "candidate_us": 35.89375,
+          "time_reduction_percent": 0.03188953132136074,
+          "control_drift_percent": 1.582961815777939
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 1,
+          "layout": "residual",
+          "control_us": 37.21875,
+          "candidate_us": 36.832300000000004,
+          "time_reduction_percent": 1.0383207388748872,
+          "control_drift_percent": 5.296714075527231
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 2,
+          "layout": "plain",
+          "control_us": 35.48125,
+          "candidate_us": 34.920824999999994,
+          "time_reduction_percent": 1.579496212788467,
+          "control_drift_percent": -0.6716154118063145
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 2,
+          "layout": "residual",
+          "control_us": 36.813525,
+          "candidate_us": 36.912499999999994,
+          "time_reduction_percent": -0.26885499283211267,
+          "control_drift_percent": 0.49113717562931924
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 3,
+          "layout": "plain",
+          "control_us": 36.285399999999996,
+          "candidate_us": 36.701025,
+          "time_reduction_percent": -1.1454331494209935,
+          "control_drift_percent": -0.7491009681880989
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 3,
+          "layout": "residual",
+          "control_us": 47.230225,
+          "candidate_us": 47.06355,
+          "time_reduction_percent": 0.35289901752532105,
+          "control_drift_percent": -0.8282051091251352
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 4,
+          "layout": "plain",
+          "control_us": 35.580225,
+          "candidate_us": 35.416675,
+          "time_reduction_percent": 0.4596654461853533,
+          "control_drift_percent": -3.20671069070142
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 4,
+          "layout": "residual",
+          "control_us": 35.49272499999999,
+          "candidate_us": 35.977075,
+          "time_reduction_percent": -1.364645853481261,
+          "control_drift_percent": 6.940812510623839
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 5,
+          "layout": "plain",
+          "control_us": 35.71875,
+          "candidate_us": 36.040625000000006,
+          "time_reduction_percent": -0.9011373578302839,
+          "control_drift_percent": -0.23348310260642435
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 5,
+          "layout": "residual",
+          "control_us": 36.105199999999996,
+          "candidate_us": 35.87605,
+          "time_reduction_percent": 0.6346731218771717,
+          "control_drift_percent": 0.4548531951640733
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 8,
+          "layout": "plain",
+          "control_us": 36.065625,
+          "candidate_us": 35.54585,
+          "time_reduction_percent": 1.4411922710336977,
+          "control_drift_percent": -0.07503030336650784
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 8,
+          "layout": "residual",
+          "control_us": 36.516675,
+          "candidate_us": 36.695825,
+          "time_reduction_percent": -0.4905977885445445,
+          "control_drift_percent": 3.1002934622752165
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 1,
+          "layout": "plain",
+          "control_us": 35.86045,
+          "candidate_us": 34.895825,
+          "time_reduction_percent": 2.68994114686234,
+          "control_drift_percent": 2.001493528274201
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 1,
+          "layout": "residual",
+          "control_us": 39.70835,
+          "candidate_us": 38.97085,
+          "time_reduction_percent": 1.8572919801502774,
+          "control_drift_percent": -0.3468753468753638
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 2,
+          "layout": "plain",
+          "control_us": 44.0656,
+          "candidate_us": 44.258325,
+          "time_reduction_percent": -0.43735930067898554,
+          "control_drift_percent": -0.42162331799815433
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 2,
+          "layout": "residual",
+          "control_us": 46.6521,
+          "candidate_us": 47.274975,
+          "time_reduction_percent": -1.3351489000495098,
+          "control_drift_percent": -0.36678570738317706
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 3,
+          "layout": "plain",
+          "control_us": 60.062475,
+          "candidate_us": 60.178125,
+          "time_reduction_percent": -0.19254950782499058,
+          "control_drift_percent": 1.3573848781851194
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 3,
+          "layout": "residual",
+          "control_us": 62.81355,
+          "candidate_us": 63.3771,
+          "time_reduction_percent": -0.8971790322310991,
+          "control_drift_percent": -0.23573628139166303
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 4,
+          "layout": "plain",
+          "control_us": 36.173950000000005,
+          "candidate_us": 35.612525,
+          "time_reduction_percent": 1.552014640369681,
+          "control_drift_percent": 2.3618917534574124
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 4,
+          "layout": "residual",
+          "control_us": 35.607275,
+          "candidate_us": 35.155225,
+          "time_reduction_percent": 1.2695439344909132,
+          "control_drift_percent": -1.1829797812864529
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 5,
+          "layout": "plain",
+          "control_us": 35.641675000000006,
+          "candidate_us": 35.919775,
+          "time_reduction_percent": -0.7802663595355641,
+          "control_drift_percent": -1.1168400634808728
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 5,
+          "layout": "residual",
+          "control_us": 37.1844,
+          "candidate_us": 36.064575,
+          "time_reduction_percent": 3.0115451641010704,
+          "control_drift_percent": 1.0090185548638608
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 8,
+          "layout": "plain",
+          "control_us": 35.360425000000006,
+          "candidate_us": 36.733325,
+          "time_reduction_percent": -3.8825890808721786,
+          "control_drift_percent": 1.636229001938183
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 8,
+          "layout": "residual",
+          "control_us": 35.267725,
+          "candidate_us": 36.58125,
+          "time_reduction_percent": -3.7244392713167596,
+          "control_drift_percent": 9.320874682699076
+        }
+      ],
+      "operator_gate_passed": false
+    },
+    {
+      "tuning": "hc-down-ks8",
+      "order": [
+        "conv-direct",
+        "hc-down-ks8",
+        "hc-down-ks8",
+        "conv-direct"
+      ],
+      "runs": [
+        "bench/features/20261009T135613020694Z-m5-hc-perf-conv-direct-on",
+        "bench/features/20261009T135615274909Z-m5-hc-perf-hc-down-ks8-on",
+        "bench/features/20261009T135617540887Z-m5-hc-perf-hc-down-ks8-on",
+        "bench/features/20261009T135619806185Z-m5-hc-perf-conv-direct-on"
+      ],
+      "summary": [
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 1,
+          "layout": "plain",
+          "control_us": 35.07185,
+          "candidate_us": 36.10105,
+          "time_reduction_percent": -2.9345472223449853,
+          "control_drift_percent": 2.2263168356752017
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 1,
+          "layout": "residual",
+          "control_us": 36.496875,
+          "candidate_us": 38.719800000000006,
+          "time_reduction_percent": -6.090726945800173,
+          "control_drift_percent": 0.3704402618926461
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 2,
+          "layout": "plain",
+          "control_us": 35.9229,
+          "candidate_us": 35.636449999999996,
+          "time_reduction_percent": 0.7974022141865045,
+          "control_drift_percent": -1.0260341834186448
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 2,
+          "layout": "residual",
+          "control_us": 36.8,
+          "candidate_us": 37.012475,
+          "time_reduction_percent": -0.5773777173913253,
+          "control_drift_percent": -0.7843137254901933
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 3,
+          "layout": "plain",
+          "control_us": 36.690625,
+          "candidate_us": 36.046875,
+          "time_reduction_percent": 1.7545353888084425,
+          "control_drift_percent": -0.9872529471055103
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 3,
+          "layout": "residual",
+          "control_us": 47.422925,
+          "candidate_us": 47.120824999999996,
+          "time_reduction_percent": 0.637033670951348,
+          "control_drift_percent": 0.4646211554624302
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 4,
+          "layout": "plain",
+          "control_us": 36.00105,
+          "candidate_us": 40.074975,
+          "time_reduction_percent": -11.316128279591853,
+          "control_drift_percent": -0.7959094604185424
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 4,
+          "layout": "residual",
+          "control_us": 36.671875,
+          "candidate_us": 41.958325,
+          "time_reduction_percent": -14.415543246697915,
+          "control_drift_percent": 4.969253780953975
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 5,
+          "layout": "plain",
+          "control_us": 35.55414999999999,
+          "candidate_us": 40.853125000000006,
+          "time_reduction_percent": -14.903956359524884,
+          "control_drift_percent": -3.469450238784022
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 5,
+          "layout": "residual",
+          "control_us": 36.55415,
+          "candidate_us": 42.486450000000005,
+          "time_reduction_percent": -16.228800286697975,
+          "control_drift_percent": -5.757748460861922
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 8,
+          "layout": "plain",
+          "control_us": 34.903125,
+          "candidate_us": 35.61772499999999,
+          "time_reduction_percent": -2.0473811442384804,
+          "control_drift_percent": -0.3287335507671685
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 8,
+          "layout": "residual",
+          "control_us": 36.701049999999995,
+          "candidate_us": 36.55,
+          "time_reduction_percent": 0.4115686063477675,
+          "control_drift_percent": 0.23242047967341195
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 1,
+          "layout": "plain",
+          "control_us": 35.966674999999995,
+          "candidate_us": 36.2573,
+          "time_reduction_percent": -0.8080396644949861,
+          "control_drift_percent": 1.9276255827208932
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 1,
+          "layout": "residual",
+          "control_us": 38.925,
+          "candidate_us": 39.6396,
+          "time_reduction_percent": -1.8358381502890264,
+          "control_drift_percent": 1.666662420609355
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 2,
+          "layout": "plain",
+          "control_us": 44.186475,
+          "candidate_us": 44.0948,
+          "time_reduction_percent": 0.20747298805799952,
+          "control_drift_percent": 0.41881967153877264
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 2,
+          "layout": "residual",
+          "control_us": 47.528125,
+          "candidate_us": 46.870850000000004,
+          "time_reduction_percent": 1.3829180090735749,
+          "control_drift_percent": -0.03945810864134369
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 3,
+          "layout": "plain",
+          "control_us": 60.239575,
+          "candidate_us": 59.952075,
+          "time_reduction_percent": 0.47726100325242715,
+          "control_drift_percent": -0.6454239930186567
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 3,
+          "layout": "residual",
+          "control_us": 62.794799999999995,
+          "candidate_us": 63.030225,
+          "time_reduction_percent": -0.37491161688547603,
+          "control_drift_percent": 1.4655772716171023
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 4,
+          "layout": "plain",
+          "control_us": 35.8125,
+          "candidate_us": 35.67395,
+          "time_reduction_percent": 0.38687609075044316,
+          "control_drift_percent": -3.4922537992323477
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 4,
+          "layout": "residual",
+          "control_us": 36.246875,
+          "candidate_us": 35.9448,
+          "time_reduction_percent": 0.833382188119669,
+          "control_drift_percent": -1.8152410090518378
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 5,
+          "layout": "plain",
+          "control_us": 36.531275,
+          "candidate_us": 35.97605,
+          "time_reduction_percent": 1.5198620907701743,
+          "control_drift_percent": 1.6178738609581522
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 5,
+          "layout": "residual",
+          "control_us": 36.497924999999995,
+          "candidate_us": 35.920824999999994,
+          "time_reduction_percent": 1.5811857797395357,
+          "control_drift_percent": 4.377241079899019
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 8,
+          "layout": "plain",
+          "control_us": 36.395825,
+          "candidate_us": 36.585425,
+          "time_reduction_percent": -0.5209388714227492,
+          "control_drift_percent": -2.257738704707335
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 8,
+          "layout": "residual",
+          "control_us": 36.444824999999994,
+          "candidate_us": 36.883325,
+          "time_reduction_percent": -1.2031886557282379,
+          "control_drift_percent": 1.1085203947287625
+        }
+      ],
+      "operator_gate_passed": false
+    },
+    {
+      "tuning": "hc-up",
+      "order": [
+        "conv-direct",
+        "hc-up",
+        "hc-up",
+        "conv-direct"
+      ],
+      "runs": [
+        "bench/features/20261009T135622069664Z-m5-hc-perf-conv-direct-on",
+        "bench/features/20261009T135624346979Z-m5-hc-perf-hc-up-on",
+        "bench/features/20261009T135626581482Z-m5-hc-perf-hc-up-on",
+        "bench/features/20261009T135628833353Z-m5-hc-perf-conv-direct-on"
+      ],
+      "summary": [
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 1,
+          "layout": "plain",
+          "control_us": 35.55835,
+          "candidate_us": 37.983325,
+          "time_reduction_percent": -6.819706201215769,
+          "control_drift_percent": -2.2633384953833158
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 1,
+          "layout": "residual",
+          "control_us": 39.66352500000001,
+          "candidate_us": 41.644800000000004,
+          "time_reduction_percent": -4.995206553124043,
+          "control_drift_percent": 14.33107080163838
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 2,
+          "layout": "plain",
+          "control_us": 35.232299999999995,
+          "candidate_us": 35.990625,
+          "time_reduction_percent": -2.1523573539053764,
+          "control_drift_percent": 1.8801320900337815
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 2,
+          "layout": "residual",
+          "control_us": 36.926025,
+          "candidate_us": 36.8177,
+          "time_reduction_percent": 0.29335678562748546,
+          "control_drift_percent": 0.9713996968165772
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 3,
+          "layout": "plain",
+          "control_us": 36.24375,
+          "candidate_us": 36.645825,
+          "time_reduction_percent": -1.1093636833936937,
+          "control_drift_percent": -0.31088082901553626
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 3,
+          "layout": "residual",
+          "control_us": 47.5021,
+          "candidate_us": 47.23335,
+          "time_reduction_percent": 0.5657644609396106,
+          "control_drift_percent": 0.06145207895330573
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 4,
+          "layout": "plain",
+          "control_us": 34.815625,
+          "candidate_us": 35.623975,
+          "time_reduction_percent": -2.321802351674007,
+          "control_drift_percent": -0.618150963672992
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 4,
+          "layout": "residual",
+          "control_us": 36.344775,
+          "candidate_us": 35.8604,
+          "time_reduction_percent": 1.3327225165102874,
+          "control_drift_percent": -1.8220739574613454
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 5,
+          "layout": "plain",
+          "control_us": 35.839600000000004,
+          "candidate_us": 35.210425,
+          "time_reduction_percent": 1.7555301956495128,
+          "control_drift_percent": 1.808846259127861
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 5,
+          "layout": "residual",
+          "control_us": 36.760400000000004,
+          "candidate_us": 36.006275,
+          "time_reduction_percent": 2.0514602670264837,
+          "control_drift_percent": -2.699692314478863
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 8,
+          "layout": "plain",
+          "control_us": 35.9073,
+          "candidate_us": 36.25315,
+          "time_reduction_percent": -0.9631746190885915,
+          "control_drift_percent": -0.7396226415094409
+        },
+        {
+          "k": 10240,
+          "m": 320,
+          "rows": 8,
+          "layout": "residual",
+          "control_us": 35.8,
+          "candidate_us": 35.9177,
+          "time_reduction_percent": -0.3287709497206803,
+          "control_drift_percent": -0.32622958616967956
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 1,
+          "layout": "plain",
+          "control_us": 34.855199999999996,
+          "candidate_us": 36.3354,
+          "time_reduction_percent": -4.246712111822637,
+          "control_drift_percent": -1.9616619805224556
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 1,
+          "layout": "residual",
+          "control_us": 38.998949999999994,
+          "candidate_us": 39.1177,
+          "time_reduction_percent": -0.30449537743966193,
+          "control_drift_percent": -1.7187938443076867
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 2,
+          "layout": "plain",
+          "control_us": 43.695825,
+          "candidate_us": 44.203125,
+          "time_reduction_percent": -1.1609804826891335,
+          "control_drift_percent": 1.1754293963141094
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 2,
+          "layout": "residual",
+          "control_us": 47.38435,
+          "candidate_us": 47.27915,
+          "time_reduction_percent": 0.22201423043684,
+          "control_drift_percent": 0.030807114755437848
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 3,
+          "layout": "plain",
+          "control_us": 60.037499999999994,
+          "candidate_us": 60.072925,
+          "time_reduction_percent": -0.05900478867375547,
+          "control_drift_percent": -0.4800166962329211
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 3,
+          "layout": "residual",
+          "control_us": 62.6354,
+          "candidate_us": 62.75727499999999,
+          "time_reduction_percent": -0.19457846521295785,
+          "control_drift_percent": -1.9478891687657374
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 4,
+          "layout": "plain",
+          "control_us": 33.77395,
+          "candidate_us": 36.96355,
+          "time_reduction_percent": -9.44396494931745,
+          "control_drift_percent": -8.133320391999188
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 4,
+          "layout": "residual",
+          "control_us": 35.230199999999996,
+          "candidate_us": 36.614575,
+          "time_reduction_percent": -3.929512179891126,
+          "control_drift_percent": -9.081305637982172
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 5,
+          "layout": "plain",
+          "control_us": 33.8656,
+          "candidate_us": 36.931250000000006,
+          "time_reduction_percent": -9.052401256732502,
+          "control_drift_percent": -7.274524475128574
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 5,
+          "layout": "residual",
+          "control_us": 36.246875,
+          "candidate_us": 37.03125,
+          "time_reduction_percent": -2.163979653418391,
+          "control_drift_percent": -0.8715807323993463
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 8,
+          "layout": "plain",
+          "control_us": 36.898925000000006,
+          "candidate_us": 36.3052,
+          "time_reduction_percent": 1.609057716451101,
+          "control_drift_percent": -0.05082740234023664
+        },
+        {
+          "k": 320,
+          "m": 10240,
+          "rows": 8,
+          "layout": "residual",
+          "control_us": 36.476074999999994,
+          "candidate_us": 36.56875,
+          "time_reduction_percent": -0.25407064767797305,
+          "control_drift_percent": 1.4459047893810029
+        }
+      ],
+      "operator_gate_passed": false
+    }
+  ],
+  "rule": "10% repeatable exact four/five-row operator improvement, adjacent rows <=2% regression, then >=2% model gain. No narrowing of F32, new weights or new swap.",
+  "full_model_candidates": []
+}

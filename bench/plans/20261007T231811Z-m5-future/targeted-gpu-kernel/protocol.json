@@ -1,0 +1,101 @@
+{
+  "experiment": {
+    "id": "targeted-gpu-kernel",
+    "title": "Optimize one measured GPU operation",
+    "priority": 9,
+    "implementation": "Design template only; target family is intentionally unset until diagnostic evidence is available.",
+    "kind": "native-candidate",
+    "depends_on": [
+      "expert-reuse",
+      "split-gpu-cost"
+    ],
+    "hypothesis": "One demonstrated expensive shape can use less dequantization/memory work or better cooperative matrix input.",
+    "only_change": "One dispatch/kernel in an isolated engine, keeping GGUF bytes and fallback behavior.",
+    "control_engine": "mtp-mma",
+    "candidate_engine": null,
+    "plan_command": null,
+    "future_run_command": null,
+    "candidate_design": {
+      "target_family": null,
+      "selected_shapes": [],
+      "new_weight_copy": false,
+      "model_requantization": false,
+      "fallback": "Existing stock kernel"
+    },
+    "prerequisites": [
+      "Measured family/shape and real routing",
+      "CPU-reference/fallback test inventory",
+      "Actual candidate patch, manifest and build receipt",
+      "Testing go-ahead"
+    ],
+    "proof": [
+      "CPU-reference math, odd/aligned shapes and inactive-expert cases",
+      "Actual dispatch proof",
+      "Original controls preserved",
+      "Fresh ABBA model comparisons and semantic checks",
+      "Matched TPS, first-token and full-reply percentages",
+      "Zero new swap"
+    ],
+    "result_fields": [
+      "kernel_latency",
+      "dispatch_proof",
+      "math_error",
+      "matched_tps",
+      "ttft",
+      "reply_time",
+      "quality_checks"
+    ],
+    "stop_if": [
+      "Math/quality failure",
+      "Gain disappears end to end",
+      "Two narrow approaches repeatedly under 2-3 percent"
+    ],
+    "limits": "A synthetic kernel win is not a model TPS win. Do not force a sparse few-row workload into MMA merely because the hardware supports matrix acceleration."
+  },
+  "control": {
+    "engine": "mtp-mma",
+    "model": "flash",
+    "draft_model": "mtp_shared_packed_q3",
+    "context": 4096,
+    "batch": 512,
+    "ubatch": 512,
+    "cache_type": "f16",
+    "draft": 3,
+    "draft_threads": 8,
+    "draft_p_min": 0.0,
+    "tensor_api": "on",
+    "temperature": 0.6,
+    "seed": 1234,
+    "fresh_output_tokens": 128,
+    "matched_inputs": [
+      512,
+      2048
+    ],
+    "warmups_per_workload": 1,
+    "repeats_per_launch": 2
+  },
+  "comparison": {
+    "order": [
+      "control",
+      "candidate",
+      "candidate",
+      "control"
+    ],
+    "new_swap_required_bytes": 0,
+    "emergency_swap_guard_bytes": 134217728,
+    "minimum_available_during_run_bytes": 1073741824,
+    "minimum_available_before_full_model_bytes": 36507222016,
+    "metrics": [
+      "generation_tok_s",
+      "prompt_tok_s",
+      "ttft_s",
+      "wall_s",
+      "draft_acceptance_percent",
+      "minimum_available_bytes",
+      "swap_growth_bytes"
+    ],
+    "adoption_gate": "At least 5 percent median complete-task improvement on the chosen workload, or useful capacity gain with an explicitly accepted speed tradeoff; no unexplained quality failure or new swap. Report control drift and all raw passes.",
+    "percentage_rules": "TPS gain = 100*(candidate/control-1). Time reduction = 100*(1-candidate/control). Requires finite positive matched metrics. Do not add percentages from separate experiments.",
+    "historical_reference_only": "bench/features/20261007T052606Z-m5-decision-baseline/review.json"
+  }
+}

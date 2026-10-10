@@ -1,0 +1,733 @@
+0.00.031.375 I srv  llama_server: initializing ...
+0.00.031.383 I cmn  common_param: common_params_print_info: build 1 (d812350) with AppleClang 21.0.0.21000334 for Darwin arm64
+0.00.031.383 I cmn  common_param: common_params_print_info: verbosity = 4 (adjust with the `-lv N` CLI arg)
+0.00.031.383 I cmn  common_param: device_info:
+0.00.031.387 I cmn  common_param:   - MTL0    : Apple M5 Pro (38338 MiB, 38338 MiB free)
+0.00.031.388 I cmn  common_param:   - BLAS    : Accelerate (0 MiB, 0 MiB free)
+0.00.031.395 I cmn  common_param:   - CPU     : Apple M5 Pro (49152 MiB, 49152 MiB free)
+0.00.031.403 I cmn  common_param: system_info: n_threads = 8 (n_threads_batch = 8) / 18 | MTL : EMBED_LIBRARY = 1 | CPU : NEON = 1 | ARM_FMA = 1 | FP16_VA = 1 | MATMUL_INT8 = 1 | DOTPROD = 1 | SME = 1 | SME2 = 1 | ACCELERATE = 1 | REPACK = 1 | 
+0.00.031.455 I srv  init_listene: running without SSL
+0.00.031.476 I srv  init_listene: The UI is disabled
+0.00.031.478 I srv  init_listene: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.031.483 I srv          init: using 17 threads for HTTP server
+0.00.033.205 I srv    load_model: loading model '/Users/justin/Documents/Github/Strata-Mac-Lab/models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf'
+0.00.033.206 I srv    load_model: local path '/Users/justin/Documents/Github/Strata-Mac-Lab/models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf'
+0.00.067.331 I llama_model_loader: additional 1 GGUFs metadata loaded.
+0.00.067.334 I llama_model_loader: loaded meta data with 73 key-value pairs and 1224 tensors from /Users/justin/Documents/Github/Strata-Mac-Lab/models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf (version GGUF V3 (latest))
+0.00.067.359 I llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+0.00.067.361 I llama_model_loader: - kv   0:                       general.architecture str              = qwen4exp
+0.00.067.361 I llama_model_loader: - kv   1:                               general.type str              = model
+0.00.067.362 I llama_model_loader: - kv   2:                     general.sampling.top_k i32              = 20
+0.00.067.364 I llama_model_loader: - kv   3:                     general.sampling.top_p f32              = 0.950000
+0.00.067.364 I llama_model_loader: - kv   4:                      general.sampling.temp f32              = 1.000000
+0.00.067.364 I llama_model_loader: - kv   5:                         general.size_label str              = 512x56B
+0.00.067.365 I llama_model_loader: - kv   6:                       qwen4exp.block_count u32              = 48
+0.00.067.365 I llama_model_loader: - kv   7:                    qwen4exp.context_length u32              = 262144
+0.00.067.365 I llama_model_loader: - kv   8:                  qwen4exp.embedding_length u32              = 2560
+0.00.067.365 I llama_model_loader: - kv   9:              qwen4exp.attention.head_count u32              = 24
+0.00.067.366 I llama_model_loader: - kv  10:           qwen4exp.attention.head_count_kv u32              = 2
+0.00.067.369 I llama_model_loader: - kv  11:           qwen4exp.rope.dimension_sections arr[i32,4]       = [11, 11, 10, 0]
+0.00.067.369 I llama_model_loader: - kv  12:                    qwen4exp.rope.freq_base f32              = 10000000.000000
+0.00.067.370 I llama_model_loader: - kv  13:  qwen4exp.attention.layer_norm_rms_epsilon f32              = 0.000001
+0.00.067.371 I llama_model_loader: - kv  14:                      qwen4exp.expert_count u32              = 512
+0.00.067.371 I llama_model_loader: - kv  15:                 qwen4exp.expert_used_count u32              = 10
+0.00.067.371 I llama_model_loader: - kv  16:              qwen4exp.attention.key_length u32              = 256
+0.00.067.371 I llama_model_loader: - kv  17:            qwen4exp.attention.value_length u32              = 256
+0.00.067.371 I llama_model_loader: - kv  18:        qwen4exp.expert_feed_forward_length u32              = 640
+0.00.067.372 I llama_model_loader: - kv  19: qwen4exp.expert_shared_feed_forward_length u32              = 640
+0.00.067.372 I llama_model_loader: - kv  20:                   qwen4exp.ssm.conv_kernel u32              = 4
+0.00.067.372 I llama_model_loader: - kv  21:                    qwen4exp.ssm.state_size u32              = 128
+0.00.067.372 I llama_model_loader: - kv  22:                   qwen4exp.ssm.group_count u32              = 16
+0.00.067.373 I llama_model_loader: - kv  23:                qwen4exp.ssm.time_step_rank u32              = 48
+0.00.067.373 I llama_model_loader: - kv  24:                    qwen4exp.ssm.inner_size u32              = 6144
+0.00.067.373 I llama_model_loader: - kv  25:           qwen4exp.full_attention_interval u32              = 4
+0.00.067.373 I llama_model_loader: - kv  26:              qwen4exp.rope.dimension_count u32              = 64
+0.00.067.374 I llama_model_loader: - kv  27:            qwen4exp.hyper_connection.count u32              = 4
+0.00.067.374 I llama_model_loader: - kv  28:         qwen4exp.hyper_connection.low_rank u32              = 320
+0.00.067.374 I llama_model_loader: - kv  29:      qwen4exp.attention.indexer.head_count u32              = 4
+0.00.067.374 I llama_model_loader: - kv  30:      qwen4exp.attention.indexer.key_length u32              = 128
+0.00.067.374 I llama_model_loader: - kv  31:           qwen4exp.attention.indexer.top_k u32              = 2048
+0.00.067.377 I llama_model_loader: - kv  32:         qwen4exp.attention.compress_ratios arr[i32,48]      = [0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4, ...
+0.00.067.378 I llama_model_loader: - kv  33:                        qwen4exp.ple.layers arr[i32,1]       = [1]
+0.00.067.378 I llama_model_loader: - kv  34:                    qwen4exp.ple.ngram_size u32              = 3
+0.00.067.379 I llama_model_loader: - kv  35:               qwen4exp.ple.heads_per_ngram u32              = 8
+0.00.067.379 I llama_model_loader: - kv  36:                   qwen4exp.ple.conv_kernel u32              = 4
+0.00.067.379 I llama_model_loader: - kv  37:                  qwen4exp.ple.eos_token_id u32              = 248044
+0.00.067.379 I llama_model_loader: - kv  38:  qwen4exp.embedding_length_per_layer_input u32              = 160
+0.00.067.382 I llama_model_loader: - kv  39:             qwen4exp.ple.layer_multipliers arr[u64,3]       = [23703573157769, 20109073645365, 8052...
+0.00.067.383 I llama_model_loader: - kv  40:                  qwen4exp.ple.head_offsets arr[u64,16]      = [0, 20000003, 40000026, 60000059, 800...
+0.00.067.385 I llama_model_loader: - kv  41:              qwen4exp.ple.head_vocab_sizes arr[u64,16]      = [20000003, 20000023, 20000033, 200000...
+0.00.067.385 I llama_model_loader: - kv  42:                       tokenizer.ggml.model str              = gpt2
+0.00.067.385 I llama_model_loader: - kv  43:                         tokenizer.ggml.pre str              = qwen35
+0.00.082.438 I llama_model_loader: - kv  44:                      tokenizer.ggml.tokens arr[str,248320]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+0.00.086.364 I llama_model_loader: - kv  45:                  tokenizer.ggml.token_type arr[i32,248320]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+0.00.101.223 I llama_model_loader: - kv  46:                      tokenizer.ggml.merges arr[str,247587]  = ["Ġ Ġ", "ĠĠ ĠĠ", "i n", "Ġ t",...
+0.00.101.226 I llama_model_loader: - kv  47:                tokenizer.ggml.eos_token_id u32              = 248046
+0.00.101.227 I llama_model_loader: - kv  48:            tokenizer.ggml.padding_token_id u32              = 248044
+0.00.101.227 I llama_model_loader: - kv  49:                tokenizer.ggml.bos_token_id u32              = 248044
+0.00.101.227 I llama_model_loader: - kv  50:               tokenizer.ggml.add_bos_token bool             = false
+0.00.101.233 I llama_model_loader: - kv  51:                    tokenizer.chat_template str              = {%- set image_count = namespace(value...
+0.00.101.233 I llama_model_loader: - kv  52:                qwen4exp.ple.image_token_id u32              = 248056
+0.00.101.234 I llama_model_loader: - kv  53:                      quantize.imatrix.file str              = imatrix-qwen3.8-flash-next.gguf
+0.00.101.234 I llama_model_loader: - kv  54:                   quantize.imatrix.dataset str              = calib_qwen3.8-flash-next.tokids
+0.00.101.235 I llama_model_loader: - kv  55:             quantize.imatrix.entries_count u32              = 926
+0.00.101.235 I llama_model_loader: - kv  56:              quantize.imatrix.chunks_count u32              = 1000
+0.00.101.235 I llama_model_loader: - kv  57:                               general.name str              = Qwen3.8-Flash-Next GSQ-RCO
+0.00.101.236 I llama_model_loader: - kv  58:                           general.basename str              = Qwen3.8-Flash-Next
+0.00.101.236 I llama_model_loader: - kv  59:                       general.quantized_by str              = ISTA DASLab
+0.00.101.237 I llama_model_loader: - kv  60:                           general.repo_url str              = https://huggingface.co/ISTA-DASLab
+0.00.101.237 I llama_model_loader: - kv  61:                            general.license str              = apache-2.0
+0.00.101.239 I llama_model_loader: - kv  62:                               general.tags arr[str,2]       = ["gsq-rco", "ista-daslab"]
+0.00.101.240 I llama_model_loader: - kv  63:                        general.description str              = GSQ-RCO non-uniform mixed-precision G...
+0.00.101.240 I llama_model_loader: - kv  64:                   general.base_model.count u32              = 1
+0.00.101.240 I llama_model_loader: - kv  65:                  general.base_model.0.name str              = Qwen3.8 Flash Next
+0.00.101.241 I llama_model_loader: - kv  66:          general.base_model.0.organization str              = Qwen
+0.00.101.241 I llama_model_loader: - kv  67:              general.base_model.0.repo_url str              = https://huggingface.co/Qwen/Qwen3.8-F...
+0.00.101.241 I llama_model_loader: - kv  68:                          general.file_type u32              = 41
+0.00.101.242 I llama_model_loader: - kv  69:               general.quantization_version u32              = 2
+0.00.101.242 I llama_model_loader: - kv  70:                                   split.no u16              = 0
+0.00.101.242 I llama_model_loader: - kv  71:                                split.count u16              = 2
+0.00.101.243 I llama_model_loader: - kv  72:                        split.tensors.count i32              = 1224
+0.00.101.243 I llama_model_loader: - type  f32:  292 tensors
+0.00.101.243 I llama_model_loader: - type  f16:    1 tensors
+0.00.101.244 I llama_model_loader: - type q4_0:   16 tensors
+0.00.101.244 I llama_model_loader: - type q5_0:    7 tensors
+0.00.101.244 I llama_model_loader: - type q8_0:    2 tensors
+0.00.101.244 I llama_model_loader: - type q3_K:   91 tensors
+0.00.101.244 I llama_model_loader: - type q4_K:   38 tensors
+0.00.101.244 I llama_model_loader: - type q5_K:   16 tensors
+0.00.101.244 I llama_model_loader: - type q6_K:   12 tensors
+0.00.101.244 I llama_model_loader: - type iq4_nl:    8 tensors
+0.00.101.245 I llama_model_loader: - type iq4_xs:   56 tensors
+0.00.101.245 I llama_model_loader: - type bf16:  483 tensors
+0.00.101.245 I llama_model_loader: - type q2_0:  202 tensors
+0.00.101.250 I print_info: file format = GGUF V3 (latest)
+0.00.101.250 I print_info: file type   = Q2_0
+0.00.101.251 I print_info: file size   = 61.85 GiB (3.00 BPW) 
+0.00.101.263 I llama_prepare_model_devices: using device MTL0 (Apple M5 Pro) (unknown id) - 38338 MiB free
+0.00.144.924 I load: 0 unused tokens
+0.00.155.986 I load: printing all EOG tokens:
+0.00.155.988 I load:   - 248044 ('<|endoftext|>')
+0.00.155.989 I load:   - 248046 ('<|im_end|>')
+0.00.155.989 I load:   - 248063 ('<|fim_pad|>')
+0.00.155.989 I load:   - 248064 ('<|repo_name|>')
+0.00.155.989 I load:   - 248065 ('<|file_sep|>')
+0.00.156.130 I load: special tokens cache size = 33
+0.00.188.575 I load: token to piece cache size = 1.7581 MB
+0.00.188.589 I print_info: arch                  = qwen4exp
+0.00.188.590 I print_info: vocab_only            = 0
+0.00.188.590 I print_info: no_alloc              = 0
+0.00.188.590 I print_info: n_ctx_train           = 262144
+0.00.188.590 I print_info: n_embd_inp            = 2560
+0.00.188.591 I print_info: n_embd                = 2560
+0.00.188.591 I print_info: n_embd_out            = 10240
+0.00.188.591 I print_info: n_layer               = 48
+0.00.188.591 I print_info: n_layer_all           = 48
+0.00.188.595 I print_info: n_head                = 24
+0.00.188.595 I print_info: n_head_kv             = 2
+0.00.188.595 I print_info: n_rot                 = 64
+0.00.188.596 I print_info: n_swa                 = 0
+0.00.188.596 I print_info: is_swa_any            = 0
+0.00.188.596 I print_info: non_causal_type       = 0
+0.00.188.596 I print_info: n_embd_head_k         = 256
+0.00.188.596 I print_info: n_embd_head_v         = 256
+0.00.188.597 I print_info: n_gqa                 = 12
+0.00.188.597 I print_info: n_embd_k_gqa          = 512
+0.00.188.598 I print_info: n_embd_v_gqa          = 512
+0.00.188.598 I print_info: f_norm_eps            = 0.0e+00
+0.00.188.599 I print_info: f_norm_rms_eps        = 1.0e-06
+0.00.188.599 I print_info: f_clamp_kqv           = 0.0e+00
+0.00.188.599 I print_info: f_max_alibi_bias      = 0.0e+00
+0.00.188.599 I print_info: f_logit_scale         = 0.0e+00
+0.00.188.599 I print_info: f_attn_scale          = 0.0e+00
+0.00.188.599 I print_info: f_attn_value_scale    = 0.0000
+0.00.188.600 I print_info: n_ff                  = 0
+0.00.188.600 I print_info: n_expert              = 512
+0.00.188.600 I print_info: n_expert_used         = 10
+0.00.188.600 I print_info: n_expert_groups       = 0
+0.00.188.600 I print_info: n_group_used          = 0
+0.00.188.600 I print_info: causal attn           = 1
+0.00.188.601 I print_info: pooling type          = -1
+0.00.188.601 I print_info: rope type             = 40
+0.00.188.601 I print_info: rope scaling          = linear
+0.00.188.601 I print_info: freq_base_train       = 10000000.0
+0.00.188.601 I print_info: freq_scale_train      = 1
+0.00.188.601 I print_info: n_ctx_orig_yarn       = 262144
+0.00.188.601 I print_info: rope_yarn_log_mul     = 0.0000
+0.00.188.602 I print_info: rope_finetuned        = unknown
+0.00.188.602 I print_info: mrope sections        = [11, 11, 10, 0]
+0.00.188.603 I print_info: model type            = A3B
+0.00.188.603 I print_info: model params          = 176.94 B
+0.00.188.603 I print_info: general.name          = Qwen3.8-Flash-Next GSQ-RCO
+0.00.188.604 I print_info: vocab type            = BPE
+0.00.188.604 I print_info: n_vocab               = 248320
+0.00.188.604 I print_info: n_merges              = 247587
+0.00.188.604 I print_info: BOS token             = 248044 '<|endoftext|>'
+0.00.188.604 I print_info: EOS token             = 248046 '<|im_end|>'
+0.00.188.604 I print_info: EOT token             = 248046 '<|im_end|>'
+0.00.188.605 I print_info: PAD token             = 248044 '<|endoftext|>'
+0.00.188.605 I print_info: LF token              = 198 'Ċ'
+0.00.188.605 I print_info: FIM PRE token         = 248060 '<|fim_prefix|>'
+0.00.188.605 I print_info: FIM SUF token         = 248062 '<|fim_suffix|>'
+0.00.188.605 I print_info: FIM MID token         = 248061 '<|fim_middle|>'
+0.00.188.605 I print_info: FIM PAD token         = 248063 '<|fim_pad|>'
+0.00.188.606 I print_info: FIM REP token         = 248064 '<|repo_name|>'
+0.00.188.606 I print_info: FIM SEP token         = 248065 '<|file_sep|>'
+0.00.188.606 I print_info: EOG token             = 248044 '<|endoftext|>'
+0.00.188.606 I print_info: EOG token             = 248046 '<|im_end|>'
+0.00.188.606 I print_info: EOG token             = 248063 '<|fim_pad|>'
+0.00.188.606 I print_info: EOG token             = 248064 '<|repo_name|>'
+0.00.188.606 I print_info: EOG token             = 248065 '<|file_sep|>'
+0.00.188.606 I print_info: max token length      = 256
+0.00.188.607 I load_tensors: loading model tensors, this can take a while... (load_mode = mmap)
+0.00.188.674 I add: tensor per_layer_token_embd.weight (size = 27465 MiB) lazy read enabled
+0.00.193.708 I load_tensors: enabling prefetch for 'per_layer_token_embd.weight'
+0.01.186.726 I 
+0.01.463.178 I load_tensors: offloading output layer to GPU
+0.01.463.181 I load_tensors: offloading 47 repeating layers to GPU
+0.01.463.182 I load_tensors: offloaded 49/49 layers to GPU
+0.01.463.183 I load_tensors:   CPU_Mapped model buffer size =   260.50 MiB
+0.01.463.184 I load_tensors:  MTL0_Mapped model buffer size = 35870.28 MiB
+0.01.463.184 I load_tensors:   CPU_Mapped model buffer size = 27465.95 MiB
+M5_LOOKUP_MAPPING {"role":"lookup","tensor":"per_layer_token_embd.weight","shard":1,"file_offset":192,"tensor_bytes":28800138240,"row_bytes":90,"mapping_base":"0x85c68cc000","tensor_address":"0x85c68cc0c0","lazy":true}
+0.01.465.740 I cmn  common_init_: added <|endoftext|> logit bias = -inf
+0.01.465.742 I cmn  common_init_: added <|im_end|> logit bias = -inf
+0.01.465.742 I cmn  common_init_: added <|fim_pad|> logit bias = -inf
+0.01.465.743 I cmn  common_init_: added <|repo_name|> logit bias = -inf
+0.01.465.743 I cmn  common_init_: added <|file_sep|> logit bias = -inf
+0.01.465.766 I llama_context: constructing llama_context
+0.01.465.769 I llama_context: n_seq_max             = 1
+0.01.465.770 I llama_context: n_ctx                 = 4096
+0.01.465.770 I llama_context: n_ctx_seq             = 4096
+0.01.465.770 I llama_context: n_batch               = 512
+0.01.465.770 I llama_context: n_ubatch              = 512
+0.01.465.770 I llama_context: causal_attn           = 1
+0.01.465.770 I llama_context: flash_attn            = enabled
+0.01.465.771 I llama_context: kv_unified            = false
+0.01.465.771 I llama_context: freq_base             = 10000000.0
+0.01.465.771 I llama_context: freq_scale            = 1
+0.01.465.771 I llama_context: n_rs_seq              = 3
+0.01.465.771 I llama_context: n_outputs_max         = 4
+0.01.465.771 I llama_context: n_outputs_max_per_seq = 4
+0.01.465.772 I llama_context: n_ctx_seq (4096) < n_ctx_train (262144) -- the full capacity of the model will not be utilized
+0.01.465.772 I ggml_metal_init: allocating
+0.01.465.799 I ggml_metal_init: found device: Apple M5 Pro
+0.01.465.802 I ggml_metal_init: picking default device: Apple M5 Pro
+0.01.465.841 I ggml_metal_init: use fusion         = true
+0.01.465.841 I ggml_metal_init: use concurrency    = true
+0.01.465.841 I ggml_metal_init: use graph optimize = true
+0.01.465.936 I llama_context:        CPU  output buffer size =     0.95 MiB
+0.01.468.101 I llama_kv_cache:       MTL0 KV buffer size =    96.00 MiB
+0.01.470.942 I llama_kv_cache: size =   96.00 MiB (  4096 cells,  12 layers,  1/1 seqs), K (f16):   48.00 MiB, V (f16):   48.00 MiB
+0.01.470.944 I llama_kv_cache: n_rot_k = 0, n_embd_head_k_all = 256
+0.01.470.944 I llama_kv_cache: n_rot_v = 0, n_embd_head_k_all = 256
+0.01.495.371 I llama_memory_recurrent:       MTL0 RS buffer size =   450.28 MiB
+0.01.495.379 I llama_memory_recurrent: size =  450.28 MiB (     1 cells,  48 layers,  1 seqs  3 rs_seq), R (f32):   16.88 MiB, S (f32):  432.00 MiB, P (f32):    1.41 MiB
+0.01.495.382 I operator(): creating indexer KV cache, size = 4096 cells
+0.01.495.904 I llama_kv_cache:       MTL0 KV buffer size =    24.00 MiB
+0.01.496.610 I llama_kv_cache: size =   24.00 MiB (  4096 cells,  12 layers,  1/1 seqs), K (f16):   24.00 MiB, V (f16):    0.00 MiB
+0.01.496.611 I llama_kv_cache: n_rot_k = 0, n_embd_head_k_all = 256
+0.01.496.611 I llama_kv_cache: n_rot_v = 0, n_embd_head_k_all = 0
+0.01.496.616 I sched_reserve: reserving ...
+0.01.497.389 I resolve_fused_ops: resolving fused DeepSeek V4 HC support:
+0.01.499.560 I resolve_fused_ops: fused DeepSeek V4 HC pre enabled
+0.01.501.424 I resolve_fused_ops: fused DeepSeek V4 HC comb enabled
+0.01.503.242 I resolve_fused_ops: fused DeepSeek V4 HC post enabled
+0.01.514.122 I sched_reserve:       MTL0 compute buffer size =   179.10 MiB
+0.01.514.125 I sched_reserve:        CPU compute buffer size =    30.19 MiB
+0.01.514.127 I sched_reserve: graph: nodes = 7226, splits = 2, input objects = 6, input tensors = 19
+0.01.514.128 I sched_reserve: reserve took 17.51 ms, sched copies = 1
+0.01.514.144 I cmn          init: llama threadpool init, n_threads = 8
+0.01.514.216 I cmn  common_init_: warming up the model with an empty run - please wait ... (--no-warmup to disable)
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":0,"begin_us":307108753295,"end_us":307108753350,"envelope_us":55,"worker_sum_us":293,"threads":8,"rows":32,"unique_rows":32,"logical_bytes":2880,"pages":32,"page_bytes":524288,"page_size":16384,"metadata_rows":32,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[{"row":9663979,"address":"0x85fa64355e","tensor_offset":869758110},{"row":12940444,"address":"0x860bf7bf98","tensor_offset":1164639960},{"row":26558231,"address":"0x865504eed6","tensor_offset":2390240790},{"row":27995687,"address":"0x865cbafa76","tensor_offset":2519611830}]}
+0.01.565.369 I common_speculative_init_result: loading draft model '/Users/justin/Documents/Github/Strata-Mac-Lab/models/mtp_shared_packed_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf'
+0.01.591.480 I llama_model_loader: loaded meta data with 51 key-value pairs and 32 tensors from /Users/justin/Documents/Github/Strata-Mac-Lab/models/mtp_shared_packed_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf (version GGUF V3 (latest))
+0.01.591.484 I llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+0.01.591.486 I llama_model_loader: - kv   0:                       general.architecture str              = qwen4exp
+0.01.591.486 I llama_model_loader: - kv   1:                               general.type str              = model
+0.01.591.487 I llama_model_loader: - kv   2:                     general.sampling.top_k i32              = 20
+0.01.591.489 I llama_model_loader: - kv   3:                     general.sampling.top_p f32              = 0.950000
+0.01.591.489 I llama_model_loader: - kv   4:                      general.sampling.temp f32              = 1.000000
+0.01.591.490 I llama_model_loader: - kv   5:                               general.name str              = Ckpt_Q38
+0.01.591.490 I llama_model_loader: - kv   6:                         general.size_label str              = 512x1.4B
+0.01.591.490 I llama_model_loader: - kv   7:                            general.license str              = other
+0.01.591.491 I llama_model_loader: - kv   8:                       general.license.name str              = qwen-community-1.0
+0.01.591.491 I llama_model_loader: - kv   9:                       general.license.link str              = LICENSE
+0.01.591.494 I llama_model_loader: - kv  10:                               general.tags arr[str,1]       = ["image-text-to-text"]
+0.01.591.494 I llama_model_loader: - kv  11:                       qwen4exp.block_count u32              = 49
+0.01.591.495 I llama_model_loader: - kv  12:                    qwen4exp.context_length u32              = 262144
+0.01.591.495 I llama_model_loader: - kv  13:                  qwen4exp.embedding_length u32              = 2560
+0.01.591.496 I llama_model_loader: - kv  14:              qwen4exp.attention.head_count u32              = 24
+0.01.591.496 I llama_model_loader: - kv  15:           qwen4exp.attention.head_count_kv u32              = 2
+0.01.591.497 I llama_model_loader: - kv  16:           qwen4exp.rope.dimension_sections arr[i32,4]       = [11, 11, 10, 0]
+0.01.591.497 I llama_model_loader: - kv  17:                    qwen4exp.rope.freq_base f32              = 10000000.000000
+0.01.591.499 I llama_model_loader: - kv  18:  qwen4exp.attention.layer_norm_rms_epsilon f32              = 0.000001
+0.01.591.499 I llama_model_loader: - kv  19:                      qwen4exp.expert_count u32              = 512
+0.01.591.499 I llama_model_loader: - kv  20:                 qwen4exp.expert_used_count u32              = 10
+0.01.591.499 I llama_model_loader: - kv  21:              qwen4exp.attention.key_length u32              = 256
+0.01.591.500 I llama_model_loader: - kv  22:            qwen4exp.attention.value_length u32              = 256
+0.01.591.500 I llama_model_loader: - kv  23:        qwen4exp.expert_feed_forward_length u32              = 640
+0.01.591.500 I llama_model_loader: - kv  24: qwen4exp.expert_shared_feed_forward_length u32              = 640
+0.01.591.500 I llama_model_loader: - kv  25:              qwen4exp.nextn_predict_layers u32              = 1
+0.01.591.501 I llama_model_loader: - kv  26:                   qwen4exp.ssm.conv_kernel u32              = 4
+0.01.591.501 I llama_model_loader: - kv  27:                    qwen4exp.ssm.state_size u32              = 128
+0.01.591.501 I llama_model_loader: - kv  28:                   qwen4exp.ssm.group_count u32              = 16
+0.01.591.502 I llama_model_loader: - kv  29:                qwen4exp.ssm.time_step_rank u32              = 48
+0.01.591.502 I llama_model_loader: - kv  30:                    qwen4exp.ssm.inner_size u32              = 6144
+0.01.591.502 I llama_model_loader: - kv  31:           qwen4exp.full_attention_interval u32              = 4
+0.01.591.502 I llama_model_loader: - kv  32:              qwen4exp.rope.dimension_count u32              = 64
+0.01.591.503 I llama_model_loader: - kv  33:            qwen4exp.hyper_connection.count u32              = 4
+0.01.591.503 I llama_model_loader: - kv  34:         qwen4exp.hyper_connection.low_rank u32              = 320
+0.01.591.503 I llama_model_loader: - kv  35:      qwen4exp.attention.indexer.head_count u32              = 4
+0.01.591.503 I llama_model_loader: - kv  36:      qwen4exp.attention.indexer.key_length u32              = 128
+0.01.591.504 I llama_model_loader: - kv  37:           qwen4exp.attention.indexer.top_k u32              = 2048
+0.01.591.506 I llama_model_loader: - kv  38:         qwen4exp.attention.compress_ratios arr[i32,49]      = [0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4, ...
+0.01.591.507 I llama_model_loader: - kv  39:                       tokenizer.ggml.model str              = gpt2
+0.01.591.507 I llama_model_loader: - kv  40:                         tokenizer.ggml.pre str              = qwen35
+0.01.606.320 I llama_model_loader: - kv  41:                      tokenizer.ggml.tokens arr[str,248320]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+0.01.610.095 I llama_model_loader: - kv  42:                  tokenizer.ggml.token_type arr[i32,248320]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+0.01.624.995 I llama_model_loader: - kv  43:                      tokenizer.ggml.merges arr[str,247587]  = ["Ġ Ġ", "ĠĠ ĠĠ", "i n", "Ġ t",...
+0.01.625.004 I llama_model_loader: - kv  44:                tokenizer.ggml.eos_token_id u32              = 248046
+0.01.625.004 I llama_model_loader: - kv  45:            tokenizer.ggml.padding_token_id u32              = 248044
+0.01.625.004 I llama_model_loader: - kv  46:                tokenizer.ggml.bos_token_id u32              = 248044
+0.01.625.005 I llama_model_loader: - kv  47:               tokenizer.ggml.add_bos_token bool             = false
+0.01.625.007 I llama_model_loader: - kv  48:                    tokenizer.chat_template str              = {%- set image_count = namespace(value...
+0.01.625.007 I llama_model_loader: - kv  49:               general.quantization_version u32              = 2
+0.01.625.008 I llama_model_loader: - kv  50:                          general.file_type u32              = 11
+0.01.625.008 I llama_model_loader: - type  f32:   11 tensors
+0.01.625.009 I llama_model_loader: - type q4_0:    5 tensors
+0.01.625.009 I llama_model_loader: - type q3_K:   14 tensors
+0.01.625.009 I llama_model_loader: - type bf16:    2 tensors
+0.01.625.010 I print_info: file format = GGUF V3 (latest)
+0.01.625.010 I print_info: file type   = Q3_K - Small
+0.01.625.011 I print_info: file size   = 1.16 GiB (3.81 BPW) 
+0.01.625.018 I llama_prepare_model_devices: using device MTL0 (Apple M5 Pro) (unknown id) - 1301 MiB free
+0.01.673.760 I load: 0 unused tokens
+0.01.686.983 I load: printing all EOG tokens:
+0.01.686.986 I load:   - 248044 ('<|endoftext|>')
+0.01.686.986 I load:   - 248046 ('<|im_end|>')
+0.01.686.986 I load:   - 248063 ('<|fim_pad|>')
+0.01.686.986 I load:   - 248064 ('<|repo_name|>')
+0.01.686.987 I load:   - 248065 ('<|file_sep|>')
+0.01.687.133 I load: special tokens cache size = 33
+0.01.719.468 I load: token to piece cache size = 1.7581 MB
+0.01.719.476 I print_info: arch                  = qwen4exp
+0.01.719.476 I print_info: vocab_only            = 0
+0.01.719.476 I print_info: no_alloc              = 0
+0.01.719.477 I print_info: n_ctx_train           = 262144
+0.01.719.477 I print_info: n_embd_inp            = 2560
+0.01.719.477 I print_info: n_embd                = 2560
+0.01.719.477 I print_info: n_embd_out            = 10240
+0.01.719.478 I print_info: n_layer               = 48
+0.01.719.478 I print_info: n_layer_all           = 49
+0.01.719.482 I print_info: n_head                = 24
+0.01.719.483 I print_info: n_head_kv             = 2
+0.01.719.483 I print_info: n_rot                 = 64
+0.01.719.483 I print_info: n_swa                 = 0
+0.01.719.484 I print_info: is_swa_any            = 0
+0.01.719.484 I print_info: non_causal_type       = 0
+0.01.719.484 I print_info: n_embd_head_k         = 256
+0.01.719.484 I print_info: n_embd_head_v         = 256
+0.01.719.485 I print_info: n_gqa                 = 12
+0.01.719.486 I print_info: n_embd_k_gqa          = 512
+0.01.719.486 I print_info: n_embd_v_gqa          = 512
+0.01.719.487 I print_info: f_norm_eps            = 0.0e+00
+0.01.719.487 I print_info: f_norm_rms_eps        = 1.0e-06
+0.01.719.487 I print_info: f_clamp_kqv           = 0.0e+00
+0.01.719.487 I print_info: f_max_alibi_bias      = 0.0e+00
+0.01.719.487 I print_info: f_logit_scale         = 0.0e+00
+0.01.719.488 I print_info: f_attn_scale          = 0.0e+00
+0.01.719.488 I print_info: f_attn_value_scale    = 0.0000
+0.01.719.489 I print_info: n_ff                  = 0
+0.01.719.489 I print_info: n_expert              = 512
+0.01.719.489 I print_info: n_expert_used         = 10
+0.01.719.489 I print_info: n_expert_groups       = 0
+0.01.719.489 I print_info: n_group_used          = 0
+0.01.719.489 I print_info: causal attn           = 1
+0.01.719.489 I print_info: pooling type          = -1
+0.01.719.490 I print_info: rope type             = 40
+0.01.719.490 I print_info: rope scaling          = linear
+0.01.719.490 I print_info: freq_base_train       = 10000000.0
+0.01.719.490 I print_info: freq_scale_train      = 1
+0.01.719.491 I print_info: n_ctx_orig_yarn       = 262144
+0.01.719.491 I print_info: rope_yarn_log_mul     = 0.0000
+0.01.719.491 I print_info: rope_finetuned        = unknown
+0.01.719.491 I print_info: mrope sections        = [11, 11, 10, 0]
+0.01.719.492 I print_info: model type            = A3B
+0.01.719.492 I print_info: model params          = 2.61 B
+0.01.719.493 I print_info: general.name          = Ckpt_Q38
+0.01.719.493 I print_info: vocab type            = BPE
+0.01.719.493 I print_info: n_vocab               = 248320
+0.01.719.493 I print_info: n_merges              = 247587
+0.01.719.494 I print_info: BOS token             = 248044 '<|endoftext|>'
+0.01.719.494 I print_info: EOS token             = 248046 '<|im_end|>'
+0.01.719.494 I print_info: EOT token             = 248046 '<|im_end|>'
+0.01.719.494 I print_info: PAD token             = 248044 '<|endoftext|>'
+0.01.719.494 I print_info: LF token              = 198 'Ċ'
+0.01.719.494 I print_info: FIM PRE token         = 248060 '<|fim_prefix|>'
+0.01.719.494 I print_info: FIM SUF token         = 248062 '<|fim_suffix|>'
+0.01.719.495 I print_info: FIM MID token         = 248061 '<|fim_middle|>'
+0.01.719.495 I print_info: FIM PAD token         = 248063 '<|fim_pad|>'
+0.01.719.495 I print_info: FIM REP token         = 248064 '<|repo_name|>'
+0.01.719.495 I print_info: FIM SEP token         = 248065 '<|file_sep|>'
+0.01.719.495 I print_info: EOG token             = 248044 '<|endoftext|>'
+0.01.719.496 I print_info: EOG token             = 248046 '<|im_end|>'
+0.01.719.496 I print_info: EOG token             = 248063 '<|fim_pad|>'
+0.01.719.496 I print_info: EOG token             = 248064 '<|repo_name|>'
+0.01.719.496 I print_info: EOG token             = 248065 '<|file_sep|>'
+0.01.719.496 I print_info: max token length      = 256
+0.01.719.497 I load_tensors: loading model tensors, this can take a while... (load_mode = mmap)
+0.01.720.339 W llama_model_loader: tensor overrides to CPU are used with mmap enabled - consider using --load-mode none for better performance
+0.01.791.092 I load_tensors: offloading output layer to GPU
+0.01.791.095 I load_tensors: offloading 48 repeating layers to GPU
+0.01.791.095 I load_tensors: offloaded 50/50 layers to GPU
+0.01.791.096 I load_tensors:   CPU_Mapped model buffer size =   687.50 MiB
+0.01.791.096 I load_tensors:   CPU_REPACK model buffer size =   450.00 MiB
+0.01.791.097 I load_tensors:  MTL0_Mapped model buffer size =    45.64 MiB
+0.01.861.534 I llama_context: constructing llama_context
+0.01.861.538 I QWEN4EXP MTP: borrowing target embeddings/output; draft KV remains separate
+0.01.861.538 I llama_context: n_seq_max             = 1
+0.01.861.539 I llama_context: n_ctx                 = 4096
+0.01.861.539 I llama_context: n_ctx_seq             = 4096
+0.01.861.539 I llama_context: n_batch               = 512
+0.01.861.539 I llama_context: n_ubatch              = 512
+0.01.861.539 I llama_context: causal_attn           = 1
+0.01.861.540 I llama_context: flash_attn            = enabled
+0.01.861.540 I llama_context: kv_unified            = false
+0.01.861.541 I llama_context: freq_base             = 10000000.0
+0.01.861.541 I llama_context: freq_scale            = 1
+0.01.861.541 I llama_context: n_rs_seq              = 0
+0.01.861.541 I llama_context: n_outputs_max         = 1
+0.01.861.542 I llama_context: n_outputs_max_per_seq = 1
+0.01.861.542 I llama_context: n_ctx_seq (4096) < n_ctx_train (262144) -- the full capacity of the model will not be utilized
+0.01.861.543 I ggml_metal_init: allocating
+0.01.861.571 I ggml_metal_init: found device: Apple M5 Pro
+0.01.861.574 I ggml_metal_init: picking default device: Apple M5 Pro
+0.01.861.594 I ggml_metal_init: use fusion         = true
+0.01.861.594 I ggml_metal_init: use concurrency    = true
+0.01.861.594 I ggml_metal_init: use graph optimize = true
+0.01.861.655 I llama_context:        CPU  output buffer size =     0.95 MiB
+0.01.861.863 I llama_kv_cache:       MTL0 KV buffer size =     8.00 MiB
+0.01.862.101 I llama_kv_cache: size =    8.00 MiB (  4096 cells,   1 layers,  1/1 seqs), K (f16):    4.00 MiB, V (f16):    4.00 MiB
+0.01.862.102 I llama_kv_cache: n_rot_k = 0, n_embd_head_k_all = 256
+0.01.862.102 I llama_kv_cache: n_rot_v = 0, n_embd_head_k_all = 256
+0.01.862.108 I llama_memory_recurrent: size =    0.00 MiB (     1 cells,  48 layers,  1 seqs  0 rs_seq), R (f32):    0.00 MiB, S (f32):    0.00 MiB, P (f32):    0.00 MiB
+0.01.862.110 I operator(): creating indexer KV cache, size = 4096 cells
+0.01.862.182 I llama_kv_cache:       MTL0 KV buffer size =     2.00 MiB
+0.01.862.245 I llama_kv_cache: size =    2.00 MiB (  4096 cells,   1 layers,  1/1 seqs), K (f16):    2.00 MiB, V (f16):    0.00 MiB
+0.01.862.245 I llama_kv_cache: n_rot_k = 0, n_embd_head_k_all = 256
+0.01.862.245 I llama_kv_cache: n_rot_v = 0, n_embd_head_k_all = 0
+0.01.862.247 I sched_reserve: reserving ...
+0.01.862.712 I resolve_fused_ops: resolving fused DeepSeek V4 HC support:
+0.01.862.861 I resolve_fused_ops: fused DeepSeek V4 HC pre enabled
+0.01.862.950 I resolve_fused_ops: fused DeepSeek V4 HC comb enabled
+0.01.863.025 I resolve_fused_ops: fused DeepSeek V4 HC post enabled
+0.01.865.860 I sched_reserve:       MTL0 compute buffer size =   148.11 MiB
+0.01.865.864 I sched_reserve:        CPU compute buffer size =   100.15 MiB
+0.01.865.865 I sched_reserve: graph: nodes = 196, splits = 4, input objects = 5, input tensors = 15
+0.01.865.866 I sched_reserve: reserve took 3.62 ms, sched copies = 1
+0.01.865.887 I cmn  common_conte: the context supports bounded partial sequence removal
+0.01.865.888 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 4096, kv_unified = 'false'
+0.01.865.898 I spec common_specu: adding speculative implementation 'draft-mtp'
+0.01.865.898 I spec common_specu: - n_max=3, n_min=0, p_min=0.00, n_embd=10240, backend_sampling=1
+0.01.865.899 I spec common_specu: - gpu_layers=-2, cache_k=f16, cache_v=f16, ctx_tgt=yes, ctx_dft=yes, devices=[default]
+0.01.865.993 I sched_reserve: reserving ...
+0.01.871.451 I sched_reserve:       MTL0 compute buffer size =   148.11 MiB
+0.01.871.452 I sched_reserve:        CPU compute buffer size =   100.15 MiB
+0.01.871.453 I sched_reserve: graph: nodes = 202, splits = 4, input objects = 6, input tensors = 15
+0.01.871.454 I sched_reserve: reserve took 5.46 ms, sched copies = 1
+0.01.884.809 I srv    load_model: speculative decoding context initialized
+0.01.884.818 I slot   load_model: id  0 | task -1 | new slot, n_ctx = 4096
+0.01.884.824 I srv    load_model: prompt cache is disabled - use `--cache-ram N` to enable it
+0.01.884.824 I srv    load_model: for more info see https://github.com/ggml-org/llama.cpp/pull/16391
+0.01.884.824 I srv    load_model: context checkpoints enabled, max = 32, min spacing = 8192
+0.01.884.836 W srv          init: --cache-idle-slots requires --cache-ram, disabling
+0.01.887.585 I srv          init: init: chat template, example_format: '<|im_start|>system
+Reasoning effort is set to xhigh. Please think carefully through the task, validate key assumptions, consider plausible alternatives, and prioritize correctness, consistency, and clarity in the final answer.
+
+You are a helpful assistant<|im_end|>
+<|im_start|>user
+Hello<|im_end|>
+<|im_start|>assistant
+<think>
+
+</think>
+
+Hi there<|im_end|>
+<|im_start|>user
+How are you?<|im_end|>
+<|im_start|>assistant
+<think>
+'
+0.01.887.890 I srv          init: init: chat template, thinking = 1
+0.01.887.893 I srv          init: preserve_reasoning kwarg: true
+0.01.887.893 W srv          init: chat template supports preserving reasoning, it is enabled by default (may use more tokens, disable via --no-reasoning-preserve)
+0.01.887.900 I srv  llama_server: model loaded
+0.01.887.903 I srv  llama_server: listening on http://127.0.0.1:63218
+0.01.887.913 I srv  update_slots: all slots are idle
+0.02.062.393 I srv  server_strea: conv_id= (empty=1)
+0.02.062.496 I slot get_availabl: id  0 | task -1 |  - skipping, slot is empty
+0.02.062.499 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.02.062.531 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> logit-bias -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+0.02.062.540 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 20, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+0.02.062.542 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.02.062.551 I slot   operator(): id  0 | task 0 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 58
+0.02.062.569 I slot   operator(): id  0 | task 0 | cached n_tokens = 0, memory_seq_rm [0, end)
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":1,"begin_us":307109306983,"end_us":307109308042,"envelope_us":1059,"worker_sum_us":7943,"threads":8,"rows":864,"unique_rows":864,"logical_bytes":77760,"pages":869,"page_bytes":14237696,"page_size":16384,"metadata_rows":864,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[{"row":510813,"address":"0x85c94a3f72","tensor_offset":45973170},{"row":1207587,"address":"0x85cd071f0e","tensor_offset":108682830},{"row":1292687,"address":"0x85cd7bfd06","tensor_offset":116341830},{"row":1437648,"address":"0x85ce430fe0","tensor_offset":129388320}]}
+0.02.336.165 I slot   operator(): id  0 | task 0 | cached n_tokens = 54, memory_seq_rm [54, end)
+0.02.336.186 I slot init_sampler: id  0 | task 0 | init sampler, took 0.01 ms, tokens: text = 58, total = 58
+0.02.346.973 I slot create_check: id  0 | task 0 | created context checkpoint 1 of 32 (pos_min = 53, pos_max = 53, n_tokens = 54, size = 112.571 MiB)
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":2,"begin_us":307109585233,"end_us":307109585349,"envelope_us":116,"worker_sum_us":672,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[{"row":3103499,"address":"0x85d732c29e","tensor_offset":279314910},{"row":12141764,"address":"0x8607aeeda8","tensor_offset":1092758760},{"row":14994213,"address":"0x8616fc2bc2","tensor_offset":1349479170},{"row":18581231,"address":"0x862a3a30c6","tensor_offset":1672310790}]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":3,"begin_us":307109645611,"end_us":307109645664,"envelope_us":53,"worker_sum_us":243,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[{"row":1617229,"address":"0x85cf39add2","tensor_offset":145550610},{"row":7331984,"address":"0x85ede1b360","tensor_offset":659878560},{"row":7854461,"address":"0x85f0af36b2","tensor_offset":706901490},{"row":14399924,"address":"0x8613cc0a08","tensor_offset":1295993160}]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":4,"begin_us":307109706336,"end_us":307109706380,"envelope_us":44,"worker_sum_us":235,"threads":8,"rows":48,"unique_rows":48,"logical_bytes":4320,"pages":48,"page_bytes":786432,"page_size":16384,"metadata_rows":48,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":5,"begin_us":307109753670,"end_us":307109753701,"envelope_us":31,"worker_sum_us":86,"threads":8,"rows":16,"unique_rows":16,"logical_bytes":1440,"pages":16,"page_bytes":262144,"page_size":16384,"metadata_rows":16,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+0.02.548.472 I slot print_timing: id  0 | task 0 | prompt eval time =     332.46 ms /    58 tokens (    5.73 ms per token,   174.46 tokens per second)
+0.02.548.474 I slot print_timing: id  0 | task 0 |        eval time =     153.45 ms /     8 tokens (   21.92 ms per token,    45.62 tokens per second)
+0.02.548.474 I slot print_timing: id  0 | task 0 |       total time =     485.91 ms /    66 tokens
+0.02.548.475 I slot print_timing: id  0 | task 0 |    graphs reused =          0
+0.02.548.477 I slot print_timing: id  0 | task 0 | draft acceptance = 0.80000 (    4 accepted /     5 generated), mean len =  3.00
+0.02.548.477 I slot print_timing: id  0 | task 0 |      acc per pos = (1.000, 0.500, 0.500)
+0.02.548.483 I spec common_specu: statistics        draft-mtp: #calls(b,g,a) =    1      2      2, #gen drafts =      2, #acc drafts =     2, #gen tokens =      5, #acc tokens =     4, #mean acc len = 3.00, #acc rate/pos = (1.000, 0.500, 0.500), dur(b,g,a) = 0.006, 22.604, 0.002 ms
+0.02.548.516 I slot      release: id  0 | task 0 | stop processing: n_tokens = 65, truncated = 0
+0.02.548.519 I srv  update_slots: all slots are idle
+0.02.550.121 I srv  server_strea: conv_id= (empty=1)
+0.02.550.152 I slot get_availabl: id  0 | task -1 |  - checking sim = 1.000 (58/58) > 0.100
+0.02.550.153 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 0.892
+0.02.550.167 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> logit-bias -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+0.02.550.170 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 20, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+0.02.550.171 I slot launch_slot_: id  0 | task 6 | processing task, is_child = 0
+0.02.550.173 I slot   operator(): id  0 | task 6 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 58
+0.02.550.174 I slot   operator(): id  0 | task 6 | erased invalidated context checkpoint (pos_min = 53, pos_max = 53, n_tokens = 54, n_swa = 0, pos_next = 0, size = 112.571 MiB)
+0.02.550.176 I slot   operator(): id  0 | task 6 | cached n_tokens = 0, memory_seq_rm [0, end)
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":6,"begin_us":307109788133,"end_us":307109788192,"envelope_us":59,"worker_sum_us":331,"threads":8,"rows":864,"unique_rows":864,"logical_bytes":77760,"pages":869,"page_bytes":14237696,"page_size":16384,"metadata_rows":864,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+0.02.797.651 I slot   operator(): id  0 | task 6 | cached n_tokens = 54, memory_seq_rm [54, end)
+0.02.797.669 I slot init_sampler: id  0 | task 6 | init sampler, took 0.01 ms, tokens: text = 58, total = 58
+0.02.803.312 I slot create_check: id  0 | task 6 | created context checkpoint 1 of 32 (pos_min = 53, pos_max = 53, n_tokens = 54, size = 112.571 MiB)
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":7,"begin_us":307110041155,"end_us":307110041162,"envelope_us":7,"worker_sum_us":29,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":8,"begin_us":307110097217,"end_us":307110097223,"envelope_us":6,"worker_sum_us":31,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":9,"begin_us":307110154965,"end_us":307110155022,"envelope_us":57,"worker_sum_us":94,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":10,"begin_us":307110210212,"end_us":307110210276,"envelope_us":64,"worker_sum_us":264,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":11,"begin_us":307110266454,"end_us":307110266510,"envelope_us":56,"worker_sum_us":305,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":12,"begin_us":307110320460,"end_us":307110320527,"envelope_us":67,"worker_sum_us":252,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":13,"begin_us":307110380773,"end_us":307110380828,"envelope_us":55,"worker_sum_us":234,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":14,"begin_us":307110436791,"end_us":307110436840,"envelope_us":49,"worker_sum_us":221,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":15,"begin_us":307110491248,"end_us":307110491303,"envelope_us":55,"worker_sum_us":235,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":66,"page_bytes":1081344,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":16,"begin_us":307110545225,"end_us":307110545276,"envelope_us":51,"worker_sum_us":235,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":17,"begin_us":307110602785,"end_us":307110602857,"envelope_us":72,"worker_sum_us":269,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":66,"page_bytes":1081344,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":18,"begin_us":307110656487,"end_us":307110656551,"envelope_us":64,"worker_sum_us":224,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":19,"begin_us":307110712418,"end_us":307110712466,"envelope_us":48,"worker_sum_us":219,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":20,"begin_us":307110766881,"end_us":307110766940,"envelope_us":59,"worker_sum_us":246,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":21,"begin_us":307110828281,"end_us":307110828329,"envelope_us":48,"worker_sum_us":244,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":22,"begin_us":307110885507,"end_us":307110885559,"envelope_us":52,"worker_sum_us":218,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":23,"begin_us":307110942473,"end_us":307110942525,"envelope_us":52,"worker_sum_us":214,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":24,"begin_us":307110996790,"end_us":307110996805,"envelope_us":15,"worker_sum_us":59,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":25,"begin_us":307111053574,"end_us":307111053614,"envelope_us":40,"worker_sum_us":203,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":26,"begin_us":307111107101,"end_us":307111107152,"envelope_us":51,"worker_sum_us":190,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":27,"begin_us":307111161458,"end_us":307111161508,"envelope_us":50,"worker_sum_us":213,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":28,"begin_us":307111218746,"end_us":307111218797,"envelope_us":51,"worker_sum_us":244,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":29,"begin_us":307111273869,"end_us":307111273926,"envelope_us":57,"worker_sum_us":228,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":30,"begin_us":307111331232,"end_us":307111331283,"envelope_us":51,"worker_sum_us":202,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":31,"begin_us":307111385836,"end_us":307111385889,"envelope_us":53,"worker_sum_us":216,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":32,"begin_us":307111440119,"end_us":307111440177,"envelope_us":58,"worker_sum_us":213,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":33,"begin_us":307111496962,"end_us":307111497013,"envelope_us":51,"worker_sum_us":202,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":34,"begin_us":307111551236,"end_us":307111551254,"envelope_us":18,"worker_sum_us":66,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":35,"begin_us":307111605271,"end_us":307111605318,"envelope_us":47,"worker_sum_us":207,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":36,"begin_us":307111663608,"end_us":307111663657,"envelope_us":49,"worker_sum_us":236,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":37,"begin_us":307111722728,"end_us":307111722766,"envelope_us":38,"worker_sum_us":190,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":38,"begin_us":307111776962,"end_us":307111776987,"envelope_us":25,"worker_sum_us":169,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":39,"begin_us":307111831967,"end_us":307111831996,"envelope_us":29,"worker_sum_us":160,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":40,"begin_us":307111886606,"end_us":307111886638,"envelope_us":32,"worker_sum_us":150,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":41,"begin_us":307111941043,"end_us":307111941083,"envelope_us":40,"worker_sum_us":205,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":42,"begin_us":307111994801,"end_us":307111994844,"envelope_us":43,"worker_sum_us":188,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":43,"begin_us":307112048496,"end_us":307112048531,"envelope_us":35,"worker_sum_us":146,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":44,"begin_us":307112102288,"end_us":307112102327,"envelope_us":39,"worker_sum_us":196,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":45,"begin_us":307112159325,"end_us":307112159364,"envelope_us":39,"worker_sum_us":202,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":46,"begin_us":307112216202,"end_us":307112216243,"envelope_us":41,"worker_sum_us":175,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":47,"begin_us":307112270278,"end_us":307112270321,"envelope_us":43,"worker_sum_us":192,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":48,"begin_us":307112324452,"end_us":307112324494,"envelope_us":42,"worker_sum_us":174,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":49,"begin_us":307112378532,"end_us":307112378575,"envelope_us":43,"worker_sum_us":152,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":50,"begin_us":307112435925,"end_us":307112435966,"envelope_us":41,"worker_sum_us":174,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":51,"begin_us":307112490087,"end_us":307112490121,"envelope_us":34,"worker_sum_us":112,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":52,"begin_us":307112544009,"end_us":307112544052,"envelope_us":43,"worker_sum_us":179,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":53,"begin_us":307112597858,"end_us":307112597901,"envelope_us":43,"worker_sum_us":191,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":54,"begin_us":307112653121,"end_us":307112653158,"envelope_us":37,"worker_sum_us":94,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":55,"begin_us":307112707214,"end_us":307112707261,"envelope_us":47,"worker_sum_us":191,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":56,"begin_us":307112761801,"end_us":307112761845,"envelope_us":44,"worker_sum_us":198,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":57,"begin_us":307112819492,"end_us":307112819529,"envelope_us":37,"worker_sum_us":173,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":58,"begin_us":307112873253,"end_us":307112873293,"envelope_us":40,"worker_sum_us":174,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":59,"begin_us":307112927182,"end_us":307112927219,"envelope_us":37,"worker_sum_us":186,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":60,"begin_us":307112981330,"end_us":307112981381,"envelope_us":51,"worker_sum_us":127,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":61,"begin_us":307113038306,"end_us":307113038343,"envelope_us":37,"worker_sum_us":201,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":62,"begin_us":307113084786,"end_us":307113084802,"envelope_us":16,"worker_sum_us":74,"threads":8,"rows":16,"unique_rows":16,"logical_bytes":1440,"pages":16,"page_bytes":262144,"page_size":16384,"metadata_rows":16,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+0.05.879.181 I slot print_timing: id  0 | task 6 | prompt eval time =     299.07 ms /    58 tokens (    5.16 ms per token,   193.94 tokens per second)
+0.05.879.184 I slot print_timing: id  0 | task 6 |        eval time =    3029.93 ms /   128 tokens (   23.86 ms per token,    41.92 tokens per second)
+0.05.879.184 I slot print_timing: id  0 | task 6 |       total time =    3329.00 ms /   186 tokens
+0.05.879.185 I slot print_timing: id  0 | task 6 |    graphs reused =         53
+0.05.879.187 I slot print_timing: id  0 | task 6 | draft acceptance = 0.44444 (   72 accepted /   162 generated), mean len =  2.33
+0.05.879.187 I slot print_timing: id  0 | task 6 |      acc per pos = (0.722, 0.426, 0.185)
+0.05.879.194 I spec common_specu: statistics        draft-mtp: #calls(b,g,a) =    2     56     56, #gen drafts =     56, #acc drafts =    41, #gen tokens =    167, #acc tokens =    76, #mean acc len = 2.36, #acc rate/pos = (0.732, 0.429, 0.196), dur(b,g,a) = 0.011, 618.116, 0.063 ms
+0.05.879.203 I slot      release: id  0 | task 6 | stop processing: n_tokens = 185, truncated = 0
+0.05.879.207 I srv  update_slots: all slots are idle
+0.05.880.925 I srv  server_strea: conv_id= (empty=1)
+0.05.880.956 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.050 (3/60) > 0.100
+0.05.880.957 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 307113114514
+0.05.880.971 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> logit-bias -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+0.05.880.974 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 20, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+0.05.880.976 I slot launch_slot_: id  0 | task 64 | processing task, is_child = 0
+0.05.880.978 I slot   operator(): id  0 | task 64 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 60
+0.05.880.979 I slot   operator(): id  0 | task 64 | erased invalidated context checkpoint (pos_min = 53, pos_max = 53, n_tokens = 54, n_swa = 0, pos_next = 0, size = 112.571 MiB)
+0.05.880.981 I slot   operator(): id  0 | task 64 | cached n_tokens = 0, memory_seq_rm [0, end)
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":63,"begin_us":307113119367,"end_us":307113119734,"envelope_us":367,"worker_sum_us":2206,"threads":8,"rows":896,"unique_rows":896,"logical_bytes":80640,"pages":904,"page_bytes":14811136,"page_size":16384,"metadata_rows":896,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+0.06.133.722 I slot   operator(): id  0 | task 64 | cached n_tokens = 56, memory_seq_rm [56, end)
+0.06.133.744 I slot init_sampler: id  0 | task 64 | init sampler, took 0.01 ms, tokens: text = 60, total = 60
+0.06.136.670 I slot create_check: id  0 | task 64 | created context checkpoint 1 of 32 (pos_min = 55, pos_max = 55, n_tokens = 56, size = 112.571 MiB)
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":64,"begin_us":307113374642,"end_us":307113374649,"envelope_us":7,"worker_sum_us":30,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":65,"begin_us":307113431872,"end_us":307113431910,"envelope_us":38,"worker_sum_us":200,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":66,"begin_us":307113492590,"end_us":307113492632,"envelope_us":42,"worker_sum_us":179,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":67,"begin_us":307113550302,"end_us":307113550339,"envelope_us":37,"worker_sum_us":191,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":68,"begin_us":307113604287,"end_us":307113604304,"envelope_us":17,"worker_sum_us":91,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":66,"page_bytes":1081344,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":69,"begin_us":307113658231,"end_us":307113658270,"envelope_us":39,"worker_sum_us":92,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":70,"begin_us":307113712321,"end_us":307113712362,"envelope_us":41,"worker_sum_us":134,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":71,"begin_us":307113769102,"end_us":307113769142,"envelope_us":40,"worker_sum_us":138,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":72,"begin_us":307113823617,"end_us":307113823646,"envelope_us":29,"worker_sum_us":182,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":73,"begin_us":307113878017,"end_us":307113878060,"envelope_us":43,"worker_sum_us":184,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":74,"begin_us":307113932358,"end_us":307113932396,"envelope_us":38,"worker_sum_us":189,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":75,"begin_us":307113986753,"end_us":307113986796,"envelope_us":43,"worker_sum_us":186,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":76,"begin_us":307114040784,"end_us":307114040826,"envelope_us":42,"worker_sum_us":190,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":77,"begin_us":307114098190,"end_us":307114098225,"envelope_us":35,"worker_sum_us":110,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":78,"begin_us":307114152332,"end_us":307114152378,"envelope_us":46,"worker_sum_us":208,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":79,"begin_us":307114206471,"end_us":307114206513,"envelope_us":42,"worker_sum_us":177,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":80,"begin_us":307114261067,"end_us":307114261108,"envelope_us":41,"worker_sum_us":134,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":81,"begin_us":307114315025,"end_us":307114315065,"envelope_us":40,"worker_sum_us":86,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":82,"begin_us":307114369427,"end_us":307114369441,"envelope_us":14,"worker_sum_us":81,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":83,"begin_us":307114423632,"end_us":307114423689,"envelope_us":57,"worker_sum_us":199,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":84,"begin_us":307114478436,"end_us":307114478475,"envelope_us":39,"worker_sum_us":204,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":85,"begin_us":307114532306,"end_us":307114532322,"envelope_us":16,"worker_sum_us":87,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":86,"begin_us":307114589599,"end_us":307114589635,"envelope_us":36,"worker_sum_us":111,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":87,"begin_us":307114643595,"end_us":307114643637,"envelope_us":42,"worker_sum_us":187,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":88,"begin_us":307114698066,"end_us":307114698102,"envelope_us":36,"worker_sum_us":114,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":89,"begin_us":307114752733,"end_us":307114752771,"envelope_us":38,"worker_sum_us":83,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":90,"begin_us":307114807122,"end_us":307114807160,"envelope_us":38,"worker_sum_us":105,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":91,"begin_us":307114861542,"end_us":307114861583,"envelope_us":41,"worker_sum_us":145,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":92,"begin_us":307114916422,"end_us":307114916459,"envelope_us":37,"worker_sum_us":152,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":93,"begin_us":307114971364,"end_us":307114971406,"envelope_us":42,"worker_sum_us":188,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":94,"begin_us":307115026193,"end_us":307115026230,"envelope_us":37,"worker_sum_us":128,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":95,"begin_us":307115084681,"end_us":307115084721,"envelope_us":40,"worker_sum_us":218,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":96,"begin_us":307115139212,"end_us":307115139254,"envelope_us":42,"worker_sum_us":189,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":97,"begin_us":307115193265,"end_us":307115193309,"envelope_us":44,"worker_sum_us":187,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":98,"begin_us":307115247390,"end_us":307115247433,"envelope_us":43,"worker_sum_us":158,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":99,"begin_us":307115301561,"end_us":307115301600,"envelope_us":39,"worker_sum_us":118,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":66,"page_bytes":1081344,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":100,"begin_us":307115355790,"end_us":307115355829,"envelope_us":39,"worker_sum_us":101,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":101,"begin_us":307115410064,"end_us":307115410103,"envelope_us":39,"worker_sum_us":195,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":102,"begin_us":307115464090,"end_us":307115464132,"envelope_us":42,"worker_sum_us":149,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":103,"begin_us":307115519042,"end_us":307115519070,"envelope_us":28,"worker_sum_us":156,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":66,"page_bytes":1081344,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":104,"begin_us":307115576622,"end_us":307115576651,"envelope_us":29,"worker_sum_us":112,"threads":8,"rows":32,"unique_rows":32,"logical_bytes":2880,"pages":32,"page_bytes":524288,"page_size":16384,"metadata_rows":32,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+0.08.377.663 I slot print_timing: id  0 | task 64 | prompt eval time =     302.12 ms /    60 tokens (    5.04 ms per token,   198.59 tokens per second)
+0.08.377.666 I slot print_timing: id  0 | task 64 |        eval time =    2194.54 ms /   128 tokens (   17.28 ms per token,    57.87 tokens per second)
+0.08.377.666 I slot print_timing: id  0 | task 64 |       total time =    2496.67 ms /   188 tokens
+0.08.377.666 I slot print_timing: id  0 | task 64 |    graphs reused =         91
+0.08.377.669 I slot print_timing: id  0 | task 64 | draft acceptance = 0.73729 (   87 accepted /   118 generated), mean len =  3.17
+0.08.377.669 I slot print_timing: id  0 | task 64 |      acc per pos = (0.875, 0.750, 0.550)
+0.08.377.676 I spec common_specu: statistics        draft-mtp: #calls(b,g,a) =    3     96     96, #gen drafts =     96, #acc drafts =    76, #gen tokens =    285, #acc tokens =   163, #mean acc len = 2.70, #acc rate/pos = (0.792, 0.562, 0.344), dur(b,g,a) = 0.016, 1040.135, 0.107 ms
+0.08.377.690 I slot      release: id  0 | task 64 | stop processing: n_tokens = 187, truncated = 0
+0.08.377.694 I srv  update_slots: all slots are idle
+0.08.379.441 I srv  server_strea: conv_id= (empty=1)
+0.08.379.472 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.054 (3/56) > 0.100
+0.08.379.473 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 307115613001
+0.08.379.485 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> logit-bias -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+0.08.379.488 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 20, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+0.08.379.488 I slot launch_slot_: id  0 | task 107 | processing task, is_child = 0
+0.08.379.491 I slot   operator(): id  0 | task 107 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 56
+0.08.379.492 I slot   operator(): id  0 | task 107 | erased invalidated context checkpoint (pos_min = 55, pos_max = 55, n_tokens = 56, n_swa = 0, pos_next = 0, size = 112.571 MiB)
+0.08.379.494 I slot   operator(): id  0 | task 107 | cached n_tokens = 0, memory_seq_rm [0, end)
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":105,"begin_us":307115617601,"end_us":307115617938,"envelope_us":337,"worker_sum_us":2133,"threads":8,"rows":832,"unique_rows":832,"logical_bytes":74880,"pages":840,"page_bytes":13762560,"page_size":16384,"metadata_rows":832,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+0.08.637.658 I slot   operator(): id  0 | task 107 | cached n_tokens = 52, memory_seq_rm [52, end)
+0.08.637.678 I slot init_sampler: id  0 | task 107 | init sampler, took 0.01 ms, tokens: text = 56, total = 56
+0.08.640.266 I slot create_check: id  0 | task 107 | created context checkpoint 1 of 32 (pos_min = 51, pos_max = 51, n_tokens = 52, size = 112.571 MiB)
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":106,"begin_us":307115878335,"end_us":307115878342,"envelope_us":7,"worker_sum_us":30,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":107,"begin_us":307115934619,"end_us":307115934650,"envelope_us":31,"worker_sum_us":83,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":108,"begin_us":307115989543,"end_us":307115989585,"envelope_us":42,"worker_sum_us":122,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":109,"begin_us":307116047032,"end_us":307116047070,"envelope_us":38,"worker_sum_us":187,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":66,"page_bytes":1081344,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":110,"begin_us":307116102188,"end_us":307116102231,"envelope_us":43,"worker_sum_us":184,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":111,"begin_us":307116155995,"end_us":307116156037,"envelope_us":42,"worker_sum_us":181,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":112,"begin_us":307116210137,"end_us":307116210174,"envelope_us":37,"worker_sum_us":199,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":113,"begin_us":307116264242,"end_us":307116264284,"envelope_us":42,"worker_sum_us":145,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":114,"begin_us":307116318036,"end_us":307116318051,"envelope_us":15,"worker_sum_us":79,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":115,"begin_us":307116371806,"end_us":307116371844,"envelope_us":38,"worker_sum_us":159,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":116,"begin_us":307116426005,"end_us":307116426048,"envelope_us":43,"worker_sum_us":187,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":117,"begin_us":307116479836,"end_us":307116479879,"envelope_us":43,"worker_sum_us":183,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":118,"begin_us":307116534323,"end_us":307116534362,"envelope_us":39,"worker_sum_us":179,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":119,"begin_us":307116591881,"end_us":307116591930,"envelope_us":49,"worker_sum_us":193,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":120,"begin_us":307116647791,"end_us":307116647824,"envelope_us":33,"worker_sum_us":198,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":121,"begin_us":307116702489,"end_us":307116702533,"envelope_us":44,"worker_sum_us":214,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":122,"begin_us":307116759965,"end_us":307116760003,"envelope_us":38,"worker_sum_us":190,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":123,"begin_us":307116814233,"end_us":307116814270,"envelope_us":37,"worker_sum_us":185,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":124,"begin_us":307116868529,"end_us":307116868573,"envelope_us":44,"worker_sum_us":187,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":125,"begin_us":307116922694,"end_us":307116922740,"envelope_us":46,"worker_sum_us":188,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":126,"begin_us":307116976533,"end_us":307116976573,"envelope_us":40,"worker_sum_us":207,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":127,"begin_us":307117030673,"end_us":307117030719,"envelope_us":46,"worker_sum_us":192,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":128,"begin_us":307117084789,"end_us":307117084844,"envelope_us":55,"worker_sum_us":224,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":129,"begin_us":307117139396,"end_us":307117139424,"envelope_us":28,"worker_sum_us":164,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":130,"begin_us":307117196992,"end_us":307117197037,"envelope_us":45,"worker_sum_us":196,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":66,"page_bytes":1081344,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":131,"begin_us":307117251141,"end_us":307117251180,"envelope_us":39,"worker_sum_us":184,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":132,"begin_us":307117305067,"end_us":307117305109,"envelope_us":42,"worker_sum_us":205,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":133,"begin_us":307117359001,"end_us":307117359045,"envelope_us":44,"worker_sum_us":182,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":134,"begin_us":307117413509,"end_us":307117413544,"envelope_us":35,"worker_sum_us":212,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":135,"begin_us":307117468346,"end_us":307117468384,"envelope_us":38,"worker_sum_us":190,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":136,"begin_us":307117523518,"end_us":307117523558,"envelope_us":40,"worker_sum_us":245,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":137,"begin_us":307117577986,"end_us":307117578013,"envelope_us":27,"worker_sum_us":168,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":138,"begin_us":307117632405,"end_us":307117632431,"envelope_us":26,"worker_sum_us":148,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":139,"begin_us":307117686426,"end_us":307117686466,"envelope_us":40,"worker_sum_us":141,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":140,"begin_us":307117740176,"end_us":307117740212,"envelope_us":36,"worker_sum_us":145,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":141,"begin_us":307117794416,"end_us":307117794442,"envelope_us":26,"worker_sum_us":157,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":142,"begin_us":307117848320,"end_us":307117848365,"envelope_us":45,"worker_sum_us":184,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":143,"begin_us":307117902586,"end_us":307117902618,"envelope_us":32,"worker_sum_us":186,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":66,"page_bytes":1081344,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":144,"begin_us":307117956557,"end_us":307117956598,"envelope_us":41,"worker_sum_us":175,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":145,"begin_us":307118010669,"end_us":307118010710,"envelope_us":41,"worker_sum_us":181,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":146,"begin_us":307118065547,"end_us":307118065590,"envelope_us":43,"worker_sum_us":148,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":147,"begin_us":307118119951,"end_us":307118119995,"envelope_us":44,"worker_sum_us":184,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":148,"begin_us":307118173817,"end_us":307118173856,"envelope_us":39,"worker_sum_us":193,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":149,"begin_us":307118227852,"end_us":307118227895,"envelope_us":43,"worker_sum_us":169,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":150,"begin_us":307118281944,"end_us":307118281971,"envelope_us":27,"worker_sum_us":159,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":151,"begin_us":307118336376,"end_us":307118336403,"envelope_us":27,"worker_sum_us":142,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":152,"begin_us":307118390196,"end_us":307118390239,"envelope_us":43,"worker_sum_us":189,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":153,"begin_us":307118444767,"end_us":307118444806,"envelope_us":39,"worker_sum_us":187,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":154,"begin_us":307118498594,"end_us":307118498632,"envelope_us":38,"worker_sum_us":115,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":155,"begin_us":307118553049,"end_us":307118553092,"envelope_us":43,"worker_sum_us":177,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":156,"begin_us":307118607026,"end_us":307118607060,"envelope_us":34,"worker_sum_us":114,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":157,"begin_us":307118661217,"end_us":307118661257,"envelope_us":40,"worker_sum_us":129,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":158,"begin_us":307118715049,"end_us":307118715086,"envelope_us":37,"worker_sum_us":171,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":159,"begin_us":307118769020,"end_us":307118769061,"envelope_us":41,"worker_sum_us":214,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":65,"page_bytes":1064960,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":160,"begin_us":307118823229,"end_us":307118823243,"envelope_us":14,"worker_sum_us":63,"threads":8,"rows":64,"unique_rows":64,"logical_bytes":5760,"pages":64,"page_bytes":1048576,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+M5_LOOKUP_OP {"pool":"0x1051c0000","ordinal":161,"begin_us":307118877533,"end_us":307118877560,"envelope_us":27,"worker_sum_us":55,"threads":8,"rows":64,"unique_rows":56,"logical_bytes":5040,"pages":56,"page_bytes":917504,"page_size":16384,"metadata_rows":64,"metadata_complete":true,"tensor_address":"0x85c68cc0c0","demand_samples":[]}
+0.11.686.165 I slot print_timing: id  0 | task 107 | prompt eval time =     307.06 ms /    56 tokens (    5.48 ms per token,   182.38 tokens per second)
+0.11.686.167 I slot print_timing: id  0 | task 107 |        eval time =    2999.60 ms /   128 tokens (   23.62 ms per token,    42.34 tokens per second)
+0.11.686.168 I slot print_timing: id  0 | task 107 |       total time =    3306.66 ms /   184 tokens
+0.11.686.168 I slot print_timing: id  0 | task 107 |    graphs reused =        145
+0.11.686.170 I slot print_timing: id  0 | task 107 | draft acceptance = 0.43636 (   72 accepted /   165 generated), mean len =  2.31
+0.11.686.170 I slot print_timing: id  0 | task 107 |      acc per pos = (0.691, 0.382, 0.236)
+0.11.686.177 I spec common_specu: statistics        draft-mtp: #calls(b,g,a) =    4    151    151, #gen drafts =    151, #acc drafts =   114, #gen tokens =    450, #acc tokens =   235, #mean acc len = 2.56, #acc rate/pos = (0.755, 0.497, 0.305), dur(b,g,a) = 0.021, 1603.594, 0.170 ms
+0.11.686.200 I slot      release: id  0 | task 107 | stop processing: n_tokens = 183, truncated = 0
+0.11.686.203 I srv  update_slots: all slots are idle
+0.11.686.668 I srv    operator(): operator(): cleaning up before exit...
+0.11.686.886 I common_memory_breakdown_print: | memory breakdown [MiB]  | total   free     self   model   context   compute    unaccounted |
+0.11.686.888 I common_memory_breakdown_print: |   - MTL0 (Apple M5 Pro) | 38338 = 1096 + (36619 = 35870 +     570 +     179) +         622 |
+0.11.686.888 I common_memory_breakdown_print: |   - Host                |                 27756 = 27726 +       0 +      30                |
+0.11.687.029 I ggml_metal_free: deallocating
+0.11.714.461 I ggml_metal_free: deallocating

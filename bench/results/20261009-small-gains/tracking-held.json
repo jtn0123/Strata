@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "status": "held; resource retry awaits unchanged34GiB headroom and quiet host",
+  "plan": "config/m5_small_gains_plan.json",
+  "candidates": [
+    {
+      "id": "P11",
+      "status": "possible addition; native verified; model validation held for memory",
+      "cohort": "long",
+      "features": [
+        "compact"
+      ],
+      "prior_evidence": "bench/results/20261009-compact-tiles/component/comparison.json",
+      "native_evidence": "bench/results/20261009-small-gains/native-checks.json",
+      "excluded_model_attempt": "X24: original control resource-only load stop; no candidate or response"
+    },
+    {
+      "id": "P07",
+      "status": "possible addition; native verified; model validation held for memory",
+      "cohort": "short",
+      "features": [
+        "reduce"
+      ],
+      "prior_evidence": "bench/results/20261009T130146Z-m5-ten-expert-reduction/comparison.json",
+      "native_evidence": "bench/results/20261009-small-gains/native-checks.json"
+    },
+    {
+      "id": "W02",
+      "status": "possible addition; native verified; model validation held for memory",
+      "cohort": "short",
+      "features": [
+        "top10"
+      ],
+      "prior_evidence": "bench/results/20261009T205909Z-m5-parallel-top10/comparison.json",
+      "native_evidence": "bench/results/20261009-small-gains/native-checks.json"
+    }
+  ],
+  "combined_status": "Awaiting individually confirmed model gains; no combination launched.",
+  "runs": [],
+  "exclusions": [
+    {
+      "id": "X23",
+      "phase": "native-prerequisites",
+      "status": "excluded-harness-error",
+      "evidence": "bench/results/20261009-small-gains/native-initial-excluded/exclusion.json",
+      "models_launched": false
+    },
+    {
+      "candidate": "P11",
+      "phase": "screen",
+      "cohort": "long",
+      "error": "Server exited during load with code -15; see server.log",
+      "evidence": [
+        "bench/results/20261010T022719Z-m5-small-gains-p11-screen-long"
+      ],
+      "time_utc": "2026-10-10T02:28:18.443343+00:00",
+      "id": "X24",
+      "status": "excluded-resource-only",
+      "new_swap_bytes": 3211264,
+      "zero_answers": true,
+      "run": "bench/results/20261010T022807Z-m5-small-gains-p11-screen-long-1-conv-direct",
+      "diagnosis": "bench/results/20261009-small-gains/model-initial-excluded/exclusion.json"
+    }
+  ],
+  "retry_preflight": {
+    "error": "Headroom did not settle within 90 seconds; model launch held",
+    "evidence": "bench/results/20261009-small-gains/resource-retry-held-plan.json"
+  },
+  "report": "bench/results/20261009-small-gains/REPORT.md",
+  "resume_driver": "bench/results/20261009-small-gains/resource-retry.py"
+}

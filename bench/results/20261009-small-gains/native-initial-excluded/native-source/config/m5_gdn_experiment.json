@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "m5-gdn",
+  "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+  "directory": "vendor/llama-m5-gdn",
+  "patch": "patches/mtp-m5-gdn.patch",
+  "patch_sha256": "89d21d66a6a20ce84529d8d99fe9a386d79bd2963b79a68ac9c5c234a1905fe4",
+  "source_diff_sha256": "89d21d66a6a20ce84529d8d99fe9a386d79bd2963b79a68ac9c5c234a1905fe4",
+  "modified_files": [
+    "ggml/src/ggml-metal/ggml-metal-common.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.h",
+    "ggml/src/ggml-metal/ggml-metal-context.m",
+    "ggml/src/ggml-metal/ggml-metal-device.cpp",
+    "ggml/src/ggml-metal/ggml-metal-device.h",
+    "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+    "ggml/src/ggml-metal/kernels/gated_delta_net.metal",
+    "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+    "ggml/src/ggml-metal/kernels/quantize.metal",
+    "src/llama-context.cpp",
+    "src/llama-cparams.h",
+    "src/models/qwen4exp.cpp",
+    "tests/test-backend-ops.cpp"
+  ],
+  "features": [
+    "mtp-shared",
+    "m5-tuning",
+    "m5-profile",
+    "m5-copy",
+    "m5-gdn"
+  ],
+  "components": [
+    {
+      "patch": "patches/mtp-m5-copy.patch",
+      "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+    }
+  ],
+  "scope": "Opt-in exact-target GDN rows per threadgroup 1/2/4 with unchanged four state elements per lane and all recurrence/rollback snapshots. F32 Sv128,Hv48,Hqk16,K4,T1..5,B1 only; original pipeline for defaults and other shapes. Normal-fusion trace, disabled during timings.",
+  "upstream": {
+    "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+    "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+    "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+    "license_file": "patches/LLAMA-LICENSE.txt"
+  }
+}

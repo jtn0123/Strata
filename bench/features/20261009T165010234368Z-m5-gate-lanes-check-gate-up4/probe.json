@@ -1,0 +1,1644 @@
+{
+  "status": "passed",
+  "probe": {
+    "engine": {
+      "engine": "m5-gate-lanes",
+      "directory": "vendor/llama-m5-gate-lanes",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "32b5dec9abcbb06e24af29b5dbad6f5e203b6f0733c98a0a941d95bd0f3c0b0c",
+      "patch": {
+        "schema": 1,
+        "id": "m5-gate-lanes",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-gate-lanes",
+        "patch": "patches/mtp-m5-gate-lanes.patch",
+        "patch_sha256": "32b5dec9abcbb06e24af29b5dbad6f5e203b6f0733c98a0a941d95bd0f3c0b0c",
+        "source_diff_sha256": "32b5dec9abcbb06e24af29b5dbad6f5e203b6f0733c98a0a941d95bd0f3c0b0c",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal-device.h",
+          "ggml/src/ggml-metal/ggml-metal-fusion.cpp",
+          "ggml/src/ggml-metal/ggml-metal-fusion.h",
+          "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv.metal",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "ggml/src/ggml-metal/kernels/quantize.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-copy",
+          "m5-gate",
+          "m5-gate-lanes"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-gate.patch",
+            "sha256": "47ae4bd6ca9842b392110ed0ff4a37d12d2b74d259b9e6df58dcdd71bfd6bf42"
+          }
+        ],
+        "scope": "Independent gate4/gate8 lane-distributed exact SwiGLU epilogue. Existing gate/up Q2 dot products, SIMD reductions, routing, guards and allocation hooks unchanged; default off.",
+        "upstream": {
+          "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+          "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+          "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        }
+      },
+      "artifacts": {
+        "llama-server": "3be9421e9e29e7d3f37025e8dd52345454e2405e479893f66f508c3297762977",
+        "libggml-base.0.26.0.dylib": "ec41125392a0aed027067c8fe94617f5b3ec94b27c1c9683680c6ac2b8cb985a",
+        "libggml-base.0.dylib": "ec41125392a0aed027067c8fe94617f5b3ec94b27c1c9683680c6ac2b8cb985a",
+        "libggml-base.dylib": "ec41125392a0aed027067c8fe94617f5b3ec94b27c1c9683680c6ac2b8cb985a",
+        "libggml-blas.0.26.0.dylib": "2b047d80ac45b0a0fe5f92b0724c0ebb54ae42cfd252adeddad630ff0c39234d",
+        "libggml-blas.0.dylib": "2b047d80ac45b0a0fe5f92b0724c0ebb54ae42cfd252adeddad630ff0c39234d",
+        "libggml-blas.dylib": "2b047d80ac45b0a0fe5f92b0724c0ebb54ae42cfd252adeddad630ff0c39234d",
+        "libggml-cpu.0.26.0.dylib": "4cb4802c2d1b07254db138d6001bc998b4f4507e129965698dbb9b709db0832e",
+        "libggml-cpu.0.dylib": "4cb4802c2d1b07254db138d6001bc998b4f4507e129965698dbb9b709db0832e",
+        "libggml-cpu.dylib": "4cb4802c2d1b07254db138d6001bc998b4f4507e129965698dbb9b709db0832e",
+        "libggml-metal.0.26.0.dylib": "d46865926f575bd0cbf2d8703a7756f260256b0c2c72eaebc01702ff521a6eed",
+        "libggml-metal.0.dylib": "d46865926f575bd0cbf2d8703a7756f260256b0c2c72eaebc01702ff521a6eed",
+        "libggml-metal.dylib": "d46865926f575bd0cbf2d8703a7756f260256b0c2c72eaebc01702ff521a6eed",
+        "libggml.0.26.0.dylib": "d81f2587565310f51d4a833f4d8faef9adea98db559a42a390a7837cf2e3e197",
+        "libggml.0.dylib": "d81f2587565310f51d4a833f4d8faef9adea98db559a42a390a7837cf2e3e197",
+        "libggml.dylib": "d81f2587565310f51d4a833f4d8faef9adea98db559a42a390a7837cf2e3e197",
+        "libllama-common.0.6.0.dylib": "ccb11ef9893be43fd73221ca0dd72c67ece0a8ea1495963d871516ee3aeca6de",
+        "libllama-common.0.dylib": "ccb11ef9893be43fd73221ca0dd72c67ece0a8ea1495963d871516ee3aeca6de",
+        "libllama-common.dylib": "ccb11ef9893be43fd73221ca0dd72c67ece0a8ea1495963d871516ee3aeca6de",
+        "libllama-server-impl.dylib": "902de99a8268f5f958e6eaa2a5c3c933c78bcb1b5077f2469e54bb3beefac4b7",
+        "libllama.0.6.0.dylib": "c95307f555650d4e9cee071cf8396416478699949fb1c74b06bb93731a5920eb",
+        "libllama.0.dylib": "c95307f555650d4e9cee071cf8396416478699949fb1c74b06bb93731a5920eb",
+        "libllama.dylib": "c95307f555650d4e9cee071cf8396416478699949fb1c74b06bb93731a5920eb",
+        "libmtmd.0.6.0.dylib": "6207924f8b74645bab2fa478824f37e2e2ffa3259eabfe0ae208cf21a10b8128",
+        "libmtmd.0.dylib": "6207924f8b74645bab2fa478824f37e2e2ffa3259eabfe0ae208cf21a10b8128",
+        "libmtmd.dylib": "6207924f8b74645bab2fa478824f37e2e2ffa3259eabfe0ae208cf21a10b8128"
+      },
+      "build_receipt": {
+        "engine": "m5-gate-lanes",
+        "directory": "vendor/llama-m5-gate-lanes",
+        "revision": "d81235049384534c167caea52b85a694f6103d14",
+        "source_diff_sha256": "32b5dec9abcbb06e24af29b5dbad6f5e203b6f0733c98a0a941d95bd0f3c0b0c",
+        "patch": {
+          "schema": 1,
+          "id": "m5-gate-lanes",
+          "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+          "directory": "vendor/llama-m5-gate-lanes",
+          "patch": "patches/mtp-m5-gate-lanes.patch",
+          "patch_sha256": "32b5dec9abcbb06e24af29b5dbad6f5e203b6f0733c98a0a941d95bd0f3c0b0c",
+          "source_diff_sha256": "32b5dec9abcbb06e24af29b5dbad6f5e203b6f0733c98a0a941d95bd0f3c0b0c",
+          "modified_files": [
+            "ggml/src/ggml-metal/ggml-metal-common.cpp",
+            "ggml/src/ggml-metal/ggml-metal-common.h",
+            "ggml/src/ggml-metal/ggml-metal-context.m",
+            "ggml/src/ggml-metal/ggml-metal-device.cpp",
+            "ggml/src/ggml-metal/ggml-metal-device.h",
+            "ggml/src/ggml-metal/ggml-metal-fusion.cpp",
+            "ggml/src/ggml-metal/ggml-metal-fusion.h",
+            "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+            "ggml/src/ggml-metal/kernels/mul_mv.metal",
+            "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+            "ggml/src/ggml-metal/kernels/quantize.metal",
+            "src/llama-context.cpp",
+            "src/llama-cparams.h",
+            "src/models/qwen4exp.cpp",
+            "tests/test-backend-ops.cpp"
+          ],
+          "features": [
+            "mtp-shared",
+            "m5-tuning",
+            "m5-profile",
+            "m5-copy",
+            "m5-gate",
+            "m5-gate-lanes"
+          ],
+          "components": [
+            {
+              "patch": "patches/mtp-m5-gate.patch",
+              "sha256": "47ae4bd6ca9842b392110ed0ff4a37d12d2b74d259b9e6df58dcdd71bfd6bf42"
+            }
+          ],
+          "scope": "Independent gate4/gate8 lane-distributed exact SwiGLU epilogue. Existing gate/up Q2 dot products, SIMD reductions, routing, guards and allocation hooks unchanged; default off.",
+          "upstream": {
+            "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+            "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+            "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+            "license_file": "patches/LLAMA-LICENSE.txt"
+          }
+        },
+        "artifacts": {
+          "llama-server": "3be9421e9e29e7d3f37025e8dd52345454e2405e479893f66f508c3297762977",
+          "libggml-base.0.26.0.dylib": "ec41125392a0aed027067c8fe94617f5b3ec94b27c1c9683680c6ac2b8cb985a",
+          "libggml-base.0.dylib": "ec41125392a0aed027067c8fe94617f5b3ec94b27c1c9683680c6ac2b8cb985a",
+          "libggml-base.dylib": "ec41125392a0aed027067c8fe94617f5b3ec94b27c1c9683680c6ac2b8cb985a",
+          "libggml-blas.0.26.0.dylib": "2b047d80ac45b0a0fe5f92b0724c0ebb54ae42cfd252adeddad630ff0c39234d",
+          "libggml-blas.0.dylib": "2b047d80ac45b0a0fe5f92b0724c0ebb54ae42cfd252adeddad630ff0c39234d",
+          "libggml-blas.dylib": "2b047d80ac45b0a0fe5f92b0724c0ebb54ae42cfd252adeddad630ff0c39234d",
+          "libggml-cpu.0.26.0.dylib": "4cb4802c2d1b07254db138d6001bc998b4f4507e129965698dbb9b709db0832e",
+          "libggml-cpu.0.dylib": "4cb4802c2d1b07254db138d6001bc998b4f4507e129965698dbb9b709db0832e",
+          "libggml-cpu.dylib": "4cb4802c2d1b07254db138d6001bc998b4f4507e129965698dbb9b709db0832e",
+          "libggml-metal.0.26.0.dylib": "d46865926f575bd0cbf2d8703a7756f260256b0c2c72eaebc01702ff521a6eed",
+          "libggml-metal.0.dylib": "d46865926f575bd0cbf2d8703a7756f260256b0c2c72eaebc01702ff521a6eed",
+          "libggml-metal.dylib": "d46865926f575bd0cbf2d8703a7756f260256b0c2c72eaebc01702ff521a6eed",
+          "libggml.0.26.0.dylib": "d81f2587565310f51d4a833f4d8faef9adea98db559a42a390a7837cf2e3e197",
+          "libggml.0.dylib": "d81f2587565310f51d4a833f4d8faef9adea98db559a42a390a7837cf2e3e197",
+          "libggml.dylib": "d81f2587565310f51d4a833f4d8faef9adea98db559a42a390a7837cf2e3e197",
+          "libllama-common.0.6.0.dylib": "ccb11ef9893be43fd73221ca0dd72c67ece0a8ea1495963d871516ee3aeca6de",
+          "libllama-common.0.dylib": "ccb11ef9893be43fd73221ca0dd72c67ece0a8ea1495963d871516ee3aeca6de",
+          "libllama-common.dylib": "ccb11ef9893be43fd73221ca0dd72c67ece0a8ea1495963d871516ee3aeca6de",
+          "libllama-server-impl.dylib": "902de99a8268f5f958e6eaa2a5c3c933c78bcb1b5077f2469e54bb3beefac4b7",
+          "libllama.0.6.0.dylib": "c95307f555650d4e9cee071cf8396416478699949fb1c74b06bb93731a5920eb",
+          "libllama.0.dylib": "c95307f555650d4e9cee071cf8396416478699949fb1c74b06bb93731a5920eb",
+          "libllama.dylib": "c95307f555650d4e9cee071cf8396416478699949fb1c74b06bb93731a5920eb",
+          "libmtmd.0.6.0.dylib": "6207924f8b74645bab2fa478824f37e2e2ffa3259eabfe0ae208cf21a10b8128",
+          "libmtmd.0.dylib": "6207924f8b74645bab2fa478824f37e2e2ffa3259eabfe0ae208cf21a10b8128",
+          "libmtmd.dylib": "6207924f8b74645bab2fa478824f37e2e2ffa3259eabfe0ae208cf21a10b8128"
+        },
+        "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+        "build_settings": {
+          "CMAKE_BUILD_TYPE": "Release",
+          "GGML_BLAS": "ON",
+          "GGML_CPU": "ON",
+          "GGML_METAL": "ON",
+          "GGML_METAL_EMBED_LIBRARY": "ON",
+          "GGML_NATIVE": "ON",
+          "LLAMA_BUILD_TESTS": "ON",
+          "LLAMA_BUILD_TOOLS": "ON"
+        },
+        "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+      }
+    },
+    "source_sha256": "7bda8e79286893d3a5598c291aa29cad122d2e307bb29c5d45e558f66355b328",
+    "runner_sha256": "f948af0a6dd48c8717cdb25dde016478a77bbd05002a589ea1cca0b6a5277b1d",
+    "fixture_sha256": "39eb096d5cecd530485f695ef21b671b58a719be7633c992f8fdb2bf619744f5",
+    "binary_sha256": "4b8bf43c9cc3d40d4e39e379aea3c8b3e6babecf78e92c21b59c04d3854b3dc2",
+    "command": [
+      "/usr/bin/c++",
+      "-O3",
+      "-ffp-contract=off",
+      "-std=gnu++17",
+      "-arch",
+      "arm64",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-gate-lanes/ggml/include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-gate-lanes/vendor",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/native/m5_gate_probe.cpp",
+      "-o",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-gate-lanes/gate-probe",
+      "-Wl,-rpath,/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-gate-lanes/build/bin",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-gate-lanes/build/bin/libggml.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-gate-lanes/build/bin/libggml-base.0.26.0.dylib"
+    ]
+  },
+  "mode": "check",
+  "metal_environment": {
+    "tensor_api": "on",
+    "tuning": "gate-up4",
+    "profile": false,
+    "variables": {
+      "GGML_M5_LAB_CONV_DIRECT": "1",
+      "GGML_M5_LAB_GATE_UP": "2",
+      "GGML_METAL_TENSOR_ENABLE": "1",
+      "GGML_M5_LAB_GATE_TRACE": "1"
+    }
+  },
+  "models_loaded": false,
+  "tps_measured": false,
+  "scope": "Normal backend scheduler/optimizer and allocation dependencies; all graph nodes forced to Metal and placement verified. Eight sequential gate/up/SwiGLU/down blocks with weighted reduction/residual per perf graph, two full512 weight sets and eight recorded routes. Full dispatch/sync costs included. No callbacks, perf traces or CPU graph work.",
+  "memory": {
+    "guard": null,
+    "monitor_healthy": true,
+    "monitor_error": null,
+    "samples": 121,
+    "live_samples": 119,
+    "baseline_before_launch": true,
+    "child_exited": true,
+    "launch_baseline": {
+      "swap_used_bytes": 523829248,
+      "available_bytes": 32201637888
+    },
+    "peak_rss_bytes": 4810178560,
+    "minimum_available_bytes": 32201637888,
+    "peak_swap_bytes": 523829248,
+    "swap_growth_bytes": 0,
+    "system_disk_read_bytes": 6991872,
+    "sampling_interval_s": 0.25,
+    "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+  },
+  "native_returncode": 0,
+  "cases": [
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.213654442924641e-14,
+      "distinct_experts": [
+        10
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 309408,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 1.706290134739774e-07,
+      "max_scaled_error": 1.706290134739774e-07,
+      "output_elements": 34560,
+      "route": "distinct",
+      "route_index": 0,
+      "rows": 1,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        606.0
+      ],
+      "wall_us_per_triplet": 606.0
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.024358699165072e-14,
+      "distinct_experts": [
+        20
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 609472,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 1.873718795120105e-07,
+      "max_scaled_error": 1.873718795120105e-07,
+      "output_elements": 69120,
+      "route": "distinct",
+      "route_index": 0,
+      "rows": 2,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1008.416
+      ],
+      "wall_us_per_triplet": 1008.416
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.469537540471911e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 909536,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.17905674504415e-07,
+      "max_scaled_error": 2.17905674504415e-07,
+      "output_elements": 103680,
+      "route": "distinct",
+      "route_index": 0,
+      "rows": 3,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1351.75
+      ],
+      "wall_us_per_triplet": 1351.75
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.436445412514432e-14,
+      "distinct_experts": [
+        60
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1809760,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.783500236969161e-07,
+      "max_scaled_error": 2.783500236969161e-07,
+      "output_elements": 207360,
+      "route": "distinct",
+      "route_index": 0,
+      "rows": 6,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1364.542
+      ],
+      "wall_us_per_triplet": 1364.542
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.957007826013444e-14,
+      "distinct_experts": [
+        14
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.6248643614223965e-07,
+      "max_scaled_error": 2.574891579953942e-07,
+      "output_elements": 138240,
+      "route": "real",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        2010.292
+      ],
+      "wall_us_per_triplet": 2010.292
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.832651961622566e-14,
+      "distinct_experts": [
+        22
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.448694641499216e-07,
+      "max_scaled_error": 2.448694641499216e-07,
+      "output_elements": 138240,
+      "route": "real",
+      "route_index": 1,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1585.917
+      ],
+      "wall_us_per_triplet": 1585.917
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.842513252329656e-14,
+      "distinct_experts": [
+        24
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 3.5117447216848063e-07,
+      "max_scaled_error": 3.309765028168983e-07,
+      "output_elements": 138240,
+      "route": "real",
+      "route_index": 2,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1475.75
+      ],
+      "wall_us_per_triplet": 1475.75
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.777091797977985e-14,
+      "distinct_experts": [
+        26
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.1572522285184803e-07,
+      "max_scaled_error": 2.1572522285184803e-07,
+      "output_elements": 138240,
+      "route": "real",
+      "route_index": 3,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1606.0
+      ],
+      "wall_us_per_triplet": 1606.0
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.7517707748835e-14,
+      "distinct_experts": [
+        28
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.150466601458234e-07,
+      "max_scaled_error": 2.150466601458234e-07,
+      "output_elements": 138240,
+      "route": "real",
+      "route_index": 4,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1598.459
+      ],
+      "wall_us_per_triplet": 1598.459
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.10774019545582e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.170793583777808e-07,
+      "max_scaled_error": 2.170793583777808e-07,
+      "output_elements": 138240,
+      "route": "real",
+      "route_index": 5,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1607.917
+      ],
+      "wall_us_per_triplet": 1607.917
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.981165811594348e-14,
+      "distinct_experts": [
+        33
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.6059448920978667e-07,
+      "max_scaled_error": 2.6059448920978667e-07,
+      "output_elements": 138240,
+      "route": "real",
+      "route_index": 6,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1634.292
+      ],
+      "wall_us_per_triplet": 1634.292
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.713374807809513e-14,
+      "distinct_experts": [
+        40
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.800380209944109e-07,
+      "max_scaled_error": 2.800380209944109e-07,
+      "output_elements": 138240,
+      "route": "real",
+      "route_index": 7,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1579.917
+      ],
+      "wall_us_per_triplet": 1579.917
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.598279141431669e-14,
+      "distinct_experts": [
+        40
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.17905674504415e-07,
+      "max_scaled_error": 2.17905674504415e-07,
+      "output_elements": 138240,
+      "route": "distinct",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        2168.666
+      ],
+      "wall_us_per_triplet": 2168.666
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.98444700127592e-14,
+      "distinct_experts": [
+        10
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.1970274310945115e-07,
+      "max_scaled_error": 2.181692722036388e-07,
+      "output_elements": 138240,
+      "route": "shared",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1544.25
+      ],
+      "wall_us_per_triplet": 1544.25
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.179403505527937e-14,
+      "distinct_experts": [
+        1
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 1.8108716881570786e-07,
+      "max_scaled_error": 1.8108716881570786e-07,
+      "output_elements": 138240,
+      "route": "duplicate",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1527.125
+      ],
+      "wall_us_per_triplet": 1527.125
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.773428138911295e-14,
+      "distinct_experts": [
+        25
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.181692722036388e-07,
+      "max_scaled_error": 2.181692722036388e-07,
+      "output_elements": 138240,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1547.917
+      ],
+      "wall_us_per_triplet": 1547.917
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.773428138911295e-14,
+      "distinct_experts": [
+        25
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1209728,
+      "input_ids_preserved": true,
+      "layout": "input-strided",
+      "max_absolute_error": 2.181692722036388e-07,
+      "max_scaled_error": 2.181692722036388e-07,
+      "output_elements": 138240,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1178.792
+      ],
+      "wall_us_per_triplet": 1178.792
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.735814187032708e-14,
+      "distinct_experts": [
+        25
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "weights-strided",
+      "max_absolute_error": 2.1337718636438296e-07,
+      "max_scaled_error": 2.1337718636438296e-07,
+      "output_elements": 138240,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1606.458
+      ],
+      "wall_us_per_triplet": 1606.458
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.773428138911295e-14,
+      "distinct_experts": [
+        25
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1201568,
+      "input_ids_preserved": true,
+      "layout": "ids-contiguous",
+      "max_absolute_error": 2.181692722036388e-07,
+      "max_scaled_error": 2.181692722036388e-07,
+      "output_elements": 138240,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1533.416
+      ],
+      "wall_us_per_triplet": 1533.416
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.773428138911295e-14,
+      "distinct_experts": [
+        25
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "ids-offset",
+      "max_absolute_error": 2.181692722036388e-07,
+      "max_scaled_error": 2.181692722036388e-07,
+      "output_elements": 138240,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1676.875
+      ],
+      "wall_us_per_triplet": 1676.875
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.773428138911295e-14,
+      "distinct_experts": [
+        25
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1250560,
+      "input_ids_preserved": true,
+      "layout": "retained",
+      "max_absolute_error": 2.71984752053811e-07,
+      "max_scaled_error": 2.71984752053811e-07,
+      "output_elements": 189440,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1622.375
+      ],
+      "wall_us_per_triplet": 1622.375
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.773428138911295e-14,
+      "distinct_experts": [
+        25
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "external",
+      "max_absolute_error": 2.181692722036388e-07,
+      "max_scaled_error": 2.181692722036388e-07,
+      "output_elements": 163840,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1611.917
+      ],
+      "wall_us_per_triplet": 1611.917
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.365549160296538e-14,
+      "distinct_experts": [
+        25
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1212160,
+      "input_ids_preserved": true,
+      "layout": "bias",
+      "max_absolute_error": 2.953813922346171e-07,
+      "max_scaled_error": 2.4190808306512324e-07,
+      "output_elements": 138240,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1484.917
+      ],
+      "wall_us_per_triplet": 1484.917
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 8.831426904685507e-14,
+      "distinct_experts": [
+        25
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "clamp",
+      "max_absolute_error": 1.0275834311235243e-07,
+      "max_scaled_error": 1.0275834311235243e-07,
+      "output_elements": 138240,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1473.208
+      ],
+      "wall_us_per_triplet": 1473.208
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.105174890364756e-14,
+      "distinct_experts": [
+        25
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1217792,
+      "input_ids_preserved": true,
+      "layout": "different-ids",
+      "max_absolute_error": 5.079397681351239e-07,
+      "max_scaled_error": 5.079397681351239e-07,
+      "output_elements": 138240,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1128.75
+      ],
+      "wall_us_per_triplet": 1128.75
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.081532305384601e-14,
+      "distinct_experts": [
+        25
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1250560,
+      "input_ids_preserved": true,
+      "layout": "different-input",
+      "max_absolute_error": 3.2652305370639567e-07,
+      "max_scaled_error": 3.2652305370639567e-07,
+      "output_elements": 138240,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1575.334
+      ],
+      "wall_us_per_triplet": 1575.334
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.818617522848162e-14,
+      "distinct_experts": [
+        25
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "reversed",
+      "max_absolute_error": 2.4869738018962195e-07,
+      "max_scaled_error": 2.4869738018962195e-07,
+      "output_elements": 138240,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1453.667
+      ],
+      "wall_us_per_triplet": 1453.667
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.826819735168753e-14,
+      "distinct_experts": [
+        25
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1023168,
+      "input_ids_preserved": true,
+      "layout": "activation-unfused",
+      "max_absolute_error": 2.181692722036388e-07,
+      "max_scaled_error": 2.181692722036388e-07,
+      "output_elements": 138240,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1643.5
+      ],
+      "wall_us_per_triplet": 1643.5
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.439040370014174e-14,
+      "distinct_experts": [
+        25
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "cancel",
+      "max_absolute_error": 1.107417313850334e-06,
+      "max_scaled_error": 5.793328369928929e-07,
+      "output_elements": 138240,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1606.417
+      ],
+      "wall_us_per_triplet": 1606.417
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 5.1401940899224406e-14,
+      "distinct_experts": [
+        25
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1209600,
+      "input_ids_preserved": true,
+      "layout": "wide",
+      "max_absolute_error": 9.725832978801918e-05,
+      "max_scaled_error": 2.805661760917977e-05,
+      "output_elements": 138240,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1539.416
+      ],
+      "wall_us_per_triplet": 1539.416
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.985739838582834e-14,
+      "distinct_experts": [
+        13
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.197026279793235e-07,
+      "max_scaled_error": 2.197026279793235e-07,
+      "output_elements": 172800,
+      "route": "real",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1435.125
+      ],
+      "wall_us_per_triplet": 1435.125
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.992811811465532e-14,
+      "distinct_experts": [
+        26
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.1181170228867785e-07,
+      "max_scaled_error": 2.1181170228867785e-07,
+      "output_elements": 172800,
+      "route": "real",
+      "route_index": 1,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1415.334
+      ],
+      "wall_us_per_triplet": 1415.334
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.854731996690669e-14,
+      "distinct_experts": [
+        29
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.708037845078337e-07,
+      "max_scaled_error": 2.708037845078337e-07,
+      "output_elements": 172800,
+      "route": "real",
+      "route_index": 2,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1892.709
+      ],
+      "wall_us_per_triplet": 1892.709
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.17224198022487e-14,
+      "distinct_experts": [
+        31
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.574891579953942e-07,
+      "max_scaled_error": 2.574891579953942e-07,
+      "output_elements": 172800,
+      "route": "real",
+      "route_index": 3,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1447.625
+      ],
+      "wall_us_per_triplet": 1447.625
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.298669103881324e-14,
+      "distinct_experts": [
+        34
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 3.256572794763102e-07,
+      "max_scaled_error": 3.256572794763102e-07,
+      "output_elements": 172800,
+      "route": "real",
+      "route_index": 4,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1217.75
+      ],
+      "wall_us_per_triplet": 1217.75
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.142711738749099e-14,
+      "distinct_experts": [
+        36
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.3639585039481048e-07,
+      "max_scaled_error": 2.3639585039481048e-07,
+      "output_elements": 172800,
+      "route": "real",
+      "route_index": 5,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1388.542
+      ],
+      "wall_us_per_triplet": 1388.542
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.100065982351799e-14,
+      "distinct_experts": [
+        40
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.6333559538516127e-07,
+      "max_scaled_error": 2.6333559538516127e-07,
+      "output_elements": 172800,
+      "route": "real",
+      "route_index": 6,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1280.041
+      ],
+      "wall_us_per_triplet": 1280.041
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.984480986800858e-14,
+      "distinct_experts": [
+        50
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.3201264554018053e-07,
+      "max_scaled_error": 2.3201264554018053e-07,
+      "output_elements": 172800,
+      "route": "real",
+      "route_index": 7,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1316.875
+      ],
+      "wall_us_per_triplet": 1316.875
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.905439371109099e-14,
+      "distinct_experts": [
+        50
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.783500236969161e-07,
+      "max_scaled_error": 2.783500236969161e-07,
+      "output_elements": 172800,
+      "route": "distinct",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1843.416
+      ],
+      "wall_us_per_triplet": 1843.416
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.366095811566404e-14,
+      "distinct_experts": [
+        10
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.1970274310945115e-07,
+      "max_scaled_error": 2.181692722036388e-07,
+      "output_elements": 172800,
+      "route": "shared",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1534.25
+      ],
+      "wall_us_per_triplet": 1534.25
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.582283082429277e-14,
+      "distinct_experts": [
+        1
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 1.8108716881570786e-07,
+      "max_scaled_error": 1.8108716881570786e-07,
+      "output_elements": 172800,
+      "route": "duplicate",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1462.708
+      ],
+      "wall_us_per_triplet": 1462.708
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.067342332137369e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.2947103567316773e-07,
+      "max_scaled_error": 2.2947103567316773e-07,
+      "output_elements": 172800,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        964.167
+      ],
+      "wall_us_per_triplet": 964.167
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.067342332137369e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1509856,
+      "input_ids_preserved": true,
+      "layout": "input-strided",
+      "max_absolute_error": 2.2947103567316773e-07,
+      "max_scaled_error": 2.2947103567316773e-07,
+      "output_elements": 172800,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1242.708
+      ],
+      "wall_us_per_triplet": 1242.708
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.006041779706105e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "weights-strided",
+      "max_absolute_error": 2.1337718636438296e-07,
+      "max_scaled_error": 2.1337718636438296e-07,
+      "output_elements": 172800,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1382.125
+      ],
+      "wall_us_per_triplet": 1382.125
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.067342332137369e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1499680,
+      "input_ids_preserved": true,
+      "layout": "ids-contiguous",
+      "max_absolute_error": 2.2947103567316773e-07,
+      "max_scaled_error": 2.2947103567316773e-07,
+      "output_elements": 172800,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1316.25
+      ],
+      "wall_us_per_triplet": 1316.25
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.067342332137369e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "ids-offset",
+      "max_absolute_error": 2.2947103567316773e-07,
+      "max_scaled_error": 2.2947103567316773e-07,
+      "output_elements": 172800,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1471.209
+      ],
+      "wall_us_per_triplet": 1471.209
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.067342332137369e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1560896,
+      "input_ids_preserved": true,
+      "layout": "retained",
+      "max_absolute_error": 2.9025725822862114e-07,
+      "max_scaled_error": 2.9025725822862114e-07,
+      "output_elements": 236800,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1304.917
+      ],
+      "wall_us_per_triplet": 1304.917
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.067342332137369e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "external",
+      "max_absolute_error": 2.2947103567316773e-07,
+      "max_scaled_error": 2.2947103567316773e-07,
+      "output_elements": 204800,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1250.084
+      ],
+      "wall_us_per_triplet": 1250.084
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.612688706758624e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1512256,
+      "input_ids_preserved": true,
+      "layout": "bias",
+      "max_absolute_error": 2.953813922346171e-07,
+      "max_scaled_error": 2.7366464167011273e-07,
+      "output_elements": 172800,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1836.375
+      ],
+      "wall_us_per_triplet": 1836.375
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 9.271057879161751e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "clamp",
+      "max_absolute_error": 1.0275834311235243e-07,
+      "max_scaled_error": 1.0275834311235243e-07,
+      "output_elements": 172800,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1388.042
+      ],
+      "wall_us_per_triplet": 1388.042
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.431943675492102e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1519936,
+      "input_ids_preserved": true,
+      "layout": "different-ids",
+      "max_absolute_error": 5.079397681351239e-07,
+      "max_scaled_error": 5.079397681351239e-07,
+      "output_elements": 172800,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1412.167
+      ],
+      "wall_us_per_triplet": 1412.167
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.112379431404274e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1560896,
+      "input_ids_preserved": true,
+      "layout": "different-input",
+      "max_absolute_error": 3.2652305370639567e-07,
+      "max_scaled_error": 3.2652305370639567e-07,
+      "output_elements": 172800,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1254.959
+      ],
+      "wall_us_per_triplet": 1254.959
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.168563465592523e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "reversed",
+      "max_absolute_error": 2.4869738018962195e-07,
+      "max_scaled_error": 2.4869738018962195e-07,
+      "output_elements": 172800,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1482.0
+      ],
+      "wall_us_per_triplet": 1482.0
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.094432926911291e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": false,
+      "graph_buffer_bytes": 1278208,
+      "input_ids_preserved": true,
+      "layout": "activation-unfused",
+      "max_absolute_error": 2.2947103567316773e-07,
+      "max_scaled_error": 2.2947103567316773e-07,
+      "output_elements": 172800,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1298.667
+      ],
+      "wall_us_per_triplet": 1298.667
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.403568366821083e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "cancel",
+      "max_absolute_error": 1.107417313850334e-06,
+      "max_scaled_error": 5.793328369928929e-07,
+      "output_elements": 172800,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        1429.75
+      ],
+      "wall_us_per_triplet": 1429.75
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 4.7673800267178446e-14,
+      "distinct_experts": [
+        30
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 1509696,
+      "input_ids_preserved": true,
+      "layout": "wide",
+      "max_absolute_error": 0.00014844197534102932,
+      "max_scaled_error": 2.805661760917977e-05,
+      "output_elements": 172800,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 1,
+      "wall_samples_us_per_triplet": [
+        931.292
+      ],
+      "wall_us_per_triplet": 931.292
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 6.957007826013444e-14,
+      "distinct_experts": [
+        14,
+        22,
+        24,
+        26,
+        28,
+        30,
+        33,
+        40
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 5385920,
+      "input_ids_preserved": true,
+      "layout": "chain",
+      "max_absolute_error": 3.669212926826759e-07,
+      "max_scaled_error": 3.163219394197725e-07,
+      "output_elements": 1105920,
+      "route": "real",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 8,
+      "wall_samples_us_per_triplet": [
+        296.27075
+      ],
+      "wall_us_per_triplet": 296.27075
+    },
+    {
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 7.030566706314856e-14,
+      "distinct_experts": [
+        13,
+        26,
+        29,
+        31,
+        34,
+        36,
+        40,
+        50
+      ],
+      "eligible": true,
+      "graph_buffer_bytes": 6721728,
+      "input_ids_preserved": true,
+      "layout": "chain",
+      "max_absolute_error": 2.9987389271735054e-07,
+      "max_scaled_error": 2.9987389271735054e-07,
+      "output_elements": 1382400,
+      "route": "real",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "scheduler": true,
+      "triplets_per_graph": 8,
+      "wall_samples_us_per_triplet": [
+        360.2395
+      ],
+      "wall_us_per_triplet": 360.2395
+    }
+  ],
+  "outputs_sha256": "f5257609ccc202ba1209796d65b8f43f329a42ec75214ae3ac218c6349d3625b"
+}

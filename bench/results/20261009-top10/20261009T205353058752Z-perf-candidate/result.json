@@ -1,0 +1,432 @@
+{
+  "status": "passed",
+  "scope": "candidate",
+  "mode": "perf",
+  "probe": {
+    "engine": {
+      "engine": "m5-top10",
+      "directory": "vendor/llama-m5-top10",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "79197b40591f2cd48db15b8b0adc0fff23d12a42329168835193c7fe7a23388e",
+      "patch": {
+        "schema": 1,
+        "id": "m5-top10",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-top10",
+        "patch": "patches/mtp-m5-top10.patch",
+        "patch_sha256": "79197b40591f2cd48db15b8b0adc0fff23d12a42329168835193c7fe7a23388e",
+        "source_diff_sha256": "79197b40591f2cd48db15b8b0adc0fff23d12a42329168835193c7fe7a23388e",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal-device.h",
+          "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+          "ggml/src/ggml-metal/ggml-metal.cpp",
+          "ggml/src/ggml-metal/kernels/argsort.metal",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "ggml/src/ggml-metal/kernels/quantize.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-copy",
+          "m5-top10"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-copy.patch",
+            "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+          }
+        ],
+        "scope": "Opt-in M5 Pro parallel exact top10 selection for contiguous248320F32 logits,row1,k10,sampling node. Numeric exceptional inputs, subnormals and any top10 tie use unchanged bitonic+merge. Other tensors and disabled mode retain old dispatch. No model, sampler, cache or launcher defaults changed.",
+        "upstream": {
+          "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+          "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+          "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        }
+      },
+      "artifacts": {
+        "llama-server": "cc5b8b13f8887059319f792f5569638889d0466ec7a8eb0a4c50a850ce217b25",
+        "libggml-base.0.26.0.dylib": "352bad3a2856463f294f05e59fe29e85b803573cc8e48f3357c6b40842e72168",
+        "libggml-base.0.dylib": "352bad3a2856463f294f05e59fe29e85b803573cc8e48f3357c6b40842e72168",
+        "libggml-base.dylib": "352bad3a2856463f294f05e59fe29e85b803573cc8e48f3357c6b40842e72168",
+        "libggml-blas.0.26.0.dylib": "2f7f975049f33991f9a8b23b269737a52625370f196547bb5245e2d29291aaa8",
+        "libggml-blas.0.dylib": "2f7f975049f33991f9a8b23b269737a52625370f196547bb5245e2d29291aaa8",
+        "libggml-blas.dylib": "2f7f975049f33991f9a8b23b269737a52625370f196547bb5245e2d29291aaa8",
+        "libggml-cpu.0.26.0.dylib": "068d267ed4605e7488acf7c48d46e01d0a1c583b8bdb76e6f28ef109b46afd03",
+        "libggml-cpu.0.dylib": "068d267ed4605e7488acf7c48d46e01d0a1c583b8bdb76e6f28ef109b46afd03",
+        "libggml-cpu.dylib": "068d267ed4605e7488acf7c48d46e01d0a1c583b8bdb76e6f28ef109b46afd03",
+        "libggml-metal.0.26.0.dylib": "4370869b67978ce6a4cc8458d87502c16a154358afcb76be5874cac2a26ffe26",
+        "libggml-metal.0.dylib": "4370869b67978ce6a4cc8458d87502c16a154358afcb76be5874cac2a26ffe26",
+        "libggml-metal.dylib": "4370869b67978ce6a4cc8458d87502c16a154358afcb76be5874cac2a26ffe26",
+        "libggml.0.26.0.dylib": "88fa45ce947c15dc2696207e3541f7d52d066bb79e7878fd911582135ffe6e9d",
+        "libggml.0.dylib": "88fa45ce947c15dc2696207e3541f7d52d066bb79e7878fd911582135ffe6e9d",
+        "libggml.dylib": "88fa45ce947c15dc2696207e3541f7d52d066bb79e7878fd911582135ffe6e9d",
+        "libllama-common.0.6.0.dylib": "5513a66be4f1b6f82115517e88b5aa003d98c508f09c892e7157c539b5d3f633",
+        "libllama-common.0.dylib": "5513a66be4f1b6f82115517e88b5aa003d98c508f09c892e7157c539b5d3f633",
+        "libllama-common.dylib": "5513a66be4f1b6f82115517e88b5aa003d98c508f09c892e7157c539b5d3f633",
+        "libllama-server-impl.dylib": "9177a2fb3b89bc9520f17501aaa44c64f587e38b9ccaffb32608c5ae06aec28c",
+        "libllama.0.6.0.dylib": "78c3be4f4d36ca46a4aa7d9d20c8114a8202accbeb8b096c5effa78c749dd5c7",
+        "libllama.0.dylib": "78c3be4f4d36ca46a4aa7d9d20c8114a8202accbeb8b096c5effa78c749dd5c7",
+        "libllama.dylib": "78c3be4f4d36ca46a4aa7d9d20c8114a8202accbeb8b096c5effa78c749dd5c7",
+        "libmtmd.0.6.0.dylib": "35a2bdbfed4e72610519324607f9ee9700aad0c66274775055981cc11cf96e16",
+        "libmtmd.0.dylib": "35a2bdbfed4e72610519324607f9ee9700aad0c66274775055981cc11cf96e16",
+        "libmtmd.dylib": "35a2bdbfed4e72610519324607f9ee9700aad0c66274775055981cc11cf96e16"
+      },
+      "build_receipt": {
+        "engine": "m5-top10",
+        "directory": "vendor/llama-m5-top10",
+        "revision": "d81235049384534c167caea52b85a694f6103d14",
+        "source_diff_sha256": "79197b40591f2cd48db15b8b0adc0fff23d12a42329168835193c7fe7a23388e",
+        "patch": {
+          "schema": 1,
+          "id": "m5-top10",
+          "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+          "directory": "vendor/llama-m5-top10",
+          "patch": "patches/mtp-m5-top10.patch",
+          "patch_sha256": "79197b40591f2cd48db15b8b0adc0fff23d12a42329168835193c7fe7a23388e",
+          "source_diff_sha256": "79197b40591f2cd48db15b8b0adc0fff23d12a42329168835193c7fe7a23388e",
+          "modified_files": [
+            "ggml/src/ggml-metal/ggml-metal-common.cpp",
+            "ggml/src/ggml-metal/ggml-metal-common.h",
+            "ggml/src/ggml-metal/ggml-metal-context.m",
+            "ggml/src/ggml-metal/ggml-metal-device.cpp",
+            "ggml/src/ggml-metal/ggml-metal-device.h",
+            "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+            "ggml/src/ggml-metal/ggml-metal.cpp",
+            "ggml/src/ggml-metal/kernels/argsort.metal",
+            "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+            "ggml/src/ggml-metal/kernels/quantize.metal",
+            "src/llama-context.cpp",
+            "src/llama-cparams.h",
+            "src/models/qwen4exp.cpp",
+            "tests/test-backend-ops.cpp"
+          ],
+          "features": [
+            "mtp-shared",
+            "m5-tuning",
+            "m5-profile",
+            "m5-copy",
+            "m5-top10"
+          ],
+          "components": [
+            {
+              "patch": "patches/mtp-m5-copy.patch",
+              "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+            }
+          ],
+          "scope": "Opt-in M5 Pro parallel exact top10 selection for contiguous248320F32 logits,row1,k10,sampling node. Numeric exceptional inputs, subnormals and any top10 tie use unchanged bitonic+merge. Other tensors and disabled mode retain old dispatch. No model, sampler, cache or launcher defaults changed.",
+          "upstream": {
+            "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+            "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+            "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+            "license_file": "patches/LLAMA-LICENSE.txt"
+          }
+        },
+        "artifacts": {
+          "llama-server": "cc5b8b13f8887059319f792f5569638889d0466ec7a8eb0a4c50a850ce217b25",
+          "libggml-base.0.26.0.dylib": "352bad3a2856463f294f05e59fe29e85b803573cc8e48f3357c6b40842e72168",
+          "libggml-base.0.dylib": "352bad3a2856463f294f05e59fe29e85b803573cc8e48f3357c6b40842e72168",
+          "libggml-base.dylib": "352bad3a2856463f294f05e59fe29e85b803573cc8e48f3357c6b40842e72168",
+          "libggml-blas.0.26.0.dylib": "2f7f975049f33991f9a8b23b269737a52625370f196547bb5245e2d29291aaa8",
+          "libggml-blas.0.dylib": "2f7f975049f33991f9a8b23b269737a52625370f196547bb5245e2d29291aaa8",
+          "libggml-blas.dylib": "2f7f975049f33991f9a8b23b269737a52625370f196547bb5245e2d29291aaa8",
+          "libggml-cpu.0.26.0.dylib": "068d267ed4605e7488acf7c48d46e01d0a1c583b8bdb76e6f28ef109b46afd03",
+          "libggml-cpu.0.dylib": "068d267ed4605e7488acf7c48d46e01d0a1c583b8bdb76e6f28ef109b46afd03",
+          "libggml-cpu.dylib": "068d267ed4605e7488acf7c48d46e01d0a1c583b8bdb76e6f28ef109b46afd03",
+          "libggml-metal.0.26.0.dylib": "4370869b67978ce6a4cc8458d87502c16a154358afcb76be5874cac2a26ffe26",
+          "libggml-metal.0.dylib": "4370869b67978ce6a4cc8458d87502c16a154358afcb76be5874cac2a26ffe26",
+          "libggml-metal.dylib": "4370869b67978ce6a4cc8458d87502c16a154358afcb76be5874cac2a26ffe26",
+          "libggml.0.26.0.dylib": "88fa45ce947c15dc2696207e3541f7d52d066bb79e7878fd911582135ffe6e9d",
+          "libggml.0.dylib": "88fa45ce947c15dc2696207e3541f7d52d066bb79e7878fd911582135ffe6e9d",
+          "libggml.dylib": "88fa45ce947c15dc2696207e3541f7d52d066bb79e7878fd911582135ffe6e9d",
+          "libllama-common.0.6.0.dylib": "5513a66be4f1b6f82115517e88b5aa003d98c508f09c892e7157c539b5d3f633",
+          "libllama-common.0.dylib": "5513a66be4f1b6f82115517e88b5aa003d98c508f09c892e7157c539b5d3f633",
+          "libllama-common.dylib": "5513a66be4f1b6f82115517e88b5aa003d98c508f09c892e7157c539b5d3f633",
+          "libllama-server-impl.dylib": "9177a2fb3b89bc9520f17501aaa44c64f587e38b9ccaffb32608c5ae06aec28c",
+          "libllama.0.6.0.dylib": "78c3be4f4d36ca46a4aa7d9d20c8114a8202accbeb8b096c5effa78c749dd5c7",
+          "libllama.0.dylib": "78c3be4f4d36ca46a4aa7d9d20c8114a8202accbeb8b096c5effa78c749dd5c7",
+          "libllama.dylib": "78c3be4f4d36ca46a4aa7d9d20c8114a8202accbeb8b096c5effa78c749dd5c7",
+          "libmtmd.0.6.0.dylib": "35a2bdbfed4e72610519324607f9ee9700aad0c66274775055981cc11cf96e16",
+          "libmtmd.0.dylib": "35a2bdbfed4e72610519324607f9ee9700aad0c66274775055981cc11cf96e16",
+          "libmtmd.dylib": "35a2bdbfed4e72610519324607f9ee9700aad0c66274775055981cc11cf96e16"
+        },
+        "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+        "build_settings": {
+          "CMAKE_BUILD_TYPE": "Release",
+          "GGML_BLAS": "ON",
+          "GGML_CPU": "ON",
+          "GGML_METAL": "ON",
+          "GGML_METAL_EMBED_LIBRARY": "ON",
+          "GGML_NATIVE": "ON",
+          "LLAMA_BUILD_TESTS": "ON",
+          "LLAMA_BUILD_TOOLS": "ON"
+        },
+        "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+      }
+    },
+    "source_sha256": "fee772f0d175b4b8847e66db28e7e20b2ffe9ee750a725b88d4c6779110af6a1",
+    "runner_sha256": "28001de7c4864ea6ec130a3ef7ba0a6b42def5787112a8ca4f4084b0e2c50261",
+    "dependencies": {
+      "benchmark.py": "c00bc75c2a2036450d65251a2621f2c4ed79914c89558532641ba54358aca0cc",
+      "check_memory.py": "3af26bba58b77fd47d9993126009f188c951aecaddff6d2e82febd5c3a83eada",
+      "engines.py": "a2ec0ab9be48cddca8f82776855481c23bddacfc006bc639ba1e5ab8fddcf0e4",
+      "metal_environment.py": "e2b79adf9580de5af1e90bb2759c761f3844b63905f7d3a829ad21830492f35c",
+      "validate_offline.py": "e2ec5c1777411e131c64bf436e91b8beccc19ecc18da62809b19cd53d0184c06"
+    },
+    "binary_sha256": "c9f77e8c744f616bc072ef98bc8efa9a419069865528425da16055c6dd16bc7e",
+    "command": [
+      "/usr/bin/c++",
+      "-O3",
+      "-ffp-contract=off",
+      "-std=gnu++17",
+      "-arch",
+      "arm64",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-top10/include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-top10/ggml/include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-top10/vendor",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/native/m5_top10_probe.cpp",
+      "-o",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-top10/top10-probe",
+      "-Wl,-rpath,/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-top10/build/bin",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-top10/build/bin/libllama.0.6.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-top10/build/bin/libggml.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-top10/build/bin/libggml-base.0.26.0.dylib"
+    ]
+  },
+  "metal_environment": {
+    "tensor_api": "on",
+    "tuning": "top10",
+    "profile": false,
+    "variables": {
+      "GGML_M5_LAB_CONV_DIRECT": "1",
+      "GGML_M5_LAB_TOP10": "1",
+      "GGML_METAL_TENSOR_ENABLE": "1"
+    }
+  },
+  "native_returncode": 0,
+  "memory": {
+    "guard": null,
+    "monitor_healthy": true,
+    "monitor_error": null,
+    "samples": 15,
+    "live_samples": 14,
+    "baseline_before_launch": true,
+    "child_exited": true,
+    "launch_baseline": {
+      "swap_used_bytes": 524812288,
+      "available_bytes": 39194951680
+    },
+    "peak_rss_bytes": 979320832,
+    "minimum_available_bytes": 39194951680,
+    "peak_swap_bytes": 524812288,
+    "swap_growth_bytes": 0,
+    "system_disk_read_bytes": 0,
+    "sampling_interval_s": 0.25,
+    "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+  },
+  "cases": [
+    {
+      "all_nodes_metal": true,
+      "allocation_bound_bytes": 944224320,
+      "block_iterations": [
+        58,
+        58,
+        58,
+        58,
+        58,
+        58,
+        57
+      ],
+      "block_us": [
+        101299.125,
+        101045.5,
+        101688.083,
+        101560.833,
+        101558.292,
+        101344.916,
+        100213.042
+      ],
+      "block_us_per_iteration": [
+        1746.5366379310344,
+        1742.1637931034484,
+        1753.2428103448276,
+        1751.0488448275862,
+        1751.0050344827587,
+        1747.3261379310345,
+        1758.123543859649
+      ],
+      "consumer_chain": "head-top_k10-gather",
+      "consumers": [
+        {
+          "above_cutoff": 9,
+          "cutoff_ties": 1,
+          "ids": [
+            28770,
+            19711,
+            166503,
+            50550,
+            49144,
+            168291,
+            26106,
+            226472,
+            76474,
+            173374
+          ],
+          "ids_sha256": "9c6d4e9bf9cca24ddf7eb270990f95d0b2aea21d14c42203ca15db0f48472ae9",
+          "selector_status": 1,
+          "tie_safe": true,
+          "values": [
+            722.3253784179688,
+            695.7282104492188,
+            686.5211181640625,
+            682.239501953125,
+            663.3927612304688,
+            663.3659057617188,
+            660.9784545898438,
+            644.2107543945312,
+            625.6520385742188,
+            618.1190185546875
+          ],
+          "values_sha256": "047fea13eba33f367dbdd3237d9a9bd80a04e2fabca020318798a3d72180fa8b"
+        }
+      ],
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 0.0,
+      "cpu_reference_values": 0,
+      "elements": 248320,
+      "eligible": true,
+      "graph_buffer_bytes": 3029056,
+      "id": "mixed",
+      "input_sha256": "e43448e020c52b745e6abc6a960033722dd82ba5dc04da38ed3672d6c0592c0a",
+      "inputs_preserved": true,
+      "k": 2560,
+      "m": 248320,
+      "max_absolute_error": 0.0,
+      "max_bound_ratio": 0.0,
+      "median_us": 1751.0050344827587,
+      "output_sha256": "9568f1471f9b09a036166f13e0136cffac0cda9f8f47b7654bd8d29650f91af4",
+      "pipeline_primed": true,
+      "rows": 1,
+      "scheduler_splits": 1,
+      "warmup_iterations": 284,
+      "warmup_us": 500252.125,
+      "weight_sha256": "56b0508225f073b2bb80f53e7fb5a5b44db73e38533928210e8fff9e9fffd8fd"
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_bound_bytes": 944224320,
+      "block_iterations": [
+        58,
+        57,
+        57,
+        57,
+        58,
+        58,
+        57
+      ],
+      "block_us": [
+        101425.875,
+        100239.708,
+        100467.125,
+        100289.167,
+        101582.75,
+        101526.166,
+        100094.666
+      ],
+      "block_us_per_iteration": [
+        1748.7219827586207,
+        1758.5913684210527,
+        1762.5811403508771,
+        1759.4590701754387,
+        1751.426724137931,
+        1750.4511379310345,
+        1756.0467719298244
+      ],
+      "consumer_chain": "head-top_k10-gather",
+      "consumers": [
+        {
+          "above_cutoff": 9,
+          "cutoff_ties": 1,
+          "ids": [
+            188258,
+            170576,
+            75626,
+            223013,
+            123048,
+            108446,
+            215922,
+            41184,
+            243335,
+            207041
+          ],
+          "ids_sha256": "04574f8797b986cadc6185e53a7a4c9dba77f37ad8bfd53dcc35966f8f54024b",
+          "selector_status": 1,
+          "tie_safe": true,
+          "values": [
+            928.8082885742188,
+            878.5467529296875,
+            867.6236572265625,
+            861.11572265625,
+            857.8529052734375,
+            845.35107421875,
+            840.2062377929688,
+            838.6378173828125,
+            834.7677612304688,
+            833.9251708984375
+          ],
+          "values_sha256": "696d1904488292c375cd7d7670626ad6cccd1d8fe220df4cca3b3bf466bc6aa8"
+        }
+      ],
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 0.0,
+      "cpu_reference_values": 0,
+      "elements": 248320,
+      "eligible": true,
+      "graph_buffer_bytes": 3029056,
+      "id": "alternating",
+      "input_sha256": "1f2c35c7ae255640bad831d09a3dd8d60016c78b77cad6cf3ee2516ee5eccba7",
+      "inputs_preserved": true,
+      "k": 2560,
+      "m": 248320,
+      "max_absolute_error": 0.0,
+      "max_bound_ratio": 0.0,
+      "median_us": 1756.0467719298244,
+      "output_sha256": "234ccfff0f5cb3589cbe5200709cf386c399e1e4183ffd92e5dae5cf8e17e66a",
+      "pipeline_primed": true,
+      "rows": 1,
+      "scheduler_splits": 1,
+      "warmup_iterations": 286,
+      "warmup_us": 501027.667,
+      "weight_sha256": "56b0508225f073b2bb80f53e7fb5a5b44db73e38533928210e8fff9e9fffd8fd"
+    }
+  ],
+  "done": {
+    "cases": 2,
+    "expanded_weight_cache": false,
+    "max_probe_bytes": 3221225472,
+    "mode": "perf",
+    "models_loaded": false,
+    "scope": "candidate",
+    "weights": [
+      {
+        "bytes": 437043200,
+        "padded": false,
+        "preserved": true,
+        "sha256": "56b0508225f073b2bb80f53e7fb5a5b44db73e38533928210e8fff9e9fffd8fd"
+      }
+    ],
+    "weights_preserved": true
+  },
+  "fixtures": [],
+  "native_log_sha256": "f2f3fa22c4fc96cd91babb54ebb502f61e87b1131d3092380df7a3b1da84788a",
+  "outputs_sha256": "bab3be48ceec2bceb48063b598468a6e78c5bd8d702a6f6a4634f2394173b1c7"
+}

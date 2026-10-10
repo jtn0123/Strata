@@ -1,0 +1,44 @@
+{
+  "time_utc": "2026-10-09T20:57:24.200917+00:00",
+  "model_runs_started": false,
+  "component_comparison_sha256": "42563039eabf5a81253e450c252d43243606dd277b05a7d71483a7d31d54c2d3",
+  "sources": {
+    "scripts/benchmark_m5_top10_models.py": "29d9ecb74f4419433c388a7ee88fd768f58bb2494a1f318357f78e310d266db1",
+    "scripts/benchmark_m5.py": "1807f91db8d9af19cadbe59e192140ecbf74c21ff4e2a396cc1096bffe1c499e",
+    "scripts/benchmark_m5_next.py": "84e70a6c387ab65d56e948395508af96d93923bb934229573ab11d422591ae1d",
+    "scripts/benchmark.py": "c00bc75c2a2036450d65251a2621f2c4ed79914c89558532641ba54358aca0cc",
+    "scripts/engines.py": "a2ec0ab9be48cddca8f82776855481c23bddacfc006bc639ba1e5ab8fddcf0e4",
+    "scripts/metal_environment.py": "e2b79adf9580de5af1e90bb2759c761f3844b63905f7d3a829ad21830492f35c",
+    "config/m5_top10_experiment.json": "6a88df80b0f3cb574bf87ef60cd61650d0fdf4cb86775feb382c3c494cad0e87",
+    "patches/mtp-m5-top10.patch": "d849c8cf38772b907b162d873973c08c86729e5583d3e4c0c9726012df5a6888"
+  },
+  "plan": {
+    "control_engine": "m5-copy",
+    "control_tuning": "conv-direct",
+    "candidate_engine": "m5-top10",
+    "candidate_tuning": "top10",
+    "order": [
+      "control",
+      "candidate",
+      "candidate",
+      "control"
+    ],
+    "fresh_predict": 256,
+    "warmup": 1,
+    "measured_repeats": 3,
+    "real_workloads": [
+      "English code",
+      "English prose"
+    ],
+    "synthetic_prompts": [
+      512,
+      2048
+    ],
+    "cached_budgets": [
+      512,
+      2048
+    ],
+    "zero_new_swap_guard": true
+  },
+  "adoption_gate": ">=1% TPS and whole-reply gain on both English tasks, each above corresponding absolute control drift; exact token/text/cache continuation checks and zero new swap. Marker proves eligible entry only."
+}

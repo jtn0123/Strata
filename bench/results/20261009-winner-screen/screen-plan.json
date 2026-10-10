@@ -1,0 +1,38 @@
+{
+  "recorded_at_utc": "2026-10-09T20:41:31.226685+00:00",
+  "timing_run_directories_at_record": 2,
+  "candidate": "R02",
+  "stage": "ideal complete-head consumer-removal component screen",
+  "settings": {
+    "engine": "m5-copy",
+    "tuning": "conv-direct",
+    "tensor_api": "on",
+    "shape": {
+      "K": 2560,
+      "M": 248320,
+      "rows": 1
+    },
+    "weights": "same synthetic packed Q5_K bytes",
+    "patterns": [
+      "mixed",
+      "alternating"
+    ],
+    "bracket": [
+      "control",
+      "head-floor",
+      "head-floor",
+      "control"
+    ],
+    "warmup_ms": 500,
+    "blocks": 7,
+    "minimum_block_ms": 100,
+    "max_probe_gib": 3,
+    "max_new_swap_bytes": 0
+  },
+  "screen_gate": "Proceed to a replacement selector only if ideal floor removes at least10% of complete head+consumer time on both patterns, above twice each absolute control drift. This conservative complete-operation gate follows the existing head screens; it is not a model TPS threshold or a strict mathematical upper bound.",
+  "qualification": "Identical all-score/input/weight digests and placement plus CPU refs before timing; actual winner/tie fallback not yet implemented.",
+  "tps_gain_claim_allowed": false,
+  "preserve_native_engines": true,
+  "timing_started_before_numeric_gate_record": true,
+  "gate_provenance": "The numeric10% comparison was recorded after timing began. It is a reference to existing S04/S05 component screens, NOT a preregistered gate for this new screen. Treat results descriptively; do not claim a predeclared failed performance gate."
+}

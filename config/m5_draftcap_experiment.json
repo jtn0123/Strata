@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "id": "m5-draftcap",
+  "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+  "directory": "vendor/llama-m5-draftcap",
+  "patch": "patches/mtp-m5-draftcap.patch",
+  "patch_sha256": "055df8fa569853b90b5cd36c930ff3995e7a96d8f7cf94f4aa6dc0aa0314cb6f",
+  "source_diff_sha256": "055df8fa569853b90b5cd36c930ff3995e7a96d8f7cf94f4aa6dc0aa0314cb6f",
+  "modified_files": [
+    "common/speculative.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.h",
+    "ggml/src/ggml-metal/ggml-metal-context.m",
+    "ggml/src/ggml-metal/ggml-metal-device.cpp",
+    "ggml/src/ggml-metal/ggml-metal-device.h",
+    "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+    "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+    "ggml/src/ggml-metal/kernels/quantize.metal",
+    "src/llama-context.cpp",
+    "src/llama-cparams.h",
+    "src/models/qwen4exp.cpp",
+    "tests/test-backend-ops.cpp",
+    "tools/server/server-context.cpp"
+  ],
+  "features": [
+    "mtp-shared",
+    "m5-tuning",
+    "m5-profile",
+    "m5-copy",
+    "m5-draftcap"
+  ],
+  "components": [
+    {
+      "patch": "patches/mtp-m5-copy.patch",
+      "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+    }
+  ],
+  "scope": "Isolated opt-in MTP inner-loop per-cycle cap early stop; bounded single-sequence diagnostic/forced caps. Global max3 allocation, weights/precision/placement unchanged. Default behavior retains old loop. No adaptive policy or catch-up removal."
+}
