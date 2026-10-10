@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "a1315b8dd89f819e95c268d376c80397b1ba63c8",
+    "filename": "tools/strata_tokenizer.py",
+    "status": "modified",
+    "additions": 13,
+    "deletions": 0,
+    "changes": 13,
+    "blob_url": "https://github.com/Niko1221/Strata/blob/a61d3511b12073b36c7212a427f5982f1d4bd962/tools%2Fstrata_tokenizer.py",
+    "raw_url": "https://github.com/Niko1221/Strata/raw/a61d3511b12073b36c7212a427f5982f1d4bd962/tools%2Fstrata_tokenizer.py",
+    "contents_url": "https://api.github.com/repos/Niko1221/Strata/contents/tools%2Fstrata_tokenizer.py?ref=a61d3511b12073b36c7212a427f5982f1d4bd962",
+    "patch": "@@ -211,6 +211,15 @@ def _bpe_heap(self, word: str) -> list[str]:\n     PIECE_CACHE_MAX = 200_000    # pre-tokenizer pieces remembered (an agent resends its whole history every turn)\n \n     def _encode_plain(self, text: str) -> list[int]:\n+        # A chat sends every earlier message again each turn, and the text between two special tokens is encoded on\n+        # its own, so a long piece (one message) is encoded once and its ids reused: the same ids, and no pre-tokenizer\n+        # pass over the whole conversation each turn (a 190K-token one cost ~1.1 s on a 2.5 GHz Xeon before any cache).\n+        long = len(text) >= 1024\n+        if long:\n+            texts = self.__dict__.setdefault(\"_text_ids\", {})\n+            hit = texts.get(text)\n+            if hit is not None:\n+                return list(hit)\n         out: list[int] = []\n         # A piece's ids depend on the piece alone, so repeated pieces (most of a resent conversation) are looked up\n         # instead of merged again.  The ids are the ones _bpe gives: this only skips the work.\n@@ -228,6 +237,10 @@ def _encode_plain(self, text: str) -> list[int]:\n                 if len(cache) < self.PIECE_CACHE_MAX:\n                     cache[piece] = got\n             out.extend(got)\n+        if long:\n+            if len(texts) >= 256:\n+                texts.clear()\n+            texts[text] = list(out)\n         return out\n \n     def _encode_matching(self, text: str, pat, plain=()) -> list[int]:"
+  }
+]
