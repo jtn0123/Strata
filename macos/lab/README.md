@@ -2,6 +2,12 @@
 
 Local, measured experiments for an Apple M5 Pro with 48 GiB unified memory. This workspace keeps Strata's existing Mac interface and uses a revision-pinned native llama.cpp Metal server behind it. All inference stays on the Mac.
 
+Latest: [P07 is validated and installed in the normal launcher](bench/results/20261010-small-gains-stack/REPORT.md). Its prior independent confirmation adds +0.61% code/+0.79% prose generation over the direct-copy profile. New longer-prompt and 32-token answer safety checks pass; 12 full-model launches, 312 answer/cache checks and 192 exact output signatures have zero new swap. The actual Strata API passes 16 English answer checks plus streaming and clean shutdown. W02 adds +0.58–0.71% TPS but exceeds the declared 10 ms startup ceiling on prose, so stacking remains untested. Double-click `Start Strata.command` for P07; `Start Strata - Original Baseline.command` restores the earlier profile. No model server is left running.
+
+Current measured short-prompt/256-output result: **60.08 TPS English code / 40.38 TPS English prose**. Longer-prompt safety results are a separate workload. [October 10 upstream and fork refresh](bench/research/20261010-upstream-refresh/REPORT.md) screens 1,811 public fork listings and records seven future investigations. The new full-model MLX engine is the strongest source lead; its 128 GB M4 measurements and F16 numerical changes are not a verified upgrade for this 48 GiB M5. [Next queue and prerequisites](bench/research/20261010-upstream-refresh/NEXT-EXPERIMENTS.json). No new model benchmark ran during that review.
+
+Earlier pass: [actual draft-cap early stopping and fixed two guesses](bench/results/20261009-draftcap/REPORT.md) are complete. The tail repair removes discarded helper work but has no useful measured gain: code59.482→59.464TPS (-0.030%), English prose39.931→40.007 (+0.191%), both below control drift. Fixed two passes short checks but changes the228th token in a longer English writing fixture and is parked; no controller added. All attempted launches have zero new swap;121 load-free checks pass,21 engine receipts validate and all20 preexisting engines/ordinary launcher defaults remain unchanged. Future benchmarks and native diagnostic prompts use English prose and code only. [Decisions and retry conditions](bench/EXPERIMENT-LEDGER.md), [remaining queue](bench/research/20261009-astra-future-queue.md).
+
 [The first M5 measurements are complete](bench/M5-RESULTS.md). Twenty full-model benchmark passes record zero swap growth. Keep Tensor API enabled and writing at depth three. Depth six raises the short cached-ledger result from 68.98 to 75.50 TPS (+9.44%) over a fresh depth-four control, with complete replies 4.88% quicker; long cached replies are essentially tied and fresh writing is slower.
 
 The subsequent [M5 GPU tuning batch](bench/M5-GPU-TUNING.md) completes another 24 passes with zero new swap: two-tile limits add only +0.39% code TPS and about +0.59% synthetic TPS; threshold and worker overrides do not help.
@@ -10,17 +16,17 @@ The [helper/confidence batch](bench/M5-HELPER-RESULTS.md) completes all twelve c
 
 The [expert/output-table measurement](bench/M5-OPERATION-PROFILE.md) passes 23 full-size CPU-reference checks and measures 5520 matrix buffers. Expert math is the larger tested matrix family, but the selected operations project to only 34-42% of the recorded main GPU interval. Actual expert reuse and the remaining work need evidence before choosing a shader. One clean unchanged writing launch measures 47.6-48.9 synthetic TPS and 54.2 code TPS; the second launch is excluded for 60.3 MiB new swap during overlapping build activity. This is an incomplete baseline refresh and no new speed gain. All seven engines and launchers remain unchanged. The [Astra research plan](bench/research/20261006-astra-future-plan.md) records later candidates.
 
-The user has placed further testing on hold. [Six future experiment templates](bench/M5-FUTURE-TEMPLATES.md) are prepared: expert reuse, broader GPU timing, 8K context, bounded Mac SSD prefetch, one measured GPU kernel and larger-model paging. The first two have compiled diagnostic tooling and CPU-only checks; their GPU/model behavior is untested. Later templates explicitly label remaining implementation work. Empty result sheets track matched TPS/latency percentages, quality and memory. No model/GPU test or automatic trigger runs during preparation.
+[Six future experiment templates](bench/M5-FUTURE-TEMPLATES.md) are prepared: expert reuse, broader GPU timing, 8K context, bounded Mac SSD prefetch, one measured GPU kernel and larger-model paging. The [October 7 preparation update](bench/M5-AUDIT-PREPARATION.md) adds launch/monitor/provenance safeguards, 72 passing offline tests and a bounded 4B split smoke with three matching response pairs and zero new swap. Full Flash routing/split behavior remains untested; full-model testing waits while OpenTaskManager's VM and builds continue. Later templates label remaining implementation work. Empty result sheets track matched TPS/latency percentages, quality and memory. No background trigger resumes testing.
 
 ## Run
 
 From this folder:
 
 ```sh
-.venv/bin/python scripts/run.py flash
+"./Start Strata.command"
 ```
 
-Open **http://127.0.0.1:8095**. OpenAI-compatible clients use **http://127.0.0.1:8095/v1**; the native engine is on **http://127.0.0.1:8096/v1**. Ctrl-C stops both processes. Double-click `Start Strata.command` to launch the full model, or `Stop Strata.command` to release its memory. The normal profile uses 4K context, processing batch 512, conversation caching and no MTP. To use the small development model:
+Open **http://127.0.0.1:8095**. OpenAI-compatible clients use **http://127.0.0.1:8095/v1**; the native engine is on **http://127.0.0.1:8096/v1**. Ctrl-C stops both processes. Double-click `Start Strata.command` to launch the full model, or `Stop Strata.command` to release its memory. The normal no-argument launcher uses P07 with the packed shared Q3 helper, depth-three MTP, mixed placement, eight helper CPU workers, Tensor API enabled, F16 KV, 4K context, processing batch 512 and conversation caching. Explicit arguments retain the generic `scripts/run.py` behavior. The rollback launcher retains the original prediction-off profile. To use the small development model:
 
 ```sh
 .venv/bin/python scripts/run.py small
@@ -28,20 +34,22 @@ Open **http://127.0.0.1:8095**. OpenAI-compatible clients use **http://127.0.0.1
 
 Use `scripts/run.py flash --no-prompt-cache` to restore v1's uncached conversation behavior. Caching reuses the common prefix in one engine slot; switching to a different conversation may replace it. It adds no separate multi-chat RAM cache. It can change rounding and generated token choices, so semantic answer checks accompany the timing comparison.
 
-The optional `Start Strata - Prediction Test.command` uses the measured smaller Q3 helper, with its body on CPU and output projection on GPU. Stop the current app before switching profiles. This is an experiment: at temperature 0 it wrote 11-13% faster, but at temperature 0.6 the fixed-length writing gain disappeared. Cached record-lookup replies finished 4-10% sooner, while fresh replies took longer. The normal launcher keeps prediction off. [Exact comparisons](bench/PREDICTION.md).
+The optional `Start Strata - Prediction Test.command` uses the measured smaller Q3 helper, with its body on CPU and output projection on GPU. Stop the current app before switching profiles. This is an experiment: at temperature 0 it wrote 11-13% faster, but at temperature 0.6 the fixed-length writing gain disappeared. Cached record-lookup replies finished 4-10% sooner, while fresh replies took longer. The current normal-launcher validation is recorded above. [Exact comparisons](bench/PREDICTION.md).
 
 `Start Strata - Shared Prediction Test.command` selects the isolated shared-weight engine and packed helper layout. It removes 521 MiB of duplicated helper tables and keeps helper experts on CPU while placing small dense operations on GPU. [Sharing, layout and comparison evidence](bench/SHARED-HELPER.md) records its scope. The separate [smaller word-list experiment](bench/DRAFT-VOCAB.md) stays optional: it helps some writing generation but slows cached replies compared with the full helper.
 
-The packed mixed comparison measured writing generation 7.7-11.6% faster and cached complete replies 7.0-11.0% sooner than the old helper. All eight passes completed 240 answer checks with no new swap; the actual Strata app passed nine API checks. Fresh long-input replies still take longer than ordinary prediction-off operation, so this is an optional workload choice and the normal launcher retains its original engine/settings.
+The packed mixed comparison measured writing generation 7.7-11.6% faster and cached complete replies 7.0-11.0% sooner than the old helper. All eight passes completed 240 answer checks with no new swap; the actual Strata app passed nine API checks. Fresh long-input replies still take longer than ordinary prediction-off operation, which is a limitation of those historical comparisons; the current normal-launcher configuration has separate validation above.
 
 No login service or system-wide Python packages are installed. Native and Strata source checkouts are under `vendor/`; model files and virtual environment stay outside git.
 
 ## Recreate the environment
 
+For the complete optional M5 engine/helper/diagnostic chain, use [the ordered preparation recipe](bench/M5-PREPARATION-RECIPE.md). It distinguishes CPU builds and saved-data checks from model/GPU execution, and documents the current external-library policy and remaining fresh-directory validation.
+
 Prerequisites: native ARM64 macOS, Apple's Command Line Tools, Python 3 and `uv`. The build embeds Metal source for runtime compilation, so the standalone Metal compiler is not required for this initial path. This does not establish that every optional Metal 4 tensor optimization is enabled.
 
 ```sh
-python3 scripts/provision.py
+uv run --python 3.12 --no-project python scripts/provision.py --jobs 1
 .venv/bin/python scripts/download_models.py small
 .venv/bin/python scripts/download_models.py flash
 .venv/bin/python scripts/download_models.py mtp
@@ -54,6 +62,8 @@ Sources, dependencies and model revisions are pinned in `config/` and `requireme
 Saved derived-model entries do not require the local files to exist already: the preparation tools regenerate missing outputs and check them against the registered byte count/SHA256 before accepting them. Recreated files preserve the registry and its original pins. Existing corrupted or unexpected partial files still require review; a mismatch is not silently re-pinned.
 
 ## Test and track
+
+Before proposing or rerunning a speed experiment, read the [experiment decision ledger](bench/EXPERIMENT-LEDGER.md). It records settings, matched results, accuracy and memory evidence, rejection reasons and specific revisit conditions, including older failed helper layouts and interrupted runs. [Machine-readable index](bench/experiment-ledger.json). New results append to this history; previous failures stay preserved.
 
 ```sh
 .venv/bin/python scripts/benchmark.py small --label small-baseline
@@ -124,7 +134,7 @@ To run the packed mixed profile manually:
 .venv/bin/python scripts/run.py flash --engine mtp-shared --spec draft-mtp --draft-model mtp_shared_packed_q3 --draft 2 --draft-placement mixed
 ```
 
-The [helper tuning results](bench/HELPER-TUNING.md) compare prediction depth and CPU workers against fresh controls in the earlier shared engine. The later [few-row GPU math comparison](bench/METAL-MMA.md) upgrades the optional writing launcher to the `mtp-mma` engine and three predicted tokens: about 49 TPS for synthetic writing and 56 TPS for code. The fast follow-up launcher uses the same new engine with four predicted tokens: about 69 TPS on the longer cached-ledger test. The original shared launcher remains at two tokens, and the ordinary launcher retains prediction off. Stop the active model before switching launchers.
+The [helper tuning results](bench/HELPER-TUNING.md) compare prediction depth and CPU workers against fresh controls in the earlier shared engine. The later [few-row GPU math comparison](bench/METAL-MMA.md) upgraded the optional writing launcher to the `mtp-mma` engine and three predicted tokens: about 49 TPS for synthetic writing and 56 TPS for code. The fast follow-up launcher uses that engine with four predicted tokens: about 69 TPS on the longer cached-ledger test. At that earlier checkpoint the ordinary launcher retained prediction off; it now selects the P07 profile described above. The original shared launcher remains at two tokens. Stop the active model before switching launchers.
 
 `Start Strata - Short Structured Follow-ups Test.command` is an optional depth-six trial for short cached structured answers. It passed nine real API checks. Its 75.50 TPS result comes from 25-token ledger answers with 512 tokens of cached history; it is not a general chat or writing rate. The ordinary, writing and existing fast-follow-up launchers keep their settings. [Matched comparisons and limits](bench/M5-RESULTS.md).
 

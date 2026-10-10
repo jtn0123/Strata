@@ -1,0 +1,14 @@
+{
+  "id": "X22",
+  "status": "excluded",
+  "mechanism": "Original-control fixture construction",
+  "failed_run": "component-initial-excluded/20261009T234759515854Z-check-control/result.json",
+  "native_error": "unsupported op CONT for ggml_cont(Q2_0 strided slice)",
+  "returncode": -6,
+  "records_completed": 168,
+  "new_swap_bytes": 0,
+  "candidate_executed": false,
+  "performance_accepted": false,
+  "diagnosis": "Original Metal CONT has no Q2_0 sliced-copy implementation. Test wrongly inserted that unsupported operation to make shape fallback weights contiguous. Stock MM_ID can consume these weight views through its original row/expert strides.",
+  "correction": "Use strided quantized weight views directly, preserve F32 input CONT, accurately label shape plus stride fallback instead of claiming an isolated contiguous shape negative. Fresh full component bracket, unchanged candidate engine and acceptance thresholds."
+}

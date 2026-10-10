@@ -1,0 +1,1319 @@
+You are independent Opus 5.5 reviewer A for a Strata Apple Silicon speed research pass. Investigate genuinely NEW performance paths for this particular native fork. You have no tools and must reason from this trusted local/public source dossier. Do not invent measured gains, new PRs, hardware capabilities, or completed tests. English prose and code workloads ONLY; no Chinese investigation. No builds or model/hardware benchmarks. Cite dossier paths/line numbers. You can propose limited experiments but flag exact-output risks and proof gates.
+Hardware: M5 Pro, 48 GiB unified RAM, 20 GPU cores, macOS 27.2 (host inspection by another researcher). Main Qwen3.8-Flash-Next GSQ-RCO Q2_0 (~37.62GB) plus 28.80GB lazy SSD lookup shard, packed shared Q3 MTP helper 1.25GB, helper mixed CPU/GPU 8 workers. Practical control m5-copy + conv-direct, TensorAPI already ON, fixed configured draft max3, confidence0, helpergreedy, CPU target sampling, F16 KV, ctx4096, batch/ubatch512. Current 256-output-token matched controls: code59.482 TPS, Englishprose39.931TPS. Temp0.6 seed1234, warmup+3 repeats, ABBA fresh controls, zero new swap, exact token IDs/text/answer/cache/continuation gates. Adoption >=1% TPS AND whole reply improvement on BOTH English real workloads above their control drift. No stacked percent gains; do not compare with historical128token rates.
+There are43 recorded decisions plus15 excluded attempts, ledger below. D01 actual existing budget early stop removed18 discarded helper steps but code-0.030%, prose+0.191% belowdrift: notadopted. D02 actualpercyclecap2 withsamemax3allocation divergedat228th emitted token English512 fixture, stopped: fixed2/adaptiveparked. N01 backendminp4boundary mismatches: parked until precise semantic repair. N02 embeddinggather backport no normalhandoffremoved: parked.
+Investigate fresh hypotheses independently. Other investigators have suggested: (a) topology-keyed graph cache rather than lastgraphonly; (b) defer helper catchup until target acceptance and batch accepted target hiddenstates +firstdraft token (NOT deletingcatchup orusinghelperhiddenstates); (c) helpergreedy confidence0 useexactargmax avoiding top10probability path; (d) QSA selector's2048token budget could allow proven allvisible shortcut, retaining indexer raw/pool cache for longercontinuation; (e) compact routedexpert prompt MMA grid preserving tilemath; (f) cache_prompt=false checkpoint avoidance separate from speculative rollback; (g) exact Q2 cooperative-input prompt kernels, OS/SDK and mathgates. Challenge these and add better ideas if justified. Distinguish work removed from overlap/synchronization and wholecycleAmdahl limit. Estimates should be hypothetical conditional bounds/ranges, zero planning baseline until measured. Rate plausiblegain, risk, difficulty; select first2 cheap bounded probes and bigbet. Detail falsification/stopgate and why notrepeatledger. Under2300words.
+
+
+FILE bench/EXPERIMENT-LEDGER.md
+
+# Strata Mac experiment decision ledger
+
+Updated October 9, 2026. Read this file **before proposing or rerunning an optimization**. It collects unsuccessful, inconclusive and limited-benefit experiments in one place; the linked immutable reports retain commands, prompts, raw responses, counters, source/build/model hashes, memory samples and native logs. [Machine-readable index](experiment-ledger.json).
+
+Do not repeat an entry just because a new session starts. A retry must cite its ID, identify what materially changed, satisfy its revisit condition, and use a new result directory. Append the new decision and link the old one; preserve rejected attempts and original evidence. A new mechanism or workload can justify a new experiment, but it must explain why the earlier result does not answer the new question. Estimates in research notes are hypotheses, not gains.
+
+## Measurement rules and current setup
+
+- Hardware: M5 Pro, 48 GiB unified memory, 20 GPU cores. Recent native experiments use revision `d81235049384534c167caea52b85a694f6103d14` plus separately hashed patches. Each evidence bundle is authoritative for its own pins.
+- Current practical benchmark control: `m5-copy` / `conv-direct`, Qwen3.8-Flash-Next GSQ-RCO Q2_0, packed shared Q3 MTP helper, mixed placement, eight helper CPU workers, depth three, confidence zero, Tensor API on, 4K context, F16 KV, batch/ubatch 512. Ordinary app launchers keep their established settings; the benchmark control is not a new default for every launcher.
+- The latest model comparisons use 256 output tokens, temperature 0.6, an excluded warmup, three measured repeats per workload per launch and independent ABBA controls. Earlier suites often use 128 tokens, other engines or other depths. Do not pool them or add their percentage gains. Cached ledger answers are short structured responses, not general writing TPS.
+- Current model-adoption gate: at least 1% fresh TPS **and** complete-reply improvement on two real workloads, each above its own control drift; exact tested outputs, answer/cache checks and zero new swap. Component screens have their own predeclared gates. Component microseconds cannot be converted into a claimed model TPS improvement.
+- A failed feature, below-gate result, noisy result, narrow opt-in and invalid run are different decisions. A correctness fix or capacity improvement can be useful without adding TPS. Older runs accepted under looser memory rules do not automatically satisfy today's zero-new-swap requirement.
+- Research/profiling must first establish that the affected operation exists in the normal fused runtime. Profiling callbacks can interrupt fusion and distort apparent costs. RSS is not total unique Metal memory; uncontrolled file cache is not a guaranteed cold SSD measurement.
+
+## Latest draft-cap experiments
+
+### D01 — MTP inner loop honors existing server output-budget caps
+
+- **Status:** Bounded correctness passes; no qualified256-token speed gain, not adopted.
+- **Settings:** Isolated `m5-draftcap` over `m5-copy` / conv-direct; existing per-cycle caps only, configured max3 allocation unchanged. Packed sharedQ3/mixed/eight workers, greedy helper, minimum0, confidence0, Tensor API on, F16/4K/batch512. IndependentABBA,256 outputs, temperature0.6, seed1234, warmup+three repeats; diagnostics off.
+- **Result:** Code59.482→59.464TPS (-0.030%), prose39.931→40.007 (+0.191%); whole replies -0.027%/+0.157% quicker, below1% and control drift. Code4.568→4.569s, prose6.678→6.667s. Cached512 +0.978% below2.514% drift. Diagnostic successful helper steps720→702,18 discarded steps→0 over240 completed-request cycles; work savings are not a TPS percentage.
+- **Validation:** 588 GPU math/residual cases;633 diagnostic tokens exact across22 requests, identical acceptance and actual target row sequences; real cache reuse, seeded repetition, EOS, output limits, cancellation/recovery.84 exact fresh/cache timed outputs and128 checks across four clean launches;19 identical native allocation records each. All zero new swap. Astra independently audited. No hidden-state bit identity, checkpoint restoration or near-context shifting proof.
+- **Revisit:** A known short output-budget workload or materially different omitted-work mechanism has a repeatable complete-response benefit above drift. Do not rerun the same256-token baseline expecting a general speed gain; unpredictable EOS is not solved by this repair.
+- **Evidence:** [Report](results/20261009-draftcap/REPORT.md), [full ABBA](results/20261009T193647Z-m5-draftcap-tail/comparison.json), [native-step parity](features/20261009T193412937896Z-m5-draftcap-qualification/tail-parity.json), [manifest](../config/m5_draftcap_experiment.json), [Astra review](results/20261009-draftcap/ASTRA-REVIEW.md).
+
+### D02 — True per-cycle cap two with configured maximum-three allocation
+
+- **Status:** Parked for repeatable extended-output divergence; speed bracket stopped, adaptive controller deferred.
+- **Settings:** Same D01 engine/allocation and early-stop repair, only cap2 override versus ordinary effective3 (`draftcap-tail`). Same precision/weights/placement/sampling, max3, minimum0, greedy helper and confidence0. Short diagnostics preceded256-token ABBA attempt.
+- **Result:** Initial22 requests/633 token IDs match; same-width truncation-only versus real cap2 helper steps792→524,268 discarded→0. Compared with ordinary3, cycles240→264, helper702→524, target verification rows942→788. Extended synthetic512 writing diverges in all three repetitions at zero-based index227, the228th emitted token,16545 versus25045. Incomplete English observations code58.944→51.226TPS, prose39.594→38.930; not a qualified comparison or gain.
+- **Validation:** Prompt hash, seed1234, CPU sampling,256 output count, native/build/model/helper receipts and all non-axis settings match. Mismatch exists in saved running snapshot before owned-runnerSIGINT. Fourteen candidate cases completed; owned model exits cleanly, healthy monitor, no cleanup error and zero new swap. No completedABBA; do not call this a quality regression or assert its numerical root cause. Astra confirms parking; short parity does not cover longer output.
+- **Revisit:** A materially changed implementation first reproduces and repairs the228th-token fixture under exact-output rules, then qualifies longer English prose/code, seeded continuation and changing caps before timing. No unchanged rerun, output-gate relaxation or controller implementation based on this failed policy.
+- **Evidence:** [Report](results/20261009-draftcap/REPORT.md), [repeatable mismatch](results/20261009-draftcap/two-early-output-stop.json), [pre-interruption snapshot](results/20261009-draftcap/two-candidate-at-stop.json), [final stopped candidate](results/20261009T195332Z-m5-draftcap-two-2-draftcap2/result.json), [interrupted suite](results/20261009T195018Z-m5-draftcap-two/comparison.json), [initial cap2 parity](features/20261009T193516053626Z-m5-draftcap-qualification/batch.json).
+
+## Previous backend sampling and embedding screen
+
+### N01 — Target backend sampling with static speculative graph
+
+- **Status:** Parked for a demonstrated min-p semantics difference; no model TPS trial.
+- **Settings:** Direct actual Metal min-p stage linked to verified `m5-copy` / `conv-direct`; eight seven-logit cases, p=0.5 and production p=0.05, sorted-flag true/false, separated controls and logf(p)/neighboring boundary values. No model loaded. Upstream #30223 graph fix is merged but not backported because it does not alter sampler arithmetic.
+- **Result:** Four separated controls match eligibility; all four boundary cases CPU retain IDs[0,1,2,3] and Metal retains[0,1,2]. CPU >=threshold versus Metal strict STEP. No full-chain, RNG/rollback, generated-token or model-quality result, and no TPS gain measured. Both sorted-flag fixtures use already ordered values.
+- **Validation:** Surviving logits and input bytes unchanged, maximum retained, eight native cases complete, zero new swap, minimum available RAM33.16GiB. Astra audited actual raw/source hashes and endorsed bounded parking. Diagnostic `passed` means the screen completed, not that full backend sampling qualified.
+- **Revisit:** An isolated implementation first matches min-p eligibility/ties and complete-chain selections plus RNG/rollback under exact-semantic rules, or explicit authorization of separate quality-changing work. Do not rerun the same graph fix expecting it to repair arithmetic; do not conflate this with P08 CPU retrieval.
+- **Evidence:** [Report](results/20261009-sampling-embedding/REPORT.md), [native cases/hashes](features/20261009T183544060739Z-m5-backend-sampling-eligibility/checks.json), [frozen probe](features/20261009T183544060739Z-m5-backend-sampling-eligibility/m5_sampling_probe.cpp), [Astra review](results/20261009-sampling-embedding/ASTRA-REVIEW.md).
+
+### N02 — Upstream common/Qwen4exp embedding gather ordering
+
+- **Status:** Parked: no removed normal handoff; more planned inputs, no TPS trial.
+- **Settings:** `m5-embedding` isolated #30160 common/Qwen4exp hunks over `m5-copy`, no Gemma/helper graph change; current conv-direct/depth3/sharedQ3/mixed/eight helper workers/4K/F16/batch512. Normal scheduler debug2/verbosity5 diagnostic only, no evaluation callback. Six32-token greedy requests per engine: code/prose/Chinese, synthetic512, cached-followup and identical fresh follow-up.
+- **Result:** Every matched target plan remains CPU→Metal, active CPU GET_ROWS2; Metal planned input tensors27→30. Extra inputs belong to inactive mixed-input branch; helper remains CPU→Metal→CPU→Metal, input counts0/14/2/2. No actual transfer-byte or measured slowdown/TPS claim. Topology screen fails to qualify a speed trial.
+- **Validation:** Candidate572 math+16 residual cases; paired192 token IDs/text and draft counts exact; two cached/fresh parity checks,508 reused tokens. Forty request/role/displayed-size comparisons,23 target/139 helper plan dumps per engine. Dumps are rebuild/reallocation plans, not execution counts; printed sizes/names truncated, byte-safe request ranges exclude startup reserves. Both accepted launches zero new swap, min RAM2.149GiB. Hidden-state/logit equality not measured. Astra independently audited raw plans.
+- **Revisit:** A different mechanism removes the observed unnecessary input copies, or a different padding/LoRA/embedding/input-placement workload demonstrates redundant normal crossings. The same upstream merge and unchanged pure-token baseline are insufficient. Preserve inactive graph branches correctly.
+- **Evidence:** [Report](results/20261009-sampling-embedding/REPORT.md), [topology and frozen analyzer](features/20261009T184602948859Z-m5-embedding-topology/topology.json), [parity](features/20261009T184602948859Z-m5-embedding-topology/parity.json), [manifest](../config/m5_embedding_experiment.json), [Astra review](results/20261009-sampling-embedding/ASTRA-REVIEW.md).
+
+## Previous sequential pass
+
+### S01 — Parallel gate/up activation, four outputs per SIMD group
+
+- **Status:** Parked below gate; component test only.
+- **Settings:** `m5-gate-lanes`, `gate-up4`; preserve original Q2 dot products and uniform reductions, distribute the unchanged SwiGLU epilogue across lanes. A/B/C/C/B/A compares practical unfused control, new parallel version and old serial four-output ablation. Full real R4/R5 and distinct-expert blocks, normal fusion, no timing callbacks.
+- **Result:** Real R4 297.497 → 296.937 us, 0.188% less time versus 0.226% control drift; conservative bracket reduction 0.016%. Real R5 -0.019% time reduction; distinct routes 0.93–1.13% slower. Failed the predeclared >=3% R4 reduction, >2x drift and bracket-separation screen. No model trial or TPS gain.
+- **Validation:** 58 cases, 11,162,880 F32 values bit-identical; six accepted native runs, zero new swap.
+- **Revisit:** A materially different epilogue/dispatch mechanism with a normal-path cost argument and repeatable complete-block improvement. The new parallel **eight-output** mode was not benchmarked; this result must not be described as testing it. Old serial eight-output failure is P01.
+- **Evidence:** [Combined report](results/20261009-sequential-pass/REPORT.md), [raw gate evidence](results/20261009-sequential-pass/gate-lanes.json), [pinned manifest](../config/m5_gate_lanes_experiment.json), [predeclared screen](../config/m5_sequential_plan.json).
+
+### S02 — Zero extra Metal encoding workers
+
+- **Status:** Rejected measured regression; full model.
+- **Settings:** `m5-encoders` / `GGML_M5_LAB_N_CB=0` versus 1, otherwise current control settings; separate 1/0/0/1 bracket. These are command-encoding workers, not helper CPU workers.
+- **Result:** Code 59.442 → 56.135 TPS (-5.563%); prose 39.943 → 37.750 (-5.489%); Chinese 40.669 → 38.390 (-5.605%). Complete replies took about 5.62–5.75% longer. Synthetic 512/2048 TPS fell 5.516%/5.102%. Retain one extra worker.
+- **Validation:** Both encoder suites together: 234 prerequisite dependent/state graphs, 168 exact fresh/cached output records and 256 answer/cache checks; eight accepted model launches, zero new swap. Both constructors, effective startup counts, malformed override fallback and stats override covered.
+- **Revisit:** Different backend scheduling implementation, CPU/GPU balance, hardware, or demonstrated encoding contention on a different workload. Repeating this exact count sweep on the same pinned model is low value.
+- **Evidence:** [Model report](results/20261009T171405Z-m5-encoders0/REPORT.md), [raw comparison](results/20261009T171405Z-m5-encoders0/comparison.json), [prerequisites and log checks](results/20261009-sequential-pass/encoders0.json), [manifest](../config/m5_encoders_experiment.json).
+
+### S03 — Two extra Metal encoding workers
+
+- **Status:** Parked, no useful model gain; bounded compatibility limitation.
+- **Settings:** `GGML_M5_LAB_N_CB=2` versus 1, independent 1/2/2/1 bracket. Helper CPU workers remain eight. Fusion matcher remains partition-local; changing command partitions can change fusion opportunities.
+- **Result:** Code 59.467 → 59.325 TPS (-0.239%); prose 39.949 → 39.882 (-0.167%); Chinese 40.607 → 40.583 (-0.061%). Whole-reply changes -0.215%, -0.121%, -0.058%. Synthetic 2048 +0.085% TPS but whole reply -0.324%; no adoption gate met.
+- **Validation:** Same combined coverage as S02. Count two is restricted to the pinned **callback-free** server path. Existing commit logic can leave the main buffer uncommitted with a non-null abort callback. No general callback fix was made. Pinned calloc initializes null; every later assignment is instrumented, and any non-null setter event invalidates a run. Accepted target/helper logs confirm count two and stats disabled.
+- **Revisit:** First fix and validate the non-null callback commit path if general compatibility is required. Performance retry also needs a changed scheduling mechanism or evidence of an encoding bottleneck; callback repair alone is not a promised speed gain.
+- **Evidence:** [Model report](results/20261009T172814Z-m5-encoders2/REPORT.md), [raw comparison](results/20261009T172814Z-m5-encoders2/comparison.json), [startup/callback evidence](results/20261009-sequential-pass/encoders2.json), [manifest](../config/m5_encoders_experiment.json).
+
+### S04 — Q5_K single-token vocabulary head, two output rows
+
+- **Status:** Rejected component regression; no model trial.
+- **Settings:** `m5-head` / `head2`; exact Q5_K K=2560, M=248320, canonical strides, F32 single-token input/output, nsg=2; original unpacking/arithmetic/reduction. Eligible target and helper heads, full vocabulary; no expanded cache or reduced precision. Dependent head → top10 → gather graph, terminal sync, untimed pipeline prime, >=500ms warmup, seven >=100ms blocks per input pattern, ABBA.
+- **Result:** Mixed input 1.904677 → 1.957748 ms (+2.786% time); alternating 1.908241 → 1.945478 ms (+1.951%). Control drift 0.10–0.26% across the head suites. Failed >=10% complete-operation speedup screen.
+- **Validation:** Each head mode passes 16 cases / 4,966,398 output scores bit-identical to control, all-score CPU references, cancellation/one-hot/zero/scaled/tie cases and exact unsupported-path fallbacks. Both modes together compare 9,932,796 values. Probe RSS <3 GiB; all 11 accepted head launches zero new swap.
+- **Revisit:** Different kernel geometry/data reuse or a changed head workload that explains this regression. Before a model trial, prove actual T1 strides and dispatch in a normal model capture; that capture was not warranted by the failed component screen and remains untested.
+- **Evidence:** [Head report](results/20261009-sequential-pass/REPORT.md), [raw correctness/timing](results/20261009-sequential-pass/head.json), [manifest](../config/m5_head_experiment.json), [screen](../config/m5_sequential_plan.json).
+
+### S05 — Q5_K single-token vocabulary head, four output rows
+
+- **Status:** Rejected component regression; no model trial.
+- **Settings:** Same exact guards and protocol as S04, `head4`, separate ABBA controls; global nr1/nsg2 defaults and all unsupported paths preserved.
+- **Result:** Mixed 1.910208 → 1.931174 ms (+1.098% time); alternating 1.910681 → 1.934325 ms (+1.237%). Failed >=10% complete-operation improvement screen.
+- **Validation:** Same complete correctness/fallback coverage and zero-swap requirement as S04. This is a full-head-plus-consumer measurement, not isolated kernel TPS.
+- **Revisit:** A new mechanism and normal model dispatch proof as S04; a repeat of nr4 alone is not justified.
+- **Evidence:** [Raw head bracket](results/20261009-sequential-pass/head.json), [report](results/20261009-sequential-pass/REPORT.md), [manifest](../config/m5_head_experiment.json).
+
+## Earlier October 9 native experiments
+
+### P01 — Serial fused gate/up, eight outputs
+
+- **Status:** Rejected component regression.
+- **Settings:** `m5-gate` / `gate-up8`; real captured R4/R5 routes, complete sequential expert block, stock fused-runtime control. Original serial activation epilogue.
+- **Result:** R4 0.2954 → 0.3484 ms (+17.95% time); R5 0.3572 → 0.4138 (+15.84%). Distinct +18.60%/+17.94%; shared +8.50%/+9.45%. Control drift 0.41%/0.71% for real routes. Failed >=10% operator improvement; no TPS trial.
+- **Validation:** 58 cases / 11,162,880 exact F32 values. Accepted final suite zero new swap; early fixture/storage failure excluded below.
+- **Revisit:** Change the serial epilogue or underlying work distribution, not the same tile count. S01 is the recorded parallel-epilogue follow-up; its four-output mode also failed to qualify.
+- **Evidence:** [Report](results/20261009-next-few/REPORT.md), [raw suite](results/20261009-next-few/REPORT.json), [frozen source hashes](results/20261009-next-few/source/SHA256.json), [manifest](../config/m5_gate_experiment.json).
+
+### P02 — Serial fused gate/up, four outputs
+
+- **Status:** Parked below gate; component only.
+- **Settings:** Same suite as P01, `gate-up4`.
+- **Result:** R4 0.2949 → 0.2962 ms (+0.42% time, 0.76% drift); R5 0.3575 → 0.3578 (+0.07%, 0.05% drift). Distinct +1.42%/+1.37%; shared 0.99%/0.82% less time. No >=10% real-route win or TPS trial.
+- **Validation:** Same exact 58-case coverage as P01; accepted runs zero new swap.
+- **Revisit:** New mechanism with full real-route evidence. S01 already tests parallel activation at this tile count; do not propose it as an untested idea.
+- **Evidence:** [Report and raw links](results/20261009-next-few/REPORT.md), [raw suite](results/20261009-next-few/REPORT.json), [manifest](../config/m5_gate_experiment.json).
+
+### P03 — Repeated-expert pair grouping, exact V4
+
+- **Status:** Rejected component regression.
+- **Settings:** `m5-group` / `expert-group`; eight sequential gate/up/SwiGLU/down/reduction/residual blocks, two full 512-expert weight sets, eight captured routes stratified by reuse, real R4/R5 and distinct/shared controls. Sixty measured graphs, four warmups, no callback tracing during performance.
+- **Result:** Real R4 301.839 → 384.266 us (+27.31% time, 0.71% drift); R5 362.391 → 449.932 (+24.16%, -0.08% drift); distinct +8.65–8.78%, shared +22.98–26.25%. Failed >=10% real R4 improvement and regression limits. No model TPS run.
+- **Validation:** 42 cases, 336 CPU projection references, 9,446,400 exact output values; 750 dispatch markers, unchanged data/padding. Six accepted runs zero new swap; peak RSS 4.48 GiB, minimum RAM 32.03 GiB. Register pressure is a hypothesis, not a measured cause.
+- **Revisit:** A substantially different grouping kernel or measured register/occupancy explanation, with exact arithmetic and dependent sequential graphs. Repeated selections alone do not prove a profitable optimization.
+- **Evidence:** [Final report](results/20261009T153117Z-m5-expert-pair-group/REPORT.md), [raw comparison](results/20261009T153117Z-m5-expert-pair-group/comparison.json), [plan](../config/m5_group_plan.json), [manifest](../config/m5_group_experiment.json).
+
+### P04 — Grouping V2/V3 streamed kernels
+
+- **Status:** Rejected correctness; performance ineligible.
+- **Settings:** Development variants of P03 with streamed grouped computation.
+- **Result:** Passed CPU tolerance but failed exact stock-bit comparison. Their timings cannot justify adoption. V4 restored known exact assignment ordering and passed correctness, then regressed (P03).
+- **Validation:** V1 was accurate but used independent graphs permitting cross-block concurrency; its throughput timings were excluded from sequential latency claims. V2/V3 are preserved in the final report's development history.
+- **Revisit:** Restore exact accumulation/output behavior before performance testing, or explicitly authorize and evaluate a separate quality-changing experiment. Do not relax the existing speed-only accuracy gate silently.
+- **Evidence:** [Development history and evidence](results/20261009T153117Z-m5-expert-pair-group/REPORT.md), [raw comparison](results/20261009T153117Z-m5-expert-pair-group/comparison.json).
+
+### P05 — GDN recurrent-state row groups one/two versus four
+
+- **Status:** Inconclusive / no qualified component gain, parked.
+- **Settings:** `m5-gdn`, `gdn-row1` / `gdn-row2` versus row4; native fused K4 path, actual target T1–4 capture, 786432-float slot stride. Final timing uses >=500ms sustained warmup, 512 synchronized samples, four states and unchanged-row4 negative controls. Includes fixture SUM/attention/copy/sync cost, not an isolated kernel.
+- **Result:** Fused T4 controls 0.3989–0.4161 ms; row1 0.4052–0.4081, row2 0.4024–0.4039. T5 controls 0.4020–0.4132; row1 0.4049–0.4051, row2 0.4054–0.4212. No gain above final 4.33% control spread. Initial short bracket had 11.43% drift and was excluded as conclusive evidence. No TPS gain established.
+- **Validation:** 32 cases per setting, 960 full output/cache/padding digests and 1,504,438,002 F32 values per setting exact. Retained-prefix rollback and continuation tested; T5/K4 prefix1 explicitly unavailable, not claimed. Accepted final suite zero new swap.
+- **Revisit:** First demonstrate reproducible lower-noise timing or a different fused implementation with a substantial effect. Do not relabel noise as a win or claim all GDN optimization has been disproven.
+- **Evidence:** [Detailed report](results/20261009-next-few/REPORT.md), [raw suite](results/20261009-next-few/REPORT.json), [frozen hashes](results/20261009-next-few/source/SHA256.json), [manifest](../config/m5_gdn_experiment.json).
+
+### P06 — SSD lookup prefetch for warm short text
+
+- **Status:** Screened low expected benefit; prefetch not implemented.
+- **Settings:** `m5-lookup` native lookup tracing, 162 attributed operations on the 28.8 GB shard, 90-byte rows / 16 KiB pages; four normal requests, trace/control outputs matched for 392 tokens. Warm short code/prose/Chinese tasks.
+- **Result:** Lookup CPU gather/dequant/scheduling envelope: prose 2.508 ms / 3.3295 s (0.0753%); code 1.885 ms / 2.4972 s (0.0755%); Chinese 2.433 ms / 3.3073 s (0.0736%); warmup 0.2677%. This is an upper-bound envelope, **not measured SSD wait**; overlap may overcount and OS cache is uncontrolled.
+- **Validation:** Paired text/token equality; accepted suite zero new swap. Separate bounded pread probe had first-pass median 123.729 us and repeats 1.708–1.833 us, but does not establish native mmap waits, SSD sequential bandwidth or TPS potential.
+- **Revisit:** Cold-cache, sustained long-context or memory-pressure workload with actual normal-path attributed lookup wait >=2% of reply time, before implementing a bounded prefetcher. Fast sequential SSD bandwidth alone does not satisfy this condition. Larger-model paging remains separately untested.
+- **Evidence:** [Native lookup screen](results/20261009-next-few/REPORT.md), [raw attribution](results/20261009-next-few/REPORT.json), [bounded read context](results/20261009T085842Z-m5-next-batch/REPORT.md), [manifest](../config/m5_lookup_experiment.json).
+
+### P07 — Ten-expert weighted reduction
+
+- **Status:** Small measured benefit, opt-in; below default-adoption gate.
+- **Settings:** `m5-reduce` / `reduce10`, exact ten-expert reduction beyond conv-direct; separate full-model ABBA, 256 output tokens, three measured repeats, depth3 current helper. Not stacked with other experimental paths.
+- **Result:** Code 59.415 → 59.948 TPS (+0.90%, reply +0.94% quicker); prose 39.845 → 40.262 (+1.05%, +1.02%); Chinese 40.636 → 41.007 (+0.91%, +0.89%). Synthetic +0.86–0.87%. Only one real workload reaches both 1% thresholds; keep opt-in, not a default upgrade.
+- **Validation:** Non-NaN operator bits and tested model outputs exact. Together with P08: 256 answer/cache checks, 168 output comparisons, eight accepted full-model launches zero new swap; minimum RAM 2.452 GiB, peak RSS 38.280 GiB.
+- **Revisit:** A materially faster reduction implementation or a different documented workload. Existing benefit is real but small; do not call it a complete failure, a new untested idea or add it arithmetically to other suites.
+- **Evidence:** [Model comparison](results/20261009T130146Z-m5-ten-expert-reduction/REPORT.md), [raw](results/20261009T130146Z-m5-ten-expert-reduction/comparison.json), [combined decision](results/20261009-next-three/REPORT.md), [manifest](../config/m5_reduce_experiment.json).
+
+### P08 — Sampling-output view / CPU retrieval consolidation
+
+- **Status:** Parked, no sustained model gain.
+- **Settings:** `m5-sampling` / `sampling-view`; consolidate already-ready output retrieval, retaining CPU/common sampling semantics, full-model ABBA beyond conv-direct.
+- **Result:** Ready retrieval 0.097706 → 0.030565 us per row, saving only 0.067141 us. Code 59.523 → 59.481 TPS (-0.07%), prose 39.983 → 39.977 (-0.01%), Chinese -0.09%, all within bracket drift; synthetic -0.05–0.17%. No useful whole-reply gain.
+- **Validation:** Five small-model backend/CPU modes, multiple rows/negative indexing; actual greedy/stochastic and both grammar paths produce identical 18 selections. Full model exact outputs and zero new swap as P07. Initial 0.5 MiB new-swap control excluded completely.
+- **Revisit:** Demonstrate a larger actual retrieval/synchronization bottleneck or new GPU-side sampling mechanism. Future **target backend sampling plus static speculative graph** is distinct and remains untested; do not confuse it with this CPU retrieval change.
+- **Evidence:** [Model report](results/20261009T132908Z-m5-sampling-view-clean-retry/REPORT.md), [raw](results/20261009T132908Z-m5-sampling-view-clean-retry/comparison.json), [read-cost checks](features/20261009T132329116485Z-m5-sampling-read_cost-conv-direct/comparison.json), [manifest](../config/m5_sampling_experiment.json).
+
+### P09 — Few-row BF16 TensorOps projections / split-K / specialization
+
+- **Status:** Parked; no qualified component win. Relaxed precision rejected separately.
+- **Settings:** `m5-hc`; exact stored BF16 weights, F32 activations/output, R4/R5, K/M=10240/320 and 320/10240, preserve residual fusion; five long-K splits, short-K direction and exact-K MMA specialization. Twenty distinct projection copies, 125 MiB working set, normal fusion, no profiling callbacks; scratch <=15 KiB, no weight cache, relaxed_precision=false.
+- **Result:** Specialization down R4 35.580 → 35.417 us (0.46% less time versus 3.21% drift), R5 0.90% slower; up R4 36.174 → 35.613 (1.55% less time versus 2.36% drift), R5 0.78% slower. Long-K split8 down 36.001 → 40.075 us (11.32% more time), R5 14.90% more. Short-K up about 9% more time but 7–8% control drift makes exact slowdown uncertain. No >=10% operator win, so no model TPS trial.
+- **Validation:** 864 CPU-reference shape/layout cases across 12 processes, unaffected fallback bits exact; eight broader GPU math/residual configurations. Relaxed precision API probe increased rounding error and was rejected before accepted performance tests.
+- **Revisit:** Different data/compute reuse or demonstrated dispatch/occupancy explanation. Quantized **prompt** cooperative-input kernels are a different format and regime; BF16 few-row failure does not rule them out, but they require their own format/precision proof.
+- **Evidence:** [Detailed report](results/20261009-next-three/REPORT.md), [confirmation brackets](results/20261009T135603Z-m5-hc-operator-confirmation/comparison.json), [complete experiment receipts](results/20261009-next-three/results.json), [manifest](../config/m5_hc_experiment.json).
+
+### C01 — Scalar row-copy replacement
+
+- **Status:** Parked, no useful fresh-model gain.
+- **Settings:** `m5-copy` / `copy-scalar` versus stock; 128 fresh tokens, depth3, Tensor API on, eight helper workers, independent bracket within stock/scalar/vector4/direct/direct/vector4/scalar/stock.
+- **Result:** Code 56.501 → 56.496 TPS (-0.01%); prose 42.877 → 42.861 (-0.04%); Chinese +0.17%; synthetic -0.24%/+0.08%. First-token delay generally worsened; no consistent fresh reply benefit.
+- **Validation:** Eight copy model launches, 256 checks, exact fresh/cached tokens, zero new swap, minimum RAM 2.14 GiB; supplementary copy probe 224 bit-exact cases including tails/padding/fallbacks. Archive distinguishes the 47-case probe used at timing from newer 56-case checks.
+- **Revisit:** Show the normal runtime actually executes enough eligible copies or change the copy mechanism materially. Isolated state-copy throughput is insufficient because normal GDN fusion removes the apparent large CPY (C03).
+- **Evidence:** [Copy report](results/20261009T112641Z-m5-copy-resume/REPORT.md), [raw comparison](results/20261009T112641Z-m5-copy-resume/comparison.json), [manifest](../config/m5_copy_experiment.json).
+
+### C02 — Four-wide vector row-copy replacement
+
+- **Status:** No fresh-writing gain; narrow cached signal needs broader proof.
+- **Settings:** Same suite as C01, `copy-v4`.
+- **Result:** Code/prose both -0.24% TPS, Chinese +0.07%; synthetic -0.42%/-0.11%. Cached2048 +2.53% TPS, but only +0.56% whole-reply benefit on a short ledger fixture; cached512 -0.25%. Keep off as general speed feature.
+- **Validation:** Same exact output and zero-swap proof as C01. Cached512 control drift 2.98%; small cached changes there are inconclusive. Copy-only scalar/vector1/4/8 screening does not establish full-model gains; the matched model table tests scalar and vector4.
+- **Revisit:** Multiple realistic cached workloads with repeatable whole-reply benefit, normal dispatch proof and current adoption gate. Do not market this one short fixture as general chat acceleration.
+- **Evidence:** [Copy report](results/20261009T112641Z-m5-copy-resume/REPORT.md), [raw](results/20261009T112641Z-m5-copy-resume/comparison.json).
+
+### C03 — Large GDN state CPY inferred from split tracing
+
+- **Status:** Invalid normal-path bottleneck attribution; optimization target parked.
+- **Settings:** Per-operation split callbacks versus lighter ordinary-dispatch inventory.
+- **Result:** Detailed split tracing interrupted cache fusion and exposed a costly-looking CPY. Lighter normal dispatch captured 123 shapes and no public large unfused GDN state CPY; native fusion already removes it. No valid model gain can be projected from that copy-only cost.
+- **Validation:** Split traces still serve bounded diagnostic purposes, but their operation percentages are not ordinary inference shares. Direct convolution-state CONT removal is a distinct positive result K01.
+- **Revisit:** A normal, uninstrumented or non-disruptively instrumented workload exhibiting the actual copy. Do not optimize this profiler artifact again without that proof.
+- **Evidence:** [Correction and scope](results/20261009T112641Z-m5-copy-resume/REPORT.md), [normal inventory](results/20261009T112641Z-m5-copy-resume/shape-inventory/inventory.json), [earlier split context](results/20261009T085842Z-m5-next-batch/REPORT.md).
+
+## Earlier settings sweeps
+
+### T01 — Blindly raise draft depth to five
+
+- **Status:** Rejected across measured fresh-writing and cached-follow-up tasks.
+- **Settings:** `mtp-mma`; depth3 writing versus5, depth4 follow-ups versus5, temperature0.6, 128 fresh tokens, confidence0, ABCCBA-style bounded sweeps with fresh controls.
+- **Result:** Writing code 56.43 → 53.54 TPS (-5.12%), prose -14.34%, Chinese -17.19%, synthetic -8.90–15.87%. Cached512 68.98 → 67.03 (-2.82%), complete reply 1.36% slower; cached2048 69.40 → 62.16 (-10.43%), reply 6.87% slower.
+- **Validation:** Tensor/depth batch: 20 passes, 600 checks and 4004 prerequisite checks, zero new swap; fresh depth control drift <=0.163%, cached <=0.515%. Shape/acceptance changes can change token paths; no general exact-output claim.
+- **Revisit:** Changed helper/model acceptance or cost-aware adaptation with evidence. Future adaptation stays within maximum3 and is **not** another blind depth5 sweep.
+- **Evidence:** [Tables and methodology](M5-RESULTS.md), [writing raw](results/20261007T005423Z-m5-depth-writing/comparison.json), [follow-up raw](results/20261007T010359Z-m5-depth-followup/comparison.json).
+
+### T02 — Raise draft depth to six for fresh writing
+
+- **Status:** Rejected fresh-writing regression.
+- **Settings:** Same writing suite as T01, depth6 versus3.
+- **Result:** Code 56.43 → 50.38 TPS (-10.72%); prose 42.84 → 34.47 (-19.53%); Chinese 40.16 → 29.91 (-25.52%); synthetic512 -23.88%, synthetic2048 -13.25%. Higher depth adds work and lowers acceptance fraction.
+- **Validation:** Same clean depth-suite evidence as T01. These end-to-end slowdowns do not isolate GPU, CPU or rollback-copy contributions.
+- **Revisit:** New helper with substantially improved accepted-prefix/cycle cost. Existing short cached benefit T03 does not justify using six for general writing.
+- **Evidence:** [Report](M5-RESULTS.md), [raw writing sweep](results/20261007T005423Z-m5-depth-writing/comparison.json).
+
+### T03 — Depth six for short structured cached replies
+
+- **Status:** Kept as narrow optional trial; long replies do not qualify.
+- **Settings:** Depth6 versus4, cached ledger naturally stops after 25/24 tokens at history512/2048; separate short-structured launcher.
+- **Result:** Cached512 68.98 → 75.50 TPS (+9.44%); complete reply 0.6252 → 0.5947 s (4.88% quicker, about30ms). Cached2048 69.40 → 69.73 (+0.48%); whole reply +0.04%, effectively tied. Fresh writing regresses (T02).
+- **Validation:** Matched cached generation drift <0.17%; nine real API groups pass; zero new swap in speed suite. Structured short-answer rate is not general chat TPS.
+- **Revisit:** A different realistic short-answer task if it can justify a specialized profile. Do not repeat this ledger fixture or advertise75.5 as ordinary writing speed.
+- **Evidence:** [Scope and app proof](M5-RESULTS.md), [cached raw](results/20261007T010359Z-m5-depth-followup/comparison.json).
+
+### T04 — Confidence threshold 0.2
+
+- **Status:** No broad meaningful gain; retained confidence0.
+- **Settings:** `mtp-mma`, separate depth3 writing and depth4 follow-up sweeps, threshold0.2 versus0, temperature0.6, 128 fresh tokens.
+- **Result:** Writing code 56.36 → 56.34 TPS (-0.03%), prose +0.83%, Chinese +0.48%, synthetic -0.16%/-0.05%; follow-up cached essentially flat. No clear general upgrade.
+- **Validation:** Follow-up0.2 reproduces all10 paired fresh outputs. Clean helper/confidence batch: 18 full passes, 540 checks, zero new swap; cached-control variation can exceed small gains. Initial Java-contention/swap attempt excluded below.
+- **Revisit:** New model/helper acceptance distribution or adaptive policy with measured cycle cost, rather than the same fixed threshold sweep.
+- **Evidence:** [Full helper/confidence report](M5-HELPER-RESULTS.md), [writing raw](results/20261007T034515Z-m5-confidence-writing/comparison.json), [follow-up raw](results/20261007T035416Z-m5-confidence-followup/comparison.json).
+
+### T05 — Confidence threshold 0.4
+
+- **Status:** Narrow prose opt-in; rejected as general upgrade.
+- **Settings:** Separate writing depth3/follow-up depth4, threshold0.4 versus0; ordinary launchers unchanged.
+- **Result:** Writing prose 42.83 → 43.61 TPS (+1.83%), reply1.58% quicker; code -0.57%, Chinese -1.33%, synthetic51249.02 →45.84 (-6.50%), synthetic2048 -3.72%. Follow-up Chinese +4.22% but code -2.8%, synthetic -4.03%/-6.76%; cached2048 69.42 →63.55 (-8.46%), reply5.46% slower. Apparent small cached writing gains are below4.37–5.73% control drift.
+- **Validation:** Focused answers pass, but two of10 writing and three of10 follow-up paired fresh outputs change. Higher acceptance percentage mainly reflects fewer proposed tokens, not more accepted work. Clean batch zero new swap; separate prose trial passes nine API groups.
+- **Revisit:** A measured workload-specific selector or materially changed helper. Do not silently combine this quality/path-changing setting with exact-output speed trials or existing opt-ins.
+- **Evidence:** [Report and limitations](M5-HELPER-RESULTS.md), [writing raw](results/20261007T034515Z-m5-confidence-writing/comparison.json), [follow-up raw](results/20261007T035416Z-m5-confidence-followup/comparison.json).
+
+### T06 — Six helper CPU workers instead of eight
+
+- **Status:** Mixed tradeoff, not a balanced default improvement.
+- **Settings:** Helper generation/prompt workers only, target workers8, depth3, `mtp-mma`; do not confuse with encoder-worker S02/S03.
+- **Result:** Generation code +0.77%, prose +1.16%, Chinese +1.09%, synthetic2048 +1.05%; long prompt input 539.26 →521.92 tok/s (-3.21%), TTFT3.7986 →3.9247s, whole long reply1.56% slower.
+- **Validation:** All10 paired fresh outputs exact, answer checks and zero new swap in clean helper suite. Earlier mtp-shared/depth2 sweep L07 also finds sub1% generation changes.
+- **Revisit:** Different host CPU contention or helper placement, with input/TTFT/whole reply included. Decode TPS alone is insufficient.
+- **Evidence:** [Report](M5-HELPER-RESULTS.md), [raw worker sweep](results/20261007T040326Z-m5-helper-workers/comparison.json).
+
+### T07 — Twelve helper CPU workers instead of eight
+
+- **Status:** Small balanced optional benefit, not a large default upgrade.
+- **Settings:** Same isolated worker suite as T06, helper12 versus8, no combination with other trial launchers.
+- **Result:** Code56.33 →56.85 TPS (+0.94%); prose +0.76%, Chinese +0.56%, synthetic2048 +0.82%. Long prompt +3.24%, TTFT3.14% quicker; full reply6.3427 →6.2025s (2.21% quicker). Separate trial exists; balanced control stays8.
+- **Validation:** All10 paired fresh outputs reproduced; clean suite zero new swap; separate twelve-worker trial passes nine API groups.
+- **Revisit:** New placement/model or contention pattern. Already measured small gain, not an untested route to a major TPS jump; combination needs its own fresh comparison.
+- **Evidence:** [Report](M5-HELPER-RESULTS.md), [worker raw](results/20261007T040326Z-m5-helper-workers/comparison.json).
+
+### T08 — BF16/Q2 few-row Tensor API dispatch thresholds
+
+- **Status:** Parked, no meaningful gain.
+- **Settings:** Isolated `m5-lab`, stock BF16 threshold4 versus3; Q2 threshold3 versus2, depth3; separate ABBA suites. Dense MMA knobs do not control separate routed `MUL_MAT_ID` experts.
+- **Result:** BF16 code56.37 →56.40 TPS (+0.05%), synthetic +0.20–0.24%, fresh drift up to0.145%; Q2 code56.41 →56.31 (-0.16%), synthetic -0.15–0.17%, drift up to0.258%. Neither useful.
+- **Validation:** Matrix batch:24 passes,720 checks,6864 CPU-reference prerequisite checks, zero new swap, minimumRAM3.083GiB. Dense Q2 storage is only73,175,040 bytes outside experts; storage share does not prove runtime cost share.
+- **Revisit:** New dense kernel implementation or actual dispatch/cost evidence on changed shapes. Do not claim these already-tested thresholds optimize routed expert kernels.
+- **Evidence:** [Matrix report](M5-GPU-TUNING.md), [BF16 raw](results/20261007T014132Z-m5-bf16-threshold/comparison.json), [Q2 raw](results/20261007T014739Z-m5-q2-threshold/comparison.json).
+
+### T09 — Dense matrix tile limit one
+
+- **Status:** Rejected small regression.
+- **Settings:** `m5-lab`, tile limit1 versus stock limit4, depth3, separate bracketed matrix-width sweep.
+- **Result:** Code56.46 →55.84 TPS (-1.09%); synthetic512 -0.93%,2048 -0.88%. No useful improvement.
+- **Validation:** Same clean matrix batch as T08; candidates measured inside isolated engine after build-parity check, not against unrelated old launcher figures.
+- **Revisit:** Different kernel/shapes or hardware with a reason one tile should win. Existing limit2 benefit is T10.
+- **Evidence:** [Matrix report](M5-GPU-TUNING.md), [width raw](results/20261007T015346Z-m5-matrix-width/comparison.json).
+
+### T10 — Dense matrix tile limit two
+
+- **Status:** Marginal optional benefit; below broad adoption gate.
+- **Settings:** Same suite as T09, limit2 versus4; separate two-tile trial launcher.
+- **Result:** Code56.46 →56.68 TPS (+0.39%); prose +0.47%, Chinese +0.55%, synthetic +0.58–0.59%; fresh complete replies only0.17–0.51% quicker. Long prompt throughput -0.12%. Limited four samples per setting; not universal sub-percent proof.
+- **Validation:** Exact10 measured paired fresh outputs, nine API groups, zero new swap; Chinese control drift0.37%, code/prose about0.05%. Build parity generation within0.17%, but prompt parity not established.
+- **Revisit:** Changed kernel/shape or explicit combined-profile comparison. Existing knob is already tested; cannot claim a new large boost from it.
+- **Evidence:** [Report and variation](M5-GPU-TUNING.md), [raw width sweep](results/20261007T015346Z-m5-matrix-width/comparison.json).
+
+### T11 — Dense MMA GPU SIMD groups four/eight
+
+- **Status:** Rejected measured small regressions.
+- **Settings:** `m5-lab` dense matrix group overrides4/8 versus stock; not CPU workers or encoding workers.
+- **Result:** Request4 code56.45 →55.61 TPS (-1.49%), synthetic -1.39%/-1.17%; request8 code56.45 →56.25 (-0.35%), synthetic -0.99%/-0.20%; fresh control drift <=0.187%.
+- **Validation:** Same24-pass clean matrix batch as T08. No hardware accelerator occupancy counter was measured.
+- **Revisit:** A different matrix kernel or measured occupancy/register explanation; do not repeat a blind group-count sweep.
+- **Evidence:** [Report](M5-GPU-TUNING.md), [raw groups sweep](results/20261007T020256Z-m5-matrix-workers/comparison.json).
+
+## Original helper / runtime approaches
+
+### L01 — Masked Q2 Metal kernel from Meld
+
+- **Status:** Optional, mixed small result; not a general engine upgrade.
+- **Settings:** `q2-masked` versus original pinned engine, prediction off, temperature0.6, 512 output tokens, 4K/F16, batch512; final adjacent quiet confirmation, not a complete new ABBA.
+- **Result:** Synthetic51237.91 →38.01 TPS (+0.27%);204835.55 →36.86 (+3.68%). Input throughput -6.09%/-7.29%; short reply0.07% slower, long1.36% quicker but TTFT about0.25s later. Earlier -8.83%/-7.30% figures are confounded by build/browser activity.
+- **Validation:** 122 Q2 +2 Q4 CPU-reference GPU tests,108 focused checks across six successful passes. Accumulation changes sampled outputs; no bit-exact claim. Final candidate new swap0.0006GiB, so these historical runs do not satisfy current zero-new-swap adoption. First2.14GiB-swap load excluded.
+- **Revisit:** New kernel design or a full quiet current-protocol comparison justified by actual normal costs. Do not reuse confounded percentages or assume all imported Q2 patches are improvements.
+- **Evidence:** [Report](Q2-METAL.md), [final analysis](results/20261006-q2-confirmation-analysis/COMPARISON.md), [original raw](results/20261006T172232Z-q2-comparison/comparison.json), [manifest](../config/q2_experiment.json).
+
+### L02 — Aggressively quantized Q2_0 helper
+
+- **Status:** Rejected poor draft acceptance and Metal OOM.
+- **Settings:** 1.110GB self-contained Q2_0 helper, full GPU, depth2; original runtime. This is helper quantization, not the successful main-model Q2_0 format.
+- **Result:** <2% draft acceptance, partial writing about12–16 TPS (recorded medians13.86/14.42), then Metal out-of-memory/streaming failure. Partial failed-run figures are not accepted speed results.
+- **Validation:** Failed native result/log preserved; do not infer safety or quality from loading successfully. Selected Q3 split/shared helper is a different approach.
+- **Revisit:** Demonstrably better helper calibration/quantization and a viable memory layout, then accuracy and acceptance before timing. A smaller file alone is not sufficient.
+- **Evidence:** [Helper report](PREDICTION.md), [failed raw result](results/20261006T145347Z-prediction-q2_0-gpu2/result.json).
+
+### L03 — Put complete helper on GPU
+
+- **Status:** Rejected at current48GiB working budget; small-batch trial slow.
+- **Settings:** Original Q4/Q2_K GPU helpers and later shared helper full-GPU placement; no raised system GPU memory limit.
+- **Result:** OriginalQ4 and1.491GBQ2_K fail generation within Metal working budget. Shared full-GPU batch512 also fails; batch128 passes focused checks but generates only about4–10TPS in a feature trial. Those feature timings are not matched benchmarks.
+- **Validation:** Native OOM/streaming records retained. Loading is insufficient proof of viable generation. Packed mixed placement is the validated alternative.
+- **Revisit:** A substantially smaller, accurate helper with different mapping/working-set requirements or changed hardware budget. Do not repeat full GPU placement unchanged or raise system limits as an unmeasured shortcut.
+- **Evidence:** [Original helper attempts](PREDICTION.md), [originalQ4 failure](results/20261006T111640Z-flash-mtp3-ubatch512/result.json), [Q2_K failure](results/20261006T144952Z-prediction-q2-gpu2/result.json), [shared512 failure](results/20261006T182852Z-feature-shared-gpu/result.json), [shared128 trial](results/20261006T183135Z-feature-shared-gpu/result.json), [layout explanation](SHARED-HELPER.md).
+
+### L04 — Original Q4 helper all CPU / smaller split alternatives
+
+- **Status:** OriginalQ4 CPU profile rejected for clean-memory baseline; Q2_K split and Q3 CPU-only inferior alternatives.
+- **Settings:** Self-containedQ4 helper CPU, depth3; later smallerQ2_K split and Q3 CPU-only versus selectedQ3 GPU-output split. Historical original engines/settings, not current packed helper.
+- **Result:** Q4 CPU about43–45TPS but +1.85GiB swap and longer startup. Q2_K split no new swap but only1–6% writing gain with slower prompt startup. Q3 CPU-only no new swap but slower than selected split. No claim of a fresh current ABBA for these early screens.
+- **Validation:** Individual raw results and helper preparation identities retained. Later Q3/shared packed profiles replace these specific memory/layout approaches.
+- **Revisit:** A changed CPU helper/kernel/placement with evidence it avoids swap and improves full replies. Do not restore old heavy CPU helper just because generation TPS looked higher.
+- **Evidence:** [Helper decisions](PREDICTION.md), [Q4 CPU raw](results/20261006T111806Z-flash-mtp3-cpu-ubatch512/result.json), [Q2_K split](results/20261006T145142Z-prediction-q2-output2/result.json), [historical scoreboard](RESULTS.md).
+
+### L05 — 106K prediction vocabulary
+
+- **Status:** Narrow mixed benefit; not adopted as general prediction upgrade.
+- **Settings:** `draft-vocab`, helper106299/248320 tokens, full main vocabulary unchanged, depth2, temperature0.6,128 output tokens; full/subset controls in six-pass comparison. Adds111.5MiB compact head and retains full fallback table.
+- **Result:** Synthetic writing +3.94–4.44% versus full helper; code -1.13%; cached generation -9.22%/-10.12% as acceptance drops. Fresh2048 whole reply7.93s versus7.91full/6.66plain, no latency improvement. Reducing helper vocabulary is not free capacity savings.
+- **Validation:** 180 focused answers pass, full target out-of-subset token reachable; general output/distribution equivalence not established. One subset run adds53.3MiB swap, others zero; historical report retains it, so suite does not satisfy current clean-memory gate. Initial CPU-routed compact-head attempt was corrected and excluded.
+- **Revisit:** Better vocabulary coverage/selection proven on realistic multilingual/code/cached tasks, memory accounting and complete-reply improvement; any shared-helper combination needs a new independent comparison.
+- **Evidence:** [Report](DRAFT-VOCAB.md), [raw comparison](results/20261006T183950Z-vocab-comparison/comparison.json), [manifest](../config/draft_vocab_experiment.json).
+
+### L06 — Shared helper with interleaved CPU/GPU tensors
+
+- **Status:** Rejected layout; fixed by packed layout.
+- **Settings:** Shared helper small dense tensors on GPU, experts on CPU, but GPU tensors interleaved with CPU weights in GGUF.
+- **Result:** Loader maps from first to last GPU tensor, spanning1183.14MiB although intended GPU weights only45.64MiB; initial mixed generation fails. Repacking CPU experts first/GPU tensors last reduces mapped span to45.64MiB with identical tensor bytes. Do not restore interleaved layout.
+- **Validation:** Packed mixed feature28 checks, zero new swap; 32 retained tensors/metadata byte-verified, full later240-check suite zero new swap. Shared table removal saves521MiB, not96% of whole-model RAM. BorrowedQ5_K output changes proposals relative to originalQ3 output, so no generic bit-equivalence claim.
+- **Revisit:** Only if loader mapping changes are proven to support interleaved placement safely. Normal development should retain the packed helper.
+- **Evidence:** [Layout report](SHARED-HELPER.md), [failed interleaved raw](results/20261006T183622Z-feature-shared-mixed/result.json), [packed pass](results/20261006T183903Z-feature-shared-mixed/result.json), [shared manifest](../config/mtp_shared_experiment.json).
+
+### L07 — Original unpatched shared-helper depth/worker sweep
+
+- **Status:** Historical workload tradeoffs; superseded by few-row MMA engine, not a universal setting win.
+- **Settings:** `mtp-shared` before `mtp-mma`, depths1/3/4 versus2; helperCPU6/12 versus8 in separate depth2 sweep. Temperature0.6,128 output tokens.
+- **Result:** Depth1 Chinese +16.29% and prose +2.74%, but cached -6.93–7.92%; depth3 code +5.02% but prose -8.32%; depth4 cached2048 +17.19% and reply9.18% quicker but Chinese -18.77%, prose -13.88%. Worker generation gains all <1%; twelve workers long reply1.6% quicker. No one setting wins every task.
+- **Validation:** Depth240/worker180 focused checks, clean speed suites zero new swap; general exact-token equivalence not claimed. Later functional checks with a restarted VM added swap and must not be called clean speed evidence.
+- **Revisit:** Changes in the current patched engine/acceptance or adaptive selection, with fresh matched controls. Never transfer these old-engine percentages directly to current control. T01–T07 cover later settings.
+- **Evidence:** [Historical report](HELPER-TUNING.md), [depth raw](results/20261006T211035Z-tuning-depth/comparison.json), [workers raw](results/20261006T212441Z-tuning-threads/comparison.json), [subsequent engine](METAL-MMA.md).
+
+## Useful results that must not be rediscovered or mislabeled failures
+
+### K01 — Direct convolution-state copy without intermediate CONT
+
+- **Status:** Kept as practical benchmark control / separate optional launcher.
+- **Settings:** `m5-copy` / `conv-direct`, remove intermediateCONT before existing strided convolution-state copy; different operation from the absent large GDN CPY in C03.
+- **Result:** Code56.501 →57.258TPS (+1.34%), prose42.877 →43.448 (+1.33%), Chinese +1.62%, synthetic204850.016 →50.737 (+1.44%). Fresh replies0.75–1.59% quicker. Small TTFT changes do not establish a strong latency win.
+- **Validation:** Eight model launches,256 checks, exact fresh/cached outputs, zero new swap. Existing ordinary launchers unchanged; later experiments compare against this improvement.
+- **Revisit:** Already implemented and measured; only new mechanism or explicit stacked-profile comparison needs testing. Do not count its gain again when reporting later comparisons.
+- **Evidence:** [Report](results/20261009T112641Z-m5-copy-resume/REPORT.md), [raw](results/20261009T112641Z-m5-copy-resume/comparison.json).
+
+### K02 — Metal Tensor API enabled
+
+- **Status:** Retain existing enabled path; measured confirmation, not a newly added accelerator.
+- **Settings:** On/off brackets at writingdepth3 and follow-updepth4, current `mtp-mma`; no separate Neural Engine runtime.
+- **Result:** Writing2048 input312.08 →535.07tok/s (+71.46%), TTFT41.67% shorter, complete reply30.83% quicker; code generation +7.23%, Chinese +12.16%, prose flat. End-to-end differences include changed floating-point paths/acceptance, not pure kernel utilization.
+- **Validation:** Clean20-pass tensor/depth batch; focused checks pass. Hardware AI occupancy and separate Neural Engine use unmeasured.
+- **Revisit:** Future exact-format cooperative-input kernels are new work; simply enabling already-on Tensor API is not another optimization.
+- **Evidence:** [On/off report](M5-RESULTS.md), [writing raw](results/20261007T004003Z-m5-tensor-writing/comparison.json), [follow-up raw](results/20261007T004710Z-m5-tensor-followup/comparison.json).
+
+### K03 — 8K F16 context
+
+- **Status:** Validated capacity option; not a decode-speed improvement.
+- **Settings:** Full Flash, same `mtp-mma`, independent4K/8K/8K/4K,128 output tokens; separate exact6144-token recall fixtures at8K. 4K defaults preserved.
+- **Result:** Fresh generation -0.18% to+0.20% versus4K, whole reply changes <0.36%; code56.45 →56.46TPS. Six long recall checks pass. Private logged buffers1046.24 →1210.75MiB, not physical RAM peak.
+- **Validation:** 134 answer/cache/capacity checks; both8K launches zero new swap, >=2.32GiB available. First fixture returned correct facts in Markdown fences and failed strict rawJSON; explicit fixturev2 passed unchanged grader, independent full retry. Initial failure not pooled.
+- **Revisit:** Larger context or stronger long-context quality/capacity study; quantizedKV requires independent correctness evidence and is unnecessary for this measured8K fit. Do not rerun8K merely hoping for higherTPS.
+- **Evidence:** [Report](results/20261009T085842Z-m5-next-batch/REPORT.md), [accepted raw comparison](results/20261009T092650Z-context-8k/comparison.json), [original format failure](results/20261009T091833Z-context-8k/comparison.json).
+
+### K04 — Upstream fused-residual correctness fix
+
+- **Status:** Validated correctness patch; no meaningful measured TPS gain.
+- **Settings:** `m5-correctness` versus `m5-lab` on4B Qwen3.5Q4_K_M and versus current engine on full Flash; independentABBA,128 output tokens,4K.
+- **Result:** Small model fresh generation -0.35% to+0.13%; full model -0.22% to+0.16%, within drift. Keep purpose labeled correctness, not accelerator gain. Full model passing does not prove its actual graph exposed the original faulty fusion.
+- **Validation:** Small163 answer/cache/capacity checks,16 selected residual cases; full128 answer/cache checks,572 general GPU cases per engine plus16 residual reproducer cases. Zero new swap in accepted launches.
+- **Revisit:** Reproduce a relevant faulty graph or validate upstream rebase behavior; no speed rerun needed merely to rediscover the already-flat result.
+- **Evidence:** [Small model report](results/20261008T122556Z-small-m5-screening/REPORT.md), [full model report](results/20261009T085842Z-m5-next-batch/REPORT.md), [full raw](results/20261009T085850Z-m5-metal-residual-correctness/comparison.json), [manifest](../config/m5_correctness_experiment.json).
+
+## Invalid or excluded attempts: preserve, do not score as feature regressions
+
+These are examples with explicit dispositions, not a claim that every compile error or raw failed process in the archive is individually summarized here. The existing [per-run scoreboard](RESULTS.md) and each linked suite remain the full run history.
+
+| ID | Attempt / problem | Disposition and retry condition | Evidence |
+| --- | --- | --- | --- |
+| X01 | Original full-model load with Docker active;2.14GiB new swap | No speed samples accepted. After authorized VM stop, later trials completed. Retry only with normal admission/quiet host; do not weaken guard. | [Raw stopped load](results/20261006T171840Z-q2-1-baseline/result.json), [Q2 report](Q2-METAL.md) |
+| X02 | Shared comparison interrupted by external Java builds/swap | Incomplete suite excluded; quiet independent eight-pass retry is SHARED-HELPER result. No feature regression claim from interrupted control. | [Interrupted comparison](results/20261006T185032Z-shared-comparison/comparison.json), [context](results/20261006T185032Z-shared-comparison/interruption-context.json) |
+| X03 | Confidence/helper initial batch overlapped VoltTracker builds; follow-up +138.18MiB swap then forced cleanup/Metal assertion | Entire initial batch excluded, quiet batch retried unchanged; cleanup assertion is not accepted inference evidence. | [Interruption receipt](features/20261006-m5-helper-resource-interruption.json), [initial writing](results/20261007T032352Z-m5-confidence-writing/comparison.json), [initial follow-up](results/20261007T033300Z-m5-confidence-followup/comparison.json) |
+| X04 | Earlier operation-profile baseline second launch +60.3MiB swap during build overlap | Baseline refresh incomplete; no optimization percentage against its first clean launch. Two clean later launches completed baseline. | [Operation report](M5-OPERATION-PROFILE.md), [later full baseline](results/20261009T042329Z-heavy-guarded-trial/REPORT.md) |
+| X05 | Full heavy trial admitted at31.85GiB, below usual34GiB; +2.625MiB swap during load | No speed samples; target-only fallback deferred before launch. Read-only owned-model cache reset restored headroom; two normal-admission clean retries passed. | [Stopped trial](results/20261009T041819Z-heavy-guarded-trial/trial.json), [complete baseline](results/20261009T042329Z-heavy-guarded-trial/REPORT.md) |
+| X06 | Initial8K rawJSON formatting check failed despite correct facts in fences | Fixturev2 explicitly asks for rawJSON, unchanged strict grader; fresh complete4K/8K bracket, no pooling. Capacity not judged from partial failure alone. | [Original context attempt](results/20261009T091833Z-context-8k/comparison.json), [retry](results/20261009T092650Z-context-8k/comparison.json) |
+| X07 | Sampling-view initial control +0.5MiB swap | Excluded completely; full clean independentABBA accepted. Retry only after headroom settles. | [Initial suite](results/20261009T132423Z-m5-sampling-view/comparison.json), [clean suite](results/20261009T132908Z-m5-sampling-view-clean-retry/comparison.json) |
+| X08 | Encoder0 initial control passed answers but +983040bytes/0.94MiB global swap | Excluded by suite's zero-new-swap rule; fresh unchanged suite accepted after headroom settled. Passed run status alone does not qualify adoption. | [Excluded run](results/20261009T171015Z-m5-encoders0-1-conv-direct/result.json), [stopped suite](results/20261009T170959Z-m5-encoders0/comparison.json) |
+| X09 | Clean encoder0 suite initially rejected in postprocessing: app logger prefixes and absent unused callback-setter events | Preserve original rejection. Corrected parser accepts exact logger prefix/raw markers and proves null via pinned initialization/instrumented setters; analyzes same raw/source/settings without performance rerun. Any non-null callback still rejected. | [Original postcheck](results/20261009T171405Z-m5-encoders0/comparison-postcheck-original.json), [corrected comparison](results/20261009T171405Z-m5-encoders0/comparison.json) |
+| X10 | Early gate probeSIGBUS: MetalVIEW overCPUINPUT storage | Corrected explicit Metal leaf placement/storage validation before accepted correctness/performance. Not a model failure or usable speed result. | [Final gate history](results/20261009-next-few/REPORT.md), [raw suite](results/20261009-next-few/REPORT.json) |
+| X11 | GroupingV1 independent graphs allowed inter-block concurrency; GDN short bracket11.43% drift | V1 throughput not sequential latency; replace with dependent fixture. Noisy GDN timing excluded as conclusive; final sustained-warmup bracket still no qualified gain. | [Grouping history](results/20261009T153117Z-m5-expert-pair-group/REPORT.md), [GDN history](results/20261009-next-few/REPORT.md) |
+| X12 | Copy probe same-second artifact collision; early compile/logging/trace-cap/CPU-admission failures | Original artifacts retained/excluded. Hardened microsecond IDs and frozen probe-at-model-runs receipt distinguish accepted speed data from supplementary checks. Admission deferral starts no model. | [Copy report](results/20261009T112641Z-m5-copy-resume/REPORT.md), [copy summary](results/20261009T112641Z-m5-copy-resume/summary.json) |
+| X13 | Embedding diagnostic first pair: clean control, candidate admission deferred while RAM settled | Candidate loaded no model; incomplete pair excluded as comparative evidence. Preserve both receipts. Independent complete pair after ten-second pause passes; no guard or admission limit weakened. Raw log postprocessing handles byte offsets and known interleaved HTTP notices without rerunning accepted inference or using logged timings as speed evidence. | [Original control](features/20261009T184458121799Z-m5-embedding-topology/m5-copy/capture.json), [deferred candidate](features/20261009T184458121799Z-m5-embedding-topology/m5-embedding/capture.json), [complete pair](features/20261009T184602948859Z-m5-embedding-topology/parity.json) |
+| X14 | Draft-cap diagnostic postprocessor conflated raw remaining/context budget with effective max3, then command normalization did not allow the explicit minimum0/greedy pair's position | Preserve original off rejection and frozen runner/raw log. Separate corrected analysis verifies source/build/model/runner identity, offline/resource checks, raw/effective distinction, actual target rows and real cancellation. Canonicalize only the two explicit scope pairs. No model rerun; not a native-feature or speed regression. | [Original rejected off](features/20261009T193100376954Z-m5-draftcap-qualification/off/capture.json), [corrected analysis](features/20261009T193100376954Z-m5-draftcap-qualification/off/reanalysis.json), [frozen reanalysis](features/20261009T193100376954Z-m5-draftcap-qualification/reanalysis-runner.py) |
+| X15 | Completed tail ABBA failed final report-path formatting after output checks: relative path passed to absolute-root relative_to | Preserve original rejected comparison. Resolve input paths for future runs; frozen reanalysis recomputes unchanged raw summary and verifies engine/model/settings/math/outputs/allocation/traces/zero-swap evidence. No performance rerun or new source pin. | [Original rejection](results/20261009T193647Z-m5-draftcap-tail/comparison-postcheck-original.json), [accepted reanalysis](results/20261009T193647Z-m5-draftcap-tail/comparison.json), [frozen analyzer](results/20261009T193647Z-m5-draftcap-tail/reanalysis-runner.py) |
+
+## Remaining ideas are not rejected results
+
+The [ranked Astra queue](research/20261009-astra-future-queue.md) retains estimates and source links. The following have **not** been implemented or benchmarked in the latest pass:
+
+1. Adaptive/mixed-cap controller and held-out policy calibration remain unimplemented or unqualified. Existing-cap early stop is tested in D01; actual fixed cap2 is parked in D02. Do not describe those completed experiments as untested, or resume an adaptive controller before fixing the demonstrated extended-output failure.
+2. Quantized prompt cooperative-input kernels, after exact-format/precision proof; different from P09's BF16 few-row projection.
+
+Parallel gate-up8, real-model T1 head dispatch proof, cold/pressured native lookup waits, larger-model SSD paging, cross-device execution and separate Neural Engine runtime remain untested or deferred. Unified memory on this Mac does not pool RAM with another computer. Do not mark those ideas disproven by unrelated tests.
+
+Latest complete state: [draft-cap report](results/20261009-draftcap/REPORT.md), [raw decisions](results/20261009-draftcap/REPORT.json), [verification](results/20261009-draftcap/evidence/final-verification.json). No qualified new TPS gain;121 load-free checks,21 engine receipts and all20 preexisting engines unchanged. Tail ABBA is the latest completed matched speed suite; fixed2 stopped at its exact-output gate. Future workload selection and adoption use English prose/code only; completed historical data remains preserved. No benchmark is started by this ledger or its index.
+
+
+FILE bench/results/20261009-draftcap/REPORT.md
+
+# M5 draft-cap experiments
+
+The existing-cap repair removes discarded helper work but has no qualified256-token speed gain. Fixed cap two fails the longer exact-output gate and is parked; no adaptive controller is implemented. Ordinary launchers and the practical three-guess control remain unchanged.
+
+Future benchmarks and native diagnostic prompts use English prose and code only, per the user's October9 correction. Already completed evidence is preserved. Synthetic writing and cached ledgers remain English.
+
+## D01: honor existing output-budget caps
+
+Separate `m5-draftcap` engine over the practical copy/conv-direct control; global maximum three and all19 native allocation records unchanged. Helper greedy, minimum zero, confidence zero, packed sharedQ3/mixed placement/eight workers, Tensor API on, F16,4K, batch/ubatch512. IndependentABBA,256 fresh output tokens, temperature0.6, seed1234, warmup plus three measured repeats. No diagnostic traces during timing.
+
+| English workload | Control TPS | Early-stop TPS | TPS change | Whole reply quicker | TPS control drift |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| code | 59.482 | 59.464 | -0.030% | -0.027% | -0.129% |
+| prose | 39.931 | 40.007 | +0.191% | +0.157% | +0.227% |
+
+The code reply takes4.568→4.569s; prose6.678→6.667s. Both TPS deltas fall below1% and their respective control drift. None qualifies adoption. Separate synthetic/cache results remain in the [complete ABBA](../20261009T193647Z-m5-draftcap-tail/REPORT.md); cached512 +0.978% TPS is below its2.514% drift.
+
+Bounded diagnostic control/off/tail replies match633 token IDs across22 requests. Completed-request cycles240 remain unchanged; successful helper decode calls720→702,18 discarded steps→0. Per-cycle acceptance and actual target dispatch rows match exactly. Seed repetition, cached/fresh continuation, normalEOS, short output limits, real streaming cancellation/reuse and oversized admission/recovery pass. This is2.5% less helper-step work in that diagnostic set, not2.5% faster model generation.
+
+The timed bracket preserves84 exact fresh/cache output records and passes128 answer/cache checks. All four launches have healthy monitoring, clean exit and zero new swap. Astra independently recomputed the final summary and reviewed the saved native allocation/source/model evidence.
+
+## D02: two guesses with maximum-three allocation
+
+Forced two early-stop diagnostics initially match22 requests/633 token IDs against both a truncation-only two control and the repaired ordinary-three control. Same-width helper calls792→524 remove268 discarded steps. Relative to ordinary three, completed-request cycles240→264, helper calls702→524, target verification rows942→788. Less helper work requires more verification cycles; no TPS prediction follows from these counts.
+
+The extended256-token synthetic512 writing fixture diverges in all three measured repetitions at zero-based index227, the228th emitted token: control16545 versus candidate25045. Prompts, seed1234, CPU sampling, weights/helper, engine receipts and all settings outside the cap axis match. Divergence was present in the running snapshot before interruption. This disproves exact output preservation on this fixture; it does not establish that the changed prose is lower quality or identify the exact numerical cause.
+
+Stopped only the owned timing runner withSIGINT after saving evidence. The owned model exited cleanly, Metal allocations were released, memory monitoring remained healthy, zero new swap and no cleanup error occurred. The suite contains one complete control and a stopped candidate, not completedABBA. Do not present its partial observations as a qualified gain.
+
+| Partial English observation | Three-guess TPS | Two-guess TPS | Status |
+| --- | ---: | ---: | --- |
+| code | 58.944 | 51.226 | Incomplete bracket; not qualified |
+| prose | 39.594 | 38.930 | Incomplete bracket; not qualified |
+
+Park fixed two and adaptive depth under the exact-output requirement. A materially different row-width/sampling/state implementation must first reproduce and repair the228th-token fixture, then qualify longer English/code, seeded continuation and mixed-cap behavior before any new speed trial. Do not simply repeat these same settings or weaken the output gate.
+
+## Evidence and setup checks
+
+- [Raw report and pins](REPORT.json), [independent Astra review](ASTRA-REVIEW.md).
+- [Stock/off corrected analysis](../../features/20261009T193100376954Z-m5-draftcap-qualification/corrected-analysis.json), [off/tail native-step parity](../../features/20261009T193412937896Z-m5-draftcap-qualification/tail-parity.json), [two same-width parity](../../features/20261009T193516053626Z-m5-draftcap-qualification/batch.json).
+- [Exact-output stop](two-early-output-stop.json), [candidate snapshot before interruption](two-candidate-at-stop.json), [final stopped candidate](../20261009T195332Z-m5-draftcap-two-2-draftcap2/result.json), [interrupted suite](../20261009T195018Z-m5-draftcap-two/comparison.json).
+- [Isolated patch manifest](../../../config/m5_draftcap_experiment.json), [588 GPU math checks](../../features/20261009T192821Z-m5-math-m5-draftcap-on-conv-direct/checks.json), [decision ledger](../../EXPERIMENT-LEDGER.md).
+
+The original diagnostic cap/parser and command-order rejection is preserved separately from its corrected analysis (X14). The tail suite's original relative report-path rejection is [preserved](../20261009T193647Z-m5-draftcap-tail/comparison-postcheck-original.json); frozen reanalysis recomputes all comparisons and validates outputs, settings, allocation, traces, math, source/model identity and memory without rerunning performance (X15). No original raw run is overwritten.
+
+After the language-scope change,121 load-free checks pass; no additional model/GPU run was needed. All20 preexisting engines are unchanged;21 current receipts validate. The old offline/source snapshot from the actual runs is retained in [evidence](evidence/offline-at-model-runs.json). No hidden-state bit identity, checkpoint restore or near-context shift claim. No controller, launcher adoption, commit or push.
+
+Next independent idea: an exact-format cooperative-input prompt kernel, after normal-shape/precision proof, focused on English prose and code. The adaptive path waits for a materially repaired exactness mechanism.
+
+
+FILE bench/research/20261009-astra-future-queue.md
+
+# Astra's next M5 experiments
+
+The first six ideas below have now received bounded screening: [sequential report](../results/20261009-sequential-pass/REPORT.md), [sampling/embedding report](../results/20261009-sampling-embedding/REPORT.md), [draft-cap report](../results/20261009-draftcap/REPORT.md), and [decision ledger S01–S05/N01/N02/D01/D02](../EXPERIMENT-LEDGER.md). Existing-cap early stop is correct within tested scope but has no useful256-token gain; actual cap2 diverges at the228th emitted token of a longer English fixture. Fixed2/adaptive work is parked under the exact-output rule. Next independent idea is exact-format cooperative-input prompt work, focused on English prose/code. Read the ledger before proposing a repeat; estimates below are archived hypotheses, not measured gains.
+
+Read-only Astra evaluation, refreshed October 9, 2026. The estimates below are hypotheses for allocating experiment effort, not measured improvements or additive gains. All three immediate experiments preserve model weights, numerical precision, context and maximum draft depth.
+
+| Order | Idea | Why investigate | Effort | Hypothesized TPS change: low / base / high |
+| --- | --- | --- | --- | ---: |
+| 1 | Parallel SwiGLU activation epilogue | Current fused kernel serializes activation math in one GPU lane | Small | -1 / 0 / +1% |
+| 2 | Additional Metal encoding threads: 0 or 2 versus current 1 | Existing backend mechanism; preparation overhead and helper CPU contention need a real model test | Small | -2 / 0 / +2% |
+| 3 | Two/four Q5_K vocabulary output rows per SIMD group | Eligible target/helper single-token full vocabulary heads currently use one; reuse the original templated arithmetic | Small-medium | -2 / +0.5 / +2% |
+| 4 | Target backend sampling with a static speculative graph | A relevant graph fix merged today; actual sampler eligibility must be proven | Medium | -2 / +0.5 / +2% |
+| 5 | Embedding gather graph ordering | Active upstream work could reduce CPU/GPU scheduler crossings if they exist locally | Medium | -1 / 0 / +1%; prompt speed possibly +3% |
+| 6 | Draft length based on accepted-prefix and actual cycle cost | Code/prose acceptance differs; keep maximum draft depth three | Medium-high | -3 / +1 / +4% on mixed workloads |
+| 7 | Cooperative-input dequantization for prompt matrix operations | Requires an exact-format Metal TensorOps adaptation; GGUF Q2_0 is not automatically a native MX format | High | Decode base 0%; prompt -3 / +2 / +8% |
+
+Zero improvement is plausible for every immediate candidate. Prior grouping, serial gate tiles, GDN rows and lookup prefetch are parked based on the [last pass](../results/20261009-next-few/REPORT.md).
+
+## Sequential execution and acceptance
+
+1. **Activation epilogue:** keep every Q2 dot product and uniform SIMD reduction unchanged. Each output lane retains its reduced gate/up scalars, then performs the same activation after all reductions. Require all 58 cases and exact bits. Compare the practical unfused control, the new lane version and the old serial gate-up4 as an explanatory ablation. Before results, Astra endorsed a >=3% real R4 complete-block reduction above twice control drift, both candidate launches faster than both controls, real R5 regression <=2%, and all-distinct regression <=5%. This qualifies at most one model trial; it does not establish a model gain.
+2. **Encoding threads:** an initialization-only 0..2 override, preserving n_main, fusion, barriers, synchronization, placements and all helper CPU worker settings. n_cb counts extra encoding threads, corresponding to up to 1/2/3 command buffers including the main thread. Test both backend constructors and effective settings. Fusion-stat mode forces zero and must stay disabled for timings. Run independent 1/0/0/1 and 1/2/2/1 model brackets; stop after the bounded sweep if neither improves above drift.
+3. **Q5_K head:** start with nr0=2, then nr0=4 at unchanged nsg=2. Guard exact K=2560, M=248320, Q5_K stored weights, F32 input/output and a single activation row. Preserve original unpacking, accumulation and reduction order. Test the full vocabulary, cancellation, diverse activations, top-k/ties and unsupported shapes/layouts. No vocabulary trimming or expanded-weight cache. Require >=10% repeatable whole-head-plus-consumer improvement before a model trial.
+
+Model adoption remains >=1% fresh TPS and whole-reply improvement on two real workloads, above bracket drift, with exact output tokens/text, rollback/cache checks and zero new swap. Each candidate gets an independent fresh control. Cached responses remain separate. All builds and heavy execution are serialized; default launchers stay unchanged until qualification.
+
+The [fresh independent Astra evaluation](20261009-astra-next-plan-review.md) supplied the staged gates, now executed in D01/D02: isolated actual early stopping, bounded native-step/target-width proof, exact outputs/continuation/cancellation, full tailABBA and an early-stopped fixed2 trial with unchanged maximum-three allocation. [Independent result audit](../results/20261009-draftcap/ASTRA-REVIEW.md) confirms no qualified gain and the longer exactness failure. The controller remains unimplemented; a materially changed implementation must repair the recorded fixture before any held-out calibration. The original16-observation/3% rule remains unsupported. [Updated card](20261009-astra-adaptive-depth-plan.md). Future benchmark/capture prompts and adoption use English prose and code only; completed historical evidence is preserved.
+
+## Upstream refresh and later prerequisites
+
+[llama.cpp #30223](https://github.com/ggml-org/llama.cpp/pull/30223) stabilizes backend sampling graph topology across speculative ubatches. GitHub API verified merged at 2026-10-09 14:20:26 UTC, merge a518119d30cade6260f7494120863428a3fe8ee5. N01's min-p accuracy screen now parks the complete backend experiment; the graph fix does not alter arithmetic and was not backported. It is not a measured upgrade here.
+
+[llama.cpp #30160](https://github.com/ggml-org/llama.cpp/pull/30160) merged at 2026-10-09 17:43:06 UTC, merge8e2d31e0eb658d0382d3106a61369dff81f0c080, head49b76388035a748ca00cd73c32d67dc9a560d656 (API verified). N02's isolated backport passes bounded output/cache parity but does not remove any target handoff and adds planned Metal inputs27→30. Parked without TPS trial for this current pure-token baseline; see the report for limits and revisit conditions.
+
+Astra checked [current Metal context](https://github.com/ggml-org/llama.cpp/blob/50e3e3e480c80b9ee0ea067e475602d540dc62c8/ggml/src/ggml-metal/ggml-metal-context.m) and [Q5_K constants](https://github.com/ggml-org/llama.cpp/blob/50e3e3e480c80b9ee0ea067e475602d540dc62c8/ggml/src/ggml-metal/ggml-metal-impl.h), confirming the mechanisms already exist upstream. These experiments remain based on our pinned, tested source; no wholesale upstream update is included.
+
+The native Strata metal-mac head remains [13da72298e0505bdcc4069bd87e96bc11e7b7aa5](https://github.com/liangxiwei/Strata-for-mac/tree/13da72298e0505bdcc4069bd87e96bc11e7b7aa5). Astra found no fresh native-fork kernel replacement for this queue. [Apple TensorOps guidance](https://developer.apple.com/videos/play/wwdc2026/330/) motivates the later prompt experiment; actual format support and precision still need proof.
+
+
+SOURCE vendor/llama-m5-copy/common/speculative.cpp:1430-1510
+1430:         , params(params.draft)
+1431:     {
+1432:         auto * ctx_tgt = this->params.ctx_tgt;
+1433:         auto * ctx_dft = this->params.ctx_dft;
+1434:         GGML_ASSERT(ctx_tgt && ctx_dft && "MTP requires ctx_tgt and ctx_dft to be set");
+1435: 
+1436:         n_embd = llama_model_n_embd_out(llama_get_model(ctx_dft));
+1437:         GGML_ASSERT(n_embd == llama_model_n_embd_out(llama_get_model(ctx_tgt)) &&
+1438:                 "MTP input row width must match the target h_nextn width");
+1439:         n_mtp_layers = std::max(1, (int) llama_model_n_layer_nextn(llama_get_model(ctx_dft)));
+1440: 
+1441:         SPC_TRC("%s", "adding speculative implementation 'draft-mtp'\n");
+1442:         SPC_TRC("- n_max=%d, n_min=%d, p_min=%.2f, n_embd=%d, backend_sampling=%d\n", this->params.n_max, this->params.n_min, this->params.p_min, n_embd, (int) this->params.backend_sampling);
+1443:         SPC_TRC("- gpu_layers=%d, cache_k=%s, cache_v=%s, ctx_tgt=%s, ctx_dft=%s, devices=[%s]\n",
+1444:                 this->params.n_gpu_layers,
+1445:                 ggml_type_name(this->params.cache_type_k),
+1446:                 ggml_type_name(this->params.cache_type_v),
+1447:                 ctx_tgt ? "yes" : "no",
+1448:                 ctx_dft ? "yes" : "no",
+1449:                 common_speculative_get_devices_str(this->params.devices).c_str());
+1450: 
+1451:         batch = common_batch(ctx_dft);
+1452: 
+1453:         smpls.resize(n_seq);
+1454:         for (auto & s : smpls) {
+1455:             common_params_sampling sparams;
+1456:             sparams.no_perf  = false;
+1457:             sparams.top_k    = 10;
+1458:             sparams.samplers = { COMMON_SAMPLER_TYPE_TOP_K };
+1459:             s.reset(common_sampler_init(llama_get_model(ctx_dft), sparams));
+1460:         }
+1461: 
+1462:         // offload draft sampling to the backend
+1463:         backend_chains.assign(n_seq, nullptr);
+1464:         if (this->params.backend_sampling) {
+1465:             for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
+1466:                 llama_sampler * chain = llama_sampler_chain_init(llama_sampler_chain_default_params());
+1467:                 llama_sampler_chain_add(chain, llama_sampler_init_top_k(10));
+1468: 
+1469:                 if (!llama_set_sampler(ctx_dft, seq_id, chain)) {
+1470:                     SPC_WRN("backend offload failed for seq_id=%d; using CPU sampler\n", (int) seq_id);
+1471:                     llama_sampler_free(chain);
+1472:                     chain = nullptr;
+1473:                 }
+1474:                 backend_chains[seq_id] = chain;
+1475:             }
+1476:         }
+1477: 
+1478:         llama_set_embeddings_nextn(ctx_tgt, true, /*masked*/ false);
+1479:         llama_set_embeddings_nextn(ctx_dft, true, /*masked*/ true);
+1480: 
+1481:         is_mem_shared = llama_get_ctx_other(ctx_dft) == ctx_tgt;
+1482:         chain_heads   = n_mtp_layers > 1 && !is_mem_shared;
+1483: 
+1484:         if (chain_heads) {
+1485:             this->params.n_max = std::min(this->params.n_max, n_mtp_layers);
+1486: 
+1487:             chain_h.assign(n_seq, {});
+1488:             for (auto & c : chain_h) {
+1489:                 c.reserve((size_t) (this->params.n_max + 1) * n_embd);
+1490:             }
+1491:         }
+1492:         this->n_max = this->params.n_max;
+1493: 
+1494:         pending_h.assign(n_seq, std::vector<float>(n_embd, 0.0f));
+1495: 
+1496:         i_last.assign(n_seq, -1);
+1497:         i_batch_beg.assign(n_seq, -1);
+1498:         i_batch_end.assign(n_seq, -1);
+1499: 
+1500:         verify_h.assign(n_seq, {});
+1501:         verify_h_rows.assign(n_seq, 0);
+1502:     }
+1503: 
+1504:     ~common_speculative_impl_draft_mtp() override {
+1505:         auto * ctx_dft = this->params.ctx_dft;
+1506:         for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) backend_chains.size(); ++seq_id) {
+1507:             if (backend_chains[seq_id] == nullptr) {
+1508:                 continue;
+1509:             }
+1510:             if (ctx_dft) {
+
+
+SOURCE vendor/llama-m5-copy/common/speculative.cpp:1540-1830
+1540:         if (batch_in.size() <= 0) {
+1541:             return true;
+1542:         }
+1543: 
+1544:         // TODO: how to make it work with vision tokens?
+1545:         if (!batch_in.has_token() || batch_in.has_embd()) {
+1546:             return true;
+1547:         }
+1548: 
+1549:         const int32_t n_tokens = batch_in.size();
+1550: 
+1551:         // remember the first and last batch index for each sequence
+1552:         std::fill(i_batch_beg.begin(), i_batch_beg.end(), -1);
+1553:         std::fill(i_batch_end.begin(), i_batch_end.end(), -1);
+1554: 
+1555:         for (int k = 0; k < n_tokens; ++k) {
+1556:             for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
+1557:                 if (batch_in.tokens[k].seq_id == seq_id) {
+1558:                     i_batch_end[seq_id] = k;
+1559:                     if (i_batch_beg[seq_id] < 0) {
+1560:                         i_batch_beg[seq_id] = k;
+1561:                     }
+1562:                 }
+1563:             }
+1564:         }
+1565: 
+1566:         auto * ctx_tgt = this->params.ctx_tgt;
+1567:         auto * ctx_dft = this->params.ctx_dft;
+1568: 
+1569:         const size_t row_bytes = (size_t) n_embd * sizeof(float);
+1570: 
+1571:         // if kv is shared with target (e.g Gemma4), then we can skip this catch-up decode
+1572:         if (!is_mem_shared) {
+1573:             batch.clear();
+1574: 
+1575:             // pair each token with the tgt embedding shifted right by one position, and
+1576:             // the first token of each sequence with the pending embedding from a previous run
+1577:             // assumes that the tokens in the batch are sequential for each sequence
+1578:             // i.e. we cannot have seq_id like this: [0, 0, 0, 1, 1, 0, 1, 1]
+1579:             //                                                       ^--- this is a problem
+1580:             // TODO:this is generally true, but would be nice to assert it
+1581:             const float * h_tgt = llama_get_embeddings_nextn(ctx_tgt);
+1582: 
+1583:             for (int k = 0; k < n_tokens; ++k) {
+1584:                 const llama_seq_id seq_id = batch_in.tokens[k].seq_id;
+1585: 
+1586:                 const int32_t idx = batch.add(batch_in.tokens[k].id, batch_in.tokens[k].pos[0], seq_id, false);
+1587: 
+1588:                 const float * h_row = k == i_batch_beg[seq_id]
+1589:                     ? pending_h[seq_id].data()
+1590:                     : h_tgt + (size_t) (k - 1) * n_embd;
+1591: 
+1592:                 batch.set_embd(idx, { h_row, 1, (size_t) n_embd });
+1593:             }
+1594: 
+1595:             auto * mem_dft = llama_get_memory(ctx_dft);
+1596: 
+1597:             bool ok = true;
+1598:             for (int head = 0; head < n_mtp_layers; ++head) {
+1599:                 if (chain_heads) {
+1600:                     // ref: https://github.com/ggml-org/llama.cpp/pull/24340/changes#r3413498544
+1601:                     for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
+1602:                         if (i_batch_beg[seq_id] < 0) {
+1603:                             continue;
+1604:                         }
+1605:                         llama_memory_seq_rm(mem_dft, seq_id, batch_in.tokens[i_batch_beg[seq_id]].pos[0], -1);
+1606:                     }
+1607:                     llama_set_nextn_layer_offset(ctx_dft, head);
+1608:                 }
+1609: 
+1610:                 const int32_t rc = llama_process(ctx_dft, LLAMA_PROCESS_TYPE_DECODE, batch.get());
+1611:                 if (rc != 0) {
+1612:                     SPC_ERR("llama_process(ctx_dft) head=%d failed rc=%d (pos=%d)\n",
+1613:                             head, (int) rc, (int) batch_in.tokens[0].pos[0]);
+1614:                     ok = false;
+1615:                     break;
+1616:                 }
+1617:             }
+1618: 
+1619:             if (chain_heads) {
+1620:                 llama_set_nextn_layer_offset(ctx_dft, 0); // restore default for non-draft decodes
+1621:             }
+1622:             if (!ok) {
+1623:                 return false;
+1624:             }
+1625:         }
+1626: 
+1627:         for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
+1628:             if (i_batch_end[seq_id] < 0) {
+1629:                 continue;
+1630:             }
+1631: 
+1632:             const int32_t n_rows = i_batch_end[seq_id] - i_batch_beg[seq_id] + 1;
+1633:             verify_h_rows[seq_id] = n_rows;
+1634:             verify_h[seq_id].resize((size_t) n_rows * n_embd);
+1635: 
+1636:             for (int32_t i = 0; i < n_rows; ++i) {
+1637:                 const float * h = llama_get_embeddings_nextn_ith(ctx_tgt, i_batch_beg[seq_id] + i);
+1638:                 std::memcpy(verify_h[seq_id].data() + (size_t) i * n_embd, h, row_bytes);
+1639:             }
+1640: 
+1641:             std::memcpy(pending_h[seq_id].data(),
+1642:                     verify_h[seq_id].data() + (size_t) (n_rows - 1) * n_embd, row_bytes);
+1643:         }
+1644: 
+1645:         return true;
+1646:     }
+1647: 
+1648:     void draft(common_speculative_draft_params_vec & dparams) override {
+1649:         auto & ctx_dft = params.ctx_dft;
+1650: 
+1651:         batch.clear();
+1652: 
+1653:         // keep track of which sequences are still drafting
+1654:         int n_drafting = 0;
+1655:         std::vector<bool> drafting(n_seq);
+1656: 
+1657:         for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
+1658:             auto & dp = dparams[seq_id];
+1659: 
+1660:             if (!dp.drafting) {
+1661:                 continue;
+1662:             }
+1663: 
+1664:             n_drafting++;
+1665:             drafting[seq_id] = true;
+1666:             // greedy drafting leaves no candidates behind, so the verifier falls back to sample-and-match
+1667:             if (!params.probabilistic) {
+1668:                 dp.result_q = nullptr;
+1669:             }
+1670: 
+1671:             // result_q is only set when the caller wants rejection, so it also gates the retune
+1672:             if (dp.result_q) {
+1673:                 spec_retune(smpls, smpls_cfg, llama_get_model(ctx_dft), seq_id, dp.temp, dp.seed);
+1674:             }
+1675: 
+1676:             // a reset reseeds the chain, which breaks probabilistic drafting
+1677:             if (!dp.result_q) {
+1678:                 common_sampler_reset(smpls[seq_id].get());
+1679:             }
+1680: 
+1681:             const int32_t idx = batch.add(dp.id_last, dp.pos0, seq_id, true);
+1682:             batch.set_embd(idx, { pending_h[seq_id].data(), 1, (size_t) n_embd });
+1683: 
+1684:             i_last[seq_id] = idx;
+1685: 
+1686:             if (chain_heads) {
+1687:                 chain_h[seq_id].assign(pending_h[seq_id].begin(), pending_h[seq_id].end());
+1688:             }
+1689:         }
+1690: 
+1691:         int i = 0;
+1692: 
+1693:         while (n_drafting > 0) {
+1694:             // each step decodes under a different head, i.e. a different decoder layer, and
+1695:             // KV is per layer. process() filled this layer's KV only for positions < pos0
+1696:             // (prompt + accepted prefix) — nothing in the draft region yet. so reset the
+1697:             // draft region (the seq_rm lower bound is pos0, leaving the prompt KV intact)
+1698:             // and select head i so it rebuilds its own layer's KV there; decoding just the
+1699:             // latest token would leave its attention reading cells only another head wrote.
+1700:             if (chain_heads) {
+1701:                 auto * mem_dft = llama_get_memory(ctx_dft);
+1702:                 for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
+1703:                     if (drafting[seq_id]) {
+1704:                         llama_memory_seq_rm(mem_dft, seq_id, dparams[seq_id].pos0, -1);
+1705:                     }
+1706:                 }
+1707:                 llama_set_nextn_layer_offset(ctx_dft, i);
+1708:             }
+1709: 
+1710:             int ret = llama_process(ctx_dft, LLAMA_PROCESS_TYPE_DECODE, batch.get());
+1711:             if (ret != 0) {
+1712:                 SPC_ERR("llama_process[%d] returned %d\n", i, ret);
+1713:                 break;
+1714:             }
+1715: 
+1716:             // rebuild the batch for the next step: the growing-KV paths re-add only the
+1717:             // new token (the KV already holds the prefix), while chained heads re-add the
+1718:             // whole prefix at the next head. dropped sequences are simply not re-added.
+1719:             batch.clear();
+1720: 
+1721:             for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
+1722:                 if (!drafting[seq_id]) {
+1723:                     continue;
+1724:                 }
+1725: 
+1726:                 auto * smpl = smpls[seq_id].get();
+1727: 
+1728:                 const llama_token id_sampled = common_sampler_sample(smpl, ctx_dft, i_last[seq_id], true);
+1729:                 const float * h_row = llama_get_embeddings_nextn_ith(ctx_dft, i_last[seq_id]);
+1730: 
+1731:                 const auto * cur_p = common_sampler_get_candidates(smpl, true);
+1732: 
+1733:                 for (int k = 0; k < std::min(3, (int) cur_p->size); ++k) {
+1734:                     SPC_DBG(" - seq_id %d, draft candidate %3d, pos %3d: %6d (%8.3f) '%s'\n",
+1735:                             seq_id, k, i, cur_p->data[k].id, cur_p->data[k].p,
+1736:                             common_token_to_piece(ctx_dft, cur_p->data[k].id).c_str());
+1737:                 }
+1738: 
+1739:                 // add drafted token for each sequence
+1740:                 const llama_token id = dparams.at(seq_id).result_q ? id_sampled : cur_p->data[0].id;
+1741: 
+1742:                 // only collect very high-confidence draft tokens
+1743:                 if (cur_p->data[0].p < params.p_min) {
+1744:                     drafting[seq_id] = false;
+1745:                     n_drafting--;
+1746: 
+1747:                     continue;
+1748:                 }
+1749: 
+1750:                 common_sampler_accept(smpl, id, true);
+1751: 
+1752:                 auto & dp = dparams.at(seq_id);
+1753:                 auto & result = *dp.result;
+1754: 
+1755:                 result.push_back(id);
+1756: 
+1757:                 if (dp.result_q) {
+1758:                     dp.result_q->emplace_back(cur_p->data, cur_p->data + cur_p->size);
+1759:                 }
+1760: 
+1761:                 if (params.n_max <= (int) result.size()) {
+1762:                     drafting[seq_id] = false;
+1763:                     n_drafting--;
+1764:                     continue;
+1765:                 }
+1766: 
+1767:                 if (chain_heads) {
+1768:                     // ref: https://github.com/ggml-org/llama.cpp/pull/24340#discussion_r3448031546
+1769:                     chain_h[seq_id].insert(chain_h[seq_id].end(), h_row, h_row + n_embd);
+1770: 
+1771:                     const int n_rows = (int) result.size() + 1; // id_last + tokens drafted so far
+1772:                     for (int t = 0; t < n_rows; ++t) {
+1773:                         const llama_token tok = (t == 0) ? dp.id_last : result[t - 1];
+1774:                         const int32_t idx = batch.add(tok, dp.pos0 + t, seq_id, t == n_rows - 1);
+1775:                         batch.set_embd(idx, { chain_h[seq_id].data() + (size_t) t * n_embd, 1, (size_t) n_embd });
+1776:                         i_last[seq_id] = idx;
+1777:                     }
+1778:                 } else if (is_mem_shared) {
+1779:                     // note: with shared memory (e.g. Gemma4 assistants) we use the same position for all draft tokens
+1780:                     // ref: https://github.com/huggingface/transformers/blob/effde20942e3f82a1b97449f60b3a48c5ff96145/docs/source/en/model_doc/gemma4_assistant.md?plain=1#L36-L37
+1781:                     const int32_t idx = batch.add(id, dp.pos0, seq_id, true);
+1782:                     batch.set_embd(idx, { h_row, 1, (size_t) n_embd });
+1783:                     i_last[seq_id] = idx;
+1784:                 } else {
+1785:                     const int32_t idx = batch.add(id, dp.pos0 + i + 1, seq_id, true);
+1786:                     batch.set_embd(idx, { h_row, 1, (size_t) n_embd });
+1787:                     i_last[seq_id] = idx;
+1788:                 }
+1789:             }
+1790: 
+1791:             if (batch.size() == 0) {
+1792:                 break;
+1793:             }
+1794: 
+1795:             ++i;
+1796:         }
+1797: 
+1798:         if (chain_heads) {
+1799:             llama_set_nextn_layer_offset(ctx_dft, 0); // restore default for non-draft decodes
+1800:         }
+1801: 
+1802:         for (llama_seq_id seq_id = 0; seq_id < (llama_seq_id) n_seq; ++seq_id) {
+1803:             auto & dp = dparams[seq_id];
+1804:             if (!dp.drafting) {
+1805:                 continue;
+1806:             }
+1807: 
+1808:             if (dp.result->size() < (size_t) params.n_min) {
+1809:                 dp.result->clear();
+1810:             }
+1811:         }
+1812:     }
+1813: 
+1814:     void accept(llama_seq_id seq_id, uint16_t n_accepted, bool /*is_other*/) override {
+1815:         if (seq_id < 0 || seq_id >= (llama_seq_id) n_seq) {
+1816:             return;
+1817:         }
+1818: 
+1819:         const int32_t n_rows = verify_h_rows[seq_id];
+1820:         if (n_rows <= 0) {
+1821:             return;
+1822:         }
+1823: 
+1824:         const int32_t i_h = std::min<int32_t>(n_accepted, n_rows - 1);
+1825:         const size_t row_bytes = (size_t) n_embd * sizeof(float);
+1826:         std::memcpy(pending_h[seq_id].data(), verify_h[seq_id].data() + (size_t) i_h * n_embd, row_bytes);
+1827:     }
+1828: };
+1829: 
+1830: // state of self-speculation (simple implementation, not ngram-map)
+
+
+SOURCE vendor/llama-m5-copy/src/llama-context.cpp:1408-1480
+1408: 
+1409:     sched_need_reserve = true;
+1410: 
+1411:     return res;
+1412: }
+1413: 
+1414: llm_graph_result * llama_context::process_ubatch(const llama_ubatch & ubatch, llm_graph_type gtype, llama_memory_context_i * mctx, ggml_status & ret) {
+1415:     if (mctx && !mctx->apply()) {
+1416:         LLAMA_LOG_ERROR("%s: failed to apply memory context\n", __func__);
+1417:         ret = GGML_STATUS_FAILED;
+1418:         return nullptr;
+1419:     }
+1420: 
+1421:     auto * res = get_gf_res_prev();
+1422:     auto * gf  = res->get_gf();
+1423: 
+1424:     // the new graph parameters
+1425:     // in order to correctly reuse a graph, it's full topology has to be uniquely determined by these parameters
+1426:     const auto gparams = graph_params(res, ubatch, mctx, gtype);
+1427: 
+1428:     if (!graph_reuse_disable && gf_res_prev_active == res && res->can_reuse(gparams)) {
+1429:         //LLAMA_LOG_DEBUG("%s: reusing previous graph\n", __func__);
+1430: 
+1431:         // with pipeline parallelism, the previous graph_compute_async may still be running
+1432:         // on the GPU. we must synchronize before set_inputs to avoid overwriting input tensors
+1433:         // that the previous compute is still reading.
+1434:         if (cparams.pipeline_parallel) {
+1435:             ggml_backend_sched_synchronize(sched.get());
+1436:         }
+1437: 
+1438:         n_reused++;
+1439:     } else {
+1440:         gf_res_prev_active = nullptr;
+1441:         res->reset();
+1442: 
+1443:         ggml_backend_sched_reset(sched.get());
+1444:         ggml_backend_sched_set_eval_callback(sched.get(), cparams.cb_eval, cparams.cb_eval_user_data);
+1445: 
+1446:         //const auto t_start_us = ggml_time_us();
+1447: 
+1448:         gf = model.build_graph(gparams);
+1449: 
+1450:         //LLAMA_LOG_INFO("graph build time: %.3f ms\n", (ggml_time_us() - t_start_us)/1000.0);
+1451: 
+1452:         if (!gf) {
+1453:             LLAMA_LOG_ERROR("%s: failed to initialize graph\n", __func__);
+1454:             ret = GGML_STATUS_FAILED;
+1455:             return nullptr;
+1456:         }
+1457: 
+1458:         if (!ggml_backend_sched_alloc_graph(sched.get(), gf)) {
+1459:             LLAMA_LOG_ERROR("%s: failed to allocate graph\n", __func__);
+1460:             ret = GGML_STATUS_ALLOC_FAILED;
+1461:             return nullptr;
+1462:         }
+1463: 
+1464:         gf_res_prev_active = res;
+1465:     }
+1466: 
+1467:     // set the input data for the input tensors
+1468:     {
+1469:         //const auto t_start_us = ggml_time_us();
+1470: 
+1471:         // FIXME this call causes a crash if any model inputs were not used in the graph and were therefore not allocated
+1472:         res->set_inputs(&ubatch);
+1473: 
+1474:         //LLAMA_LOG_INFO("graph set inputs time: %.3f ms\n", (ggml_time_us() - t_start_us)/1000.0);
+1475:     }
+1476: 
+1477:     const auto status = graph_compute(res->get_gf(), ubatch.n_tokens > 1);
+1478:     if (status != GGML_STATUS_SUCCESS) {
+1479:         LLAMA_LOG_ERROR("%s: failed to compute graph, compute status: %d\n", __func__, status);
+1480:         ret = status;
+
+
+SOURCE vendor/llama-m5-copy/src/models/qwen4exp.cpp:740-955
+740: }
+741: 
+742: // QSA attends to the top blocks of compress_ratio cells plus the incomplete tail, like the glm5-next k-pool indexer
+743: // a block is scored by one pooled key: the mean of its raw indexer keys, normed and rotated to its first member
+744: ggml_tensor * llama_model_qwen4exp::graph::build_qsa_sel(
+745:         const llama_memory_hybrid_idx_context * mctx_hyb,
+746:         llm_graph_input_kpool *                 inp_kpool,
+747:         ggml_tensor *                           cur,
+748:         ggml_tensor *                           inp_pos,
+749:         ggml_tensor *                           kq_mask,
+750:         int *                                   sections,
+751:         int                                     il) {
+752:     const llama_kv_cache_context * mctx_idx = mctx_hyb->get_idx();
+753: 
+754:     const int64_t idx_dim = hparams.indexer_head_size;
+755:     const int64_t n_idx_h = hparams.indexer_n_head;
+756:     const int64_t kpool   = inp_kpool->kpool;
+757:     const int64_t n_pool  = inp_kpool->pool_cells->ne[0];
+758:     const int64_t n_new   = inp_kpool->n_new;
+759: 
+760:     GGML_ASSERT(hparams.dsv4_compress_ratios[il] == kpool);
+761: 
+762:     // cache rows store raw key | pooled key: pooling precedes norm and rotation, so the raw key gets neither
+763:     ggml_tensor * k_raw = build_lora_mm(model.layers[il].index_k_proj, cur);
+764:     cb(k_raw, "indexer_k_raw", il);
+765: 
+766:     ggml_tensor * pzero  = ggml_fill(ctx0, ggml_new_tensor_2d(ctx0, GGML_TYPE_F32, idx_dim, n_tokens), 0.0f);
+767:     ggml_tensor * packed = ggml_reshape_3d(ctx0, ggml_concat(ctx0, k_raw, pzero, 0), 2*idx_dim, 1, n_tokens);
+768:     ggml_build_forward_expand(gf, mctx_idx->cpy_k(ctx0, packed, inp_kpool->k_idxs, il));
+769: 
+770:     // the raw keys and the persistent pooled slots, see llama_memory_hybrid_idx::mem_idx_stale
+771:     auto kpool_cache = mctx_hyb->get_kpool_access(ctx0, il, idx_dim);
+772: 
+773:     // pool only the blocks this ubatch completes or regroups
+774:     ggml_tensor * rows = kpool_cache.gather_key_gate(ggml_reshape_1d(ctx0, inp_kpool->new_pool_idxs, kpool*n_new));
+775:     rows = ggml_reshape_3d(ctx0, rows, idx_dim, kpool, n_new);
+776: 
+777:     // mean over the members; kpool is small, so summing slices beats a transpose plus sum_rows
+778:     ggml_tensor * pooled_new = nullptr;
+779:     for (int64_t i = 0; i < kpool; ++i) {
+780:         ggml_tensor * slice = ggml_view_2d(ctx0, rows, idx_dim, n_new, rows->nb[2], i*rows->nb[1]);
+781:         pooled_new = pooled_new ? ggml_add(ctx0, pooled_new, slice) : ggml_cont(ctx0, slice);
+782:     }
+783:     pooled_new = ggml_scale(ctx0, pooled_new, 1.0f/(float) kpool);
+784:     pooled_new = build_norm(pooled_new, model.layers[il].index_k_norm, nullptr, LLM_NORM_RMS, il);
+785: 
+786:     pooled_new = ggml_reshape_3d(ctx0, pooled_new, idx_dim, 1, n_new);
+787:     pooled_new = ggml_rope_multi(ctx0, pooled_new, inp_kpool->new_pool_pos, nullptr,
+788:             n_rot, sections, rope_type, n_ctx_orig, freq_base, freq_scale,
+789:             ext_factor, attn_factor, beta_fast, beta_slow);
+790:     pooled_new = ggml_reshape_2d(ctx0, pooled_new, idx_dim, n_new);
+791:     cb(pooled_new, "indexer_pool_k_new", il);
+792: 
+793:     // scatter the fresh pooled keys, then gather all n_pool of them by cell, in both cache modes:
+794:     // the reserved graph cannot branch on cache_safe, and without sharing every pool is re-pooled
+795:     // anyway (n_new == n_pool_real, layout order), so the gather returns exactly pooled_new
+796:     ggml_build_forward_expand(gf, kpool_cache.scatter_pooled(pooled_new, inp_kpool->new_pool_rep));
+797:     ggml_tensor * pooled = kpool_cache.gather_pooled(inp_kpool->pool_cells);
+798:     pooled = ggml_reshape_3d(ctx0, pooled, idx_dim, 1, n_pool);
+799:     cb(pooled, "indexer_k", il);
+800: 
+801:     ggml_tensor * q = build_lora_mm(model.layers[il].index_q_proj, cur);
+802:     q = ggml_reshape_3d(ctx0, q, idx_dim, n_idx_h, n_tokens);
+803:     q = build_norm(q, model.layers[il].index_q_norm, nullptr, LLM_NORM_RMS, il);
+804:     q = ggml_rope_multi(ctx0, q, inp_pos, nullptr,
+805:             n_rot, sections, rope_type, n_ctx_orig, freq_base, freq_scale,
+806:             ext_factor, attn_factor, beta_fast, beta_slow);
+807:     cb(q, "indexer_q", il);
+808: 
+809:     // the reference sums the rectified head scores unweighted, scaled by 1/sqrt(head_dim),
+810:     // which is the lightning indexer with every head weight set to that scale
+811:     ggml_tensor * weights = ggml_fill(ctx0, ggml_new_tensor_2d(ctx0, GGML_TYPE_F32, n_idx_h, n_tokens), 1.0f/sqrtf((float) idx_dim));
+812:     ggml_tensor * score = ggml_lightning_indexer(ctx0, q, pooled, weights, inp_kpool->pool_mask); // [n_pool, n_tokens]
+813:     res->add_fused_node({LLM_FUSED_OP_LIGHTNING_INDEXER, score, il});
+814:     cb(score, "indexer_score", il);
+815: 
+816:     const int64_t n_top_pool = std::min<int64_t>(n_pool, hparams.indexer_top_k / kpool);
+817:     ggml_tensor * top_k = ggml_top_k(ctx0, score, n_top_pool); // [n_top_pool, n_tokens], unordered
+818:     cb(top_k, "indexer_top_k", il);
+819: 
+820:     // the top blocks, then the incomplete tail with n_kv for missing cells
+821:     ggml_tensor * sel_idx = ggml_get_rows(ctx0, inp_kpool->pool_idxs,
+822:             ggml_reshape_1d(ctx0, top_k, n_top_pool*n_tokens)); // [kpool, n_top_pool*n_tokens]
+823:     sel_idx = ggml_reshape_2d(ctx0, sel_idx, kpool*n_top_pool, n_tokens);
+824:     sel_idx = ggml_concat(ctx0, sel_idx, inp_kpool->tail_idxs, 0);
+825:     const int64_t n_sel = sel_idx->ne[0];
+826:     GGML_ASSERT(n_sel == inp_kpool->n_sel);
+827: 
+828:     ggml_build_forward_expand(gf, sel_idx);
+829: 
+830:     // TODO: figure out to reduce the large copmute buffer that this creates
+831: 
+832:     // scatter zeros for the selected cells into an all -inf row, each dead slot into its own dump row n_kv + slot
+833:     // seeding from sel_idx ties the scatter storage lifetime to this layer
+834:     const int64_t n_kv = inp_kpool->n_kv;
+835: 
+836:     ggml_tensor * mask_all = ggml_new_tensor_4d(ctx0, kq_mask->type, n_kv + n_sel, 1, 1, 1);
+837:     mask_all = ggml_fill(ctx0, mask_all, -INFINITY);
+838:     mask_all = ggml_repeat_4d(ctx0, mask_all, n_kv + n_sel, n_tokens, 1, 1);
+839:     mask_all = ggml_reshape_3d(ctx0, mask_all, 1, n_kv + n_sel, n_tokens);
+840: 
+841:     ggml_tensor * zeros = ggml_new_tensor_4d(ctx0, kq_mask->type, n_sel, 1, 1, 1);
+842:     zeros = ggml_fill(ctx0, zeros, 0.0f);
+843:     zeros = ggml_repeat_4d(ctx0, zeros, n_sel, n_tokens, 1, 1);
+844:     zeros = ggml_reshape_3d(ctx0, zeros, 1, n_sel, n_tokens);
+845: 
+846:     // live slots address disjoint cells, but padded pools and missing tail cells share the n_kv sentinel, and
+847:     // top_k fills a short selection with invisible pools that can overlap the tail, so the scatter would write
+848:     // some cells from several threads: map every dead slot to its own dump row, idx = dump + live*(idx - dump)
+849:     // a picked pool is live when visible: a visible score is a rectified sum >= 0, an invisible one is -inf
+850:     ggml_tensor * top_score = ggml_get_rows(ctx0, ggml_reshape_3d(ctx0, score, 1, n_pool, n_tokens), top_k); // [1, n_top_pool, n_tokens]
+851:     ggml_tensor * live_pool = ggml_clamp(ctx0, ggml_scale_bias(ctx0, top_score, 1.0f, 1.0f), 0.0f, 1.0f);
+852:     live_pool = ggml_reshape_2d(ctx0, ggml_repeat_4d(ctx0, live_pool, kpool, n_top_pool, n_tokens, 1), kpool*n_top_pool, n_tokens);
+853:     // a tail cell is live unless it is the n_kv sentinel
+854:     ggml_tensor * live_tail = ggml_cast(ctx0, inp_kpool->tail_idxs, GGML_TYPE_F32);
+855:     live_tail = ggml_clamp(ctx0, ggml_scale_bias(ctx0, live_tail, -1.0f, (float) n_kv), 0.0f, 1.0f);
+856:     ggml_tensor * live = ggml_concat(ctx0, live_pool, live_tail, 0); // [n_sel, n_tokens]
+857: 
+858:     // dump rows n_kv + slot as a cumulative sum: the meta backend cannot split an arange, which has no source
+859:     ggml_tensor * dump  = ggml_scale_bias(ctx0, ggml_cumsum(ctx0, ggml_fill(ctx0, live, 1.0f)), 1.0f, (float) (n_kv - 1));
+860:     ggml_tensor * idx_f = ggml_cast(ctx0, sel_idx, GGML_TYPE_F32);
+861:     idx_f   = ggml_add(ctx0, ggml_mul(ctx0, ggml_sub(ctx0, idx_f, dump), live), dump);
+862:     sel_idx = ggml_cast(ctx0, idx_f, GGML_TYPE_I32);
+863: 
+864:     ggml_tensor * sel = ggml_set_rows(ctx0, mask_all, zeros, ggml_reshape_3d(ctx0, sel_idx, n_sel, n_tokens, 1));
+865: 
+866:     GGML_ASSERT(kq_mask->ne[0] == n_kv && kq_mask->ne[1]*kq_mask->ne[2]*kq_mask->ne[3] == n_tokens);
+867:     const size_t row = sel->nb[2];
+868:     sel = ggml_view_4d(ctx0, sel, n_kv, kq_mask->ne[1], kq_mask->ne[2], kq_mask->ne[3],
+869:             row, row*kq_mask->ne[1], row*kq_mask->ne[1]*kq_mask->ne[2], 0);
+870:     sel = ggml_add(ctx0, sel, kq_mask);
+871:     cb(sel, "indexer_sel", il);
+872: 
+873:     return sel;
+874: }
+875: 
+876: // Dense GQA self-attention over the cells that the QSA mask keeps.
+877: ggml_tensor * llama_model_qwen4exp::graph::build_attn_qsa(
+878:         llm_graph_input_attn_kv * inp,
+879:         ggml_tensor *             q_cur,
+880:         ggml_tensor *             k_cur,
+881:         ggml_tensor *             v_cur,
+882:         ggml_tensor *             sel,
+883:         int64_t                   n_sel,
+884:         float                     kq_scale,
+885:         int                       il) {
+886:     // rotate q/k/v before they reach a quantized cache, as the dense path does. the indexer
+887:     // has already scored with its own query in build_qsa_sel, so the selection is unaffected.
+888:     if (inp->self_k_rot) {
+889:         q_cur = llama_mul_mat_hadamard(ctx0, q_cur, inp->self_k_rot);
+890:         k_cur = llama_mul_mat_hadamard(ctx0, k_cur, inp->self_k_rot);
+891:     }
+892: 
+893:     if (inp->self_v_rot) {
+894:         v_cur = llama_mul_mat_hadamard(ctx0, v_cur, inp->self_v_rot);
+895:     }
+896: 
+897:     // these nodes are added to the graph together so that they are not reordered
+898:     // by doing so, the number of splits in the graph is reduced
+899:     // expand k later to enable rope fusion which directly writes into k-v cache
+900:     ggml_build_forward_expand(gf, q_cur);
+901:     ggml_build_forward_expand(gf, v_cur);
+902:     ggml_build_forward_expand(gf, k_cur);
+903: 
+904:     const auto * mctx_cur = inp->mctx;
+905: 
+906:     // store to KV cache
+907:     {
+908:         const auto & k_idxs = inp->get_k_idxs();
+909:         const auto & v_idxs = inp->get_v_idxs();
+910: 
+911:         ggml_build_forward_expand(gf, mctx_cur->cpy_k(ctx0, k_cur, k_idxs, il));
+912:         ggml_build_forward_expand(gf, mctx_cur->cpy_v(ctx0, v_cur, v_idxs, il));
+913:     }
+914: 
+915:     // the selection mask already carries the causal mask
+916:     ggml_tensor * kq_mask = inp->get_kq_mask();
+917:     ggml_tensor * mask    = ggml_reshape_4d(ctx0, sel, kq_mask->ne[0], kq_mask->ne[1], kq_mask->ne[2], kq_mask->ne[3]);
+918:     cb(mask, "kq_mask_qsa", il);
+919: 
+920:     ggml_tensor * q = q_cur;
+921:     ggml_tensor * k = mctx_cur->get_k(ctx0, il);
+922:     ggml_tensor * v = mctx_cur->get_v(ctx0, il);
+923: 
+924:     ggml_tensor * cur = build_attn_mha(q, k, v, nullptr, mask, nullptr, nullptr, n_sel, kq_scale, il);
+925:     cb(cur, "kqv_out", il);
+926: 
+927:     // the rotation is its own inverse, so undo it on the value side of the output
+928:     if (inp->self_v_rot) {
+929:         cur = llama_mul_mat_hadamard(ctx0, cur, inp->self_v_rot);
+930:     }
+931: 
+932:     return cur;
+933: }
+934: 
+935: ggml_tensor * llama_model_qwen4exp::graph::build_layer_attn(
+936:         llm_graph_input_attn_kv * inp,
+937:         const llama_memory_hybrid_idx_context * mctx_hyb,
+938:         llm_graph_input_kpool *   inp_kpool,
+939:         ggml_tensor *             cur,
+940:         ggml_tensor *             inp_pos,
+941:         int *                     sections,
+942:         int                       il) {
+943:     const int64_t n_embd_head = hparams.n_embd_head_v();
+944:     GGML_ASSERT(n_embd_head == hparams.n_embd_head_k());
+945: 
+946:     // indexer reads the same block input as q/k/v; no cache or no ratio means dense
+947:     const bool qsa = inp_kpool != nullptr && hparams.dsv4_compress_ratios[il] > 0;
+948: 
+949:     ggml_tensor * sel = qsa ? build_qsa_sel(mctx_hyb, inp_kpool, cur, inp_pos, inp->get_kq_mask(), sections, il) : nullptr;
+950: 
+951:     // Qwen3Next uses a single Q projection that outputs query + gate
+952:     ggml_tensor * Qcur_full = build_lora_mm(model.layers[il].wq, cur, model.layers[il].wq_s); // [ (n_embd_head * 2) * n_head, n_tokens ]
+953:     cb(Qcur_full, "Qcur_full", il);
+954: 
+955:     ggml_tensor * Qcur = ggml_view_3d(ctx0, Qcur_full, n_embd_head, n_head, n_tokens,
+
+
+SOURCE vendor/llama-m5-copy/ggml/src/ggml-metal/ggml-metal-ops.cpp:2950-3040
+2950:             ggml_metal_encoder_set_bytes   (enc, &args, sizeof(args), 0);
+2951:             ggml_metal_encoder_set_buffer  (enc, bid_src2, 1);
+2952:             ggml_metal_encoder_set_buffer  (enc, bid_tpe,  2);
+2953:             ggml_metal_encoder_set_buffer  (enc, bid_ids,  3);
+2954: 
+2955:             ggml_metal_encoder_set_threadgroup_memory_size(enc, smem, 0);
+2956: 
+2957:             ggml_metal_encoder_dispatch_threadgroups(enc, 1, 1, 1, ne02, 1, 1);
+2958:         }
+2959: 
+2960:         ggml_metal_op_concurrency_reset(ctx);
+2961: 
+2962:         if (use_amax) {
+2963:             auto pipeline = ggml_metal_library_get_pipeline_mul_mm_id_amax(lib);
+2964: 
+2965:             ggml_metal_encoder_set_pipeline(enc, pipeline);
+2966:             ggml_metal_encoder_set_buffer  (enc, bid_amax, 0);
+2967: 
+2968:             ggml_metal_encoder_dispatch_threadgroups(enc, 1, 1, 1, 32, 1, 1);
+2969: 
+2970:             // the next kernel has to wait for the amax data
+2971:             ggml_metal_op_concurrency_reset(ctx);
+2972:         }
+2973: 
+2974:         {
+2975:             auto pipeline = ggml_metal_library_get_pipeline_mul_mm_id(lib, op);
+2976: 
+2977:             ggml_metal_kargs_mul_mm_id args = {
+2978:                 /*.ne00  =*/ ne00,
+2979:                 /*.ne02  =*/ ne02,
+2980:                 /*.nb01  =*/ nb01,
+2981:                 /*.nb02  =*/ nb02,
+2982:                 /*.nb03  =*/ nb03,
+2983:                 /*.ne11  =*/ ne11, // n_expert_used (bcast)
+2984:                 /*.nb10  =*/ nb10,
+2985:                 /*.nb11  =*/ nb11,
+2986:                 /*.nb12  =*/ nb12,
+2987:                 /*.nb13  =*/ nb13,
+2988:                 /*.ne20  =*/ ne20, // n_expert_used
+2989:                 /*.ne21  =*/ ne21, // n_tokens
+2990:                 /*.ne0   =*/ ne0,
+2991:                 /*.ne1   =*/ ne1,
+2992:                 /*.r2    =*/ r2,
+2993:                 /*.r3    =*/ r3,
+2994:             };
+2995: 
+2996:             ggml_metal_encoder_set_pipeline(enc, pipeline);
+2997:             ggml_metal_encoder_set_bytes   (enc, &args, sizeof(args), 0);
+2998:             ggml_metal_encoder_set_buffer  (enc, bid_src0, 1);
+2999:             ggml_metal_encoder_set_buffer  (enc, bid_src1, 2);
+3000:             ggml_metal_encoder_set_buffer  (enc, bid_tpe,  3);
+3001:             ggml_metal_encoder_set_buffer  (enc, bid_ids,  4);
+3002:             ggml_metal_encoder_set_buffer  (enc, bid_dst,  5);
+3003:             ggml_metal_encoder_set_buffer  (enc, bid_amax, 6);
+3004: 
+3005:             const size_t smem = pipeline.smem;
+3006: 
+3007:             ggml_metal_encoder_set_threadgroup_memory_size(enc, smem, 0);
+3008: 
+3009:             ggml_metal_encoder_dispatch_threadgroups(enc, (ne21 + 31)/32, (ne01 + 63)/64, ne02, 128, 1, 1);
+3010:         }
+3011:     } else {
+3012:         auto pipeline = ggml_metal_library_get_pipeline_mul_mv_id(lib, op);
+3013: 
+3014:         const int nr0 = pipeline.nr0;
+3015:         const int nr1 = pipeline.nr1;
+3016:         const int nsg = pipeline.nsg;
+3017: 
+3018:         const size_t smem = pipeline.smem;
+3019: 
+3020:         ggml_metal_kargs_mul_mv_id args = {
+3021:             /*.nei0 =*/ ne20,
+3022:             /*.nei1 =*/ ne21,
+3023:             /*.nbi1 =*/ nb21,
+3024:             /*.ne00 =*/ ne00,
+3025:             /*.ne01 =*/ ne01,
+3026:             /*.ne02 =*/ ne02,
+3027:             /*.nb00 =*/ nb00,
+3028:             /*.nb01 =*/ nb01,
+3029:             /*.nb02 =*/ nb02,
+3030:             /*.ne10 =*/ ne10,
+3031:             /*.ne11 =*/ ne11,
+3032:             /*.ne12 =*/ ne12,
+3033:             /*.ne13 =*/ ne13,
+3034:             /*.nb10 =*/ nb10,
+3035:             /*.nb11 =*/ nb11,
+3036:             /*.nb12 =*/ nb12,
+3037:             /*.ne0  =*/ ne0,
+3038:             /*.ne1  =*/ ne1,
+3039:             /*.nb1  =*/ nb1,
+3040:             /*.nr0  =*/ nr0,
+
+
+SOURCE unavailable at vendor/llama-m5-copy/ggml/src/ggml-metal/ggml-metal-mul_mm.metal, do not assume contents.

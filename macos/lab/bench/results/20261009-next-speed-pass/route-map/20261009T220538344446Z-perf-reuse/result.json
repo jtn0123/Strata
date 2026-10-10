@@ -1,0 +1,2380 @@
+{
+  "status": "passed",
+  "scope": "reuse",
+  "mode": "perf",
+  "probe": {
+    "engine": {
+      "engine": "m5-route-map",
+      "directory": "vendor/llama-m5-route-map",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "55117924d185e4ee5cdad9f89b11086a7552736725b570b8d1164cecdaa42cfb",
+      "patch": {
+        "schema": 1,
+        "id": "m5-route-map",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-route-map",
+        "patch": "patches/mtp-m5-route-map.patch",
+        "patch_sha256": "55117924d185e4ee5cdad9f89b11086a7552736725b570b8d1164cecdaa42cfb",
+        "source_diff_sha256": "55117924d185e4ee5cdad9f89b11086a7552736725b570b8d1164cecdaa42cfb",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal-device.h",
+          "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+          "ggml/src/ggml-metal/ggml-metal-ops.h",
+          "ggml/src/ggml-metal/ggml-metal.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "ggml/src/ggml-metal/kernels/quantize.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-copy",
+          "m5-route-map"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-copy.patch",
+            "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+          }
+        ],
+        "scope": "Private opt-in M5Pro prompt gate/up pair route-map reuse. Same activation/ID objects, Q2_0[2560,640,512], T32..512, same encoder partition and following SwiGLU consumes both. Borrow only previous TPE/IDS scratch; current amax unchanged. Complete allocation overlap guard and post-barrier scratch tracking. No shader math, graph reorder, model/cache/precision/default changes.",
+        "upstream": {
+          "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+          "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+          "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        }
+      },
+      "artifacts": {
+        "llama-server": "5c0a8e2913a6452e91f9aaa4b3f8c8ba8d9504c1322d2df142d7268444919094",
+        "libggml-base.0.26.0.dylib": "b36f444ead03bb061ef06dfe05f006cd74ac354f60489743e38ad896223b3a23",
+        "libggml-base.0.dylib": "b36f444ead03bb061ef06dfe05f006cd74ac354f60489743e38ad896223b3a23",
+        "libggml-base.dylib": "b36f444ead03bb061ef06dfe05f006cd74ac354f60489743e38ad896223b3a23",
+        "libggml-blas.0.26.0.dylib": "c52c1d37f68690d6472adefcfdb11eed3d1635f4488d089daffa226001b54b60",
+        "libggml-blas.0.dylib": "c52c1d37f68690d6472adefcfdb11eed3d1635f4488d089daffa226001b54b60",
+        "libggml-blas.dylib": "c52c1d37f68690d6472adefcfdb11eed3d1635f4488d089daffa226001b54b60",
+        "libggml-cpu.0.26.0.dylib": "be7d03901e2ae544db33797cdd2f8d267ad2f42116814fa6bebf85568d5626f5",
+        "libggml-cpu.0.dylib": "be7d03901e2ae544db33797cdd2f8d267ad2f42116814fa6bebf85568d5626f5",
+        "libggml-cpu.dylib": "be7d03901e2ae544db33797cdd2f8d267ad2f42116814fa6bebf85568d5626f5",
+        "libggml-metal.0.26.0.dylib": "3dc84bf0110a223e6e4da2e1ba75c3d02747a575a02eb1b5bdc4be564aff27cd",
+        "libggml-metal.0.dylib": "3dc84bf0110a223e6e4da2e1ba75c3d02747a575a02eb1b5bdc4be564aff27cd",
+        "libggml-metal.dylib": "3dc84bf0110a223e6e4da2e1ba75c3d02747a575a02eb1b5bdc4be564aff27cd",
+        "libggml.0.26.0.dylib": "814d4c3520af9f4bdb286aa358e05da6fddcc17f7668f61a43612901a5008b56",
+        "libggml.0.dylib": "814d4c3520af9f4bdb286aa358e05da6fddcc17f7668f61a43612901a5008b56",
+        "libggml.dylib": "814d4c3520af9f4bdb286aa358e05da6fddcc17f7668f61a43612901a5008b56",
+        "libllama-common.0.6.0.dylib": "7af2972d58b03f42c3938b8045343687fdb31a8d51182ccbe10951f9e29b0062",
+        "libllama-common.0.dylib": "7af2972d58b03f42c3938b8045343687fdb31a8d51182ccbe10951f9e29b0062",
+        "libllama-common.dylib": "7af2972d58b03f42c3938b8045343687fdb31a8d51182ccbe10951f9e29b0062",
+        "libllama-server-impl.dylib": "d0e52abc493768d2a03e489d19e9b9c08688244c7bce3a7dba504dc039b5092b",
+        "libllama.0.6.0.dylib": "2828ebd2bb4335e062420aa0e723e613f2ff0113ea8749dc81b7472efee00355",
+        "libllama.0.dylib": "2828ebd2bb4335e062420aa0e723e613f2ff0113ea8749dc81b7472efee00355",
+        "libllama.dylib": "2828ebd2bb4335e062420aa0e723e613f2ff0113ea8749dc81b7472efee00355",
+        "libmtmd.0.6.0.dylib": "b2b57d08a4b4eeb642b5671a6aa3e9dc7d54b5a1dc50f995e683a7c48c0da052",
+        "libmtmd.0.dylib": "b2b57d08a4b4eeb642b5671a6aa3e9dc7d54b5a1dc50f995e683a7c48c0da052",
+        "libmtmd.dylib": "b2b57d08a4b4eeb642b5671a6aa3e9dc7d54b5a1dc50f995e683a7c48c0da052"
+      },
+      "build_receipt": {
+        "engine": "m5-route-map",
+        "directory": "vendor/llama-m5-route-map",
+        "revision": "d81235049384534c167caea52b85a694f6103d14",
+        "source_diff_sha256": "55117924d185e4ee5cdad9f89b11086a7552736725b570b8d1164cecdaa42cfb",
+        "patch": {
+          "schema": 1,
+          "id": "m5-route-map",
+          "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+          "directory": "vendor/llama-m5-route-map",
+          "patch": "patches/mtp-m5-route-map.patch",
+          "patch_sha256": "55117924d185e4ee5cdad9f89b11086a7552736725b570b8d1164cecdaa42cfb",
+          "source_diff_sha256": "55117924d185e4ee5cdad9f89b11086a7552736725b570b8d1164cecdaa42cfb",
+          "modified_files": [
+            "ggml/src/ggml-metal/ggml-metal-common.cpp",
+            "ggml/src/ggml-metal/ggml-metal-common.h",
+            "ggml/src/ggml-metal/ggml-metal-context.m",
+            "ggml/src/ggml-metal/ggml-metal-device.cpp",
+            "ggml/src/ggml-metal/ggml-metal-device.h",
+            "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+            "ggml/src/ggml-metal/ggml-metal-ops.h",
+            "ggml/src/ggml-metal/ggml-metal.cpp",
+            "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+            "ggml/src/ggml-metal/kernels/quantize.metal",
+            "src/llama-context.cpp",
+            "src/llama-cparams.h",
+            "src/models/qwen4exp.cpp",
+            "tests/test-backend-ops.cpp"
+          ],
+          "features": [
+            "mtp-shared",
+            "m5-tuning",
+            "m5-profile",
+            "m5-copy",
+            "m5-route-map"
+          ],
+          "components": [
+            {
+              "patch": "patches/mtp-m5-copy.patch",
+              "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+            }
+          ],
+          "scope": "Private opt-in M5Pro prompt gate/up pair route-map reuse. Same activation/ID objects, Q2_0[2560,640,512], T32..512, same encoder partition and following SwiGLU consumes both. Borrow only previous TPE/IDS scratch; current amax unchanged. Complete allocation overlap guard and post-barrier scratch tracking. No shader math, graph reorder, model/cache/precision/default changes.",
+          "upstream": {
+            "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+            "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+            "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+            "license_file": "patches/LLAMA-LICENSE.txt"
+          }
+        },
+        "artifacts": {
+          "llama-server": "5c0a8e2913a6452e91f9aaa4b3f8c8ba8d9504c1322d2df142d7268444919094",
+          "libggml-base.0.26.0.dylib": "b36f444ead03bb061ef06dfe05f006cd74ac354f60489743e38ad896223b3a23",
+          "libggml-base.0.dylib": "b36f444ead03bb061ef06dfe05f006cd74ac354f60489743e38ad896223b3a23",
+          "libggml-base.dylib": "b36f444ead03bb061ef06dfe05f006cd74ac354f60489743e38ad896223b3a23",
+          "libggml-blas.0.26.0.dylib": "c52c1d37f68690d6472adefcfdb11eed3d1635f4488d089daffa226001b54b60",
+          "libggml-blas.0.dylib": "c52c1d37f68690d6472adefcfdb11eed3d1635f4488d089daffa226001b54b60",
+          "libggml-blas.dylib": "c52c1d37f68690d6472adefcfdb11eed3d1635f4488d089daffa226001b54b60",
+          "libggml-cpu.0.26.0.dylib": "be7d03901e2ae544db33797cdd2f8d267ad2f42116814fa6bebf85568d5626f5",
+          "libggml-cpu.0.dylib": "be7d03901e2ae544db33797cdd2f8d267ad2f42116814fa6bebf85568d5626f5",
+          "libggml-cpu.dylib": "be7d03901e2ae544db33797cdd2f8d267ad2f42116814fa6bebf85568d5626f5",
+          "libggml-metal.0.26.0.dylib": "3dc84bf0110a223e6e4da2e1ba75c3d02747a575a02eb1b5bdc4be564aff27cd",
+          "libggml-metal.0.dylib": "3dc84bf0110a223e6e4da2e1ba75c3d02747a575a02eb1b5bdc4be564aff27cd",
+          "libggml-metal.dylib": "3dc84bf0110a223e6e4da2e1ba75c3d02747a575a02eb1b5bdc4be564aff27cd",
+          "libggml.0.26.0.dylib": "814d4c3520af9f4bdb286aa358e05da6fddcc17f7668f61a43612901a5008b56",
+          "libggml.0.dylib": "814d4c3520af9f4bdb286aa358e05da6fddcc17f7668f61a43612901a5008b56",
+          "libggml.dylib": "814d4c3520af9f4bdb286aa358e05da6fddcc17f7668f61a43612901a5008b56",
+          "libllama-common.0.6.0.dylib": "7af2972d58b03f42c3938b8045343687fdb31a8d51182ccbe10951f9e29b0062",
+          "libllama-common.0.dylib": "7af2972d58b03f42c3938b8045343687fdb31a8d51182ccbe10951f9e29b0062",
+          "libllama-common.dylib": "7af2972d58b03f42c3938b8045343687fdb31a8d51182ccbe10951f9e29b0062",
+          "libllama-server-impl.dylib": "d0e52abc493768d2a03e489d19e9b9c08688244c7bce3a7dba504dc039b5092b",
+          "libllama.0.6.0.dylib": "2828ebd2bb4335e062420aa0e723e613f2ff0113ea8749dc81b7472efee00355",
+          "libllama.0.dylib": "2828ebd2bb4335e062420aa0e723e613f2ff0113ea8749dc81b7472efee00355",
+          "libllama.dylib": "2828ebd2bb4335e062420aa0e723e613f2ff0113ea8749dc81b7472efee00355",
+          "libmtmd.0.6.0.dylib": "b2b57d08a4b4eeb642b5671a6aa3e9dc7d54b5a1dc50f995e683a7c48c0da052",
+          "libmtmd.0.dylib": "b2b57d08a4b4eeb642b5671a6aa3e9dc7d54b5a1dc50f995e683a7c48c0da052",
+          "libmtmd.dylib": "b2b57d08a4b4eeb642b5671a6aa3e9dc7d54b5a1dc50f995e683a7c48c0da052"
+        },
+        "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+        "build_settings": {
+          "CMAKE_BUILD_TYPE": "Release",
+          "GGML_BLAS": "ON",
+          "GGML_CPU": "ON",
+          "GGML_METAL": "ON",
+          "GGML_METAL_EMBED_LIBRARY": "ON",
+          "GGML_NATIVE": "ON",
+          "LLAMA_BUILD_TESTS": "ON",
+          "LLAMA_BUILD_TOOLS": "ON"
+        },
+        "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+      }
+    },
+    "source_sha256": "70388e942d74772836acc67ac2b27986e6ef2dca4dd6cefb68c86a22f8079b95",
+    "runner_sha256": "a259c733b6eb147222c9fac6d3e67bef1dd643d26fe79a7a4c9443d5d1506a70",
+    "dependencies": {
+      "benchmark.py": "c00bc75c2a2036450d65251a2621f2c4ed79914c89558532641ba54358aca0cc",
+      "engines.py": "e38ebf1f080f997d2f7a041e997e866a44c1fad60a1fc12df62a458cfd3a35bc",
+      "metal_environment.py": "612bdcb37724d5a543d36dda0b5085afebf553f1bd0d05aafd5e6a3b6830820d",
+      "check_memory.py": "3af26bba58b77fd47d9993126009f188c951aecaddff6d2e82febd5c3a83eada",
+      "validate_offline.py": "e2ec5c1777411e131c64bf436e91b8beccc19ecc18da62809b19cd53d0184c06"
+    },
+    "binary_sha256": "a454857fcac249d8e702755650d92fdf088deac03f37f1e530e7a18785e369d0",
+    "command": [
+      "/usr/bin/c++",
+      "-O3",
+      "-ffp-contract=off",
+      "-std=gnu++17",
+      "-arch",
+      "arm64",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-route-map/ggml/include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-route-map/vendor",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/native/m5_route_map_probe.cpp",
+      "-o",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-route-map/reuse-probe",
+      "-Wl,-rpath,/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-route-map/build/bin",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-route-map/build/bin/libggml.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-route-map/build/bin/libggml-base.0.26.0.dylib"
+    ]
+  },
+  "metal_environment": {
+    "tensor_api": "on",
+    "tuning": "route-map",
+    "profile": false,
+    "variables": {
+      "GGML_M5_LAB_CONV_DIRECT": "1",
+      "GGML_M5_LAB_ROUTE_MAP": "1",
+      "GGML_METAL_TENSOR_ENABLE": "1"
+    }
+  },
+  "memory": {
+    "guard": null,
+    "monitor_healthy": true,
+    "monitor_error": null,
+    "samples": 92,
+    "live_samples": 91,
+    "baseline_before_launch": true,
+    "child_exited": true,
+    "launch_baseline": {
+      "swap_used_bytes": 525926400,
+      "available_bytes": 40167014400
+    },
+    "peak_rss_bytes": 1534296064,
+    "minimum_available_bytes": 38317441024,
+    "peak_swap_bytes": 525926400,
+    "swap_growth_bytes": 0,
+    "system_disk_read_bytes": 8511488,
+    "sampling_interval_s": 0.25,
+    "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+  },
+  "native_returncode": 0,
+  "cases": [
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1425911392,
+      "block_iterations": [
+        16,
+        16,
+        16,
+        16,
+        16,
+        16,
+        16
+      ],
+      "block_ns": [
+        104288708,
+        104555916,
+        104223083,
+        104213166,
+        104387792,
+        104101500,
+        105403708
+      ],
+      "coefficients_sha256": "3756e22ba3319959565aa3f5e6d241193e0527d02c68e5676b54d54a943286ac",
+      "count_delta": 380,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 190,
+      "graph_buffer_bytes": 9872480,
+      "id": "t32-uniform-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "082857700deac7aaf3b75d5acf5c78fa0ea07d16666f8e6d33f8f6ffebd137e3",
+        "6f1393dcfe1a701eea440cad7d331420874a6ab0f991919cffe73f3770cb6b59"
+      ],
+      "input_buffer_bytes": 461312,
+      "input_sha256": "2e19b93b674abfcdd768d95d1ec100bb8b19047d547714c86fd3f5abcffe8253",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 6518044.25,
+      "mode": "perf",
+      "ns_per_triplet": [
+        3259022.125,
+        3267372.375,
+        3256971.34375,
+        3256661.4375,
+        3262118.5,
+        3253171.875,
+        3293865.875
+      ],
+      "ns_samples": [
+        6518044.25,
+        6534744.75,
+        6513942.6875,
+        6513322.875,
+        6524237.0,
+        6506343.75,
+        6587731.75
+      ],
+      "output_sha256": "bca9314c50393c01517313b13390e9b0b47729c1d8f36512ecfb904b370104ae",
+      "outputs": [
+        {
+          "bytes": 327680,
+          "elements": 81920,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "bca9314c50393c01517313b13390e9b0b47729c1d8f36512ecfb904b370104ae"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "uniform",
+      "route_source": "synthetic",
+      "rows": 32,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 77,
+      "warmup_ns": 503502708,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1425911392,
+      "block_iterations": [
+        129,
+        130,
+        130,
+        129,
+        131,
+        129,
+        129
+      ],
+      "block_ns": [
+        100530417,
+        100043083,
+        100193959,
+        100080583,
+        100683833,
+        100488208,
+        100366958
+      ],
+      "coefficients_sha256": "3756e22ba3319959565aa3f5e6d241193e0527d02c68e5676b54d54a943286ac",
+      "count_delta": 3128,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 1564,
+      "graph_buffer_bytes": 9872480,
+      "id": "t32-shared-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "b1ece5c789b94b4cb816b647518e257aba9da43f9ec30b19b075865a4d13d0a2",
+        "8ea75e07bec73861561546571cd682a8509c81366cbe410b039a02468acbacd2"
+      ],
+      "input_buffer_bytes": 461312,
+      "input_sha256": "2e19b93b674abfcdd768d95d1ec100bb8b19047d547714c86fd3f5abcffe8253",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 775818.472868217,
+      "mode": "perf",
+      "ns_per_triplet": [
+        389652.77906976745,
+        384781.0884615385,
+        385361.3807692308,
+        387909.2364341085,
+        384289.4389312977,
+        389489.1782945736,
+        389019.2170542636
+      ],
+      "ns_samples": [
+        779305.5581395349,
+        769562.176923077,
+        770722.7615384615,
+        775818.472868217,
+        768578.8778625954,
+        778978.3565891472,
+        778038.4341085271
+      ],
+      "output_sha256": "eff2eadff9c175daed557b30ffff8ba7fa16681ca272ccb534cf574ce0343ef6",
+      "outputs": [
+        {
+          "bytes": 327680,
+          "elements": 81920,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "eff2eadff9c175daed557b30ffff8ba7fa16681ca272ccb534cf574ce0343ef6"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "shared",
+      "route_source": "synthetic",
+      "rows": 32,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 656,
+      "warmup_ns": 500554042,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1425911392,
+      "block_iterations": [
+        28,
+        28,
+        28,
+        28,
+        28,
+        27,
+        28
+      ],
+      "block_ns": [
+        103225000,
+        103250167,
+        103524416,
+        102926917,
+        103132375,
+        100797792,
+        102987084
+      ],
+      "coefficients_sha256": "3756e22ba3319959565aa3f5e6d241193e0527d02c68e5676b54d54a943286ac",
+      "count_delta": 664,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 332,
+      "graph_buffer_bytes": 9872480,
+      "id": "t32-mixed-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "4c375eb3a0479ffab8eb7153ef50a7c254ce6ea833a2750b0b282979dea0d40d",
+        "7daf8fb5a1268b3696a31d9463cf03b8ba6f8b6d01dbca6188607610c2d32448"
+      ],
+      "input_buffer_bytes": 461312,
+      "input_sha256": "2e19b93b674abfcdd768d95d1ec100bb8b19047d547714c86fd3f5abcffe8253",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 3686607.1428571427,
+      "mode": "perf",
+      "ns_per_triplet": [
+        1843303.5714285714,
+        1843752.982142857,
+        1848650.2857142857,
+        1837980.6607142857,
+        1841649.5535714286,
+        1866625.7777777778,
+        1839055.0714285714
+      ],
+      "ns_samples": [
+        3686607.1428571427,
+        3687505.964285714,
+        3697300.5714285714,
+        3675961.3214285714,
+        3683299.1071428573,
+        3733251.5555555555,
+        3678110.1428571427
+      ],
+      "output_sha256": "718c2594264d471989b0bb224e9b25d5609c85862b05ad919e056097f37eb358",
+      "outputs": [
+        {
+          "bytes": 327680,
+          "elements": 81920,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "718c2594264d471989b0bb224e9b25d5609c85862b05ad919e056097f37eb358"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "mixed",
+      "route_source": "synthetic",
+      "rows": 32,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 136,
+      "warmup_ns": 502267666,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1426234080,
+      "block_iterations": [
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15
+      ],
+      "block_ns": [
+        101186791,
+        101194250,
+        100987000,
+        100939417,
+        101028458,
+        100899125,
+        101490833
+      ],
+      "coefficients_sha256": "f53341772fcf0a561aca911d9bd943eed94d0f1a245ffc992ac3b662e6144863",
+      "count_delta": 362,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 181,
+      "graph_buffer_bytes": 10180704,
+      "id": "t33-uniform-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "b0b3203be00f024b3db74ec66940c12942b83010b6a00463afb7e44e38a433a4",
+        "2227373c9760ccb3c3cebc27c91dd9df05f22bdbceabe544028ad6b8f963b57b"
+      ],
+      "input_buffer_bytes": 475776,
+      "input_sha256": "48323de53dcc527335f92c464e5d92e47dcd3e1c546ae3efbe43ac1d51b4e653",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 6735230.533333333,
+      "mode": "perf",
+      "ns_per_triplet": [
+        3372893.033333333,
+        3373141.6666666665,
+        3366233.3333333335,
+        3364647.2333333334,
+        3367615.2666666666,
+        3363304.1666666665,
+        3383027.7666666666
+      ],
+      "ns_samples": [
+        6745786.066666666,
+        6746283.333333333,
+        6732466.666666667,
+        6729294.466666667,
+        6735230.533333333,
+        6726608.333333333,
+        6766055.533333333
+      ],
+      "output_sha256": "107cf00d18940775d749f7694b0b07c050500e3505b8bc8a2a9f1c7fbe51aab1",
+      "outputs": [
+        {
+          "bytes": 337920,
+          "elements": 84480,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "107cf00d18940775d749f7694b0b07c050500e3505b8bc8a2a9f1c7fbe51aab1"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "uniform",
+      "route_source": "synthetic",
+      "rows": 33,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 75,
+      "warmup_ns": 505163708,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1426234080,
+      "block_iterations": [
+        103,
+        103,
+        103,
+        102,
+        103,
+        102,
+        103
+      ],
+      "block_ns": [
+        100161375,
+        100709708,
+        100672166,
+        100014417,
+        100604041,
+        100061041,
+        100837875
+      ],
+      "coefficients_sha256": "f53341772fcf0a561aca911d9bd943eed94d0f1a245ffc992ac3b662e6144863",
+      "count_delta": 2466,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 1233,
+      "graph_buffer_bytes": 10180704,
+      "id": "t33-shared-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "3a91806f5f8e238da99cfc634f9b02d238b5db74cc6977588ea3343258c966c8",
+        "d8e76b0e62591b8d442d7f4e906f6c245f903ebab00965962aa638aa910b37cc"
+      ],
+      "input_buffer_bytes": 475776,
+      "input_sha256": "48323de53dcc527335f92c464e5d92e47dcd3e1c546ae3efbe43ac1d51b4e653",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 977764.1553398059,
+      "mode": "perf",
+      "ns_per_triplet": [
+        486220.26699029125,
+        488882.07766990294,
+        488699.8349514563,
+        490266.75,
+        488369.13106796116,
+        490495.29901960783,
+        489504.2475728155
+      ],
+      "ns_samples": [
+        972440.5339805825,
+        977764.1553398059,
+        977399.6699029126,
+        980533.5,
+        976738.2621359223,
+        980990.5980392157,
+        979008.495145631
+      ],
+      "output_sha256": "54f7e6c6617825dabdc1ea816b765a62d40ed0c62309f54ac0c0adfcd084826f",
+      "outputs": [
+        {
+          "bytes": 337920,
+          "elements": 84480,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "54f7e6c6617825dabdc1ea816b765a62d40ed0c62309f54ac0c0adfcd084826f"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "shared",
+      "route_source": "synthetic",
+      "rows": 33,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 513,
+      "warmup_ns": 500668417,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1426234080,
+      "block_iterations": [
+        26,
+        26,
+        26,
+        26,
+        26,
+        26,
+        26
+      ],
+      "block_ns": [
+        100578708,
+        100558834,
+        100458083,
+        100709375,
+        100660542,
+        100564791,
+        100748500
+      ],
+      "coefficients_sha256": "f53341772fcf0a561aca911d9bd943eed94d0f1a245ffc992ac3b662e6144863",
+      "count_delta": 626,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 313,
+      "graph_buffer_bytes": 10180704,
+      "id": "t33-mixed-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "89968b2cecae9de2dd05a56b188a9cc2b102dcf4c7f853933b099d685b2cfd88",
+        "7bcb830ed68ee348435a2cf20e140c941f9fa6d8c250e9597025e991dccc468b"
+      ],
+      "input_buffer_bytes": 475776,
+      "input_sha256": "48323de53dcc527335f92c464e5d92e47dcd3e1c546ae3efbe43ac1d51b4e653",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 3868411.846153846,
+      "mode": "perf",
+      "ns_per_triplet": [
+        1934205.923076923,
+        1933823.7307692308,
+        1931886.2115384615,
+        1936718.75,
+        1935779.6538461538,
+        1933938.2884615385,
+        1937471.1538461538
+      ],
+      "ns_samples": [
+        3868411.846153846,
+        3867647.4615384615,
+        3863772.423076923,
+        3873437.5,
+        3871559.3076923075,
+        3867876.576923077,
+        3874942.3076923075
+      ],
+      "output_sha256": "9042f3ff92181bef2244f3b1f759f5605bd61c1ecd6baea7e0ddf629b2ce801b",
+      "outputs": [
+        {
+          "bytes": 337920,
+          "elements": 84480,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "9042f3ff92181bef2244f3b1f759f5605bd61c1ecd6baea7e0ddf629b2ce801b"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "mixed",
+      "route_source": "synthetic",
+      "rows": 33,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 130,
+      "warmup_ns": 503674583,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1436235872,
+      "block_iterations": [
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10
+      ],
+      "block_ns": [
+        103231083,
+        103830708,
+        103978375,
+        103605458,
+        103656125,
+        103821709,
+        103806334
+      ],
+      "coefficients_sha256": "b01a572f63d68f2144b3a52a7cacb8ee37790c4962323cf7a1b4e9f8944ec389",
+      "count_delta": 240,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 120,
+      "graph_buffer_bytes": 19735648,
+      "id": "t64-uniform-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "e6eebc3ea2254cf34636f2ea5ee83e809b2d5635430c20adf19f3c1523880f2a",
+        "36824e3a9cd8aadc5bc0447368c5391aa07ecdaf2c3b32cd3670e2c8ffb135cd"
+      ],
+      "input_buffer_bytes": 922624,
+      "input_sha256": "8a04278a53864573deb05b5f39c804a8ed43625d3ac8590542a1adf05f9dac15",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 10380633.4,
+      "mode": "perf",
+      "ns_per_triplet": [
+        5161554.15,
+        5191535.4,
+        5198918.75,
+        5180272.9,
+        5182806.25,
+        5191085.45,
+        5190316.7
+      ],
+      "ns_samples": [
+        10323108.3,
+        10383070.8,
+        10397837.5,
+        10360545.8,
+        10365612.5,
+        10382170.9,
+        10380633.4
+      ],
+      "output_sha256": "58cc09fb1e16c054ba716179e5d5763e87afa5767d7fb439879d0324cd242454",
+      "outputs": [
+        {
+          "bytes": 655360,
+          "elements": 163840,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "58cc09fb1e16c054ba716179e5d5763e87afa5767d7fb439879d0324cd242454"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "uniform",
+      "route_source": "synthetic",
+      "rows": 64,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 49,
+      "warmup_ns": 505432208,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1436235872,
+      "block_iterations": [
+        90,
+        89,
+        89,
+        89,
+        89,
+        89,
+        90
+      ],
+      "block_ns": [
+        100927917,
+        100591458,
+        100421542,
+        100315250,
+        100732291,
+        100684625,
+        100932667
+      ],
+      "coefficients_sha256": "b01a572f63d68f2144b3a52a7cacb8ee37790c4962323cf7a1b4e9f8944ec389",
+      "count_delta": 2134,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 1067,
+      "graph_buffer_bytes": 19735648,
+      "id": "t64-shared-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "2d68590adc537270b6152d0f799aad029f45dc4c877c24bc786f4ad1f6c239cf",
+        "5f7f48e5538ad95c65b3301035dd4a682e7c22b3233bc7fc32232d8d81a061a0"
+      ],
+      "input_buffer_bytes": 922624,
+      "input_sha256": "8a04278a53864573deb05b5f39c804a8ed43625d3ac8590542a1adf05f9dac15",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 1128331.9325842697,
+      "mode": "perf",
+      "ns_per_triplet": [
+        560710.65,
+        565120.5505617978,
+        564165.9662921348,
+        563568.8202247191,
+        565911.7471910112,
+        565643.9606741572,
+        560737.0388888889
+      ],
+      "ns_samples": [
+        1121421.3,
+        1130241.1011235956,
+        1128331.9325842697,
+        1127137.6404494382,
+        1131823.4943820224,
+        1131287.9213483145,
+        1121474.0777777778
+      ],
+      "output_sha256": "2693cc560394ee712f67a02c78d22dacfe9bef9dfe8d68e00fdb5eac6e145893",
+      "outputs": [
+        {
+          "bytes": 655360,
+          "elements": 163840,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "2693cc560394ee712f67a02c78d22dacfe9bef9dfe8d68e00fdb5eac6e145893"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "shared",
+      "route_source": "synthetic",
+      "rows": 64,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 441,
+      "warmup_ns": 500257000,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1436235872,
+      "block_iterations": [
+        15,
+        15,
+        15,
+        15,
+        15,
+        15,
+        15
+      ],
+      "block_ns": [
+        103872250,
+        103709041,
+        104219167,
+        104091500,
+        104374000,
+        104177834,
+        104586750
+      ],
+      "coefficients_sha256": "b01a572f63d68f2144b3a52a7cacb8ee37790c4962323cf7a1b4e9f8944ec389",
+      "count_delta": 358,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 179,
+      "graph_buffer_bytes": 19735648,
+      "id": "t64-mixed-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "99f065885e37e5204a044eab38f79358248dfa18312d9914c4eb3e1630e6078a",
+        "f19fc4746fd45e1dc4269eb1f4028afd0a0f0ad229df64614c768d6cf0009b74"
+      ],
+      "input_buffer_bytes": 922624,
+      "input_sha256": "8a04278a53864573deb05b5f39c804a8ed43625d3ac8590542a1adf05f9dac15",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 6945188.933333334,
+      "mode": "perf",
+      "ns_per_triplet": [
+        3462408.3333333335,
+        3456968.033333333,
+        3473972.2333333334,
+        3469716.6666666665,
+        3479133.3333333335,
+        3472594.466666667,
+        3486225.0
+      ],
+      "ns_samples": [
+        6924816.666666667,
+        6913936.066666666,
+        6947944.466666667,
+        6939433.333333333,
+        6958266.666666667,
+        6945188.933333334,
+        6972450.0
+      ],
+      "output_sha256": "868782188f7ccff8ffbb0c2fe8ff941e33f93266a6ae93a2832dab8d99e5bdb6",
+      "outputs": [
+        {
+          "bytes": 655360,
+          "elements": 163840,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "868782188f7ccff8ffbb0c2fe8ff941e33f93266a6ae93a2832dab8d99e5bdb6"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "mixed",
+      "route_source": "synthetic",
+      "rows": 64,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 73,
+      "warmup_ns": 502444792,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1456562208,
+      "block_iterations": [
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10
+      ],
+      "block_ns": [
+        107654750,
+        107144500,
+        107182083,
+        107296542,
+        107415625,
+        107695542,
+        107926000
+      ],
+      "coefficients_sha256": "be5c7ca9e2f3ccf6833319c6ae4c527eb9b6a2df16461e15d13ff4e15e1edeab",
+      "count_delta": 236,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 118,
+      "graph_buffer_bytes": 39153760,
+      "id": "t127-uniform-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "1403f292b5ab93f3fe34879c5debd6d3be455a553aa9b7293f8a74e78a2f84c1",
+        "00072cf79ac2bc66f6d23e1053c280756b12c2093db03c29247e0fa94c43df66"
+      ],
+      "input_buffer_bytes": 1830848,
+      "input_sha256": "462a0310ddb1d566adbcdbab81807f97d61125be9903872376127257e7bac23d",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 10741562.5,
+      "mode": "perf",
+      "ns_per_triplet": [
+        5382737.5,
+        5357225.0,
+        5359104.15,
+        5364827.1,
+        5370781.25,
+        5384777.1,
+        5396300.0
+      ],
+      "ns_samples": [
+        10765475.0,
+        10714450.0,
+        10718208.3,
+        10729654.2,
+        10741562.5,
+        10769554.2,
+        10792600.0
+      ],
+      "output_sha256": "56f4efbeb0b03afc30c8ccc2aa766e94e6136280ae77cd254ee54013d56068ab",
+      "outputs": [
+        {
+          "bytes": 1300480,
+          "elements": 325120,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "56f4efbeb0b03afc30c8ccc2aa766e94e6136280ae77cd254ee54013d56068ab"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "uniform",
+      "route_source": "synthetic",
+      "rows": 127,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 47,
+      "warmup_ns": 503433375,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1456562208,
+      "block_iterations": [
+        51,
+        51,
+        51,
+        51,
+        51,
+        51,
+        51
+      ],
+      "block_ns": [
+        101147875,
+        101073500,
+        101357625,
+        101203208,
+        101224166,
+        101104292,
+        101365958
+      ],
+      "coefficients_sha256": "be5c7ca9e2f3ccf6833319c6ae4c527eb9b6a2df16461e15d13ff4e15e1edeab",
+      "count_delta": 1220,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 610,
+      "graph_buffer_bytes": 39153760,
+      "id": "t127-shared-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "1999020f139495f210cb53872f3add662da6d0d216607e6a339651eee1e8ff11",
+        "e4365bbbebfd1b6816d083e31a9f06e54b2c58910db809ca846349595d27ccf1"
+      ],
+      "input_buffer_bytes": 1830848,
+      "input_sha256": "462a0310ddb1d566adbcdbab81807f97d61125be9903872376127257e7bac23d",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 1984376.6274509805,
+      "mode": "perf",
+      "ns_per_triplet": [
+        991645.8333333334,
+        990916.6666666666,
+        993702.2058823529,
+        992188.3137254902,
+        992393.7843137255,
+        991218.5490196078,
+        993783.9019607843
+      ],
+      "ns_samples": [
+        1983291.6666666667,
+        1981833.3333333333,
+        1987404.4117647058,
+        1984376.6274509805,
+        1984787.568627451,
+        1982437.0980392157,
+        1987567.8039215687
+      ],
+      "output_sha256": "e958cc3e920eb1b515666c688163925c73c21b0efc873dfdfe3f5274ef9e088c",
+      "outputs": [
+        {
+          "bytes": 1300480,
+          "elements": 325120,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "e958cc3e920eb1b515666c688163925c73c21b0efc873dfdfe3f5274ef9e088c"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "shared",
+      "route_source": "synthetic",
+      "rows": 127,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 252,
+      "warmup_ns": 500950625,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1456562208,
+      "block_iterations": [
+        9,
+        9,
+        9,
+        9,
+        9,
+        9,
+        9
+      ],
+      "block_ns": [
+        101074500,
+        101102458,
+        100875834,
+        101112791,
+        101335209,
+        101794375,
+        101376209
+      ],
+      "coefficients_sha256": "be5c7ca9e2f3ccf6833319c6ae4c527eb9b6a2df16461e15d13ff4e15e1edeab",
+      "count_delta": 220,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 110,
+      "graph_buffer_bytes": 39153760,
+      "id": "t127-mixed-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "f34b9320ccbcede679bf79027b7f7fc3c61a5459f01202c12a568762be294024",
+        "e380dc0f1cfd5a8f144c504940fb28d07fad4646aa7613d93e734c019db975a1"
+      ],
+      "input_buffer_bytes": 1830848,
+      "input_sha256": "462a0310ddb1d566adbcdbab81807f97d61125be9903872376127257e7bac23d",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 11234754.555555556,
+      "mode": "perf",
+      "ns_per_triplet": [
+        5615250.0,
+        5616803.222222222,
+        5604213.0,
+        5617377.277777778,
+        5629733.833333333,
+        5655243.055555556,
+        5632011.611111111
+      ],
+      "ns_samples": [
+        11230500.0,
+        11233606.444444444,
+        11208426.0,
+        11234754.555555556,
+        11259467.666666666,
+        11310486.111111112,
+        11264023.222222222
+      ],
+      "output_sha256": "dad7674282d7f3a4ddf95a8a4ffcf9a72aa58f2eb1fb2ea69691952f22324f8d",
+      "outputs": [
+        {
+          "bytes": 1300480,
+          "elements": 325120,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "dad7674282d7f3a4ddf95a8a4ffcf9a72aa58f2eb1fb2ea69691952f22324f8d"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "mixed",
+      "route_source": "synthetic",
+      "rows": 127,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 46,
+      "warmup_ns": 511292292,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1579488032,
+      "block_iterations": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "block_ns": [
+        102996167,
+        103264875,
+        103391958,
+        103320084,
+        103127416,
+        103066792,
+        103159458
+      ],
+      "coefficients_sha256": "88186984865140b07b757f47c19d8964b3912798623cb9c381c9e23c1b053f23",
+      "count_delta": 192,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 96,
+      "graph_buffer_bytes": 156587104,
+      "id": "t508-uniform-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "cff780901929d505d6b823c42bd639e463cbbe802f2cd36d67a404018f0a23a8",
+        "adf8a8938467a59d97194657b4f521e930f027d4aaebeaadb0a2dd7b8f47c595"
+      ],
+      "input_buffer_bytes": 7323328,
+      "input_sha256": "33eb1e0214d167d48f0abbfd4b43c6da13139a6ab30404756468b77105a710b9",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 12894932.25,
+      "mode": "perf",
+      "ns_per_triplet": [
+        6437260.4375,
+        6454054.6875,
+        6461997.375,
+        6457505.25,
+        6445463.5,
+        6441674.5,
+        6447466.125
+      ],
+      "ns_samples": [
+        12874520.875,
+        12908109.375,
+        12923994.75,
+        12915010.5,
+        12890927.0,
+        12883349.0,
+        12894932.25
+      ],
+      "output_sha256": "32cdc427cf8f477adfb65a35f2a6ca13f1402fca7f496aa004139e8c0ab2d224",
+      "outputs": [
+        {
+          "bytes": 5201920,
+          "elements": 1300480,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "32cdc427cf8f477adfb65a35f2a6ca13f1402fca7f496aa004139e8c0ab2d224"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "uniform",
+      "route_source": "synthetic",
+      "rows": 508,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 39,
+      "warmup_ns": 502017458,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1579488032,
+      "block_iterations": [
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14
+      ],
+      "block_ns": [
+        102130417,
+        102067292,
+        102078625,
+        102059625,
+        102241666,
+        102088542,
+        101886542
+      ],
+      "coefficients_sha256": "88186984865140b07b757f47c19d8964b3912798623cb9c381c9e23c1b053f23",
+      "count_delta": 336,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 168,
+      "graph_buffer_bytes": 156587104,
+      "id": "t508-shared-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "a7f4a44203bad1fc153c88ebe4b42596f45500f853827cb82bf75094a126abbe",
+        "cc65388e23e32f3fce78338471c299347d9c026078098de3f6aa0bde9ae6b4c0"
+      ],
+      "input_buffer_bytes": 7323328,
+      "input_sha256": "33eb1e0214d167d48f0abbfd4b43c6da13139a6ab30404756468b77105a710b9",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 7291330.357142857,
+      "mode": "perf",
+      "ns_per_triplet": [
+        3647514.8928571427,
+        3645260.4285714286,
+        3645665.1785714286,
+        3644986.6071428573,
+        3651488.0714285714,
+        3646019.3571428573,
+        3638805.0714285714
+      ],
+      "ns_samples": [
+        7295029.785714285,
+        7290520.857142857,
+        7291330.357142857,
+        7289973.214285715,
+        7302976.142857143,
+        7292038.714285715,
+        7277610.142857143
+      ],
+      "output_sha256": "db0d00eb949dc91183517c481e18254060f7c04c3ea65a65f7b9e6e322fa3586",
+      "outputs": [
+        {
+          "bytes": 5201920,
+          "elements": 1300480,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "db0d00eb949dc91183517c481e18254060f7c04c3ea65a65f7b9e6e322fa3586"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "shared",
+      "route_source": "synthetic",
+      "rows": 508,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 69,
+      "warmup_ns": 502217500,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1579488032,
+      "block_iterations": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "block_ns": [
+        119144875,
+        119491333,
+        119085709,
+        119314334,
+        119150125,
+        119266667,
+        119105875
+      ],
+      "coefficients_sha256": "88186984865140b07b757f47c19d8964b3912798623cb9c381c9e23c1b053f23",
+      "count_delta": 182,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 91,
+      "graph_buffer_bytes": 156587104,
+      "id": "t508-mixed-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "b22296ba14eb29008ebd87d00c70c4ab934f15abf5c2cb95ea33ee77ef7cbe9f",
+        "6141df205f386ce881311846f36bb39039218cca5618926290526fae4b424882"
+      ],
+      "input_buffer_bytes": 7323328,
+      "input_sha256": "33eb1e0214d167d48f0abbfd4b43c6da13139a6ab30404756468b77105a710b9",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 14893765.625,
+      "mode": "perf",
+      "ns_per_triplet": [
+        7446554.6875,
+        7468208.3125,
+        7442856.8125,
+        7457145.875,
+        7446882.8125,
+        7454166.6875,
+        7444117.1875
+      ],
+      "ns_samples": [
+        14893109.375,
+        14936416.625,
+        14885713.625,
+        14914291.75,
+        14893765.625,
+        14908333.375,
+        14888234.375
+      ],
+      "output_sha256": "ed405480e9214867f9eebbd8a8f8af83c86c0e5bf5587a23a30ff5a8880c19ea",
+      "outputs": [
+        {
+          "bytes": 5201920,
+          "elements": 1300480,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "ed405480e9214867f9eebbd8a8f8af83c86c0e5bf5587a23a30ff5a8880c19ea"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "mixed",
+      "route_source": "synthetic",
+      "rows": 508,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 34,
+      "warmup_ns": 506223042,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1580778592,
+      "block_iterations": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "block_ns": [
+        103312500,
+        103239666,
+        103166542,
+        103291792,
+        103365792,
+        103354708,
+        103303625
+      ],
+      "coefficients_sha256": "342b141e1e5641eac53da54082ffbc6431ef4cc0943863969a874a033b7f591a",
+      "count_delta": 192,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 96,
+      "graph_buffer_bytes": 157820000,
+      "id": "t512-uniform-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "afa5eb762176b6329e907e3d53af4ff883c0114cdc06377c240e5d0a24954e0f",
+        "fa69554aff7bd82aab43aad786b748a5c3d6a28cdb7529aaf8ef579e1e934e81"
+      ],
+      "input_buffer_bytes": 7380992,
+      "input_sha256": "3e8614762af822993f3e08a51fcd3c58779a930815a87df13575f718b81b0842",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 12912953.125,
+      "mode": "perf",
+      "ns_per_triplet": [
+        6457031.25,
+        6452479.125,
+        6447908.875,
+        6455737.0,
+        6460362.0,
+        6459669.25,
+        6456476.5625
+      ],
+      "ns_samples": [
+        12914062.5,
+        12904958.25,
+        12895817.75,
+        12911474.0,
+        12920724.0,
+        12919338.5,
+        12912953.125
+      ],
+      "output_sha256": "7012e73e7b0c37d80910c9963fa34228c221f0bb33f7a0de5e0809e40d5d0b8d",
+      "outputs": [
+        {
+          "bytes": 5242880,
+          "elements": 1310720,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "7012e73e7b0c37d80910c9963fa34228c221f0bb33f7a0de5e0809e40d5d0b8d"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "uniform",
+      "route_source": "synthetic",
+      "rows": 512,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 39,
+      "warmup_ns": 503130542,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1580778592,
+      "block_iterations": [
+        14,
+        14,
+        14,
+        14,
+        14,
+        14,
+        14
+      ],
+      "block_ns": [
+        102263916,
+        102248625,
+        102184833,
+        102373208,
+        102243125,
+        102809500,
+        102252709
+      ],
+      "coefficients_sha256": "342b141e1e5641eac53da54082ffbc6431ef4cc0943863969a874a033b7f591a",
+      "count_delta": 336,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 168,
+      "graph_buffer_bytes": 157820000,
+      "id": "t512-shared-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "e6946f9cc8bf00d0d592a7c4fd7c6ea4e06ca5a3c6366d1197d565680d108eaf",
+        "e731732c45b37fdb80ac0425e85310ad24de5bcf4374499cc5b806dfa699aab8"
+      ],
+      "input_buffer_bytes": 7380992,
+      "input_sha256": "3e8614762af822993f3e08a51fcd3c58779a930815a87df13575f718b81b0842",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 7303764.928571428,
+      "mode": "perf",
+      "ns_per_triplet": [
+        3652282.714285714,
+        3651736.6071428573,
+        3649458.3214285714,
+        3656186.0,
+        3651540.1785714286,
+        3671767.8571428573,
+        3651882.464285714
+      ],
+      "ns_samples": [
+        7304565.428571428,
+        7303473.214285715,
+        7298916.642857143,
+        7312372.0,
+        7303080.357142857,
+        7343535.714285715,
+        7303764.928571428
+      ],
+      "output_sha256": "545b4e8abe12c05b3614f8f3cd9a73138b69f90b04729611d29dfc2b2e7b8dd0",
+      "outputs": [
+        {
+          "bytes": 5242880,
+          "elements": 1310720,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "545b4e8abe12c05b3614f8f3cd9a73138b69f90b04729611d29dfc2b2e7b8dd0"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "shared",
+      "route_source": "synthetic",
+      "rows": 512,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 69,
+      "warmup_ns": 504204416,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_estimate_bytes": 1580778592,
+      "block_iterations": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "block_ns": [
+        119310833,
+        119522125,
+        119473791,
+        119292000,
+        119470083,
+        119292208,
+        119454916
+      ],
+      "coefficients_sha256": "342b141e1e5641eac53da54082ffbc6431ef4cc0943863969a874a033b7f591a",
+      "count_delta": 182,
+      "counter_available": true,
+      "counter_semantics": "borrowed map encodings; completed graph checked separately",
+      "cpu_compute_nodes": 0,
+      "eligible": true,
+      "evaluation_callbacks": false,
+      "exact_oracle": "original-engine full F32 byte digests",
+      "executions": 91,
+      "graph_buffer_bytes": 157820000,
+      "id": "t512-mixed-stride2048-plain-precision-default",
+      "id_stride_bytes": 2048,
+      "ids_preserved": true,
+      "ids_sha256": [
+        "cc4298993e3bbca4719a88a9d6be7189aedbd8d439e9530b4038fe12f43ad744",
+        "3e905fe2358d8cb2142bc2ec6d4ee50cd00648d0666c1d62ba694b8a9aa64c92"
+      ],
+      "input_buffer_bytes": 7380992,
+      "input_sha256": "3e8614762af822993f3e08a51fcd3c58779a930815a87df13575f718b81b0842",
+      "input_version": 0,
+      "inputs_preserved": true,
+      "layout": "plain",
+      "median_ns": 14931864.5,
+      "mode": "perf",
+      "ns_per_triplet": [
+        7456927.0625,
+        7470132.8125,
+        7467111.9375,
+        7455750.0,
+        7466880.1875,
+        7455763.0,
+        7465932.25
+      ],
+      "ns_samples": [
+        14913854.125,
+        14940265.625,
+        14934223.875,
+        14911500.0,
+        14933760.375,
+        14911526.0,
+        14931864.5
+      ],
+      "output_sha256": "00700535e3353033feb17caa12dbdbd588fc596b1f8f2bf31956ee1d13096ef5",
+      "outputs": [
+        {
+          "bytes": 5242880,
+          "elements": 1310720,
+          "finite": true,
+          "name": "block1.residual",
+          "sha256": "00700535e3353033feb17caa12dbdbd588fc596b1f8f2bf31956ee1d13096ef5"
+        }
+      ],
+      "performance_outputs": "terminal residual only; inputs allocated separately",
+      "pipeline_primed": true,
+      "precision": "default",
+      "projection_precision": {
+        "down": "default",
+        "gate": "default",
+        "up": "default"
+      },
+      "round": 0,
+      "route": "mixed",
+      "route_source": "synthetic",
+      "rows": 512,
+      "same_graph_mutation": false,
+      "scheduler_splits": 1,
+      "scope": "reuse",
+      "terminal_only": false,
+      "triplets_per_graph": 2,
+      "warmup_iterations": 34,
+      "warmup_ns": 506894333,
+      "weights": [
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "gate.weight",
+          "sha256": "3a30319f566f6b881e68bdea7477e0ef6c6ddf7185762d2d12aa414298aed840"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 2560,
+          "m": 640,
+          "name": "up.weight",
+          "sha256": "03a440f5152500e6fe365878dfe3b5b3058addfb8db0467ea2f2ee3ae5b2e760"
+        },
+        {
+          "bytes": 235929600,
+          "experts": 512,
+          "k": 640,
+          "m": 2560,
+          "name": "down.weight",
+          "sha256": "5f44baeab1b25847a504b9b105ab40188556502f30909d5dda0538a8d2d28a3b"
+        }
+      ]
+    }
+  ],
+  "native_log_sha256": "d1e1e84c18602efcacd130a31f83ae7520abf6a3f7ecb9fb667a1393a8c5cf14",
+  "evidence_sha256": "1ace500e6d19dee6c31116e91bb96a6053a4264b61edb52950bc64b618e79d4f"
+}

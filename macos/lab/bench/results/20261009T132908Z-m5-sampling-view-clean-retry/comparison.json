@@ -1,0 +1,666 @@
+{
+  "schema": 1,
+  "kind": "m5-single-axis-comparison",
+  "experiment": {
+    "id": "sampling-view-clean-retry",
+    "engine": "m5-sampling",
+    "depth": 3,
+    "axis": "m5_tuning",
+    "control": "conv-direct",
+    "candidates": [
+      "sampling-view"
+    ],
+    "predict": 256
+  },
+  "order": [
+    "conv-direct",
+    "sampling-view",
+    "sampling-view",
+    "conv-direct"
+  ],
+  "status": "passed",
+  "repeats": 3,
+  "runs": [
+    {
+      "value": "conv-direct",
+      "run_id": "20261009T132924Z-m5-sampling-view-clean-retry-1-conv-direct",
+      "status": "passed"
+    },
+    {
+      "value": "sampling-view",
+      "run_id": "20261009T133220Z-m5-sampling-view-clean-retry-2-sampling-view",
+      "status": "passed"
+    },
+    {
+      "value": "sampling-view",
+      "run_id": "20261009T133517Z-m5-sampling-view-clean-retry-3-sampling-view",
+      "status": "passed"
+    },
+    {
+      "value": "conv-direct",
+      "run_id": "20261009T133814Z-m5-sampling-view-clean-retry-4-conv-direct",
+      "status": "passed"
+    }
+  ],
+  "math_checks": [
+    "bench/features/20261009T132908Z-m5-math-m5-sampling-on-conv-direct/checks.json",
+    "bench/features/20261009T132916Z-m5-math-m5-sampling-on-sampling-view/checks.json"
+  ],
+  "preflight": {
+    "memory": {
+      "total": 51539607552,
+      "available": 40805138432,
+      "percent": 20.8,
+      "used": 7041859584,
+      "free": 1533509632,
+      "active": 3743776768,
+      "inactive": 39112179712,
+      "wired": 3298082816
+    },
+    "swap": {
+      "total": 2147483648,
+      "used": 531759104,
+      "free": 1615724544,
+      "percent": 24.8,
+      "sin": 3707582529536,
+      "sout": 2148253696
+    },
+    "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 87%",
+    "largest_process_groups": [
+      {
+        "name": "mediaanalysisd",
+        "rss_bytes": 366100480
+      },
+      {
+        "name": "T3 Code (Alpha) Helper (Renderer)",
+        "rss_bytes": 352321536
+      },
+      {
+        "name": "T3 Code (Alpha)",
+        "rss_bytes": 300433408
+      },
+      {
+        "name": "codex",
+        "rss_bytes": 135856128
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "rss_bytes": 96075776
+      },
+      {
+        "name": "T3 Code (Alpha) Helper",
+        "rss_bytes": 78561280
+      },
+      {
+        "name": "NewsTag",
+        "rss_bytes": 61341696
+      },
+      {
+        "name": "mdworker_shared",
+        "rss_bytes": 60489728
+      },
+      {
+        "name": "loginwindow",
+        "rss_bytes": 36651008
+      },
+      {
+        "name": "node",
+        "rss_bytes": 34111488
+      },
+      {
+        "name": "python3.12",
+        "rss_bytes": 33914880
+      },
+      {
+        "name": "Finder",
+        "rss_bytes": 33652736
+      }
+    ],
+    "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth."
+  },
+  "headroom_waits": [
+    {
+      "required_bytes": 36507222016,
+      "samples": [
+        {
+          "elapsed_s": 0.026475792023120448,
+          "available_bytes": 40777859072,
+          "swap_used_bytes": 531759104
+        }
+      ]
+    },
+    {
+      "required_bytes": 36507222016,
+      "samples": [
+        {
+          "elapsed_s": 0.026126749988179654,
+          "available_bytes": 3270737920,
+          "swap_used_bytes": 531759104
+        },
+        {
+          "elapsed_s": 2.0844014169997536,
+          "available_bytes": 40963883008,
+          "swap_used_bytes": 531759104
+        }
+      ]
+    },
+    {
+      "required_bytes": 36507222016,
+      "samples": [
+        {
+          "elapsed_s": 0.026799874991411343,
+          "available_bytes": 7480901632,
+          "swap_used_bytes": 531759104
+        },
+        {
+          "elapsed_s": 2.0828131249872968,
+          "available_bytes": 41368272896,
+          "swap_used_bytes": 531759104
+        }
+      ]
+    },
+    {
+      "required_bytes": 36507222016,
+      "samples": [
+        {
+          "elapsed_s": 0.027019667002605274,
+          "available_bytes": 28187770880,
+          "swap_used_bytes": 523370496
+        },
+        {
+          "elapsed_s": 2.0778207080147695,
+          "available_bytes": 41352052736,
+          "swap_used_bytes": 523370496
+        }
+      ]
+    }
+  ],
+  "summary": [
+    {
+      "workload": "chinese",
+      "input_budget": 56,
+      "cached": false,
+      "profiles": {
+        "conv-direct": {
+          "generation_tok_s": 40.68710671354151,
+          "prompt_tok_s": 190.8814919790421,
+          "ttft_s": 0.29393320849339943,
+          "wall_s": 6.560002853992046,
+          "draft_acceptance_percent": 40.17341040462428
+        },
+        "sampling-view": {
+          "generation_tok_s": 40.65091578709993,
+          "prompt_tok_s": 191.88567108212595,
+          "ttft_s": 0.29243556199071463,
+          "wall_s": 6.565199459000723,
+          "draft_acceptance_percent": 40.17341040462428
+        }
+      },
+      "vs_control": {
+        "conv-direct": {
+          "generation_increase_percent": 0.0,
+          "prompt_increase_percent": 0.0,
+          "ttft_reduction_percent": 0.0,
+          "total_time_reduction_percent": 0.0
+        },
+        "sampling-view": {
+          "generation_increase_percent": -0.0889493733146951,
+          "prompt_increase_percent": 0.5260746302182762,
+          "ttft_reduction_percent": 0.5095193259588515,
+          "total_time_reduction_percent": -0.07921650530251512
+        }
+      },
+      "control_passes": [
+        {
+          "generation_tok_s": 40.7212158492721,
+          "prompt_tok_s": 190.43926857718063,
+          "ttft_s": 0.2945935830066446,
+          "wall_s": 6.556882167002186,
+          "draft_acceptance_percent": 40.17341040462428
+        },
+        {
+          "generation_tok_s": 40.66238547558726,
+          "prompt_tok_s": 192.34534232318828,
+          "ttft_s": 0.2917022920155432,
+          "wall_s": 6.562877999996999,
+          "draft_acceptance_percent": 40.17341040462428
+        }
+      ],
+      "control_drift": {
+        "generation_increase_percent": -0.14447106368974394,
+        "prompt_increase_percent": 1.0008827277317334,
+        "ttft_reduction_percent": 0.981450770784853,
+        "total_time_reduction_percent": -0.09144335435806727
+      }
+    },
+    {
+      "workload": "code",
+      "input_budget": 48,
+      "cached": false,
+      "profiles": {
+        "conv-direct": {
+          "generation_tok_s": 59.52272123045469,
+          "prompt_tok_s": 172.0781927824488,
+          "ttft_s": 0.2795148119912483,
+          "wall_s": 4.563524332988891,
+          "draft_acceptance_percent": 74.57627118644068
+        },
+        "sampling-view": {
+          "generation_tok_s": 59.48146412311231,
+          "prompt_tok_s": 171.4160247378862,
+          "ttft_s": 0.2806133959966246,
+          "wall_s": 4.5679339170019375,
+          "draft_acceptance_percent": 74.57627118644068
+        }
+      },
+      "vs_control": {
+        "conv-direct": {
+          "generation_increase_percent": 0.0,
+          "prompt_increase_percent": 0.0,
+          "ttft_reduction_percent": 0.0,
+          "total_time_reduction_percent": 0.0
+        },
+        "sampling-view": {
+          "generation_increase_percent": -0.0693132076113323,
+          "prompt_increase_percent": -0.38480648468905976,
+          "ttft_reduction_percent": -0.3930324828047782,
+          "total_time_reduction_percent": -0.09662672292927166
+        }
+      },
+      "control_passes": [
+        {
+          "generation_tok_s": 59.592025979319004,
+          "prompt_tok_s": 171.87483215348422,
+          "ttft_s": 0.2798123749962542,
+          "wall_s": 4.558637040987378,
+          "draft_acceptance_percent": 74.57627118644068
+        },
+        {
+          "generation_tok_s": 59.45562430387374,
+          "prompt_tok_s": 172.55014738658423,
+          "ttft_s": 0.27873920800630003,
+          "wall_s": 4.568377957999473,
+          "draft_acceptance_percent": 74.57627118644068
+        }
+      ],
+      "control_drift": {
+        "generation_increase_percent": -0.2288924956043603,
+        "prompt_increase_percent": 0.3929110647782119,
+        "ttft_reduction_percent": 0.38353092495232444,
+        "total_time_reduction_percent": -0.21368046906373728
+      }
+    },
+    {
+      "workload": "prose",
+      "input_budget": 53,
+      "cached": false,
+      "profiles": {
+        "conv-direct": {
+          "generation_tok_s": 39.98252083607038,
+          "prompt_tok_s": 183.20845166344844,
+          "ttft_s": 0.28985237450979184,
+          "wall_s": 6.668574416515185,
+          "draft_acceptance_percent": 38.92045454545455
+        },
+        "sampling-view": {
+          "generation_tok_s": 39.976938793402326,
+          "prompt_tok_s": 183.2305170312269,
+          "ttft_s": 0.28980054150451906,
+          "wall_s": 6.668233728996711,
+          "draft_acceptance_percent": 38.92045454545455
+        }
+      },
+      "vs_control": {
+        "conv-direct": {
+          "generation_increase_percent": 0.0,
+          "prompt_increase_percent": 0.0,
+          "ttft_reduction_percent": 0.0,
+          "total_time_reduction_percent": 0.0
+        },
+        "sampling-view": {
+          "generation_increase_percent": -0.013961207425960964,
+          "prompt_increase_percent": 0.012043859100452359,
+          "ttft_reduction_percent": 0.017882553268866452,
+          "total_time_reduction_percent": 0.005108850815704891
+        }
+      },
+      "control_passes": [
+        {
+          "generation_tok_s": 40.00677134216128,
+          "prompt_tok_s": 182.5213429438282,
+          "ttft_s": 0.29086104201269336,
+          "wall_s": 6.666835540992906,
+          "draft_acceptance_percent": 38.92045454545455
+        },
+        {
+          "generation_tok_s": 39.96908430514374,
+          "prompt_tok_s": 184.1921436837734,
+          "ttft_s": 0.28827920800540596,
+          "wall_s": 6.6687893330235966,
+          "draft_acceptance_percent": 38.92045454545455
+        }
+      ],
+      "control_drift": {
+        "generation_increase_percent": -0.09420164575446588,
+        "prompt_increase_percent": 0.9154002008737061,
+        "ttft_reduction_percent": 0.8876520517913544,
+        "total_time_reduction_percent": -0.029306138102214163
+      }
+    },
+    {
+      "workload": "synthetic",
+      "input_budget": 512,
+      "cached": false,
+      "profiles": {
+        "conv-direct": {
+          "generation_tok_s": 48.47132834062876,
+          "prompt_tok_s": 562.5974493073084,
+          "ttft_s": 0.910678124986589,
+          "wall_s": 6.1726770420063986,
+          "draft_acceptance_percent": 55.400696864111495
+        },
+        "sampling-view": {
+          "generation_tok_s": 48.39072126447121,
+          "prompt_tok_s": 558.3214313277919,
+          "ttft_s": 0.9176534794969484,
+          "wall_s": 6.192141333012842,
+          "draft_acceptance_percent": 55.400696864111495
+        }
+      },
+      "vs_control": {
+        "conv-direct": {
+          "generation_increase_percent": 0.0,
+          "prompt_increase_percent": 0.0,
+          "ttft_reduction_percent": 0.0,
+          "total_time_reduction_percent": 0.0
+        },
+        "sampling-view": {
+          "generation_increase_percent": -0.1662984673972412,
+          "prompt_increase_percent": -0.7600493007533737,
+          "ttft_reduction_percent": -0.7659516923679499,
+          "total_time_reduction_percent": -0.3153298135312177
+        }
+      },
+      "control_passes": [
+        {
+          "generation_tok_s": 48.61233701045946,
+          "prompt_tok_s": 567.1458606106123,
+          "ttft_s": 0.9033632079954259,
+          "wall_s": 6.141910375008592,
+          "draft_acceptance_percent": 55.400696864111495
+        },
+        {
+          "generation_tok_s": 48.4502107584168,
+          "prompt_tok_s": 561.7743291075907,
+          "ttft_s": 0.9120030420017429,
+          "wall_s": 6.174637374992017,
+          "draft_acceptance_percent": 55.400696864111495
+        }
+      ],
+      "control_drift": {
+        "generation_increase_percent": -0.3335084507617436,
+        "prompt_increase_percent": -0.9471164079798533,
+        "ttft_reduction_percent": -0.9564075589804988,
+        "total_time_reduction_percent": -0.5328472410895291
+      }
+    },
+    {
+      "workload": "synthetic",
+      "input_budget": 2048,
+      "cached": false,
+      "profiles": {
+        "conv-direct": {
+          "generation_tok_s": 49.904466607889134,
+          "prompt_tok_s": 539.6628420550855,
+          "ttft_s": 3.7958038124925224,
+          "wall_s": 8.903724416493787,
+          "draft_acceptance_percent": 61.79775280898876
+        },
+        "sampling-view": {
+          "generation_tok_s": 49.88106894454909,
+          "prompt_tok_s": 537.3055472530034,
+          "ttft_s": 3.8124098544940352,
+          "wall_s": 8.92464910451963,
+          "draft_acceptance_percent": 61.79775280898876
+        }
+      },
+      "vs_control": {
+        "conv-direct": {
+          "generation_increase_percent": 0.0,
+          "prompt_increase_percent": 0.0,
+          "ttft_reduction_percent": 0.0,
+          "total_time_reduction_percent": 0.0
+        },
+        "sampling-view": {
+          "generation_increase_percent": -0.04688490816640023,
+          "prompt_increase_percent": -0.4368088032715711,
+          "ttft_reduction_percent": -0.43748420155067524,
+          "total_time_reduction_percent": -0.23501050849104033
+        }
+      },
+      "control_passes": [
+        {
+          "generation_tok_s": 50.03530923096515,
+          "prompt_tok_s": 541.7360258954053,
+          "ttft_s": 3.781252125016181,
+          "wall_s": 8.894655375013826,
+          "draft_acceptance_percent": 61.79775280898876
+        },
+        {
+          "generation_tok_s": 49.88982175247097,
+          "prompt_tok_s": 538.7885675800817,
+          "ttft_s": 3.801942374993814,
+          "wall_s": 8.920827041001758,
+          "draft_acceptance_percent": 61.79775280898876
+        }
+      ],
+      "control_drift": {
+        "generation_increase_percent": -0.2907696199549781,
+        "prompt_increase_percent": -0.5440764827208788,
+        "ttft_reduction_percent": -0.5471798571893727,
+        "total_time_reduction_percent": -0.2942403599070387
+      }
+    },
+    {
+      "workload": "cached-ledger",
+      "input_budget": 512,
+      "cached": true,
+      "profiles": {
+        "conv-direct": {
+          "generation_tok_s": 69.78301775572481,
+          "prompt_tok_s": 153.77656799097468,
+          "ttft_s": 0.2736516879958799,
+          "wall_s": 0.6253500419988995,
+          "draft_acceptance_percent": 92.98245614035088
+        },
+        "sampling-view": {
+          "generation_tok_s": 70.15205469577599,
+          "prompt_tok_s": 153.6548717020611,
+          "ttft_s": 0.2738446254952578,
+          "wall_s": 0.6153083749959478,
+          "draft_acceptance_percent": 92.98245614035088
+        }
+      },
+      "vs_control": {
+        "conv-direct": {
+          "generation_increase_percent": 0.0,
+          "prompt_increase_percent": 0.0,
+          "ttft_reduction_percent": 0.0,
+          "total_time_reduction_percent": 0.0
+        },
+        "sampling-view": {
+          "generation_increase_percent": 0.5288348826400613,
+          "prompt_increase_percent": -0.07913838272208817,
+          "ttft_reduction_percent": -0.0705047722493024,
+          "total_time_reduction_percent": 1.6057673828331454
+        }
+      },
+      "control_passes": [
+        {
+          "generation_tok_s": 69.5674354834502,
+          "prompt_tok_s": 147.94254193466577,
+          "ttft_s": 0.28441745799500495,
+          "wall_s": 0.6304542089928873,
+          "draft_acceptance_percent": 92.98245614035088
+        },
+        {
+          "generation_tok_s": 69.99860002799944,
+          "prompt_tok_s": 154.2563740937438,
+          "ttft_s": 0.27273087500361726,
+          "wall_s": 0.6147315420093946,
+          "draft_acceptance_percent": 92.98245614035088
+        }
+      ],
+      "control_drift": {
+        "generation_increase_percent": 0.6197792710812555,
+        "prompt_increase_percent": 4.2677596832602305,
+        "ttft_reduction_percent": 4.108954166798351,
+        "total_time_reduction_percent": 2.493863433572552
+      }
+    },
+    {
+      "workload": "cached-ledger",
+      "input_budget": 2048,
+      "cached": true,
+      "profiles": {
+        "conv-direct": {
+          "generation_tok_s": 63.518637377671524,
+          "prompt_tok_s": 146.70169378321236,
+          "ttft_s": 0.28747087449301034,
+          "wall_s": 0.6491573330131359,
+          "draft_acceptance_percent": 100.0
+        },
+        "sampling-view": {
+          "generation_tok_s": 63.75756752246238,
+          "prompt_tok_s": 146.7323999281063,
+          "ttft_s": 0.28691291649010964,
+          "wall_s": 0.6483842500165338,
+          "draft_acceptance_percent": 100.0
+        }
+      },
+      "vs_control": {
+        "conv-direct": {
+          "generation_increase_percent": 0.0,
+          "prompt_increase_percent": 0.0,
+          "ttft_reduction_percent": 0.0,
+          "total_time_reduction_percent": 0.0
+        },
+        "sampling-view": {
+          "generation_increase_percent": 0.3761575415577978,
+          "prompt_increase_percent": 0.02093100911249035,
+          "ttft_reduction_percent": 0.19409201154194644,
+          "total_time_reduction_percent": 0.11909023549250275
+        }
+      },
+      "control_passes": [
+        {
+          "generation_tok_s": 63.15107384282521,
+          "prompt_tok_s": 146.3929815022011,
+          "ttft_s": 0.2877702080004383,
+          "wall_s": 0.6513655419985298,
+          "draft_acceptance_percent": 100.0
+        },
+        {
+          "generation_tok_s": 63.542757368887806,
+          "prompt_tok_s": 146.99140100304132,
+          "ttft_s": 0.28645458302344196,
+          "wall_s": 0.6486238750221673,
+          "draft_acceptance_percent": 100.0
+        }
+      ],
+      "control_drift": {
+        "generation_increase_percent": 0.6202325664919739,
+        "prompt_increase_percent": 0.4087760865989498,
+        "ttft_reduction_percent": 0.45717900617229246,
+        "total_time_reduction_percent": 0.4209106560888132
+      }
+    }
+  ],
+  "postflight": {
+    "memory": {
+      "total": 51539607552,
+      "available": 6253953024,
+      "percent": 87.9,
+      "used": 41402122240,
+      "free": 1683603456,
+      "active": 2787311616,
+      "inactive": 4566253568,
+      "wired": 38614810624
+    },
+    "swap": {
+      "total": 2147483648,
+      "used": 523370496,
+      "free": 1624113152,
+      "percent": 24.4,
+      "sin": 3714403844096,
+      "sout": 2150203392
+    },
+    "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 86%",
+    "largest_process_groups": [
+      {
+        "name": "T3 Code (Alpha) Helper (Renderer)",
+        "rss_bytes": 312492032
+      },
+      {
+        "name": "T3 Code (Alpha)",
+        "rss_bytes": 269680640
+      },
+      {
+        "name": "codex",
+        "rss_bytes": 115769344
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "rss_bytes": 75939840
+      },
+      {
+        "name": "T3 Code (Alpha) Helper",
+        "rss_bytes": 69550080
+      },
+      {
+        "name": "loginwindow",
+        "rss_bytes": 36618240
+      },
+      {
+        "name": "Finder",
+        "rss_bytes": 35487744
+      },
+      {
+        "name": "mdworker_shared",
+        "rss_bytes": 34799616
+      },
+      {
+        "name": "python3.12",
+        "rss_bytes": 32620544
+      },
+      {
+        "name": "ControlCenter",
+        "rss_bytes": 32243712
+      },
+      {
+        "name": "node_repl",
+        "rss_bytes": 28262400
+      },
+      {
+        "name": "WiFiman Desktop",
+        "rss_bytes": 27639808
+      }
+    ],
+    "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth."
+  },
+  "output_parity": {
+    "passed": true,
+    "runs": [
+      "20261009T132924Z-m5-sampling-view-clean-retry-1-conv-direct",
+      "20261009T133220Z-m5-sampling-view-clean-retry-2-sampling-view",
+      "20261009T133517Z-m5-sampling-view-clean-retry-3-sampling-view",
+      "20261009T133814Z-m5-sampling-view-clean-retry-4-conv-direct"
+    ],
+    "cases_per_run": 21
+  },
+  "decision": {
+    "measured_speed_candidate": false,
+    "winning_real_workloads": [],
+    "rule": "At least 1% TPS and total-reply improvement on two real workloads, above bracket TPS drift; exact tested output parity and zero new swap."
+  }
+}

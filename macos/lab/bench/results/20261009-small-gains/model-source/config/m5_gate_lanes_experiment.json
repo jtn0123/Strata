@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "id": "m5-gate-lanes",
+  "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+  "directory": "vendor/llama-m5-gate-lanes",
+  "patch": "patches/mtp-m5-gate-lanes.patch",
+  "patch_sha256": "32b5dec9abcbb06e24af29b5dbad6f5e203b6f0733c98a0a941d95bd0f3c0b0c",
+  "source_diff_sha256": "32b5dec9abcbb06e24af29b5dbad6f5e203b6f0733c98a0a941d95bd0f3c0b0c",
+  "modified_files": [
+    "ggml/src/ggml-metal/ggml-metal-common.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.h",
+    "ggml/src/ggml-metal/ggml-metal-context.m",
+    "ggml/src/ggml-metal/ggml-metal-device.cpp",
+    "ggml/src/ggml-metal/ggml-metal-device.h",
+    "ggml/src/ggml-metal/ggml-metal-fusion.cpp",
+    "ggml/src/ggml-metal/ggml-metal-fusion.h",
+    "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+    "ggml/src/ggml-metal/kernels/mul_mv.metal",
+    "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+    "ggml/src/ggml-metal/kernels/quantize.metal",
+    "src/llama-context.cpp",
+    "src/llama-cparams.h",
+    "src/models/qwen4exp.cpp",
+    "tests/test-backend-ops.cpp"
+  ],
+  "features": [
+    "mtp-shared",
+    "m5-tuning",
+    "m5-profile",
+    "m5-copy",
+    "m5-gate",
+    "m5-gate-lanes"
+  ],
+  "components": [
+    {
+      "patch": "patches/mtp-m5-gate.patch",
+      "sha256": "47ae4bd6ca9842b392110ed0ff4a37d12d2b74d259b9e6df58dcdd71bfd6bf42"
+    }
+  ],
+  "scope": "Independent gate4/gate8 lane-distributed exact SwiGLU epilogue. Existing gate/up Q2 dot products, SIMD reductions, routing, guards and allocation hooks unchanged; default off.",
+  "upstream": {
+    "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+    "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+    "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+    "license_file": "patches/LLAMA-LICENSE.txt"
+  }
+}

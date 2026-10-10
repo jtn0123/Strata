@@ -1,0 +1,3050 @@
+{
+  "status": "preregistered_before_gpu",
+  "source": {
+    "control": {
+      "engine": {
+        "engine": "m5-copy",
+        "directory": "vendor/llama-m5-copy",
+        "revision": "d81235049384534c167caea52b85a694f6103d14",
+        "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+        "patch": {
+          "schema": 1,
+          "id": "m5-copy",
+          "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+          "directory": "vendor/llama-m5-copy",
+          "patch": "patches/mtp-m5-copy.patch",
+          "patch_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+          "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+          "modified_files": [
+            "ggml/src/ggml-metal/ggml-metal-common.cpp",
+            "ggml/src/ggml-metal/ggml-metal-common.h",
+            "ggml/src/ggml-metal/ggml-metal-context.m",
+            "ggml/src/ggml-metal/ggml-metal-device.cpp",
+            "ggml/src/ggml-metal/ggml-metal-device.h",
+            "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+            "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+            "ggml/src/ggml-metal/kernels/quantize.metal",
+            "src/llama-context.cpp",
+            "src/llama-cparams.h",
+            "src/models/qwen4exp.cpp",
+            "tests/test-backend-ops.cpp"
+          ],
+          "features": [
+            "mtp-shared",
+            "m5-tuning",
+            "m5-profile",
+            "m5-copy"
+          ],
+          "components": [
+            {
+              "patch": "patches/mtp-m5-correctness.patch",
+              "sha256": "f0d397305b8e6dd148bc32eb92ceedbabd7e5f8d5b69a43de4780b468c0fe07b"
+            }
+          ],
+          "scope": "Isolated same-shape wide F32 row copy experiment. Width 0 keeps the existing dispatch; widths 1,4,8 explicitly opt in. Strided rows preserve all source and destination strides. Unaligned vectors and different shapes fall back. No model, cache, rollback or launcher default changes. Separate conv-direct mode skips an intermediate contiguous tensor before the existing strided copy; all rollback slots remain.",
+          "upstream": {
+            "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+            "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+            "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+            "license_file": "patches/LLAMA-LICENSE.txt"
+          }
+        },
+        "artifacts": {
+          "llama-server": "e60bfd1dd90f4a6000f37068605fac8db7cc25d143ca30e11c6b72f8b7af8570",
+          "libggml-base.0.26.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+          "libggml-base.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+          "libggml-base.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+          "libggml-blas.0.26.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+          "libggml-blas.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+          "libggml-blas.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+          "libggml-cpu.0.26.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+          "libggml-cpu.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+          "libggml-cpu.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+          "libggml-metal.0.26.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+          "libggml-metal.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+          "libggml-metal.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+          "libggml.0.26.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+          "libggml.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+          "libggml.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+          "libllama-common.0.6.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+          "libllama-common.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+          "libllama-common.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+          "libllama-server-impl.dylib": "93e778b6fe31a96ea8790af786b29eadda4a8abc7fdbff0774c999e00d558d2b",
+          "libllama.0.6.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+          "libllama.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+          "libllama.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+          "libmtmd.0.6.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+          "libmtmd.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+          "libmtmd.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5"
+        },
+        "build_receipt": {
+          "engine": "m5-copy",
+          "directory": "vendor/llama-m5-copy",
+          "revision": "d81235049384534c167caea52b85a694f6103d14",
+          "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+          "patch": {
+            "schema": 1,
+            "id": "m5-copy",
+            "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+            "directory": "vendor/llama-m5-copy",
+            "patch": "patches/mtp-m5-copy.patch",
+            "patch_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+            "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+            "modified_files": [
+              "ggml/src/ggml-metal/ggml-metal-common.cpp",
+              "ggml/src/ggml-metal/ggml-metal-common.h",
+              "ggml/src/ggml-metal/ggml-metal-context.m",
+              "ggml/src/ggml-metal/ggml-metal-device.cpp",
+              "ggml/src/ggml-metal/ggml-metal-device.h",
+              "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+              "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+              "ggml/src/ggml-metal/kernels/quantize.metal",
+              "src/llama-context.cpp",
+              "src/llama-cparams.h",
+              "src/models/qwen4exp.cpp",
+              "tests/test-backend-ops.cpp"
+            ],
+            "features": [
+              "mtp-shared",
+              "m5-tuning",
+              "m5-profile",
+              "m5-copy"
+            ],
+            "components": [
+              {
+                "patch": "patches/mtp-m5-correctness.patch",
+                "sha256": "f0d397305b8e6dd148bc32eb92ceedbabd7e5f8d5b69a43de4780b468c0fe07b"
+              }
+            ],
+            "scope": "Isolated same-shape wide F32 row copy experiment. Width 0 keeps the existing dispatch; widths 1,4,8 explicitly opt in. Strided rows preserve all source and destination strides. Unaligned vectors and different shapes fall back. No model, cache, rollback or launcher default changes. Separate conv-direct mode skips an intermediate contiguous tensor before the existing strided copy; all rollback slots remain.",
+            "upstream": {
+              "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+              "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+              "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+              "license_file": "patches/LLAMA-LICENSE.txt"
+            }
+          },
+          "artifacts": {
+            "llama-server": "e60bfd1dd90f4a6000f37068605fac8db7cc25d143ca30e11c6b72f8b7af8570",
+            "libggml-base.0.26.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+            "libggml-base.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+            "libggml-base.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+            "libggml-blas.0.26.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+            "libggml-blas.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+            "libggml-blas.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+            "libggml-cpu.0.26.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+            "libggml-cpu.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+            "libggml-cpu.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+            "libggml-metal.0.26.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+            "libggml-metal.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+            "libggml-metal.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+            "libggml.0.26.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+            "libggml.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+            "libggml.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+            "libllama-common.0.6.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+            "libllama-common.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+            "libllama-common.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+            "libllama-server-impl.dylib": "93e778b6fe31a96ea8790af786b29eadda4a8abc7fdbff0774c999e00d558d2b",
+            "libllama.0.6.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+            "libllama.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+            "libllama.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+            "libmtmd.0.6.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+            "libmtmd.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+            "libmtmd.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5"
+          },
+          "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+          "build_settings": {
+            "CMAKE_BUILD_TYPE": "Release",
+            "GGML_BLAS": "ON",
+            "GGML_CPU": "ON",
+            "GGML_METAL": "ON",
+            "GGML_METAL_EMBED_LIBRARY": "ON",
+            "GGML_NATIVE": "ON",
+            "LLAMA_BUILD_TESTS": "ON",
+            "LLAMA_BUILD_TOOLS": "ON"
+          },
+          "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+        }
+      },
+      "source_sha256": "d144fc12cdf4f4354086d7f8295f8158b189d28cddfca233538e07334ed7c075",
+      "runner_sha256": "21dd65ed588f4603eef3c1ae4f4811463f053587eeadcfacd6993217e0de8477",
+      "dependencies": {
+        "benchmark.py": "88d7dbc119d3d6cd675ad54d620734b2af68e9dc5fdbbe23ea29c342d4fbce48",
+        "engines.py": "2af2e541c7a09f60bc36693e519c2f6a81c4c8ac44ad5117ad8836cbe18cd73f",
+        "metal_environment.py": "1b70760802f3e504ed8d6a6d38cd74e8b0b34edc961a0256f15b43fff91f8d0a",
+        "check_memory.py": "3af26bba58b77fd47d9993126009f188c951aecaddff6d2e82febd5c3a83eada",
+        "validate_offline.py": "e2ec5c1777411e131c64bf436e91b8beccc19ecc18da62809b19cd53d0184c06"
+      },
+      "binary_sha256": "5780af03b8c0077c189c9a470e9f2c23f5b0f3e146deb09015a48fa56a82d9a6",
+      "command": [
+        "/usr/bin/c++",
+        "-O3",
+        "-ffp-contract=off",
+        "-std=gnu++17",
+        "-arch",
+        "arm64",
+        "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-copy/ggml/include",
+        "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-copy/vendor",
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/native/m5_compact_probe.cpp",
+        "-o",
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-compact-cols/control-probe",
+        "-Wl,-rpath,/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-copy/build/bin",
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-copy/build/bin/libggml.0.26.0.dylib",
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-copy/build/bin/libggml-base.0.26.0.dylib"
+      ]
+    },
+    "compact": {
+      "engine": {
+        "engine": "m5-compact-cols",
+        "directory": "vendor/llama-m5-compact-cols",
+        "revision": "d81235049384534c167caea52b85a694f6103d14",
+        "source_diff_sha256": "8b817ede2aa0625a38aab9904f772c9ab3e6f0bfa91a45dcd8734a98079888df",
+        "patch": {
+          "schema": 1,
+          "id": "m5-compact-cols",
+          "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+          "directory": "vendor/llama-m5-compact-cols",
+          "patch": "patches/mtp-m5-compact-cols.patch",
+          "patch_sha256": "8b817ede2aa0625a38aab9904f772c9ab3e6f0bfa91a45dcd8734a98079888df",
+          "source_diff_sha256": "8b817ede2aa0625a38aab9904f772c9ab3e6f0bfa91a45dcd8734a98079888df",
+          "modified_files": [
+            "ggml/src/ggml-metal/ggml-metal-common.cpp",
+            "ggml/src/ggml-metal/ggml-metal-common.h",
+            "ggml/src/ggml-metal/ggml-metal-context.m",
+            "ggml/src/ggml-metal/ggml-metal-device.cpp",
+            "ggml/src/ggml-metal/ggml-metal-device.h",
+            "ggml/src/ggml-metal/ggml-metal-impl.h",
+            "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+            "ggml/src/ggml-metal/ggml-metal-ops.h",
+            "ggml/src/ggml-metal/ggml-metal.cpp",
+            "ggml/src/ggml-metal/kernels/mul_mm.metal",
+            "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+            "ggml/src/ggml-metal/kernels/quantize.metal",
+            "src/llama-context.cpp",
+            "src/llama-cparams.h",
+            "src/models/qwen4exp.cpp",
+            "tests/test-backend-ops.cpp"
+          ],
+          "features": [
+            "mtp-shared",
+            "m5-tuning",
+            "m5-profile",
+            "m5-copy",
+            "m5-compact",
+            "m5-compact-cols"
+          ],
+          "components": [
+            {
+              "patch": "patches/mtp-m5-copy.patch",
+              "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+            },
+            {
+              "patch": "patches/mtp-m5-compact.patch",
+              "sha256": "f00bde8d2ec960aa5c89db32b1e87c4fea6423d80974acbacc9fefc1f0dd9164"
+            }
+          ],
+          "scope": "Private opt-in M5Pro compact expert/token tile dispatch after original route map. Q2_0 gate/up [2560,640,512] and down [640,2560,512], F32 contiguous activations/output, I32 top10 IDs, T32..512, DEFAULT/F32 source precision and exact stock MM eligibility. GPU prefix worklist uses own appended allocation after unchanged amax, bounded static dispatch, same matrix arithmetic with function-constant expert/tile remap. Allocation, overlap, alignment and layout guards fall back; invalid GPU count or capacity fails closed. Private encoding counter and once-only encoded marker. No route-map reuse, graph reorder, model/cache/precision/default changes. V2 changes only compact grid axes to place output-channel tiles first, their logical coordinate remap, and matching overflow output indexing. Worklist construction, capacity, scratch, barriers, matrix arithmetic and fallback grid are identical to V1.",
+          "upstream": {
+            "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+            "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+            "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+            "license_file": "patches/LLAMA-LICENSE.txt"
+          }
+        },
+        "artifacts": {
+          "llama-server": "72d312cd6eb7dd05ccc3a14aa736dba2686b8710bbd93c2f72735653b40dd5aa",
+          "libggml-base.0.26.0.dylib": "4df975ecaafabdb7228a95a10905b41e84a5f69f3613d040c8ed59682c349425",
+          "libggml-base.0.dylib": "4df975ecaafabdb7228a95a10905b41e84a5f69f3613d040c8ed59682c349425",
+          "libggml-base.dylib": "4df975ecaafabdb7228a95a10905b41e84a5f69f3613d040c8ed59682c349425",
+          "libggml-blas.0.26.0.dylib": "c401d8a6c3ffac8ef9c687df68194888dfb3b8cae969538b82b568d4868a559a",
+          "libggml-blas.0.dylib": "c401d8a6c3ffac8ef9c687df68194888dfb3b8cae969538b82b568d4868a559a",
+          "libggml-blas.dylib": "c401d8a6c3ffac8ef9c687df68194888dfb3b8cae969538b82b568d4868a559a",
+          "libggml-cpu.0.26.0.dylib": "031b9a0732b659286ee0a1fca6b93819c639af5bc60964534c587f7558b07523",
+          "libggml-cpu.0.dylib": "031b9a0732b659286ee0a1fca6b93819c639af5bc60964534c587f7558b07523",
+          "libggml-cpu.dylib": "031b9a0732b659286ee0a1fca6b93819c639af5bc60964534c587f7558b07523",
+          "libggml-metal.0.26.0.dylib": "b180738d495c77da39979d5aa3fa7dee2cd0032f10189b9874d8b8d74e654139",
+          "libggml-metal.0.dylib": "b180738d495c77da39979d5aa3fa7dee2cd0032f10189b9874d8b8d74e654139",
+          "libggml-metal.dylib": "b180738d495c77da39979d5aa3fa7dee2cd0032f10189b9874d8b8d74e654139",
+          "libggml.0.26.0.dylib": "7c09668a3b9c9c4a7d839153865b3eb96f338324b32e2fd40af0c74df2aa88b7",
+          "libggml.0.dylib": "7c09668a3b9c9c4a7d839153865b3eb96f338324b32e2fd40af0c74df2aa88b7",
+          "libggml.dylib": "7c09668a3b9c9c4a7d839153865b3eb96f338324b32e2fd40af0c74df2aa88b7",
+          "libllama-common.0.6.0.dylib": "68fc298b69e1248159980fffed2e97a06b097d4d9fba4b86a37b25dc579a65f5",
+          "libllama-common.0.dylib": "68fc298b69e1248159980fffed2e97a06b097d4d9fba4b86a37b25dc579a65f5",
+          "libllama-common.dylib": "68fc298b69e1248159980fffed2e97a06b097d4d9fba4b86a37b25dc579a65f5",
+          "libllama-server-impl.dylib": "30ca282b61915d2ec343a90ab8f220fd5388a98699542df2ef1cfa04c7da9d43",
+          "libllama.0.6.0.dylib": "d08559f5ee5981c0e570601413088ed651be20d9d1249b45494bb74f9f79a75d",
+          "libllama.0.dylib": "d08559f5ee5981c0e570601413088ed651be20d9d1249b45494bb74f9f79a75d",
+          "libllama.dylib": "d08559f5ee5981c0e570601413088ed651be20d9d1249b45494bb74f9f79a75d",
+          "libmtmd.0.6.0.dylib": "bedd97187be2cf12245c13f4c05b21d342175d76a6098612dc4b33935346f344",
+          "libmtmd.0.dylib": "bedd97187be2cf12245c13f4c05b21d342175d76a6098612dc4b33935346f344",
+          "libmtmd.dylib": "bedd97187be2cf12245c13f4c05b21d342175d76a6098612dc4b33935346f344"
+        },
+        "build_receipt": {
+          "engine": "m5-compact-cols",
+          "directory": "vendor/llama-m5-compact-cols",
+          "revision": "d81235049384534c167caea52b85a694f6103d14",
+          "source_diff_sha256": "8b817ede2aa0625a38aab9904f772c9ab3e6f0bfa91a45dcd8734a98079888df",
+          "patch": {
+            "schema": 1,
+            "id": "m5-compact-cols",
+            "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+            "directory": "vendor/llama-m5-compact-cols",
+            "patch": "patches/mtp-m5-compact-cols.patch",
+            "patch_sha256": "8b817ede2aa0625a38aab9904f772c9ab3e6f0bfa91a45dcd8734a98079888df",
+            "source_diff_sha256": "8b817ede2aa0625a38aab9904f772c9ab3e6f0bfa91a45dcd8734a98079888df",
+            "modified_files": [
+              "ggml/src/ggml-metal/ggml-metal-common.cpp",
+              "ggml/src/ggml-metal/ggml-metal-common.h",
+              "ggml/src/ggml-metal/ggml-metal-context.m",
+              "ggml/src/ggml-metal/ggml-metal-device.cpp",
+              "ggml/src/ggml-metal/ggml-metal-device.h",
+              "ggml/src/ggml-metal/ggml-metal-impl.h",
+              "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+              "ggml/src/ggml-metal/ggml-metal-ops.h",
+              "ggml/src/ggml-metal/ggml-metal.cpp",
+              "ggml/src/ggml-metal/kernels/mul_mm.metal",
+              "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+              "ggml/src/ggml-metal/kernels/quantize.metal",
+              "src/llama-context.cpp",
+              "src/llama-cparams.h",
+              "src/models/qwen4exp.cpp",
+              "tests/test-backend-ops.cpp"
+            ],
+            "features": [
+              "mtp-shared",
+              "m5-tuning",
+              "m5-profile",
+              "m5-copy",
+              "m5-compact",
+              "m5-compact-cols"
+            ],
+            "components": [
+              {
+                "patch": "patches/mtp-m5-copy.patch",
+                "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+              },
+              {
+                "patch": "patches/mtp-m5-compact.patch",
+                "sha256": "f00bde8d2ec960aa5c89db32b1e87c4fea6423d80974acbacc9fefc1f0dd9164"
+              }
+            ],
+            "scope": "Private opt-in M5Pro compact expert/token tile dispatch after original route map. Q2_0 gate/up [2560,640,512] and down [640,2560,512], F32 contiguous activations/output, I32 top10 IDs, T32..512, DEFAULT/F32 source precision and exact stock MM eligibility. GPU prefix worklist uses own appended allocation after unchanged amax, bounded static dispatch, same matrix arithmetic with function-constant expert/tile remap. Allocation, overlap, alignment and layout guards fall back; invalid GPU count or capacity fails closed. Private encoding counter and once-only encoded marker. No route-map reuse, graph reorder, model/cache/precision/default changes. V2 changes only compact grid axes to place output-channel tiles first, their logical coordinate remap, and matching overflow output indexing. Worklist construction, capacity, scratch, barriers, matrix arithmetic and fallback grid are identical to V1.",
+            "upstream": {
+              "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+              "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+              "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+              "license_file": "patches/LLAMA-LICENSE.txt"
+            }
+          },
+          "artifacts": {
+            "llama-server": "72d312cd6eb7dd05ccc3a14aa736dba2686b8710bbd93c2f72735653b40dd5aa",
+            "libggml-base.0.26.0.dylib": "4df975ecaafabdb7228a95a10905b41e84a5f69f3613d040c8ed59682c349425",
+            "libggml-base.0.dylib": "4df975ecaafabdb7228a95a10905b41e84a5f69f3613d040c8ed59682c349425",
+            "libggml-base.dylib": "4df975ecaafabdb7228a95a10905b41e84a5f69f3613d040c8ed59682c349425",
+            "libggml-blas.0.26.0.dylib": "c401d8a6c3ffac8ef9c687df68194888dfb3b8cae969538b82b568d4868a559a",
+            "libggml-blas.0.dylib": "c401d8a6c3ffac8ef9c687df68194888dfb3b8cae969538b82b568d4868a559a",
+            "libggml-blas.dylib": "c401d8a6c3ffac8ef9c687df68194888dfb3b8cae969538b82b568d4868a559a",
+            "libggml-cpu.0.26.0.dylib": "031b9a0732b659286ee0a1fca6b93819c639af5bc60964534c587f7558b07523",
+            "libggml-cpu.0.dylib": "031b9a0732b659286ee0a1fca6b93819c639af5bc60964534c587f7558b07523",
+            "libggml-cpu.dylib": "031b9a0732b659286ee0a1fca6b93819c639af5bc60964534c587f7558b07523",
+            "libggml-metal.0.26.0.dylib": "b180738d495c77da39979d5aa3fa7dee2cd0032f10189b9874d8b8d74e654139",
+            "libggml-metal.0.dylib": "b180738d495c77da39979d5aa3fa7dee2cd0032f10189b9874d8b8d74e654139",
+            "libggml-metal.dylib": "b180738d495c77da39979d5aa3fa7dee2cd0032f10189b9874d8b8d74e654139",
+            "libggml.0.26.0.dylib": "7c09668a3b9c9c4a7d839153865b3eb96f338324b32e2fd40af0c74df2aa88b7",
+            "libggml.0.dylib": "7c09668a3b9c9c4a7d839153865b3eb96f338324b32e2fd40af0c74df2aa88b7",
+            "libggml.dylib": "7c09668a3b9c9c4a7d839153865b3eb96f338324b32e2fd40af0c74df2aa88b7",
+            "libllama-common.0.6.0.dylib": "68fc298b69e1248159980fffed2e97a06b097d4d9fba4b86a37b25dc579a65f5",
+            "libllama-common.0.dylib": "68fc298b69e1248159980fffed2e97a06b097d4d9fba4b86a37b25dc579a65f5",
+            "libllama-common.dylib": "68fc298b69e1248159980fffed2e97a06b097d4d9fba4b86a37b25dc579a65f5",
+            "libllama-server-impl.dylib": "30ca282b61915d2ec343a90ab8f220fd5388a98699542df2ef1cfa04c7da9d43",
+            "libllama.0.6.0.dylib": "d08559f5ee5981c0e570601413088ed651be20d9d1249b45494bb74f9f79a75d",
+            "libllama.0.dylib": "d08559f5ee5981c0e570601413088ed651be20d9d1249b45494bb74f9f79a75d",
+            "libllama.dylib": "d08559f5ee5981c0e570601413088ed651be20d9d1249b45494bb74f9f79a75d",
+            "libmtmd.0.6.0.dylib": "bedd97187be2cf12245c13f4c05b21d342175d76a6098612dc4b33935346f344",
+            "libmtmd.0.dylib": "bedd97187be2cf12245c13f4c05b21d342175d76a6098612dc4b33935346f344",
+            "libmtmd.dylib": "bedd97187be2cf12245c13f4c05b21d342175d76a6098612dc4b33935346f344"
+          },
+          "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+          "build_settings": {
+            "CMAKE_BUILD_TYPE": "Release",
+            "GGML_BLAS": "ON",
+            "GGML_CPU": "ON",
+            "GGML_METAL": "ON",
+            "GGML_METAL_EMBED_LIBRARY": "ON",
+            "GGML_NATIVE": "ON",
+            "LLAMA_BUILD_TESTS": "ON",
+            "LLAMA_BUILD_TOOLS": "ON"
+          },
+          "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+        }
+      },
+      "source_sha256": "d144fc12cdf4f4354086d7f8295f8158b189d28cddfca233538e07334ed7c075",
+      "runner_sha256": "21dd65ed588f4603eef3c1ae4f4811463f053587eeadcfacd6993217e0de8477",
+      "dependencies": {
+        "benchmark.py": "88d7dbc119d3d6cd675ad54d620734b2af68e9dc5fdbbe23ea29c342d4fbce48",
+        "engines.py": "2af2e541c7a09f60bc36693e519c2f6a81c4c8ac44ad5117ad8836cbe18cd73f",
+        "metal_environment.py": "1b70760802f3e504ed8d6a6d38cd74e8b0b34edc961a0256f15b43fff91f8d0a",
+        "check_memory.py": "3af26bba58b77fd47d9993126009f188c951aecaddff6d2e82febd5c3a83eada",
+        "validate_offline.py": "e2ec5c1777411e131c64bf436e91b8beccc19ecc18da62809b19cd53d0184c06"
+      },
+      "binary_sha256": "65be052083d2ca56d8944afdee710368f9407725c188232f4e449c8ab0fbc21a",
+      "command": [
+        "/usr/bin/c++",
+        "-O3",
+        "-ffp-contract=off",
+        "-std=gnu++17",
+        "-arch",
+        "arm64",
+        "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-compact-cols/ggml/include",
+        "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-compact-cols/vendor",
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/native/m5_compact_probe.cpp",
+        "-o",
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-compact-cols/compact-probe",
+        "-Wl,-rpath,/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-compact-cols/build/bin",
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-compact-cols/build/bin/libggml.0.26.0.dylib",
+        "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-compact-cols/build/bin/libggml-base.0.26.0.dylib"
+      ]
+    }
+  },
+  "archive": {
+    "native/m5_compact_probe.cpp": "d144fc12cdf4f4354086d7f8295f8158b189d28cddfca233538e07334ed7c075",
+    "scripts/benchmark_m5_compact_cols.py": "21dd65ed588f4603eef3c1ae4f4811463f053587eeadcfacd6993217e0de8477",
+    "tests/test_m5_compact.py": "53119c57a9d77acd868497bac7cb22eea69c95b16639f24b3900ee48c4dec801",
+    "scripts/benchmark.py": "88d7dbc119d3d6cd675ad54d620734b2af68e9dc5fdbbe23ea29c342d4fbce48",
+    "scripts/engines.py": "2af2e541c7a09f60bc36693e519c2f6a81c4c8ac44ad5117ad8836cbe18cd73f",
+    "scripts/metal_environment.py": "1b70760802f3e504ed8d6a6d38cd74e8b0b34edc961a0256f15b43fff91f8d0a",
+    "scripts/check_memory.py": "3af26bba58b77fd47d9993126009f188c951aecaddff6d2e82febd5c3a83eada",
+    "scripts/validate_offline.py": "e2ec5c1777411e131c64bf436e91b8beccc19ecc18da62809b19cd53d0184c06",
+    "config/m5_compact_cols_experiment.json": "35ca6d8c0934bb3eb1f96894a59041f06969d2abc594268becba0e57986cfef3",
+    "patches/mtp-m5-compact-cols.patch": "8b817ede2aa0625a38aab9904f772c9ab3e6f0bfa91a45dcd8734a98079888df",
+    "config/m5_compact_experiment.json": "fca2de046bdb8284ebded57107f9b382215afe222bf97266640756f112d674c3",
+    "patches/mtp-m5-compact.patch": "f00bde8d2ec960aa5c89db32b1e87c4fea6423d80974acbacc9fefc1f0dd9164",
+    "scripts/benchmark_m5_compact.py": "e3bb6dcff4273787af39f6a13c53c76330e59d4241f28ff5a427e328efcc5e56",
+    "config/m5_copy_experiment.json": "2784a55939ab85bb6400c2bed8ca7e69b7602ba6e60ee5a40654d5a6d1c48633",
+    "patches/mtp-m5-copy.patch": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+  },
+  "check_inventory": [
+    {
+      "rows": 31,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 31,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 31,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 31,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 31,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 31,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 31,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 31,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 31,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 31,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 31,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 31,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 31,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 31,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 31,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 31,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 31,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 31,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 32,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 32,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 32,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 32,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 32,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 32,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 32,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 32,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 32,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 32,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 32,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 32,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 32,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 32,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 32,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 32,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 32,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 32,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 64,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 64,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 64,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 64,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 64,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 64,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 64,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 64,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 64,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 64,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 64,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 64,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 64,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 64,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 64,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 64,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 64,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 64,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 127,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 127,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 127,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 127,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 127,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 127,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 127,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 127,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 127,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 127,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 127,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 127,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 127,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 127,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 127,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 127,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 127,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 127,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 508,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 508,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 508,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 508,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 508,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 508,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 508,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 508,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 508,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 508,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 508,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 508,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 508,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 508,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 508,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 508,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 508,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 508,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 513,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 513,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 513,
+      "route": "uniform",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 513,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 513,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 513,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 513,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 513,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 513,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 513,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 513,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 513,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 513,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 513,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 513,
+      "route": "mixed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 513,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 513,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 513,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": false,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": false,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": false,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "all-f32",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "all-f32",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "all-f32",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "gate-f32-up-default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "gate-f32-up-default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "gate-f32-up-default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "gate-default-up-f32",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "gate-default-up-f32",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "gate-default-up-f32",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "different-input",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "different-input",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "different-input",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "different-ids",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "different-ids",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "different-ids",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "intervening-gate-scale",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "intervening-gate-scale",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "intervening-gate-scale",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "activation-unfused",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "activation-unfused",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "activation-unfused",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "unsupported-shape",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "unsupported-shape",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "unsupported-shape",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "unsupported-k",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "unsupported-k",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "unsupported-k",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "activation-f16",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "activation-f16",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "activation-f16",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "precision-f16",
+      "precision": "all-f16",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "precision-f16",
+      "precision": "all-f16",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "precision-f16",
+      "precision": "all-f16",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": false,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": false,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": false,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "all-f32",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "all-f32",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "all-f32",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "gate-f32-up-default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "gate-f32-up-default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "gate-f32-up-default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "gate-default-up-f32",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "gate-default-up-f32",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "gate-default-up-f32",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "different-input",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "different-input",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "different-input",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "different-ids",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "different-ids",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "different-ids",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "intervening-gate-scale",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "intervening-gate-scale",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "intervening-gate-scale",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "activation-unfused",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "activation-unfused",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "activation-unfused",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "unsupported-shape",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "unsupported-shape",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "unsupported-shape",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "unsupported-k",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "unsupported-k",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "unsupported-k",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "activation-f16",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "activation-f16",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "activation-f16",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "precision-f16",
+      "precision": "all-f16",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "precision-f16",
+      "precision": "all-f16",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "precision-f16",
+      "precision": "all-f16",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 1,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 1,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 1,
+      "route": "shared",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "skewed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "skewed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "skewed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 33,
+      "route": "skewed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "skewed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 33,
+      "route": "skewed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 64,
+      "route": "skewed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 64,
+      "route": "skewed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 64,
+      "route": "skewed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 64,
+      "route": "skewed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 64,
+      "route": "skewed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 64,
+      "route": "skewed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 127,
+      "route": "skewed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 127,
+      "route": "skewed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 127,
+      "route": "skewed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 127,
+      "route": "skewed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 127,
+      "route": "skewed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 127,
+      "route": "skewed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 508,
+      "route": "skewed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 508,
+      "route": "skewed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 508,
+      "route": "skewed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 508,
+      "route": "skewed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 508,
+      "route": "skewed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 508,
+      "route": "skewed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "skewed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "skewed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "skewed",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "skewed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "skewed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "skewed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 508,
+      "route": "capacity",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 508,
+      "route": "capacity",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 508,
+      "route": "capacity",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 508,
+      "route": "capacity-permuted",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 508,
+      "route": "capacity-permuted",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 508,
+      "route": "capacity-permuted",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 508,
+      "route": "capacity",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 508,
+      "route": "capacity",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 508,
+      "route": "capacity",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 508,
+      "route": "capacity-permuted",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 508,
+      "route": "capacity-permuted",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 508,
+      "route": "capacity-permuted",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "capacity",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "capacity",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "capacity",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "capacity-permuted",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "capacity-permuted",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "capacity-permuted",
+      "id_stride_bytes": 40,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "capacity",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "capacity",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "capacity",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    },
+    {
+      "rows": 512,
+      "route": "capacity-permuted",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "capacity-permuted",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 1
+    },
+    {
+      "rows": 512,
+      "route": "capacity-permuted",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 2
+    }
+  ],
+  "perf_inventory": [
+    {
+      "rows": 32,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 32,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 32,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 33,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 64,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 64,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 64,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 127,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 127,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 127,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 508,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 508,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 508,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "uniform",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "shared",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    },
+    {
+      "rows": 512,
+      "route": "mixed",
+      "id_stride_bytes": 2048,
+      "layout": "plain",
+      "precision": "default",
+      "terminal_only": true,
+      "round": 0
+    }
+  ],
+  "gate": "Strictly more than 10% complete two-dependent-block time reduction above twice absolute control drift for BOTH T508/T512 uniform synthetic routes; exact terminal F32 bytes and diagnostic projection bytes, complete per-MM activation/fallback, immutable inputs/weights, no new swap. Scheduling tile counts are not elapsed gains or model TPS."
+}

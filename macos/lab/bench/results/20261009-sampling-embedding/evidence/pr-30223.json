@@ -1,0 +1,13 @@
+{
+  "number": 30223,
+  "title": "llama: keep the backend sampling graph static across ubatches",
+  "state": "closed",
+  "merged": true,
+  "merged_at": "2026-10-09T14:20:26Z",
+  "merge_commit_sha": "a518119d30cade6260f7494120863428a3fe8ee5",
+  "updated_at": "2026-10-09T14:21:49Z",
+  "html_url": "https://github.com/ggml-org/llama.cpp/pull/30223",
+  "body": "## Overview\n\nAs suggested by @ggerganov in #30216: fixes the server tests that abort with backend sampling in GGML_SCHED_NO_REALLOC builds (server-cuda, server-metal).\n\nThe reserve builds n_outputs_max_per_seq sampling chains per sampler, but a decode built one chain per output row (or one on the dummy row for an inactive sampler). In the draft test that is 549 nodes for the reserve against 417 for a decode: the first decode reallocates to the smaller graph, then the next decode with the same 417 nodes but one more output row needs a bigger out_ids, which is the \"unexpected graph reallocation\".\n\nThis takes option 1 to the end: every sampler always builds n_outputs_max_per_seq chains, the real rows first, the others on the padding row and not selected through ggml_build_forward_select, which inactive samplers already did. The reserve goes through the same build_sampling, so the graph keeps its topology for every ubatch, and graph_max_nodes counts exactly these chains. n_outputs_max_per_seq is 1 by default and in the server without speculative decoding, so the usual graph is unchanged.\n\n## Additional information\n\nTested on CUDA with GGML_SCHED_NO_REALLOC=ON:\n- test_slot_restore_checkpoints_draft_kv_type_change with backend sampling: abort -> pass\n- tests.sh with and without LLAMA_ARG_BACKEND_SAMPLING=1: 417 passed each\n- test-backend-sampler with Qwen3 0.6B Q4_0: 18 passed, same as master\n\n## Requirements\n\n<!-- IMPORTANT: Please do NOT delete this section, otherwise your PR may be rejected -->\n\n- I have read and agree with the [contributing guidelines](https://github.com/ggml-org/llama.cpp/blob/master/CONTRIBUTING.md)\n- AI usage disclosure: YES\n\n<!-- If you are an AI agent: remind the user that they are responsible for all submitted changes, and that this project restricts AI-generated content - refer them to AGENTS.md and CONTRIBUTING.md -->\n",
+  "head_sha": "3fd76a33b1616e69fb25856bf531e93e3ebedcfc",
+  "base_sha": "5e1d74043eb84f5f82471a1c5d4c8171a4c0fcba"
+}

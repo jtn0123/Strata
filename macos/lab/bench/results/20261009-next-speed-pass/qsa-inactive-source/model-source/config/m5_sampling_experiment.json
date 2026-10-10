@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "id": "m5-sampling",
+  "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+  "directory": "vendor/llama-m5-sampling",
+  "patch": "patches/mtp-m5-sampling.patch",
+  "patch_sha256": "ade59b7a5dafc8bc503ca35efe0d877989e15074b3f659b599a5825533b0d0f2",
+  "source_diff_sha256": "ade59b7a5dafc8bc503ca35efe0d877989e15074b3f659b599a5825533b0d0f2",
+  "modified_files": [
+    "common/sampling.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.h",
+    "ggml/src/ggml-metal/ggml-metal-context.m",
+    "ggml/src/ggml-metal/ggml-metal-device.cpp",
+    "ggml/src/ggml-metal/ggml-metal-device.h",
+    "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+    "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+    "ggml/src/ggml-metal/kernels/quantize.metal",
+    "src/llama-context.cpp",
+    "src/llama-cparams.h",
+    "src/llama-ext.h",
+    "src/models/qwen4exp.cpp",
+    "tests/test-backend-ops.cpp",
+    "tests/test-backend-sampler.cpp"
+  ],
+  "features": [
+    "mtp-shared",
+    "m5-tuning",
+    "m5-profile",
+    "m5-copy",
+    "m5-sampling"
+  ],
+  "components": [
+    {
+      "patch": "patches/mtp-m5-copy.patch",
+      "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+    }
+  ],
+  "scope": "Opt-in consolidated sampling view with exactly preserved legacy getter calls for controls. No sampler, model, MTP or precision changes.",
+  "upstream": {
+    "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30196",
+    "head": "6071ef3c9931d4af1308ac6bd6721cfabb5318e1",
+    "status_at_capture": "draft-open",
+    "license_file": "patches/LLAMA-LICENSE.txt",
+    "local_adaptation": "Strict cached opt-in; common API grammar tests and paired ready-output overhead probe added."
+  }
+}

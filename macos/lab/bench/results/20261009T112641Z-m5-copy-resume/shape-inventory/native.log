@@ -1,0 +1,672 @@
+0.00.029.192 I srv  llama_server: initializing ...
+0.00.029.201 I cmn  common_param: common_params_print_info: build 1 (d812350) with AppleClang 21.0.0.21000334 for Darwin arm64
+0.00.029.201 I cmn  common_param: common_params_print_info: verbosity = 4 (adjust with the `-lv N` CLI arg)
+0.00.029.201 I cmn  common_param: device_info:
+0.00.029.206 I cmn  common_param:   - MTL0    : Apple M5 Pro (38338 MiB, 38338 MiB free)
+0.00.029.207 I cmn  common_param:   - BLAS    : Accelerate (0 MiB, 0 MiB free)
+0.00.029.214 I cmn  common_param:   - CPU     : Apple M5 Pro (49152 MiB, 49152 MiB free)
+0.00.029.223 I cmn  common_param: system_info: n_threads = 8 (n_threads_batch = 8) / 18 | MTL : EMBED_LIBRARY = 1 | CPU : NEON = 1 | ARM_FMA = 1 | FP16_VA = 1 | MATMUL_INT8 = 1 | DOTPROD = 1 | SME = 1 | SME2 = 1 | ACCELERATE = 1 | REPACK = 1 | 
+0.00.029.390 I srv  init_listene: running without SSL
+0.00.029.481 I srv  init_listene: The UI is disabled
+0.00.029.482 I srv  init_listene: Use --ui/--no-ui (or deprecated --webui/--no-webui) to enable/disable
+0.00.029.554 I srv          init: using 17 threads for HTTP server
+0.00.031.442 I srv    load_model: loading model '/Users/justin/Documents/Github/Strata-Mac-Lab/models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf'
+0.00.031.444 I srv    load_model: local path '/Users/justin/Documents/Github/Strata-Mac-Lab/models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf'
+0.00.065.372 I llama_model_loader: additional 1 GGUFs metadata loaded.
+0.00.065.374 I llama_model_loader: loaded meta data with 73 key-value pairs and 1224 tensors from /Users/justin/Documents/Github/Strata-Mac-Lab/models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf (version GGUF V3 (latest))
+0.00.065.396 I llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+0.00.065.397 I llama_model_loader: - kv   0:                       general.architecture str              = qwen4exp
+0.00.065.398 I llama_model_loader: - kv   1:                               general.type str              = model
+0.00.065.399 I llama_model_loader: - kv   2:                     general.sampling.top_k i32              = 20
+0.00.065.400 I llama_model_loader: - kv   3:                     general.sampling.top_p f32              = 0.950000
+0.00.065.400 I llama_model_loader: - kv   4:                      general.sampling.temp f32              = 1.000000
+0.00.065.401 I llama_model_loader: - kv   5:                         general.size_label str              = 512x56B
+0.00.065.401 I llama_model_loader: - kv   6:                       qwen4exp.block_count u32              = 48
+0.00.065.401 I llama_model_loader: - kv   7:                    qwen4exp.context_length u32              = 262144
+0.00.065.402 I llama_model_loader: - kv   8:                  qwen4exp.embedding_length u32              = 2560
+0.00.065.402 I llama_model_loader: - kv   9:              qwen4exp.attention.head_count u32              = 24
+0.00.065.402 I llama_model_loader: - kv  10:           qwen4exp.attention.head_count_kv u32              = 2
+0.00.065.405 I llama_model_loader: - kv  11:           qwen4exp.rope.dimension_sections arr[i32,4]       = [11, 11, 10, 0]
+0.00.065.406 I llama_model_loader: - kv  12:                    qwen4exp.rope.freq_base f32              = 10000000.000000
+0.00.065.406 I llama_model_loader: - kv  13:  qwen4exp.attention.layer_norm_rms_epsilon f32              = 0.000001
+0.00.065.407 I llama_model_loader: - kv  14:                      qwen4exp.expert_count u32              = 512
+0.00.065.407 I llama_model_loader: - kv  15:                 qwen4exp.expert_used_count u32              = 10
+0.00.065.407 I llama_model_loader: - kv  16:              qwen4exp.attention.key_length u32              = 256
+0.00.065.407 I llama_model_loader: - kv  17:            qwen4exp.attention.value_length u32              = 256
+0.00.065.408 I llama_model_loader: - kv  18:        qwen4exp.expert_feed_forward_length u32              = 640
+0.00.065.408 I llama_model_loader: - kv  19: qwen4exp.expert_shared_feed_forward_length u32              = 640
+0.00.065.408 I llama_model_loader: - kv  20:                   qwen4exp.ssm.conv_kernel u32              = 4
+0.00.065.408 I llama_model_loader: - kv  21:                    qwen4exp.ssm.state_size u32              = 128
+0.00.065.408 I llama_model_loader: - kv  22:                   qwen4exp.ssm.group_count u32              = 16
+0.00.065.409 I llama_model_loader: - kv  23:                qwen4exp.ssm.time_step_rank u32              = 48
+0.00.065.409 I llama_model_loader: - kv  24:                    qwen4exp.ssm.inner_size u32              = 6144
+0.00.065.409 I llama_model_loader: - kv  25:           qwen4exp.full_attention_interval u32              = 4
+0.00.065.409 I llama_model_loader: - kv  26:              qwen4exp.rope.dimension_count u32              = 64
+0.00.065.409 I llama_model_loader: - kv  27:            qwen4exp.hyper_connection.count u32              = 4
+0.00.065.410 I llama_model_loader: - kv  28:         qwen4exp.hyper_connection.low_rank u32              = 320
+0.00.065.410 I llama_model_loader: - kv  29:      qwen4exp.attention.indexer.head_count u32              = 4
+0.00.065.410 I llama_model_loader: - kv  30:      qwen4exp.attention.indexer.key_length u32              = 128
+0.00.065.410 I llama_model_loader: - kv  31:           qwen4exp.attention.indexer.top_k u32              = 2048
+0.00.065.413 I llama_model_loader: - kv  32:         qwen4exp.attention.compress_ratios arr[i32,48]      = [0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4, ...
+0.00.065.414 I llama_model_loader: - kv  33:                        qwen4exp.ple.layers arr[i32,1]       = [1]
+0.00.065.414 I llama_model_loader: - kv  34:                    qwen4exp.ple.ngram_size u32              = 3
+0.00.065.414 I llama_model_loader: - kv  35:               qwen4exp.ple.heads_per_ngram u32              = 8
+0.00.065.414 I llama_model_loader: - kv  36:                   qwen4exp.ple.conv_kernel u32              = 4
+0.00.065.415 I llama_model_loader: - kv  37:                  qwen4exp.ple.eos_token_id u32              = 248044
+0.00.065.415 I llama_model_loader: - kv  38:  qwen4exp.embedding_length_per_layer_input u32              = 160
+0.00.065.425 I llama_model_loader: - kv  39:             qwen4exp.ple.layer_multipliers arr[u64,3]       = [23703573157769, 20109073645365, 8052...
+0.00.065.426 I llama_model_loader: - kv  40:                  qwen4exp.ple.head_offsets arr[u64,16]      = [0, 20000003, 40000026, 60000059, 800...
+0.00.065.427 I llama_model_loader: - kv  41:              qwen4exp.ple.head_vocab_sizes arr[u64,16]      = [20000003, 20000023, 20000033, 200000...
+0.00.065.428 I llama_model_loader: - kv  42:                       tokenizer.ggml.model str              = gpt2
+0.00.065.428 I llama_model_loader: - kv  43:                         tokenizer.ggml.pre str              = qwen35
+0.00.080.044 I llama_model_loader: - kv  44:                      tokenizer.ggml.tokens arr[str,248320]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+0.00.083.682 I llama_model_loader: - kv  45:                  tokenizer.ggml.token_type arr[i32,248320]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+0.00.097.902 I llama_model_loader: - kv  46:                      tokenizer.ggml.merges arr[str,247587]  = ["Ġ Ġ", "ĠĠ ĠĠ", "i n", "Ġ t",...
+0.00.097.905 I llama_model_loader: - kv  47:                tokenizer.ggml.eos_token_id u32              = 248046
+0.00.097.906 I llama_model_loader: - kv  48:            tokenizer.ggml.padding_token_id u32              = 248044
+0.00.097.906 I llama_model_loader: - kv  49:                tokenizer.ggml.bos_token_id u32              = 248044
+0.00.097.906 I llama_model_loader: - kv  50:               tokenizer.ggml.add_bos_token bool             = false
+0.00.097.911 I llama_model_loader: - kv  51:                    tokenizer.chat_template str              = {%- set image_count = namespace(value...
+0.00.097.911 I llama_model_loader: - kv  52:                qwen4exp.ple.image_token_id u32              = 248056
+0.00.097.911 I llama_model_loader: - kv  53:                      quantize.imatrix.file str              = imatrix-qwen3.8-flash-next.gguf
+0.00.097.912 I llama_model_loader: - kv  54:                   quantize.imatrix.dataset str              = calib_qwen3.8-flash-next.tokids
+0.00.097.912 I llama_model_loader: - kv  55:             quantize.imatrix.entries_count u32              = 926
+0.00.097.912 I llama_model_loader: - kv  56:              quantize.imatrix.chunks_count u32              = 1000
+0.00.097.913 I llama_model_loader: - kv  57:                               general.name str              = Qwen3.8-Flash-Next GSQ-RCO
+0.00.097.913 I llama_model_loader: - kv  58:                           general.basename str              = Qwen3.8-Flash-Next
+0.00.097.913 I llama_model_loader: - kv  59:                       general.quantized_by str              = ISTA DASLab
+0.00.097.914 I llama_model_loader: - kv  60:                           general.repo_url str              = https://huggingface.co/ISTA-DASLab
+0.00.097.914 I llama_model_loader: - kv  61:                            general.license str              = apache-2.0
+0.00.097.916 I llama_model_loader: - kv  62:                               general.tags arr[str,2]       = ["gsq-rco", "ista-daslab"]
+0.00.097.917 I llama_model_loader: - kv  63:                        general.description str              = GSQ-RCO non-uniform mixed-precision G...
+0.00.097.917 I llama_model_loader: - kv  64:                   general.base_model.count u32              = 1
+0.00.097.917 I llama_model_loader: - kv  65:                  general.base_model.0.name str              = Qwen3.8 Flash Next
+0.00.097.918 I llama_model_loader: - kv  66:          general.base_model.0.organization str              = Qwen
+0.00.097.918 I llama_model_loader: - kv  67:              general.base_model.0.repo_url str              = https://huggingface.co/Qwen/Qwen3.8-F...
+0.00.097.919 I llama_model_loader: - kv  68:                          general.file_type u32              = 41
+0.00.097.919 I llama_model_loader: - kv  69:               general.quantization_version u32              = 2
+0.00.097.919 I llama_model_loader: - kv  70:                                   split.no u16              = 0
+0.00.097.920 I llama_model_loader: - kv  71:                                split.count u16              = 2
+0.00.097.920 I llama_model_loader: - kv  72:                        split.tensors.count i32              = 1224
+0.00.097.920 I llama_model_loader: - type  f32:  292 tensors
+0.00.097.920 I llama_model_loader: - type  f16:    1 tensors
+0.00.097.921 I llama_model_loader: - type q4_0:   16 tensors
+0.00.097.921 I llama_model_loader: - type q5_0:    7 tensors
+0.00.097.921 I llama_model_loader: - type q8_0:    2 tensors
+0.00.097.921 I llama_model_loader: - type q3_K:   91 tensors
+0.00.097.921 I llama_model_loader: - type q4_K:   38 tensors
+0.00.097.921 I llama_model_loader: - type q5_K:   16 tensors
+0.00.097.921 I llama_model_loader: - type q6_K:   12 tensors
+0.00.097.922 I llama_model_loader: - type iq4_nl:    8 tensors
+0.00.097.922 I llama_model_loader: - type iq4_xs:   56 tensors
+0.00.097.922 I llama_model_loader: - type bf16:  483 tensors
+0.00.097.922 I llama_model_loader: - type q2_0:  202 tensors
+0.00.097.925 I print_info: file format = GGUF V3 (latest)
+0.00.097.925 I print_info: file type   = Q2_0
+0.00.097.926 I print_info: file size   = 61.85 GiB (3.00 BPW) 
+0.00.097.961 I llama_prepare_model_devices: using device MTL0 (Apple M5 Pro) (unknown id) - 38338 MiB free
+0.00.142.424 I load: 0 unused tokens
+0.00.153.555 I load: printing all EOG tokens:
+0.00.153.559 I load:   - 248044 ('<|endoftext|>')
+0.00.153.559 I load:   - 248046 ('<|im_end|>')
+0.00.153.559 I load:   - 248063 ('<|fim_pad|>')
+0.00.153.560 I load:   - 248064 ('<|repo_name|>')
+0.00.153.560 I load:   - 248065 ('<|file_sep|>')
+0.00.153.701 I load: special tokens cache size = 33
+0.00.185.326 I load: token to piece cache size = 1.7581 MB
+0.00.185.352 I print_info: arch                  = qwen4exp
+0.00.185.352 I print_info: vocab_only            = 0
+0.00.185.352 I print_info: no_alloc              = 0
+0.00.185.353 I print_info: n_ctx_train           = 262144
+0.00.185.353 I print_info: n_embd_inp            = 2560
+0.00.185.353 I print_info: n_embd                = 2560
+0.00.185.353 I print_info: n_embd_out            = 10240
+0.00.185.353 I print_info: n_layer               = 48
+0.00.185.354 I print_info: n_layer_all           = 48
+0.00.185.357 I print_info: n_head                = 24
+0.00.185.357 I print_info: n_head_kv             = 2
+0.00.185.358 I print_info: n_rot                 = 64
+0.00.185.358 I print_info: n_swa                 = 0
+0.00.185.358 I print_info: is_swa_any            = 0
+0.00.185.358 I print_info: non_causal_type       = 0
+0.00.185.358 I print_info: n_embd_head_k         = 256
+0.00.185.358 I print_info: n_embd_head_v         = 256
+0.00.185.359 I print_info: n_gqa                 = 12
+0.00.185.360 I print_info: n_embd_k_gqa          = 512
+0.00.185.360 I print_info: n_embd_v_gqa          = 512
+0.00.185.360 I print_info: f_norm_eps            = 0.0e+00
+0.00.185.361 I print_info: f_norm_rms_eps        = 1.0e-06
+0.00.185.361 I print_info: f_clamp_kqv           = 0.0e+00
+0.00.185.362 I print_info: f_max_alibi_bias      = 0.0e+00
+0.00.185.362 I print_info: f_logit_scale         = 0.0e+00
+0.00.185.362 I print_info: f_attn_scale          = 0.0e+00
+0.00.185.362 I print_info: f_attn_value_scale    = 0.0000
+0.00.185.363 I print_info: n_ff                  = 0
+0.00.185.363 I print_info: n_expert              = 512
+0.00.185.364 I print_info: n_expert_used         = 10
+0.00.185.364 I print_info: n_expert_groups       = 0
+0.00.185.364 I print_info: n_group_used          = 0
+0.00.185.364 I print_info: causal attn           = 1
+0.00.185.364 I print_info: pooling type          = -1
+0.00.185.364 I print_info: rope type             = 40
+0.00.185.364 I print_info: rope scaling          = linear
+0.00.185.364 I print_info: freq_base_train       = 10000000.0
+0.00.185.365 I print_info: freq_scale_train      = 1
+0.00.185.365 I print_info: n_ctx_orig_yarn       = 262144
+0.00.185.365 I print_info: rope_yarn_log_mul     = 0.0000
+0.00.185.365 I print_info: rope_finetuned        = unknown
+0.00.185.365 I print_info: mrope sections        = [11, 11, 10, 0]
+0.00.185.366 I print_info: model type            = A3B
+0.00.185.366 I print_info: model params          = 176.94 B
+0.00.185.366 I print_info: general.name          = Qwen3.8-Flash-Next GSQ-RCO
+0.00.185.367 I print_info: vocab type            = BPE
+0.00.185.367 I print_info: n_vocab               = 248320
+0.00.185.367 I print_info: n_merges              = 247587
+0.00.185.367 I print_info: BOS token             = 248044 '<|endoftext|>'
+0.00.185.367 I print_info: EOS token             = 248046 '<|im_end|>'
+0.00.185.368 I print_info: EOT token             = 248046 '<|im_end|>'
+0.00.185.368 I print_info: PAD token             = 248044 '<|endoftext|>'
+0.00.185.368 I print_info: LF token              = 198 'Ċ'
+0.00.185.368 I print_info: FIM PRE token         = 248060 '<|fim_prefix|>'
+0.00.185.368 I print_info: FIM SUF token         = 248062 '<|fim_suffix|>'
+0.00.185.368 I print_info: FIM MID token         = 248061 '<|fim_middle|>'
+0.00.185.369 I print_info: FIM PAD token         = 248063 '<|fim_pad|>'
+0.00.185.369 I print_info: FIM REP token         = 248064 '<|repo_name|>'
+0.00.185.369 I print_info: FIM SEP token         = 248065 '<|file_sep|>'
+0.00.185.369 I print_info: EOG token             = 248044 '<|endoftext|>'
+0.00.185.369 I print_info: EOG token             = 248046 '<|im_end|>'
+0.00.185.369 I print_info: EOG token             = 248063 '<|fim_pad|>'
+0.00.185.369 I print_info: EOG token             = 248064 '<|repo_name|>'
+0.00.185.370 I print_info: EOG token             = 248065 '<|file_sep|>'
+0.00.185.370 I print_info: max token length      = 256
+0.00.185.370 I load_tensors: loading model tensors, this can take a while... (load_mode = mmap)
+0.00.185.448 I add: tensor per_layer_token_embd.weight (size = 27465 MiB) lazy read enabled
+0.00.190.370 I load_tensors: enabling prefetch for 'per_layer_token_embd.weight'
+0.01.162.167 I 
+0.01.375.269 I load_tensors: offloading output layer to GPU
+0.01.375.271 I load_tensors: offloading 47 repeating layers to GPU
+0.01.375.271 I load_tensors: offloaded 49/49 layers to GPU
+0.01.375.275 I load_tensors:   CPU_Mapped model buffer size =   260.50 MiB
+0.01.375.275 I load_tensors:  MTL0_Mapped model buffer size = 35870.28 MiB
+0.01.375.275 I load_tensors:   CPU_Mapped model buffer size = 27465.95 MiB
+0.01.378.487 I cmn  common_init_: added <|endoftext|> logit bias = -inf
+0.01.378.491 I cmn  common_init_: added <|im_end|> logit bias = -inf
+0.01.378.492 I cmn  common_init_: added <|fim_pad|> logit bias = -inf
+0.01.378.492 I cmn  common_init_: added <|repo_name|> logit bias = -inf
+0.01.378.492 I cmn  common_init_: added <|file_sep|> logit bias = -inf
+0.01.378.553 I llama_context: constructing llama_context
+0.01.378.554 I llama_context: n_seq_max             = 1
+0.01.378.554 I llama_context: n_ctx                 = 4096
+0.01.378.555 I llama_context: n_ctx_seq             = 4096
+0.01.378.555 I llama_context: n_batch               = 512
+0.01.378.555 I llama_context: n_ubatch              = 512
+0.01.378.555 I llama_context: causal_attn           = 1
+0.01.378.556 I llama_context: flash_attn            = enabled
+0.01.378.556 I llama_context: kv_unified            = false
+0.01.378.556 I llama_context: freq_base             = 10000000.0
+0.01.378.556 I llama_context: freq_scale            = 1
+0.01.378.557 I llama_context: n_rs_seq              = 3
+0.01.378.557 I llama_context: n_outputs_max         = 4
+0.01.378.557 I llama_context: n_outputs_max_per_seq = 4
+0.01.378.557 I llama_context: n_ctx_seq (4096) < n_ctx_train (262144) -- the full capacity of the model will not be utilized
+0.01.378.558 I ggml_metal_init: allocating
+0.01.378.593 I ggml_metal_init: found device: Apple M5 Pro
+0.01.378.595 I ggml_metal_init: picking default device: Apple M5 Pro
+0.01.378.639 I ggml_metal_init: use fusion         = true
+0.01.378.640 I ggml_metal_init: use concurrency    = true
+0.01.378.640 I ggml_metal_init: use graph optimize = true
+0.01.378.706 I llama_context:        CPU  output buffer size =     0.95 MiB
+0.01.380.628 I llama_kv_cache:       MTL0 KV buffer size =    96.00 MiB
+0.01.383.364 I llama_kv_cache: size =   96.00 MiB (  4096 cells,  12 layers,  1/1 seqs), K (f16):   48.00 MiB, V (f16):   48.00 MiB
+0.01.383.366 I llama_kv_cache: n_rot_k = 0, n_embd_head_k_all = 256
+0.01.383.366 I llama_kv_cache: n_rot_v = 0, n_embd_head_k_all = 256
+0.01.405.109 I llama_memory_recurrent:       MTL0 RS buffer size =   450.28 MiB
+0.01.405.118 I llama_memory_recurrent: size =  450.28 MiB (     1 cells,  48 layers,  1 seqs  3 rs_seq), R (f32):   16.88 MiB, S (f32):  432.00 MiB, P (f32):    1.41 MiB
+0.01.405.122 I operator(): creating indexer KV cache, size = 4096 cells
+0.01.405.852 I llama_kv_cache:       MTL0 KV buffer size =    24.00 MiB
+0.01.406.676 I llama_kv_cache: size =   24.00 MiB (  4096 cells,  12 layers,  1/1 seqs), K (f16):   24.00 MiB, V (f16):    0.00 MiB
+0.01.406.678 I llama_kv_cache: n_rot_k = 0, n_embd_head_k_all = 256
+0.01.406.678 I llama_kv_cache: n_rot_v = 0, n_embd_head_k_all = 0
+0.01.406.682 I sched_reserve: reserving ...
+0.01.407.969 I resolve_fused_ops: resolving fused DeepSeek V4 HC support:
+0.01.410.374 I resolve_fused_ops: fused DeepSeek V4 HC pre enabled
+0.01.412.329 I resolve_fused_ops: fused DeepSeek V4 HC comb enabled
+0.01.414.180 I resolve_fused_ops: fused DeepSeek V4 HC post enabled
+0.01.425.933 I sched_reserve:       MTL0 compute buffer size =   185.61 MiB
+0.01.425.938 I sched_reserve:        CPU compute buffer size =    30.19 MiB
+0.01.425.939 I sched_reserve: graph: nodes = 7374, splits = 2, input objects = 6, input tensors = 19
+0.01.425.939 I sched_reserve: reserve took 19.26 ms, sched copies = 1
+0.01.425.986 I cmn          init: llama threadpool init, n_threads = 8
+0.01.426.053 I cmn  common_init_: warming up the model with an empty run - please wait ... (--no-warmup to disable)
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,20,204800,204800],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,12,122880,122880],"dst_ne":[30720,1,1,1],"dst_nb":[4,122880,122880,122880],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,20,204800,204800],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,20,204800,204800],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f16","dst_type":"f16","src_ne":[1,10240,1,1],"src_nb":[2,8,81920,81920],"dst_ne":[1,10240,1,1],"dst_nb":[2,2,20480,20480],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,44,450560,450560],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f16","dst_type":"f32","src_ne":[10240,1,1,1],"src_nb":[2,20480,20480,20480],"dst_ne":[10240,1,1,1],"dst_nb":[4,40960,40960,40960],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f16","dst_type":"f16","src_ne":[1,10240,1,1],"src_nb":[2,8,81920,81920],"dst_ne":[1,10240,1,1],"dst_nb":[2,2,20480,20480],"src_alignment":2,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,36,368640,368640],"dst_ne":[92160,1,1,1],"dst_nb":[4,368640,368640,368640],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,44,450560,450560],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f16","dst_type":"f16","src_ne":[1,10240,1,1],"src_nb":[2,8,81920,81920],"dst_ne":[1,10240,1,1],"dst_nb":[2,2,20480,20480],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,44,450560,450560],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f16","dst_type":"f16","src_ne":[1,10240,1,1],"src_nb":[2,8,81920,81920],"dst_ne":[1,10240,1,1],"dst_nb":[2,2,20480,20480],"src_alignment":6,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,2,1,1],"src_nb":[44,4,450560,450560],"dst_ne":[10240,2,1,1],"dst_nb":[4,40960,81920,81920],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,2,1,1],"src_nb":[44,4,450560,450560],"dst_ne":[10240,2,1,1],"dst_nb":[4,40960,81920,81920],"src_alignment":12,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,2,1,1],"src_nb":[44,4,450560,450560],"dst_ne":[10240,2,1,1],"dst_nb":[4,40960,81920,81920],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,2,1,1],"src_nb":[44,4,450560,450560],"dst_ne":[10240,2,1,1],"dst_nb":[4,40960,81920,81920],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":true,"src_type":"f32","dst_type":"f32","src_ne":[10240,2,1,1],"src_nb":[4,40960,81920,81920],"dst_ne":[10240,2,1,1],"dst_nb":[4,40960,81920,81920],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[128,1,1,1],"src_nb":[4,2048,2048,2048],"dst_ne":[128,1,1,1],"dst_nb":[4,512,512,512],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[259,2,1,1],"src_nb":[4,1036,2072,2072],"dst_ne":[259,2,1,1],"dst_nb":[4,1036,2072,2072],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[3,2,1,1],"src_nb":[4,12,24,24],"dst_ne":[3,2,1,1],"dst_nb":[4,12,24,24],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"i32","src_ne":[259,2,1,1],"src_nb":[4,1036,2072,2072],"dst_ne":[259,2,1,1],"dst_nb":[4,1036,2072,2072],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[256,24,2,1],"src_nb":[4,2048,49152,98304],"dst_ne":[6144,2,1,1],"dst_nb":[4,24576,49152,49152],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[2560,1,1,1],"src_nb":[4,40960,40960,40960],"dst_ne":[2560,1,1,1],"dst_nb":[4,10240,10240,10240],"src_alignment":0,"dst_alignment":0}
+0.01.477.960 I common_speculative_init_result: loading draft model '/Users/justin/Documents/Github/Strata-Mac-Lab/models/mtp_shared_packed_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf'
+0.01.503.827 I llama_model_loader: loaded meta data with 51 key-value pairs and 32 tensors from /Users/justin/Documents/Github/Strata-Mac-Lab/models/mtp_shared_packed_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf (version GGUF V3 (latest))
+0.01.503.832 I llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+0.01.503.834 I llama_model_loader: - kv   0:                       general.architecture str              = qwen4exp
+0.01.503.834 I llama_model_loader: - kv   1:                               general.type str              = model
+0.01.503.835 I llama_model_loader: - kv   2:                     general.sampling.top_k i32              = 20
+0.01.503.837 I llama_model_loader: - kv   3:                     general.sampling.top_p f32              = 0.950000
+0.01.503.837 I llama_model_loader: - kv   4:                      general.sampling.temp f32              = 1.000000
+0.01.503.838 I llama_model_loader: - kv   5:                               general.name str              = Ckpt_Q38
+0.01.503.838 I llama_model_loader: - kv   6:                         general.size_label str              = 512x1.4B
+0.01.503.838 I llama_model_loader: - kv   7:                            general.license str              = other
+0.01.503.839 I llama_model_loader: - kv   8:                       general.license.name str              = qwen-community-1.0
+0.01.503.839 I llama_model_loader: - kv   9:                       general.license.link str              = LICENSE
+0.01.503.841 I llama_model_loader: - kv  10:                               general.tags arr[str,1]       = ["image-text-to-text"]
+0.01.503.842 I llama_model_loader: - kv  11:                       qwen4exp.block_count u32              = 49
+0.01.503.842 I llama_model_loader: - kv  12:                    qwen4exp.context_length u32              = 262144
+0.01.503.842 I llama_model_loader: - kv  13:                  qwen4exp.embedding_length u32              = 2560
+0.01.503.843 I llama_model_loader: - kv  14:              qwen4exp.attention.head_count u32              = 24
+0.01.503.843 I llama_model_loader: - kv  15:           qwen4exp.attention.head_count_kv u32              = 2
+0.01.503.844 I llama_model_loader: - kv  16:           qwen4exp.rope.dimension_sections arr[i32,4]       = [11, 11, 10, 0]
+0.01.503.845 I llama_model_loader: - kv  17:                    qwen4exp.rope.freq_base f32              = 10000000.000000
+0.01.503.846 I llama_model_loader: - kv  18:  qwen4exp.attention.layer_norm_rms_epsilon f32              = 0.000001
+0.01.503.846 I llama_model_loader: - kv  19:                      qwen4exp.expert_count u32              = 512
+0.01.503.847 I llama_model_loader: - kv  20:                 qwen4exp.expert_used_count u32              = 10
+0.01.503.847 I llama_model_loader: - kv  21:              qwen4exp.attention.key_length u32              = 256
+0.01.503.847 I llama_model_loader: - kv  22:            qwen4exp.attention.value_length u32              = 256
+0.01.503.847 I llama_model_loader: - kv  23:        qwen4exp.expert_feed_forward_length u32              = 640
+0.01.503.847 I llama_model_loader: - kv  24: qwen4exp.expert_shared_feed_forward_length u32              = 640
+0.01.503.848 I llama_model_loader: - kv  25:              qwen4exp.nextn_predict_layers u32              = 1
+0.01.503.848 I llama_model_loader: - kv  26:                   qwen4exp.ssm.conv_kernel u32              = 4
+0.01.503.848 I llama_model_loader: - kv  27:                    qwen4exp.ssm.state_size u32              = 128
+0.01.503.848 I llama_model_loader: - kv  28:                   qwen4exp.ssm.group_count u32              = 16
+0.01.503.848 I llama_model_loader: - kv  29:                qwen4exp.ssm.time_step_rank u32              = 48
+0.01.503.849 I llama_model_loader: - kv  30:                    qwen4exp.ssm.inner_size u32              = 6144
+0.01.503.849 I llama_model_loader: - kv  31:           qwen4exp.full_attention_interval u32              = 4
+0.01.503.849 I llama_model_loader: - kv  32:              qwen4exp.rope.dimension_count u32              = 64
+0.01.503.849 I llama_model_loader: - kv  33:            qwen4exp.hyper_connection.count u32              = 4
+0.01.503.849 I llama_model_loader: - kv  34:         qwen4exp.hyper_connection.low_rank u32              = 320
+0.01.503.850 I llama_model_loader: - kv  35:      qwen4exp.attention.indexer.head_count u32              = 4
+0.01.503.850 I llama_model_loader: - kv  36:      qwen4exp.attention.indexer.key_length u32              = 128
+0.01.503.850 I llama_model_loader: - kv  37:           qwen4exp.attention.indexer.top_k u32              = 2048
+0.01.503.852 I llama_model_loader: - kv  38:         qwen4exp.attention.compress_ratios arr[i32,49]      = [0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 4, ...
+0.01.503.853 I llama_model_loader: - kv  39:                       tokenizer.ggml.model str              = gpt2
+0.01.503.853 I llama_model_loader: - kv  40:                         tokenizer.ggml.pre str              = qwen35
+0.01.518.501 I llama_model_loader: - kv  41:                      tokenizer.ggml.tokens arr[str,248320]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+0.01.522.347 I llama_model_loader: - kv  42:                  tokenizer.ggml.token_type arr[i32,248320]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+0.01.536.933 I llama_model_loader: - kv  43:                      tokenizer.ggml.merges arr[str,247587]  = ["Ġ Ġ", "ĠĠ ĠĠ", "i n", "Ġ t",...
+0.01.536.937 I llama_model_loader: - kv  44:                tokenizer.ggml.eos_token_id u32              = 248046
+0.01.536.938 I llama_model_loader: - kv  45:            tokenizer.ggml.padding_token_id u32              = 248044
+0.01.536.938 I llama_model_loader: - kv  46:                tokenizer.ggml.bos_token_id u32              = 248044
+0.01.536.938 I llama_model_loader: - kv  47:               tokenizer.ggml.add_bos_token bool             = false
+0.01.536.942 I llama_model_loader: - kv  48:                    tokenizer.chat_template str              = {%- set image_count = namespace(value...
+0.01.536.942 I llama_model_loader: - kv  49:               general.quantization_version u32              = 2
+0.01.536.942 I llama_model_loader: - kv  50:                          general.file_type u32              = 11
+0.01.536.943 I llama_model_loader: - type  f32:   11 tensors
+0.01.536.943 I llama_model_loader: - type q4_0:    5 tensors
+0.01.536.943 I llama_model_loader: - type q3_K:   14 tensors
+0.01.536.944 I llama_model_loader: - type bf16:    2 tensors
+0.01.536.945 I print_info: file format = GGUF V3 (latest)
+0.01.536.945 I print_info: file type   = Q3_K - Small
+0.01.536.946 I print_info: file size   = 1.16 GiB (3.81 BPW) 
+0.01.536.953 I llama_prepare_model_devices: using device MTL0 (Apple M5 Pro) (unknown id) - 1294 MiB free
+0.01.581.050 I load: 0 unused tokens
+0.01.592.959 I load: printing all EOG tokens:
+0.01.592.961 I load:   - 248044 ('<|endoftext|>')
+0.01.592.961 I load:   - 248046 ('<|im_end|>')
+0.01.592.962 I load:   - 248063 ('<|fim_pad|>')
+0.01.592.962 I load:   - 248064 ('<|repo_name|>')
+0.01.592.962 I load:   - 248065 ('<|file_sep|>')
+0.01.593.117 I load: special tokens cache size = 33
+0.01.625.323 I load: token to piece cache size = 1.7581 MB
+0.01.625.333 I print_info: arch                  = qwen4exp
+0.01.625.333 I print_info: vocab_only            = 0
+0.01.625.333 I print_info: no_alloc              = 0
+0.01.625.333 I print_info: n_ctx_train           = 262144
+0.01.625.334 I print_info: n_embd_inp            = 2560
+0.01.625.334 I print_info: n_embd                = 2560
+0.01.625.334 I print_info: n_embd_out            = 10240
+0.01.625.335 I print_info: n_layer               = 48
+0.01.625.335 I print_info: n_layer_all           = 49
+0.01.625.339 I print_info: n_head                = 24
+0.01.625.339 I print_info: n_head_kv             = 2
+0.01.625.339 I print_info: n_rot                 = 64
+0.01.625.340 I print_info: n_swa                 = 0
+0.01.625.342 I print_info: is_swa_any            = 0
+0.01.625.342 I print_info: non_causal_type       = 0
+0.01.625.342 I print_info: n_embd_head_k         = 256
+0.01.625.343 I print_info: n_embd_head_v         = 256
+0.01.625.343 I print_info: n_gqa                 = 12
+0.01.625.344 I print_info: n_embd_k_gqa          = 512
+0.01.625.344 I print_info: n_embd_v_gqa          = 512
+0.01.625.345 I print_info: f_norm_eps            = 0.0e+00
+0.01.625.345 I print_info: f_norm_rms_eps        = 1.0e-06
+0.01.625.346 I print_info: f_clamp_kqv           = 0.0e+00
+0.01.625.346 I print_info: f_max_alibi_bias      = 0.0e+00
+0.01.625.346 I print_info: f_logit_scale         = 0.0e+00
+0.01.625.346 I print_info: f_attn_scale          = 0.0e+00
+0.01.625.346 I print_info: f_attn_value_scale    = 0.0000
+0.01.625.347 I print_info: n_ff                  = 0
+0.01.625.347 I print_info: n_expert              = 512
+0.01.625.348 I print_info: n_expert_used         = 10
+0.01.625.348 I print_info: n_expert_groups       = 0
+0.01.625.348 I print_info: n_group_used          = 0
+0.01.625.348 I print_info: causal attn           = 1
+0.01.625.348 I print_info: pooling type          = -1
+0.01.625.349 I print_info: rope type             = 40
+0.01.625.349 I print_info: rope scaling          = linear
+0.01.625.349 I print_info: freq_base_train       = 10000000.0
+0.01.625.349 I print_info: freq_scale_train      = 1
+0.01.625.349 I print_info: n_ctx_orig_yarn       = 262144
+0.01.625.350 I print_info: rope_yarn_log_mul     = 0.0000
+0.01.625.350 I print_info: rope_finetuned        = unknown
+0.01.625.350 I print_info: mrope sections        = [11, 11, 10, 0]
+0.01.625.351 I print_info: model type            = A3B
+0.01.625.351 I print_info: model params          = 2.61 B
+0.01.625.351 I print_info: general.name          = Ckpt_Q38
+0.01.625.352 I print_info: vocab type            = BPE
+0.01.625.352 I print_info: n_vocab               = 248320
+0.01.625.352 I print_info: n_merges              = 247587
+0.01.625.352 I print_info: BOS token             = 248044 '<|endoftext|>'
+0.01.625.352 I print_info: EOS token             = 248046 '<|im_end|>'
+0.01.625.353 I print_info: EOT token             = 248046 '<|im_end|>'
+0.01.625.353 I print_info: PAD token             = 248044 '<|endoftext|>'
+0.01.625.353 I print_info: LF token              = 198 'Ċ'
+0.01.625.353 I print_info: FIM PRE token         = 248060 '<|fim_prefix|>'
+0.01.625.353 I print_info: FIM SUF token         = 248062 '<|fim_suffix|>'
+0.01.625.353 I print_info: FIM MID token         = 248061 '<|fim_middle|>'
+0.01.625.354 I print_info: FIM PAD token         = 248063 '<|fim_pad|>'
+0.01.625.354 I print_info: FIM REP token         = 248064 '<|repo_name|>'
+0.01.625.354 I print_info: FIM SEP token         = 248065 '<|file_sep|>'
+0.01.625.354 I print_info: EOG token             = 248044 '<|endoftext|>'
+0.01.625.354 I print_info: EOG token             = 248046 '<|im_end|>'
+0.01.625.354 I print_info: EOG token             = 248063 '<|fim_pad|>'
+0.01.625.354 I print_info: EOG token             = 248064 '<|repo_name|>'
+0.01.625.354 I print_info: EOG token             = 248065 '<|file_sep|>'
+0.01.625.355 I print_info: max token length      = 256
+0.01.625.355 I load_tensors: loading model tensors, this can take a while... (load_mode = mmap)
+0.01.626.225 W llama_model_loader: tensor overrides to CPU are used with mmap enabled - consider using --load-mode none for better performance
+0.01.714.002 I load_tensors: offloading output layer to GPU
+0.01.714.004 I load_tensors: offloading 48 repeating layers to GPU
+0.01.714.004 I load_tensors: offloaded 50/50 layers to GPU
+0.01.714.005 I load_tensors:   CPU_Mapped model buffer size =   687.50 MiB
+0.01.714.005 I load_tensors:   CPU_REPACK model buffer size =   450.00 MiB
+0.01.714.006 I load_tensors:  MTL0_Mapped model buffer size =    45.64 MiB
+0.01.816.688 I llama_context: constructing llama_context
+0.01.816.691 I QWEN4EXP MTP: borrowing target embeddings/output; draft KV remains separate
+0.01.816.692 I llama_context: n_seq_max             = 1
+0.01.816.692 I llama_context: n_ctx                 = 4096
+0.01.816.697 I llama_context: n_ctx_seq             = 4096
+0.01.816.697 I llama_context: n_batch               = 512
+0.01.816.697 I llama_context: n_ubatch              = 512
+0.01.816.698 I llama_context: causal_attn           = 1
+0.01.816.698 I llama_context: flash_attn            = enabled
+0.01.816.698 I llama_context: kv_unified            = false
+0.01.816.701 I llama_context: freq_base             = 10000000.0
+0.01.816.701 I llama_context: freq_scale            = 1
+0.01.816.701 I llama_context: n_rs_seq              = 0
+0.01.816.701 I llama_context: n_outputs_max         = 1
+0.01.816.702 I llama_context: n_outputs_max_per_seq = 1
+0.01.816.702 I llama_context: n_ctx_seq (4096) < n_ctx_train (262144) -- the full capacity of the model will not be utilized
+0.01.816.703 I ggml_metal_init: allocating
+0.01.816.728 I ggml_metal_init: found device: Apple M5 Pro
+0.01.816.731 I ggml_metal_init: picking default device: Apple M5 Pro
+0.01.816.750 I ggml_metal_init: use fusion         = true
+0.01.816.750 I ggml_metal_init: use concurrency    = true
+0.01.816.750 I ggml_metal_init: use graph optimize = true
+0.01.816.815 I llama_context:        CPU  output buffer size =     0.95 MiB
+0.01.817.116 I llama_kv_cache:       MTL0 KV buffer size =     8.00 MiB
+0.01.817.378 I llama_kv_cache: size =    8.00 MiB (  4096 cells,   1 layers,  1/1 seqs), K (f16):    4.00 MiB, V (f16):    4.00 MiB
+0.01.817.380 I llama_kv_cache: n_rot_k = 0, n_embd_head_k_all = 256
+0.01.817.380 I llama_kv_cache: n_rot_v = 0, n_embd_head_k_all = 256
+0.01.817.386 I llama_memory_recurrent: size =    0.00 MiB (     1 cells,  48 layers,  1 seqs  0 rs_seq), R (f32):    0.00 MiB, S (f32):    0.00 MiB, P (f32):    0.00 MiB
+0.01.817.388 I operator(): creating indexer KV cache, size = 4096 cells
+0.01.817.488 I llama_kv_cache:       MTL0 KV buffer size =     2.00 MiB
+0.01.817.572 I llama_kv_cache: size =    2.00 MiB (  4096 cells,   1 layers,  1/1 seqs), K (f16):    2.00 MiB, V (f16):    0.00 MiB
+0.01.817.573 I llama_kv_cache: n_rot_k = 0, n_embd_head_k_all = 256
+0.01.817.573 I llama_kv_cache: n_rot_v = 0, n_embd_head_k_all = 0
+0.01.817.575 I sched_reserve: reserving ...
+0.01.818.200 I resolve_fused_ops: resolving fused DeepSeek V4 HC support:
+0.01.818.362 I resolve_fused_ops: fused DeepSeek V4 HC pre enabled
+0.01.818.456 I resolve_fused_ops: fused DeepSeek V4 HC comb enabled
+0.01.818.534 I resolve_fused_ops: fused DeepSeek V4 HC post enabled
+0.01.826.177 I sched_reserve:       MTL0 compute buffer size =   148.11 MiB
+0.01.826.179 I sched_reserve:        CPU compute buffer size =   100.15 MiB
+0.01.826.181 I sched_reserve: graph: nodes = 196, splits = 4, input objects = 5, input tensors = 15
+0.01.826.181 I sched_reserve: reserve took 8.61 ms, sched copies = 1
+0.01.826.209 I cmn  common_conte: the context supports bounded partial sequence removal
+0.01.826.209 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 4096, kv_unified = 'false'
+0.01.826.229 I spec common_specu: adding speculative implementation 'draft-mtp'
+0.01.826.230 I spec common_specu: - n_max=3, n_min=0, p_min=0.00, n_embd=10240, backend_sampling=1
+0.01.826.230 I spec common_specu: - gpu_layers=-2, cache_k=f16, cache_v=f16, ctx_tgt=yes, ctx_dft=yes, devices=[default]
+0.01.826.335 I sched_reserve: reserving ...
+0.01.848.781 I sched_reserve:       MTL0 compute buffer size =   148.11 MiB
+0.01.848.784 I sched_reserve:        CPU compute buffer size =   100.15 MiB
+0.01.848.785 I sched_reserve: graph: nodes = 202, splits = 4, input objects = 6, input tensors = 15
+0.01.848.786 I sched_reserve: reserve took 22.45 ms, sched copies = 1
+0.01.863.573 I srv    load_model: speculative decoding context initialized
+0.01.863.576 I slot   load_model: id  0 | task -1 | new slot, n_ctx = 4096
+0.01.863.581 I srv    load_model: prompt cache is disabled - use `--cache-ram N` to enable it
+0.01.863.582 I srv    load_model: for more info see https://github.com/ggml-org/llama.cpp/pull/16391
+0.01.863.582 I srv    load_model: context checkpoints enabled, max = 32, min spacing = 8192
+0.01.863.615 W srv          init: --cache-idle-slots requires --cache-ram, disabling
+0.01.866.465 I srv          init: init: chat template, example_format: '<|im_start|>system
+Reasoning effort is set to xhigh. Please think carefully through the task, validate key assumptions, consider plausible alternatives, and prioritize correctness, consistency, and clarity in the final answer.
+
+You are a helpful assistant<|im_end|>
+<|im_start|>user
+Hello<|im_end|>
+<|im_start|>assistant
+<think>
+
+</think>
+
+Hi there<|im_end|>
+<|im_start|>user
+How are you?<|im_end|>
+<|im_start|>assistant
+<think>
+'
+0.01.866.795 I srv          init: init: chat template, thinking = 1
+0.01.866.797 I srv          init: preserve_reasoning kwarg: true
+0.01.866.797 W srv          init: chat template supports preserving reasoning, it is enabled by default (may use more tokens, disable via --no-reasoning-preserve)
+0.01.866.813 I srv  llama_server: model loaded
+0.01.866.815 I srv  llama_server: listening on http://127.0.0.1:56348
+0.01.866.834 I srv  update_slots: all slots are idle
+0.02.071.909 I srv  server_strea: conv_id= (empty=1)
+0.02.072.064 I slot get_availabl: id  0 | task -1 |  - skipping, slot is empty
+0.02.072.065 I slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = -1
+0.02.072.112 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> logit-bias -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+0.02.072.121 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 20, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+0.02.072.123 I slot launch_slot_: id  0 | task 0 | processing task, is_child = 0
+0.02.072.143 I slot   operator(): id  0 | task 0 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 512
+0.02.072.156 I slot   operator(): id  0 | task 0 | cached n_tokens = 0, memory_seq_rm [0, end)
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,2044,20930560,20930560],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,2044,20930560,20930560],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":12,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,2044,20930560,20930560],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,2044,20930560,20930560],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,2068,21176320,21176320],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,2068,21176320,21176320],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":12,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,2068,21176320,21176320],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,2068,21176320,21176320],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,508,1,1],"src_nb":[2068,4,21176320,21176320],"dst_ne":[10240,508,1,1],"dst_nb":[4,40960,20807680,20807680],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,508,1,1],"src_nb":[2068,4,21176320,21176320],"dst_ne":[10240,508,1,1],"dst_nb":[4,40960,20807680,20807680],"src_alignment":12,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,508,1,1],"src_nb":[2068,4,21176320,21176320],"dst_ne":[10240,508,1,1],"dst_nb":[4,40960,20807680,20807680],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,508,1,1],"src_nb":[2068,4,21176320,21176320],"dst_ne":[10240,508,1,1],"dst_nb":[4,40960,20807680,20807680],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":true,"src_type":"f32","dst_type":"f32","src_ne":[10240,508,1,1],"src_nb":[4,40960,20807680,20807680],"dst_ne":[10240,508,1,1],"dst_nb":[4,40960,20807680,20807680],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[128,127,1,1],"src_nb":[4,2048,260096,260096],"dst_ne":[128,127,1,1],"dst_nb":[4,512,65024,65024],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[515,508,1,1],"src_nb":[4,2060,1046480,1046480],"dst_ne":[515,508,1,1],"dst_nb":[4,2060,1046480,1046480],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[3,508,1,1],"src_nb":[4,12,6096,6096],"dst_ne":[3,508,1,1],"dst_nb":[4,12,6096,6096],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"i32","src_ne":[515,508,1,1],"src_nb":[4,2060,1046480,1046480],"dst_ne":[515,508,1,1],"dst_nb":[4,2060,1046480,1046480],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[256,24,508,1],"src_nb":[4,2048,49152,24969216],"dst_ne":[6144,508,1,1],"dst_nb":[4,24576,12484608,12484608],"src_alignment":0,"dst_alignment":0}
+0.02.962.870 I slot   operator(): id  0 | task 0 | cached n_tokens = 508, memory_seq_rm [508, end)
+0.02.962.945 I slot init_sampler: id  0 | task 0 | init sampler, took 0.04 ms, tokens: text = 512, total = 512
+0.02.976.335 I slot create_check: id  0 | task 0 | created context checkpoint 1 of 32 (pos_min = 507, pos_max = 507, n_tokens = 508, size = 112.571 MiB)
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,28,286720,286720],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,28,286720,286720],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":12,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,28,286720,286720],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,28,286720,286720],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,52,532480,532480],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,52,532480,532480],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":12,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,52,532480,532480],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,52,532480,532480],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,4,1,1],"src_nb":[52,4,532480,532480],"dst_ne":[10240,4,1,1],"dst_nb":[4,40960,163840,163840],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,4,1,1],"src_nb":[52,4,532480,532480],"dst_ne":[10240,4,1,1],"dst_nb":[4,40960,163840,163840],"src_alignment":12,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,4,1,1],"src_nb":[52,4,532480,532480],"dst_ne":[10240,4,1,1],"dst_nb":[4,40960,163840,163840],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,4,1,1],"src_nb":[52,4,532480,532480],"dst_ne":[10240,4,1,1],"dst_nb":[4,40960,163840,163840],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":true,"src_type":"f32","dst_type":"f32","src_ne":[10240,4,1,1],"src_nb":[4,40960,163840,163840],"dst_ne":[10240,4,1,1],"dst_nb":[4,40960,163840,163840],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[128,2,1,1],"src_nb":[4,2048,4096,4096],"dst_ne":[128,2,1,1],"dst_nb":[4,512,1024,1024],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[771,4,1,1],"src_nb":[4,3084,12336,12336],"dst_ne":[771,4,1,1],"dst_nb":[4,3084,12336,12336],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[3,4,1,1],"src_nb":[4,12,48,48],"dst_ne":[3,4,1,1],"dst_nb":[4,12,48,48],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"i32","src_ne":[771,4,1,1],"src_nb":[4,3084,12336,12336],"dst_ne":[771,4,1,1],"dst_nb":[4,3084,12336,12336],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[256,24,4,1],"src_nb":[4,2048,49152,196608],"dst_ne":[6144,4,1,1],"dst_nb":[4,24576,98304,98304],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[771,1,1,1],"src_nb":[4,3084,3084,3084],"dst_ne":[771,1,1,1],"dst_nb":[4,3084,3084,3084],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[3,1,1,1],"src_nb":[4,12,12,12],"dst_ne":[3,1,1,1],"dst_nb":[4,12,12,12],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"i32","src_ne":[771,1,1,1],"src_nb":[4,3084,3084,3084],"dst_ne":[771,1,1,1],"dst_nb":[4,3084,3084,3084],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[256,24,1,1],"src_nb":[4,2048,49152,49152],"dst_ne":[6144,1,1,1],"dst_nb":[4,24576,24576,24576],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[2560,4,1,1],"src_nb":[4,40960,163840,163840],"dst_ne":[2560,4,1,1],"dst_nb":[4,10240,40960,40960],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,24,245760,245760],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":12,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,24,245760,245760],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,24,245760,245760],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,24,245760,245760],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,48,491520,491520],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":12,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,48,491520,491520],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,48,491520,491520],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,48,491520,491520],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,3,1,1],"src_nb":[48,4,491520,491520],"dst_ne":[10240,3,1,1],"dst_nb":[4,40960,122880,122880],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,3,1,1],"src_nb":[48,4,491520,491520],"dst_ne":[10240,3,1,1],"dst_nb":[4,40960,122880,122880],"src_alignment":12,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,3,1,1],"src_nb":[48,4,491520,491520],"dst_ne":[10240,3,1,1],"dst_nb":[4,40960,122880,122880],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,3,1,1],"src_nb":[48,4,491520,491520],"dst_ne":[10240,3,1,1],"dst_nb":[4,40960,122880,122880],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":true,"src_type":"f32","dst_type":"f32","src_ne":[10240,3,1,1],"src_nb":[4,40960,122880,122880],"dst_ne":[10240,3,1,1],"dst_nb":[4,40960,122880,122880],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[771,3,1,1],"src_nb":[4,3084,9252,9252],"dst_ne":[771,3,1,1],"dst_nb":[4,3084,9252,9252],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[3,3,1,1],"src_nb":[4,12,36,36],"dst_ne":[3,3,1,1],"dst_nb":[4,12,36,36],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"i32","src_ne":[771,3,1,1],"src_nb":[4,3084,9252,9252],"dst_ne":[771,3,1,1],"dst_nb":[4,3084,9252,9252],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[256,24,3,1],"src_nb":[4,2048,49152,147456],"dst_ne":[6144,3,1,1],"dst_nb":[4,24576,73728,73728],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[2560,3,1,1],"src_nb":[4,40960,122880,122880],"dst_ne":[2560,3,1,1],"dst_nb":[4,10240,30720,30720],"src_alignment":0,"dst_alignment":0}
+0.03.274.259 I slot print_timing: id  0 | task 0 | prompt eval time =     965.12 ms /   512 tokens (    1.89 ms per token,   530.50 tokens per second)
+0.03.274.261 I slot print_timing: id  0 | task 0 |        eval time =     236.98 ms /    16 tokens (   15.80 ms per token,    63.30 tokens per second)
+0.03.274.262 I slot print_timing: id  0 | task 0 |       total time =    1202.10 ms /   528 tokens
+0.03.274.262 I slot print_timing: id  0 | task 0 |    graphs reused =          2
+0.03.274.264 I slot print_timing: id  0 | task 0 | draft acceptance = 1.00000 (   11 accepted /    11 generated), mean len =  3.75
+0.03.274.264 I slot print_timing: id  0 | task 0 |      acc per pos = (1.000, 1.000, 0.750)
+0.03.274.271 I spec common_specu: statistics        draft-mtp: #calls(b,g,a) =    1      4      4, #gen drafts =      4, #acc drafts =     4, #gen tokens =     11, #acc tokens =    11, #mean acc len = 3.75, #acc rate/pos = (1.000, 1.000, 0.750), dur(b,g,a) = 0.008, 44.284, 0.005 ms
+0.03.274.313 I slot      release: id  0 | task 0 | stop processing: n_tokens = 527, truncated = 0
+0.03.274.317 I srv  update_slots: all slots are idle
+0.03.275.200 I srv  server_strea: conv_id= (empty=1)
+0.03.275.240 I slot get_availabl: id  0 | task -1 |  - checking sim = 1.000 (512/512) > 0.100
+0.03.275.241 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 1.000 (> 0.100 thold), f_keep = 0.972
+0.03.275.253 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> logit-bias -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+0.03.275.256 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 20, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+0.03.275.256 I slot launch_slot_: id  0 | task 7 | processing task, is_child = 0
+0.03.275.259 I slot   operator(): id  0 | task 7 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 512
+0.03.275.260 I slot   operator(): id  0 | task 7 | erased invalidated context checkpoint (pos_min = 507, pos_max = 507, n_tokens = 508, n_swa = 0, pos_next = 0, size = 112.571 MiB)
+0.03.275.261 I slot   operator(): id  0 | task 7 | cached n_tokens = 0, memory_seq_rm [0, end)
+0.04.105.413 I slot   operator(): id  0 | task 7 | cached n_tokens = 508, memory_seq_rm [508, end)
+0.04.105.468 I slot init_sampler: id  0 | task 7 | init sampler, took 0.04 ms, tokens: text = 512, total = 512
+0.04.109.224 I slot create_check: id  0 | task 7 | created context checkpoint 1 of 32 (pos_min = 507, pos_max = 507, n_tokens = 508, size = 112.571 MiB)
+0.04.800.139 I slot print_timing: id  0 | task 7 | prompt eval time =     891.14 ms /   512 tokens (    1.74 ms per token,   574.54 tokens per second)
+0.04.800.141 I slot print_timing: id  0 | task 7 |        eval time =     633.72 ms /    32 tokens (   20.44 ms per token,    48.92 tokens per second)
+0.04.800.142 I slot print_timing: id  0 | task 7 |       total time =    1524.86 ms /   544 tokens
+0.04.800.142 I slot print_timing: id  0 | task 7 |    graphs reused =         12
+0.04.800.144 I slot print_timing: id  0 | task 7 | draft acceptance = 0.60606 (   20 accepted /    33 generated), mean len =  2.82
+0.04.800.144 I slot print_timing: id  0 | task 7 |      acc per pos = (0.636, 0.636, 0.545)
+0.04.800.151 I spec common_specu: statistics        draft-mtp: #calls(b,g,a) =    2     15     15, #gen drafts =     15, #acc drafts =    11, #gen tokens =     44, #acc tokens =    31, #mean acc len = 3.07, #acc rate/pos = (0.733, 0.733, 0.600), dur(b,g,a) = 0.014, 161.541, 0.019 ms
+0.04.800.173 I slot      release: id  0 | task 7 | stop processing: n_tokens = 543, truncated = 0
+0.04.800.177 I srv  update_slots: all slots are idle
+0.04.801.071 I srv  server_strea: conv_id= (empty=1)
+0.04.801.124 I slot get_availabl: id  0 | task -1 |  - checking sim = 0.227 (464/2048) > 0.100
+0.04.801.125 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.227 (> 0.100 thold), f_keep = 0.855
+0.04.801.137 I slot launch_slot_: id  0 | task -1 | sampler chain: logits -> logit-bias -> ?penalties -> ?dry -> ?top-n-sigma -> top-k -> ?typical -> top-p -> min-p -> ?xtc -> temp-ext -> dist 
+0.04.801.140 I slot launch_slot_: id  0 | task -1 | sampler params: 
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 20, top_p = 0.950, min_p = 0.050, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+0.04.801.141 I slot launch_slot_: id  0 | task 21 | processing task, is_child = 0
+0.04.801.146 I slot   operator(): id  0 | task 21 | new prompt, n_ctx_slot = 4096, n_keep = 0, task.n_tokens = 2048
+0.04.801.147 I slot   operator(): id  0 | task 21 | erased invalidated context checkpoint (pos_min = 507, pos_max = 507, n_tokens = 508, n_swa = 0, pos_next = 0, size = 112.571 MiB)
+0.04.801.148 I slot   operator(): id  0 | task 21 | cached n_tokens = 0, memory_seq_rm [0, end)
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,2060,21094400,21094400],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,2060,21094400,21094400],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":12,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,2060,21094400,21094400],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,2060,21094400,21094400],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,2084,21340160,21340160],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,2084,21340160,21340160],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":12,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,2084,21340160,21340160],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,2084,21340160,21340160],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,512,1,1],"src_nb":[2084,4,21340160,21340160],"dst_ne":[10240,512,1,1],"dst_nb":[4,40960,20971520,20971520],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,512,1,1],"src_nb":[2084,4,21340160,21340160],"dst_ne":[10240,512,1,1],"dst_nb":[4,40960,20971520,20971520],"src_alignment":12,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,512,1,1],"src_nb":[2084,4,21340160,21340160],"dst_ne":[10240,512,1,1],"dst_nb":[4,40960,20971520,20971520],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,512,1,1],"src_nb":[2084,4,21340160,21340160],"dst_ne":[10240,512,1,1],"dst_nb":[4,40960,20971520,20971520],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":true,"src_type":"f32","dst_type":"f32","src_ne":[10240,512,1,1],"src_nb":[4,40960,20971520,20971520],"dst_ne":[10240,512,1,1],"dst_nb":[4,40960,20971520,20971520],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[128,129,1,1],"src_nb":[4,2048,264192,264192],"dst_ne":[128,129,1,1],"dst_nb":[4,512,66048,66048],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[771,512,1,1],"src_nb":[4,3084,1579008,1579008],"dst_ne":[771,512,1,1],"dst_nb":[4,3084,1579008,1579008],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[3,512,1,1],"src_nb":[4,12,6144,6144],"dst_ne":[3,512,1,1],"dst_nb":[4,12,6144,6144],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"i32","src_ne":[771,512,1,1],"src_nb":[4,3084,1579008,1579008],"dst_ne":[771,512,1,1],"dst_nb":[4,3084,1579008,1579008],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[256,24,512,1],"src_nb":[4,2048,49152,25165824],"dst_ne":[6144,512,1,1],"dst_nb":[4,24576,12582912,12582912],"src_alignment":0,"dst_alignment":0}
+0.05.638.893 I slot   operator(): id  0 | task 21 | cached n_tokens = 512, memory_seq_rm [512, end)
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[1283,512,1,1],"src_nb":[4,5132,2627584,2627584],"dst_ne":[1283,512,1,1],"dst_nb":[4,5132,2627584,2627584],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"i32","src_ne":[1283,512,1,1],"src_nb":[4,5132,2627584,2627584],"dst_ne":[1283,512,1,1],"dst_nb":[4,5132,2627584,2627584],"src_alignment":0,"dst_alignment":0}
+0.06.514.041 I slot   operator(): id  0 | task 21 | cached n_tokens = 1024, memory_seq_rm [1024, end)
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[1795,512,1,1],"src_nb":[4,7180,3676160,3676160],"dst_ne":[1795,512,1,1],"dst_nb":[4,7180,3676160,3676160],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"i32","src_ne":[1795,512,1,1],"src_nb":[4,7180,3676160,3676160],"dst_ne":[1795,512,1,1],"dst_nb":[4,7180,3676160,3676160],"src_alignment":0,"dst_alignment":0}
+0.07.458.874 I slot   operator(): id  0 | task 21 | cached n_tokens = 1536, memory_seq_rm [1536, end)
+0.07.462.898 I slot create_check: id  0 | task 21 | created context checkpoint 1 of 32 (pos_min = 1535, pos_max = 1535, n_tokens = 1536, size = 112.571 MiB)
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[128,128,1,1],"src_nb":[4,2048,262144,262144],"dst_ne":[128,128,1,1],"dst_nb":[4,512,65536,65536],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[2051,508,1,1],"src_nb":[4,8204,4167632,4167632],"dst_ne":[2051,508,1,1],"dst_nb":[4,8204,4167632,4167632],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"i32","src_ne":[2051,508,1,1],"src_nb":[4,8204,4167632,4167632],"dst_ne":[2051,508,1,1],"dst_nb":[4,8204,4167632,4167632],"src_alignment":0,"dst_alignment":0}
+0.08.473.508 I slot   operator(): id  0 | task 21 | cached n_tokens = 2044, memory_seq_rm [2044, end)
+0.08.473.679 I slot init_sampler: id  0 | task 21 | init sampler, took 0.15 ms, tokens: text = 2048, total = 2048
+0.08.498.225 I slot create_check: id  0 | task 21 | created context checkpoint 2 of 32 (pos_min = 2043, pos_max = 2043, n_tokens = 2044, size = 112.571 MiB)
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[2051,4,1,1],"src_nb":[4,8204,32816,32816],"dst_ne":[2051,4,1,1],"dst_nb":[4,8204,32816,32816],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"i32","src_ne":[2051,4,1,1],"src_nb":[4,8204,32816,32816],"dst_ne":[2051,4,1,1],"dst_nb":[4,8204,32816,32816],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[2051,1,1,1],"src_nb":[4,8204,8204,8204],"dst_ne":[2051,1,1,1],"dst_nb":[4,8204,8204,8204],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"i32","src_ne":[2051,1,1,1],"src_nb":[4,8204,8204,8204],"dst_ne":[2051,1,1,1],"dst_nb":[4,8204,8204,8204],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"i32","dst_type":"f32","src_ne":[2051,3,1,1],"src_nb":[4,8204,24612,24612],"dst_ne":[2051,3,1,1],"dst_nb":[4,8204,24612,24612],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"i32","src_ne":[2051,3,1,1],"src_nb":[4,8204,24612,24612],"dst_ne":[2051,3,1,1],"dst_nb":[4,8204,24612,24612],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,16,163840,163840],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[3,10240,1,1],"src_nb":[4,16,163840,163840],"dst_ne":[3,10240,1,1],"dst_nb":[4,12,122880,122880],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,40,409600,409600],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[9,10240,1,1],"src_nb":[4,40,409600,409600],"dst_ne":[9,10240,1,1],"dst_nb":[4,36,368640,368640],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,1,1,1],"src_nb":[40,4,409600,409600],"dst_ne":[10240,1,1,1],"dst_nb":[4,40960,40960,40960],"src_alignment":0,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,1,1,1],"src_nb":[40,4,409600,409600],"dst_ne":[10240,1,1,1],"dst_nb":[4,40960,40960,40960],"src_alignment":12,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,1,1,1],"src_nb":[40,4,409600,409600],"dst_ne":[10240,1,1,1],"dst_nb":[4,40960,40960,40960],"src_alignment":8,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":false,"src_type":"f32","dst_type":"f32","src_ne":[10240,1,1,1],"src_nb":[40,4,409600,409600],"dst_ne":[10240,1,1,1],"dst_nb":[4,40960,40960,40960],"src_alignment":4,"dst_alignment":0}
+M5_COPY_SHAPE {"width":4,"eligible":true,"src_type":"f32","dst_type":"f32","src_ne":[10240,1,1,1],"src_nb":[4,40960,40960,40960],"dst_ne":[10240,1,1,1],"dst_nb":[4,40960,40960,40960],"src_alignment":0,"dst_alignment":0}
+0.09.119.280 I slot print_timing: id  0 | task 21 | prompt eval time =    3756.62 ms /  2048 tokens (    1.83 ms per token,   545.17 tokens per second)
+0.09.119.282 I slot print_timing: id  0 | task 21 |        eval time =     561.51 ms /    32 tokens (   18.11 ms per token,    55.21 tokens per second)
+0.09.119.283 I slot print_timing: id  0 | task 21 |       total time =    4318.13 ms /  2080 tokens
+0.09.119.283 I slot print_timing: id  0 | task 21 |    graphs reused =         19
+0.09.119.285 I slot print_timing: id  0 | task 21 | draft acceptance = 0.80769 (   21 accepted /    26 generated), mean len =  3.33
+0.09.119.286 I slot print_timing: id  0 | task 21 |      acc per pos = (1.000, 0.778, 0.556)
+0.09.119.293 I spec common_specu: statistics        draft-mtp: #calls(b,g,a) =    3     24     24, #gen drafts =     24, #acc drafts =    20, #gen tokens =     70, #acc tokens =    52, #mean acc len = 3.17, #acc rate/pos = (0.833, 0.750, 0.583), dur(b,g,a) = 0.030, 257.700, 0.029 ms
+0.09.119.314 I slot      release: id  0 | task 21 | stop processing: n_tokens = 2079, truncated = 0
+0.09.119.319 I srv  update_slots: all slots are idle
+0.09.119.826 I srv    operator(): operator(): cleaning up before exit...
+0.09.120.105 I common_memory_breakdown_print: | memory breakdown [MiB]  | total   free     self   model   context   compute    unaccounted |
+0.09.120.106 I common_memory_breakdown_print: |   - MTL0 (Apple M5 Pro) | 38338 = 1090 + (36626 = 35870 +     570 +     185) +         622 |
+0.09.120.107 I common_memory_breakdown_print: |   - Host                |                 27756 = 27726 +       0 +      30                |
+0.09.120.182 I ggml_metal_free: deallocating
+0.09.154.465 I ggml_metal_free: deallocating

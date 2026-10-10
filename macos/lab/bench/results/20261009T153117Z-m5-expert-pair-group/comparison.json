@@ -1,0 +1,437 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "plan": {
+    "schema": 1,
+    "id": "expert-pair-group",
+    "engine": "m5-group",
+    "control": "conv-direct",
+    "candidate": "expert-group",
+    "correctness": "Strict CPU projection NMSE below1e-8/maxabs below1e-4, complete fallback/candidate trace inventory, allcheck outputbits identical, zero new swap.",
+    "operator": {
+      "order": [
+        "conv-direct",
+        "expert-group",
+        "expert-group",
+        "conv-direct"
+      ],
+      "samples_per_case": 60,
+      "triplets_per_graph": 8,
+      "scope": "Sequential expert blocks, each includes gate/up/SwiGLU/down/weighted10 reduction/residual. Two distinct full512 expert weightsets; eight actual routes per realgraph.",
+      "minimum_real_R4_time_reduction_percent": 10,
+      "maximum_real_R5_slowdown_percent": 2,
+      "maximum_distinct_slowdown_percent": 5,
+      "require_gain_above_bracket_drift": true
+    },
+    "model": {
+      "run_only_after_operator_gate": true,
+      "harness": "scripts/benchmark_m5_next.py",
+      "depth": 3,
+      "predict": 256,
+      "repeats": 3,
+      "order": [
+        "conv-direct",
+        "expert-group",
+        "expert-group",
+        "conv-direct"
+      ],
+      "scope": "Fresh code, prose, Chinese, synthetic512/2048 plus cached512/2048, exact tokens/text parity, zero newswap; no defaults changed."
+    },
+    "next_if_operator_fails": "Park grouping. Shared route map or gate/up fusion needs separate normal-dispatch evidence before implementation; do not claim TPS gain from operator timings."
+  },
+  "models_loaded": false,
+  "tps_measured": false,
+  "runs": [
+    {
+      "tuning": "conv-direct",
+      "path": "bench/features/20261009T153117318538Z-m5-group-perf-conv-direct"
+    },
+    {
+      "tuning": "expert-group",
+      "path": "bench/features/20261009T153145747633Z-m5-group-perf-expert-group"
+    },
+    {
+      "tuning": "expert-group",
+      "path": "bench/features/20261009T153214203939Z-m5-group-perf-expert-group"
+    },
+    {
+      "tuning": "conv-direct",
+      "path": "bench/features/20261009T153242823845Z-m5-group-perf-conv-direct"
+    }
+  ],
+  "summary": [
+    {
+      "rows": 4,
+      "route": "real",
+      "control_us": 301.83856249999997,
+      "candidate_us": 384.2656875,
+      "time_reduction_percent": -27.308347984860305,
+      "control_time_drift_percent": 0.7134708296534953,
+      "all_us": [
+        300.765625,
+        383.198,
+        385.333375,
+        302.9115
+      ]
+    },
+    {
+      "rows": 4,
+      "route": "distinct",
+      "control_us": 311.302125,
+      "candidate_us": 338.645875,
+      "time_reduction_percent": -8.783669562165697,
+      "control_time_drift_percent": 0.34858033759117557,
+      "all_us": [
+        310.7605,
+        338.432375,
+        338.859375,
+        311.84375
+      ]
+    },
+    {
+      "rows": 4,
+      "route": "shared",
+      "control_us": 295.104125,
+      "candidate_us": 362.9193125,
+      "time_reduction_percent": -22.980087960478347,
+      "control_time_drift_percent": 0.5131665612786884,
+      "all_us": [
+        294.348875,
+        364.0365,
+        361.802125,
+        295.859375
+      ]
+    },
+    {
+      "rows": 5,
+      "route": "real",
+      "control_us": 362.390625,
+      "candidate_us": 449.93225,
+      "time_reduction_percent": -24.15670245332644,
+      "control_time_drift_percent": -0.08330077960013726,
+      "all_us": [
+        362.541625,
+        450.536375,
+        449.328125,
+        362.239625
+      ]
+    },
+    {
+      "rows": 5,
+      "route": "distinct",
+      "control_us": 373.4296875,
+      "candidate_us": 405.742125,
+      "time_reduction_percent": -8.652883951547107,
+      "control_time_drift_percent": 0.4263215750785809,
+      "all_us": [
+        372.635375,
+        406.45825,
+        405.026,
+        374.224
+      ]
+    },
+    {
+      "rows": 5,
+      "route": "shared",
+      "control_us": 354.25518750000003,
+      "candidate_us": 447.234375,
+      "time_reduction_percent": -26.246387005977144,
+      "control_time_drift_percent": 0.0323618542318993,
+      "all_us": [
+        354.197875,
+        446.447875,
+        448.020875,
+        354.3125
+      ]
+    }
+  ],
+  "operator_speed_gate": false,
+  "decision": "parked-no-full-model-benchmark",
+  "zero_new_swap": true,
+  "correctness": {
+    "status": "passed",
+    "control": "bench/features/20261009T152917935359Z-m5-group-check-conv-direct",
+    "candidate": "bench/features/20261009T152947347619Z-m5-group-check-expert-group",
+    "cases_per_launch": 42,
+    "CPU_projection_references": 336,
+    "elements_bit_identical": 9446400,
+    "candidate_route_markers": 750,
+    "tensor_output_comparison": "bench/features/20261009T152947347619Z-m5-group-check-expert-group/comparison.json"
+  },
+  "native_engine": {
+    "engine": "m5-group",
+    "directory": "vendor/llama-m5-group",
+    "revision": "d81235049384534c167caea52b85a694f6103d14",
+    "source_diff_sha256": "494c0f83b822266c7d88ab268d39dc4f576d52356b3f351a7e970c59bbbbdcda",
+    "patch": {
+      "schema": 1,
+      "id": "m5-group",
+      "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+      "directory": "vendor/llama-m5-group",
+      "patch": "patches/mtp-m5-group.patch",
+      "patch_sha256": "494c0f83b822266c7d88ab268d39dc4f576d52356b3f351a7e970c59bbbbdcda",
+      "source_diff_sha256": "494c0f83b822266c7d88ab268d39dc4f576d52356b3f351a7e970c59bbbbdcda",
+      "modified_files": [
+        "ggml/src/ggml-metal/ggml-metal-common.cpp",
+        "ggml/src/ggml-metal/ggml-metal-common.h",
+        "ggml/src/ggml-metal/ggml-metal-context.m",
+        "ggml/src/ggml-metal/ggml-metal-device.cpp",
+        "ggml/src/ggml-metal/ggml-metal-device.h",
+        "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+        "ggml/src/ggml-metal/kernels/mul_mv.metal",
+        "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+        "ggml/src/ggml-metal/kernels/quantize.metal",
+        "src/llama-context.cpp",
+        "src/llama-cparams.h",
+        "src/models/qwen4exp.cpp",
+        "tests/test-backend-ops.cpp"
+      ],
+      "features": [
+        "mtp-shared",
+        "m5-tuning",
+        "m5-profile",
+        "m5-copy",
+        "m5-group"
+      ],
+      "components": [
+        {
+          "patch": "patches/mtp-m5-copy.patch",
+          "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+        }
+      ],
+      "scope": "Opt-in R4/R5 exact Q2_0 pair grouping. Separate original singleton and nr0=8 pair kernels, GPU-only bounded map in existing scratch, direct gather/scatter. Preserves known-exact original ordered pair arithmetic. Every per-op map/barrier/dispatch cost included, no new persistent weights or precision change.",
+      "upstream": {
+        "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+        "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+        "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+        "license_file": "patches/LLAMA-LICENSE.txt"
+      }
+    },
+    "artifacts": {
+      "llama-server": "c976f0cc89928a54f9afadb41bf293e96896ce7116870c54947f7aeccb0c7624",
+      "libggml-base.0.26.0.dylib": "e0d19bc928c78f4923c65f4f8bbf037bda4693ffc4fd05c9febea26e1230801e",
+      "libggml-base.0.dylib": "e0d19bc928c78f4923c65f4f8bbf037bda4693ffc4fd05c9febea26e1230801e",
+      "libggml-base.dylib": "e0d19bc928c78f4923c65f4f8bbf037bda4693ffc4fd05c9febea26e1230801e",
+      "libggml-blas.0.26.0.dylib": "08072d431c981356fdd9cba2355e115b99693b2f2d01fa6c8efccc4c425ec72c",
+      "libggml-blas.0.dylib": "08072d431c981356fdd9cba2355e115b99693b2f2d01fa6c8efccc4c425ec72c",
+      "libggml-blas.dylib": "08072d431c981356fdd9cba2355e115b99693b2f2d01fa6c8efccc4c425ec72c",
+      "libggml-cpu.0.26.0.dylib": "665bb6d26b208868e11328d4083d82d43f8cf59793f95f935820143d5640f6e6",
+      "libggml-cpu.0.dylib": "665bb6d26b208868e11328d4083d82d43f8cf59793f95f935820143d5640f6e6",
+      "libggml-cpu.dylib": "665bb6d26b208868e11328d4083d82d43f8cf59793f95f935820143d5640f6e6",
+      "libggml-metal.0.26.0.dylib": "cf97eb1e914ddabfad3adc50b6f05612fb0b4cb2bfaf12d20ebf4d9f4848db6b",
+      "libggml-metal.0.dylib": "cf97eb1e914ddabfad3adc50b6f05612fb0b4cb2bfaf12d20ebf4d9f4848db6b",
+      "libggml-metal.dylib": "cf97eb1e914ddabfad3adc50b6f05612fb0b4cb2bfaf12d20ebf4d9f4848db6b",
+      "libggml.0.26.0.dylib": "b519741b5d3d2b52200b65816c45f9b4ba08ce5be6ce43ea0ac6666d03816257",
+      "libggml.0.dylib": "b519741b5d3d2b52200b65816c45f9b4ba08ce5be6ce43ea0ac6666d03816257",
+      "libggml.dylib": "b519741b5d3d2b52200b65816c45f9b4ba08ce5be6ce43ea0ac6666d03816257",
+      "libllama-common.0.6.0.dylib": "6ef3a23dfd8bebef53c39a6507e953d312fc434970f86cc4bcae4a541d06ad86",
+      "libllama-common.0.dylib": "6ef3a23dfd8bebef53c39a6507e953d312fc434970f86cc4bcae4a541d06ad86",
+      "libllama-common.dylib": "6ef3a23dfd8bebef53c39a6507e953d312fc434970f86cc4bcae4a541d06ad86",
+      "libllama-server-impl.dylib": "a72799c805f5ef084732144aa6ef6add8edb75835ac1913ea54eef73dea1726f",
+      "libllama.0.6.0.dylib": "b644e4bcebaee562b78767113ea7c84bf35815a8ca467c02599e3275bc784de6",
+      "libllama.0.dylib": "b644e4bcebaee562b78767113ea7c84bf35815a8ca467c02599e3275bc784de6",
+      "libllama.dylib": "b644e4bcebaee562b78767113ea7c84bf35815a8ca467c02599e3275bc784de6",
+      "libmtmd.0.6.0.dylib": "4c4a09032e0f0895775bc2ecb11d230aee72159b6a8b711b5fd76679cd0ae301",
+      "libmtmd.0.dylib": "4c4a09032e0f0895775bc2ecb11d230aee72159b6a8b711b5fd76679cd0ae301",
+      "libmtmd.dylib": "4c4a09032e0f0895775bc2ecb11d230aee72159b6a8b711b5fd76679cd0ae301"
+    },
+    "build_receipt": {
+      "engine": "m5-group",
+      "directory": "vendor/llama-m5-group",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "494c0f83b822266c7d88ab268d39dc4f576d52356b3f351a7e970c59bbbbdcda",
+      "patch": {
+        "schema": 1,
+        "id": "m5-group",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-group",
+        "patch": "patches/mtp-m5-group.patch",
+        "patch_sha256": "494c0f83b822266c7d88ab268d39dc4f576d52356b3f351a7e970c59bbbbdcda",
+        "source_diff_sha256": "494c0f83b822266c7d88ab268d39dc4f576d52356b3f351a7e970c59bbbbdcda",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal-device.h",
+          "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv.metal",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "ggml/src/ggml-metal/kernels/quantize.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-copy",
+          "m5-group"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-copy.patch",
+            "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+          }
+        ],
+        "scope": "Opt-in R4/R5 exact Q2_0 pair grouping. Separate original singleton and nr0=8 pair kernels, GPU-only bounded map in existing scratch, direct gather/scatter. Preserves known-exact original ordered pair arithmetic. Every per-op map/barrier/dispatch cost included, no new persistent weights or precision change.",
+        "upstream": {
+          "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+          "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+          "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        }
+      },
+      "artifacts": {
+        "llama-server": "c976f0cc89928a54f9afadb41bf293e96896ce7116870c54947f7aeccb0c7624",
+        "libggml-base.0.26.0.dylib": "e0d19bc928c78f4923c65f4f8bbf037bda4693ffc4fd05c9febea26e1230801e",
+        "libggml-base.0.dylib": "e0d19bc928c78f4923c65f4f8bbf037bda4693ffc4fd05c9febea26e1230801e",
+        "libggml-base.dylib": "e0d19bc928c78f4923c65f4f8bbf037bda4693ffc4fd05c9febea26e1230801e",
+        "libggml-blas.0.26.0.dylib": "08072d431c981356fdd9cba2355e115b99693b2f2d01fa6c8efccc4c425ec72c",
+        "libggml-blas.0.dylib": "08072d431c981356fdd9cba2355e115b99693b2f2d01fa6c8efccc4c425ec72c",
+        "libggml-blas.dylib": "08072d431c981356fdd9cba2355e115b99693b2f2d01fa6c8efccc4c425ec72c",
+        "libggml-cpu.0.26.0.dylib": "665bb6d26b208868e11328d4083d82d43f8cf59793f95f935820143d5640f6e6",
+        "libggml-cpu.0.dylib": "665bb6d26b208868e11328d4083d82d43f8cf59793f95f935820143d5640f6e6",
+        "libggml-cpu.dylib": "665bb6d26b208868e11328d4083d82d43f8cf59793f95f935820143d5640f6e6",
+        "libggml-metal.0.26.0.dylib": "cf97eb1e914ddabfad3adc50b6f05612fb0b4cb2bfaf12d20ebf4d9f4848db6b",
+        "libggml-metal.0.dylib": "cf97eb1e914ddabfad3adc50b6f05612fb0b4cb2bfaf12d20ebf4d9f4848db6b",
+        "libggml-metal.dylib": "cf97eb1e914ddabfad3adc50b6f05612fb0b4cb2bfaf12d20ebf4d9f4848db6b",
+        "libggml.0.26.0.dylib": "b519741b5d3d2b52200b65816c45f9b4ba08ce5be6ce43ea0ac6666d03816257",
+        "libggml.0.dylib": "b519741b5d3d2b52200b65816c45f9b4ba08ce5be6ce43ea0ac6666d03816257",
+        "libggml.dylib": "b519741b5d3d2b52200b65816c45f9b4ba08ce5be6ce43ea0ac6666d03816257",
+        "libllama-common.0.6.0.dylib": "6ef3a23dfd8bebef53c39a6507e953d312fc434970f86cc4bcae4a541d06ad86",
+        "libllama-common.0.dylib": "6ef3a23dfd8bebef53c39a6507e953d312fc434970f86cc4bcae4a541d06ad86",
+        "libllama-common.dylib": "6ef3a23dfd8bebef53c39a6507e953d312fc434970f86cc4bcae4a541d06ad86",
+        "libllama-server-impl.dylib": "a72799c805f5ef084732144aa6ef6add8edb75835ac1913ea54eef73dea1726f",
+        "libllama.0.6.0.dylib": "b644e4bcebaee562b78767113ea7c84bf35815a8ca467c02599e3275bc784de6",
+        "libllama.0.dylib": "b644e4bcebaee562b78767113ea7c84bf35815a8ca467c02599e3275bc784de6",
+        "libllama.dylib": "b644e4bcebaee562b78767113ea7c84bf35815a8ca467c02599e3275bc784de6",
+        "libmtmd.0.6.0.dylib": "4c4a09032e0f0895775bc2ecb11d230aee72159b6a8b711b5fd76679cd0ae301",
+        "libmtmd.0.dylib": "4c4a09032e0f0895775bc2ecb11d230aee72159b6a8b711b5fd76679cd0ae301",
+        "libmtmd.dylib": "4c4a09032e0f0895775bc2ecb11d230aee72159b6a8b711b5fd76679cd0ae301"
+      },
+      "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+      "build_settings": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GGML_BLAS": "ON",
+        "GGML_CPU": "ON",
+        "GGML_METAL": "ON",
+        "GGML_METAL_EMBED_LIBRARY": "ON",
+        "GGML_NATIVE": "ON",
+        "LLAMA_BUILD_TESTS": "ON",
+        "LLAMA_BUILD_TOOLS": "ON"
+      },
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+    }
+  },
+  "existing_engines_unchanged": [
+    "baseline",
+    "q2-masked",
+    "draft-vocab",
+    "mtp-shared",
+    "mtp-mma",
+    "m5-lab",
+    "m5-trace",
+    "m5-correctness",
+    "m5-copy",
+    "m5-reduce",
+    "m5-sampling",
+    "m5-hc"
+  ],
+  "offline_gate": {
+    "path": "bench/features/offline-validation.json",
+    "sha256": "1ec53af08c410bb2b5bf59ce2b28e561e7f1faafbcf3690ce1f905f08b25abc9",
+    "tests": 107
+  },
+  "memory": {
+    "zero_new_swap": true,
+    "minimum_available_GiB": 32.03184509277344,
+    "maximum_process_RSS_GiB": 4.47991943359375,
+    "note": "Native component probes only; no model loaded. RSS is not total Metal memory."
+  },
+  "variants": {
+    "v1": "bench/runtime/m5-group/v1/interpretation.json",
+    "v2": "bench/runtime/m5-group/v2/interpretation.json",
+    "v3": "bench/runtime/m5-group/v3/interpretation.json",
+    "v4": "Current accepted correctness source; failed operator speed gate."
+  },
+  "next_card": "bench/research/20261009-astra-gate-up-plan.md",
+  "postflight": {
+    "memory": {
+      "total": 51539607552,
+      "available": 38690488320,
+      "percent": 24.9,
+      "used": 10112679936,
+      "free": 31018270720,
+      "active": 6404521984,
+      "inactive": 7223083008,
+      "wired": 3708157952
+    },
+    "swap": {
+      "total": 2147483648,
+      "used": 523370496,
+      "free": 1624113152,
+      "percent": 24.4,
+      "sin": 3727001501696,
+      "sout": 2150219776
+    },
+    "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 89%",
+    "largest_process_groups": [
+      {
+        "name": "mediaanalysisd",
+        "rss_bytes": 1365262336
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "rss_bytes": 584564736
+      },
+      {
+        "name": "T3 Code (Alpha) Helper (Renderer)",
+        "rss_bytes": 430391296
+      },
+      {
+        "name": "T3 Code (Alpha)",
+        "rss_bytes": 380993536
+      },
+      {
+        "name": "codex",
+        "rss_bytes": 307363840
+      },
+      {
+        "name": "node",
+        "rss_bytes": 148553728
+      },
+      {
+        "name": "MenuBarAgent",
+        "rss_bytes": 120356864
+      },
+      {
+        "name": "textunderstandingd",
+        "rss_bytes": 91226112
+      },
+      {
+        "name": "T3 Code (Alpha) Helper",
+        "rss_bytes": 85835776
+      },
+      {
+        "name": "node_repl",
+        "rss_bytes": 78299136
+      },
+      {
+        "name": "corespotlightd",
+        "rss_bytes": 76398592
+      },
+      {
+        "name": "NewsTag",
+        "rss_bytes": 64028672
+      }
+    ],
+    "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth."
+  },
+  "defaults_changed": false,
+  "committed": false,
+  "pushed": false,
+  "interpretation": "This pass adopts no TPS gain. Expert pair grouping is slower in the complete sequential component graphs, so no full-model benchmark was run. The component graphs omit full-model attention/shared-expert overlap and do not prove the model TPS would decline by these percentages."
+}

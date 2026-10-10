@@ -1,0 +1,631 @@
+{
+  "status": "passed",
+  "probe": {
+    "engine": {
+      "engine": "m5-encoders",
+      "directory": "vendor/llama-m5-encoders",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "2e71c1892c3eaa0b050bb4f211b7c24d9fa320b269758466bd2a116c5b3e67f1",
+      "patch": {
+        "schema": 1,
+        "id": "m5-encoders",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-encoders",
+        "patch": "patches/mtp-m5-encoders.patch",
+        "patch_sha256": "2e71c1892c3eaa0b050bb4f211b7c24d9fa320b269758466bd2a116c5b3e67f1",
+        "source_diff_sha256": "2e71c1892c3eaa0b050bb4f211b7c24d9fa320b269758466bd2a116c5b3e67f1",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal-device.h",
+          "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+          "ggml/src/ggml-metal/ggml-metal.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "ggml/src/ggml-metal/kernels/quantize.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-copy",
+          "m5-encoders"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-copy.patch",
+            "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+          }
+        ],
+        "scope": "Initialization-only extra Metal encoding thread count0/1/2 for both constructors, same default1. Original partition math/fusion/barriers/queues/graph placement unchanged; read-only effective setting getter and startup proof. No helper CPU thread/model/precision/default launcher changes. Count2 restricted to null abort callbacks in these experiments; original callback enqueue/commit behavior unchanged. Startup setter markers verify the actual model path.",
+        "upstream": {
+          "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+          "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+          "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        }
+      },
+      "artifacts": {
+        "llama-server": "1dd688780da6ce890d2040a893d3b678414ffa22fbe844f1b16c620058adb2a6",
+        "libggml-base.0.26.0.dylib": "9ba5d2f4903179eab21449a5117b4d982eee322b4b5f6dda5967972b106adf34",
+        "libggml-base.0.dylib": "9ba5d2f4903179eab21449a5117b4d982eee322b4b5f6dda5967972b106adf34",
+        "libggml-base.dylib": "9ba5d2f4903179eab21449a5117b4d982eee322b4b5f6dda5967972b106adf34",
+        "libggml-blas.0.26.0.dylib": "70908f99c1ac2cd3c5c61050eb49251c48d0533d874d410d9150173b8a1ade2e",
+        "libggml-blas.0.dylib": "70908f99c1ac2cd3c5c61050eb49251c48d0533d874d410d9150173b8a1ade2e",
+        "libggml-blas.dylib": "70908f99c1ac2cd3c5c61050eb49251c48d0533d874d410d9150173b8a1ade2e",
+        "libggml-cpu.0.26.0.dylib": "2878b0b7d5c970d2b9b7b482bff87b07bacbf4869deabbee3fd045558e10dbeb",
+        "libggml-cpu.0.dylib": "2878b0b7d5c970d2b9b7b482bff87b07bacbf4869deabbee3fd045558e10dbeb",
+        "libggml-cpu.dylib": "2878b0b7d5c970d2b9b7b482bff87b07bacbf4869deabbee3fd045558e10dbeb",
+        "libggml-metal.0.26.0.dylib": "c19a4af176dba39e073164a1637bbd410744d5b4009d1e29e96e9b8b37dfe508",
+        "libggml-metal.0.dylib": "c19a4af176dba39e073164a1637bbd410744d5b4009d1e29e96e9b8b37dfe508",
+        "libggml-metal.dylib": "c19a4af176dba39e073164a1637bbd410744d5b4009d1e29e96e9b8b37dfe508",
+        "libggml.0.26.0.dylib": "be93c1c71c3b0e25c5f7e1144162bf6db57c5d0877adb09a9eac32edfb40cb55",
+        "libggml.0.dylib": "be93c1c71c3b0e25c5f7e1144162bf6db57c5d0877adb09a9eac32edfb40cb55",
+        "libggml.dylib": "be93c1c71c3b0e25c5f7e1144162bf6db57c5d0877adb09a9eac32edfb40cb55",
+        "libllama-common.0.6.0.dylib": "fdf4982dd2f7b9d8cfe5202c2b92fbdc834b38cddd52c913e97faf8bd91ed963",
+        "libllama-common.0.dylib": "fdf4982dd2f7b9d8cfe5202c2b92fbdc834b38cddd52c913e97faf8bd91ed963",
+        "libllama-common.dylib": "fdf4982dd2f7b9d8cfe5202c2b92fbdc834b38cddd52c913e97faf8bd91ed963",
+        "libllama-server-impl.dylib": "75d78a7ff0c110715329cb59145b48b766050b93339f3528e9079208ed61d2b3",
+        "libllama.0.6.0.dylib": "c7fe7554363574a281a4e3452432905fedd1b7c413b29702fa2a76c8be94598f",
+        "libllama.0.dylib": "c7fe7554363574a281a4e3452432905fedd1b7c413b29702fa2a76c8be94598f",
+        "libllama.dylib": "c7fe7554363574a281a4e3452432905fedd1b7c413b29702fa2a76c8be94598f",
+        "libmtmd.0.6.0.dylib": "cbc39350d9626261ad24ffa00ad4c18dce10a72d9a802d531ea997e3258acb2b",
+        "libmtmd.0.dylib": "cbc39350d9626261ad24ffa00ad4c18dce10a72d9a802d531ea997e3258acb2b",
+        "libmtmd.dylib": "cbc39350d9626261ad24ffa00ad4c18dce10a72d9a802d531ea997e3258acb2b"
+      },
+      "build_receipt": {
+        "engine": "m5-encoders",
+        "directory": "vendor/llama-m5-encoders",
+        "revision": "d81235049384534c167caea52b85a694f6103d14",
+        "source_diff_sha256": "2e71c1892c3eaa0b050bb4f211b7c24d9fa320b269758466bd2a116c5b3e67f1",
+        "patch": {
+          "schema": 1,
+          "id": "m5-encoders",
+          "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+          "directory": "vendor/llama-m5-encoders",
+          "patch": "patches/mtp-m5-encoders.patch",
+          "patch_sha256": "2e71c1892c3eaa0b050bb4f211b7c24d9fa320b269758466bd2a116c5b3e67f1",
+          "source_diff_sha256": "2e71c1892c3eaa0b050bb4f211b7c24d9fa320b269758466bd2a116c5b3e67f1",
+          "modified_files": [
+            "ggml/src/ggml-metal/ggml-metal-common.cpp",
+            "ggml/src/ggml-metal/ggml-metal-common.h",
+            "ggml/src/ggml-metal/ggml-metal-context.h",
+            "ggml/src/ggml-metal/ggml-metal-context.m",
+            "ggml/src/ggml-metal/ggml-metal-device.cpp",
+            "ggml/src/ggml-metal/ggml-metal-device.h",
+            "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+            "ggml/src/ggml-metal/ggml-metal.cpp",
+            "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+            "ggml/src/ggml-metal/kernels/quantize.metal",
+            "src/llama-context.cpp",
+            "src/llama-cparams.h",
+            "src/models/qwen4exp.cpp",
+            "tests/test-backend-ops.cpp"
+          ],
+          "features": [
+            "mtp-shared",
+            "m5-tuning",
+            "m5-profile",
+            "m5-copy",
+            "m5-encoders"
+          ],
+          "components": [
+            {
+              "patch": "patches/mtp-m5-copy.patch",
+              "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+            }
+          ],
+          "scope": "Initialization-only extra Metal encoding thread count0/1/2 for both constructors, same default1. Original partition math/fusion/barriers/queues/graph placement unchanged; read-only effective setting getter and startup proof. No helper CPU thread/model/precision/default launcher changes. Count2 restricted to null abort callbacks in these experiments; original callback enqueue/commit behavior unchanged. Startup setter markers verify the actual model path.",
+          "upstream": {
+            "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+            "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+            "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+            "license_file": "patches/LLAMA-LICENSE.txt"
+          }
+        },
+        "artifacts": {
+          "llama-server": "1dd688780da6ce890d2040a893d3b678414ffa22fbe844f1b16c620058adb2a6",
+          "libggml-base.0.26.0.dylib": "9ba5d2f4903179eab21449a5117b4d982eee322b4b5f6dda5967972b106adf34",
+          "libggml-base.0.dylib": "9ba5d2f4903179eab21449a5117b4d982eee322b4b5f6dda5967972b106adf34",
+          "libggml-base.dylib": "9ba5d2f4903179eab21449a5117b4d982eee322b4b5f6dda5967972b106adf34",
+          "libggml-blas.0.26.0.dylib": "70908f99c1ac2cd3c5c61050eb49251c48d0533d874d410d9150173b8a1ade2e",
+          "libggml-blas.0.dylib": "70908f99c1ac2cd3c5c61050eb49251c48d0533d874d410d9150173b8a1ade2e",
+          "libggml-blas.dylib": "70908f99c1ac2cd3c5c61050eb49251c48d0533d874d410d9150173b8a1ade2e",
+          "libggml-cpu.0.26.0.dylib": "2878b0b7d5c970d2b9b7b482bff87b07bacbf4869deabbee3fd045558e10dbeb",
+          "libggml-cpu.0.dylib": "2878b0b7d5c970d2b9b7b482bff87b07bacbf4869deabbee3fd045558e10dbeb",
+          "libggml-cpu.dylib": "2878b0b7d5c970d2b9b7b482bff87b07bacbf4869deabbee3fd045558e10dbeb",
+          "libggml-metal.0.26.0.dylib": "c19a4af176dba39e073164a1637bbd410744d5b4009d1e29e96e9b8b37dfe508",
+          "libggml-metal.0.dylib": "c19a4af176dba39e073164a1637bbd410744d5b4009d1e29e96e9b8b37dfe508",
+          "libggml-metal.dylib": "c19a4af176dba39e073164a1637bbd410744d5b4009d1e29e96e9b8b37dfe508",
+          "libggml.0.26.0.dylib": "be93c1c71c3b0e25c5f7e1144162bf6db57c5d0877adb09a9eac32edfb40cb55",
+          "libggml.0.dylib": "be93c1c71c3b0e25c5f7e1144162bf6db57c5d0877adb09a9eac32edfb40cb55",
+          "libggml.dylib": "be93c1c71c3b0e25c5f7e1144162bf6db57c5d0877adb09a9eac32edfb40cb55",
+          "libllama-common.0.6.0.dylib": "fdf4982dd2f7b9d8cfe5202c2b92fbdc834b38cddd52c913e97faf8bd91ed963",
+          "libllama-common.0.dylib": "fdf4982dd2f7b9d8cfe5202c2b92fbdc834b38cddd52c913e97faf8bd91ed963",
+          "libllama-common.dylib": "fdf4982dd2f7b9d8cfe5202c2b92fbdc834b38cddd52c913e97faf8bd91ed963",
+          "libllama-server-impl.dylib": "75d78a7ff0c110715329cb59145b48b766050b93339f3528e9079208ed61d2b3",
+          "libllama.0.6.0.dylib": "c7fe7554363574a281a4e3452432905fedd1b7c413b29702fa2a76c8be94598f",
+          "libllama.0.dylib": "c7fe7554363574a281a4e3452432905fedd1b7c413b29702fa2a76c8be94598f",
+          "libllama.dylib": "c7fe7554363574a281a4e3452432905fedd1b7c413b29702fa2a76c8be94598f",
+          "libmtmd.0.6.0.dylib": "cbc39350d9626261ad24ffa00ad4c18dce10a72d9a802d531ea997e3258acb2b",
+          "libmtmd.0.dylib": "cbc39350d9626261ad24ffa00ad4c18dce10a72d9a802d531ea997e3258acb2b",
+          "libmtmd.dylib": "cbc39350d9626261ad24ffa00ad4c18dce10a72d9a802d531ea997e3258acb2b"
+        },
+        "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+        "build_settings": {
+          "CMAKE_BUILD_TYPE": "Release",
+          "GGML_BLAS": "ON",
+          "GGML_CPU": "ON",
+          "GGML_METAL": "ON",
+          "GGML_METAL_EMBED_LIBRARY": "ON",
+          "GGML_NATIVE": "ON",
+          "LLAMA_BUILD_TESTS": "ON",
+          "LLAMA_BUILD_TOOLS": "ON"
+        },
+        "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+      }
+    },
+    "source_sha256": "597e9431d665efdba9f60fce3860126e6fc936838986c1374a5c7b6da9bb23a9",
+    "runner_sha256": "abca1574627ff108cf76d81b5fa35ad10b134bc6aaf4f6bbf73fd75d05db686f",
+    "binary_sha256": "a87e4f0c2d78ca53da961ee5d0342b222336516a1257426a248bfaf7efe46f85",
+    "command": [
+      "/usr/bin/c++",
+      "-O3",
+      "-ffp-contract=off",
+      "-std=gnu++17",
+      "-arch",
+      "arm64",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-encoders/ggml/include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-encoders/vendor",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/native/m5_encoder_probe.cpp",
+      "-o",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-encoders/encoder-probe",
+      "-Wl,-rpath,/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-encoders/build/bin",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-encoders/build/bin/libggml.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-encoders/build/bin/libggml-base.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-encoders/build/bin/libggml-metal.0.26.0.dylib"
+    ]
+  },
+  "constructor": "legacy",
+  "variant": "unset",
+  "command": [
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-encoders/encoder-probe",
+    "legacy",
+    "1",
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/features/20261009T170907488888Z-m5-encoders-check-legacy-unset/outputs.jsonl"
+  ],
+  "effective_n_cb": 1,
+  "metal_environment": {
+    "tensor_api": "on",
+    "tuning": "conv-direct",
+    "profile": false,
+    "variables": {
+      "GGML_M5_LAB_CONV_DIRECT": "1",
+      "GGML_METAL_TENSOR_ENABLE": "1"
+    }
+  },
+  "models_loaded": false,
+  "timings_measured": false,
+  "tps_measured": false,
+  "stats_case_excluded_from_speed": false,
+  "scope": "Dependent dyadic ADD fusion and shared-state ADD/CPY chains across command-buffer partitions. Scheduler optimizer on; CPU bit reference and all returned buffer digests. No timings or callbacks.",
+  "memory": {
+    "guard": null,
+    "monitor_healthy": true,
+    "monitor_error": null,
+    "samples": 3,
+    "live_samples": 1,
+    "baseline_before_launch": true,
+    "child_exited": true,
+    "launch_baseline": {
+      "swap_used_bytes": 523829248,
+      "available_bytes": 37606948864
+    },
+    "peak_rss_bytes": 32768,
+    "minimum_available_bytes": 37606359040,
+    "peak_swap_bytes": 523829248,
+    "swap_growth_bytes": 0,
+    "system_disk_read_bytes": 69632,
+    "sampling_interval_s": 0.25,
+    "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+  },
+  "cases": [
+    {
+      "all_nodes_metal": true,
+      "checked_values": 538,
+      "cpu_bit_exact": true,
+      "crossed_boundaries": 0,
+      "digest_buffers": 2,
+      "inputs_preserved": true,
+      "kind": "add",
+      "padding_preserved": true,
+      "partitions": [
+        [
+          0,
+          63
+        ],
+        [
+          63,
+          63
+        ]
+      ],
+      "plan": [
+        1,
+        63,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "raw_nodes": 63,
+      "scheduler_splits": 1,
+      "steps": 61
+    },
+    {
+      "all_nodes_metal": true,
+      "checked_values": 538,
+      "cpu_bit_exact": true,
+      "crossed_boundaries": 0,
+      "digest_buffers": 2,
+      "inputs_preserved": true,
+      "kind": "add",
+      "padding_preserved": true,
+      "partitions": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          64
+        ]
+      ],
+      "plan": [
+        1,
+        64,
+        0,
+        0,
+        1,
+        0,
+        1,
+        1
+      ],
+      "raw_nodes": 64,
+      "scheduler_splits": 1,
+      "steps": 62
+    },
+    {
+      "all_nodes_metal": true,
+      "checked_values": 538,
+      "cpu_bit_exact": true,
+      "crossed_boundaries": 1,
+      "digest_buffers": 2,
+      "inputs_preserved": true,
+      "kind": "add",
+      "padding_preserved": true,
+      "partitions": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          65
+        ]
+      ],
+      "plan": [
+        1,
+        64,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1
+      ],
+      "raw_nodes": 65,
+      "scheduler_splits": 1,
+      "steps": 63
+    },
+    {
+      "all_nodes_metal": true,
+      "checked_values": 538,
+      "cpu_bit_exact": true,
+      "crossed_boundaries": 1,
+      "digest_buffers": 2,
+      "inputs_preserved": true,
+      "kind": "add",
+      "padding_preserved": true,
+      "partitions": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          66
+        ]
+      ],
+      "plan": [
+        1,
+        64,
+        2,
+        2,
+        1,
+        0,
+        1,
+        1
+      ],
+      "raw_nodes": 66,
+      "scheduler_splits": 1,
+      "steps": 64
+    },
+    {
+      "all_nodes_metal": true,
+      "checked_values": 538,
+      "cpu_bit_exact": true,
+      "crossed_boundaries": 1,
+      "digest_buffers": 2,
+      "inputs_preserved": true,
+      "kind": "add",
+      "padding_preserved": true,
+      "partitions": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          130
+        ]
+      ],
+      "plan": [
+        1,
+        64,
+        66,
+        66,
+        1,
+        0,
+        1,
+        1
+      ],
+      "raw_nodes": 130,
+      "scheduler_splits": 1,
+      "steps": 128
+    },
+    {
+      "all_nodes_metal": true,
+      "checked_values": 538,
+      "cpu_bit_exact": true,
+      "crossed_boundaries": 1,
+      "digest_buffers": 2,
+      "inputs_preserved": true,
+      "kind": "add",
+      "padding_preserved": true,
+      "partitions": [
+        [
+          0,
+          65
+        ],
+        [
+          65,
+          650
+        ]
+      ],
+      "plan": [
+        1,
+        65,
+        585,
+        585,
+        1,
+        0,
+        1,
+        1
+      ],
+      "raw_nodes": 650,
+      "scheduler_splits": 1,
+      "steps": 648
+    },
+    {
+      "all_nodes_metal": true,
+      "checked_values": 538,
+      "cpu_bit_exact": true,
+      "crossed_boundaries": 1,
+      "digest_buffers": 2,
+      "inputs_preserved": true,
+      "kind": "alias",
+      "padding_preserved": true,
+      "partitions": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          65
+        ]
+      ],
+      "plan": [
+        1,
+        64,
+        1,
+        1,
+        1,
+        0,
+        1,
+        1
+      ],
+      "raw_nodes": 65,
+      "scheduler_splits": 1,
+      "steps": 21
+    },
+    {
+      "all_nodes_metal": true,
+      "checked_values": 538,
+      "cpu_bit_exact": true,
+      "crossed_boundaries": 1,
+      "digest_buffers": 2,
+      "inputs_preserved": true,
+      "kind": "alias",
+      "padding_preserved": true,
+      "partitions": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          131
+        ]
+      ],
+      "plan": [
+        1,
+        64,
+        67,
+        67,
+        1,
+        0,
+        1,
+        1
+      ],
+      "raw_nodes": 131,
+      "scheduler_splits": 1,
+      "steps": 43
+    },
+    {
+      "all_nodes_metal": true,
+      "checked_values": 538,
+      "cpu_bit_exact": true,
+      "crossed_boundaries": 1,
+      "digest_buffers": 2,
+      "inputs_preserved": true,
+      "kind": "alias",
+      "padding_preserved": true,
+      "partitions": [
+        [
+          0,
+          65
+        ],
+        [
+          65,
+          653
+        ]
+      ],
+      "plan": [
+        1,
+        65,
+        588,
+        588,
+        1,
+        0,
+        1,
+        1
+      ],
+      "raw_nodes": 653,
+      "scheduler_splits": 1,
+      "steps": 217
+    }
+  ],
+  "buffers": [
+    {
+      "bytes": 1024,
+      "id": "add/61/output",
+      "sha256": "a9651116dcc0964e0f7d9ace1881c5906c9cca73201c015c50597939e1d63822"
+    },
+    {
+      "bytes": 1128,
+      "id": "add/61/storage",
+      "sha256": "d03f0440daa5bb7433a02e6c4d5cd2749ef5e35941a0f63f7c56fec31ad54905"
+    },
+    {
+      "bytes": 1024,
+      "id": "add/62/output",
+      "sha256": "e6bb2c7d22114672317e767985e9809ef767624ffbc9c5676f55559f68187e92"
+    },
+    {
+      "bytes": 1128,
+      "id": "add/62/storage",
+      "sha256": "d03f0440daa5bb7433a02e6c4d5cd2749ef5e35941a0f63f7c56fec31ad54905"
+    },
+    {
+      "bytes": 1024,
+      "id": "add/63/output",
+      "sha256": "2af5d531d3d1505f39975961376aa8f6b822bc73de27c2d8d323ebebce31adf7"
+    },
+    {
+      "bytes": 1128,
+      "id": "add/63/storage",
+      "sha256": "d03f0440daa5bb7433a02e6c4d5cd2749ef5e35941a0f63f7c56fec31ad54905"
+    },
+    {
+      "bytes": 1024,
+      "id": "add/64/output",
+      "sha256": "36ad7394c7ece67fc3ec5e7730b31dde44ff5f4e80ea423a64bf46bfabb45067"
+    },
+    {
+      "bytes": 1128,
+      "id": "add/64/storage",
+      "sha256": "d03f0440daa5bb7433a02e6c4d5cd2749ef5e35941a0f63f7c56fec31ad54905"
+    },
+    {
+      "bytes": 1024,
+      "id": "add/128/output",
+      "sha256": "cd6cb8d18e4163b1a957d77238baa9ce365c12a78ffca6eaa413afd6dc8cfa17"
+    },
+    {
+      "bytes": 1128,
+      "id": "add/128/storage",
+      "sha256": "d03f0440daa5bb7433a02e6c4d5cd2749ef5e35941a0f63f7c56fec31ad54905"
+    },
+    {
+      "bytes": 1024,
+      "id": "add/648/output",
+      "sha256": "d0005ff68cc66ae078a81c50a3847b7a02ab85be29b610f7d27d9d6b69853339"
+    },
+    {
+      "bytes": 1128,
+      "id": "add/648/storage",
+      "sha256": "d03f0440daa5bb7433a02e6c4d5cd2749ef5e35941a0f63f7c56fec31ad54905"
+    },
+    {
+      "bytes": 1024,
+      "id": "alias/21/output",
+      "sha256": "7773e536b0c9f0b0239753607d25524d6e2b08fdcb37d021cf1642b5a7598a82"
+    },
+    {
+      "bytes": 1128,
+      "id": "alias/21/storage",
+      "sha256": "e48b876455e25ef23ef19765fd0db5ac370297fed116781189a2a4cbc33d84c1"
+    },
+    {
+      "bytes": 1024,
+      "id": "alias/43/output",
+      "sha256": "77be8111a6c3bf4f81c62dab1456d0cc1e79a460f2d962868fa72c750fab973d"
+    },
+    {
+      "bytes": 1128,
+      "id": "alias/43/storage",
+      "sha256": "4a017b368a4e94ddddb0d005aa792bd79e1d1cf37b0c6cf486f6127ef7b5e21d"
+    },
+    {
+      "bytes": 1024,
+      "id": "alias/217/output",
+      "sha256": "dde94b638c138f7073b031e60200e1dfcf17f1a6a1d1e3f6210c6e61eebc9ae4"
+    },
+    {
+      "bytes": 1128,
+      "id": "alias/217/storage",
+      "sha256": "95854c2ab79288b94b1450e450195df4e7bdd8dc3da6a76c0aadb0939f6f4892"
+    }
+  ],
+  "outputs_sha256": "a08b7e726354364319d46853a652581a68edb1f0123839e83ab9febbe5b022fe",
+  "native_log_sha256": "4345a5660b4534d61d757a694cd8af8fd912f6188c2064133abafb8b49b1e944"
+}

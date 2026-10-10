@@ -1,0 +1,711 @@
+[
+  {
+    "sha": "c57a31fe7b5dca115896b239811b592fc847197b",
+    "node_id": "C_kwDOU6jT4toAKGM1N2EzMWZlN2I1ZGNhMTE1ODk2YjIzOTgxMWI1OTJmYzg0NzE5N2I",
+    "commit": {
+      "author": {
+        "name": "shruxx",
+        "email": "24369531+shruxx@users.noreply.github.com",
+        "date": "2026-10-05T15:38:13Z"
+      },
+      "committer": {
+        "name": "shruxx",
+        "email": "24369531+shruxx@users.noreply.github.com",
+        "date": "2026-10-05T15:38:13Z"
+      },
+      "message": "docs(macos): neither model loads under Ollama, and why\n\nOnce a model fits the GPU whole this fork adds nothing to its speed -\nthe layer tuner is overridden, the budget planning is moot, and\nmetal-split-mmap.patch only applies to a CPU split - so Kolibri Q3_K_M\nat 51 of 51 layers is plain llama.cpp with Metal.  Tried under Ollama\n0.35.1 on the same Mac:\n\n- Kolibri Q3_K_M: `ollama create` succeeds and validates nothing; the\n  first request fails with \"unknown model architecture: 'kolibri1'\".\n  Upstream llama.cpp has only an open feature request (#29922); the\n  architecture exists in this fork's patch and nowhere else.\n- Qwen Q2_0: `ollama create` fails before any architecture check, with\n  \"unsupported tensor blk.0.ffn_down_exps.weight size overflows\" - its\n  own GGUF parser.  Probably GGML_TYPE_Q2_0 = 42 (of 43) being newer\n  than Ollama's vendored llama.cpp; the split layout may contribute and\n  this was not isolated.  qwen4exp itself is upstream.\n\nSo the unlock for Kolibri is upstreaming kolibri1-llama.cpp.patch, which\nwould serve Ollama, LM Studio and llama.cpp at once.\n\nAlso recorded: `ollama rm` leaves the blob behind unreferenced, which\ncost 35 GB until it was deleted by hand.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "tree": {
+        "sha": "9eb0424300686072d21754105093015f4d133e1a",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/git/trees/9eb0424300686072d21754105093015f4d133e1a"
+      },
+      "url": "https://api.github.com/repos/shruxx/StrataForMac/git/commits/c57a31fe7b5dca115896b239811b592fc847197b",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/c57a31fe7b5dca115896b239811b592fc847197b",
+    "html_url": "https://github.com/shruxx/StrataForMac/commit/c57a31fe7b5dca115896b239811b592fc847197b",
+    "comments_url": "https://api.github.com/repos/shruxx/StrataForMac/commits/c57a31fe7b5dca115896b239811b592fc847197b/comments",
+    "author": {
+      "login": "shruxx",
+      "id": 24369531,
+      "node_id": "MDQ6VXNlcjI0MzY5NTMx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24369531?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/shruxx",
+      "html_url": "https://github.com/shruxx",
+      "followers_url": "https://api.github.com/users/shruxx/followers",
+      "following_url": "https://api.github.com/users/shruxx/following{/other_user}",
+      "gists_url": "https://api.github.com/users/shruxx/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/shruxx/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/shruxx/subscriptions",
+      "organizations_url": "https://api.github.com/users/shruxx/orgs",
+      "repos_url": "https://api.github.com/users/shruxx/repos",
+      "events_url": "https://api.github.com/users/shruxx/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/shruxx/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "shruxx",
+      "id": 24369531,
+      "node_id": "MDQ6VXNlcjI0MzY5NTMx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24369531?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/shruxx",
+      "html_url": "https://github.com/shruxx",
+      "followers_url": "https://api.github.com/users/shruxx/followers",
+      "following_url": "https://api.github.com/users/shruxx/following{/other_user}",
+      "gists_url": "https://api.github.com/users/shruxx/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/shruxx/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/shruxx/subscriptions",
+      "organizations_url": "https://api.github.com/users/shruxx/orgs",
+      "repos_url": "https://api.github.com/users/shruxx/repos",
+      "events_url": "https://api.github.com/users/shruxx/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/shruxx/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "1231e2beb1cc0ec7a59f345ccbcafb73e8b06fc7",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/1231e2beb1cc0ec7a59f345ccbcafb73e8b06fc7",
+        "html_url": "https://github.com/shruxx/StrataForMac/commit/1231e2beb1cc0ec7a59f345ccbcafb73e8b06fc7"
+      }
+    ]
+  },
+  {
+    "sha": "1231e2beb1cc0ec7a59f345ccbcafb73e8b06fc7",
+    "node_id": "C_kwDOU6jT4toAKDEyMzFlMmJlYjFjYzBlYzdhNTlmMzQ1Y2NiY2FmYjczZThiMDZmYzc",
+    "commit": {
+      "author": {
+        "name": "shruxx",
+        "email": "24369531+shruxx@users.noreply.github.com",
+        "date": "2026-10-05T15:16:40Z"
+      },
+      "committer": {
+        "name": "shruxx",
+        "email": "24369531+shruxx@users.noreply.github.com",
+        "date": "2026-10-05T15:16:40Z"
+      },
+      "message": "bench(macos): Kolibri-1 at 3 bits, 32 -> 59 tok/s on a 48 GB Mac\n\nSetup installs Kolibri-1 Q4_K_M, and its 44.2 GiB cannot go on a 48 GB\nMac's GPU at any Metal limit: it runs as a split, reads experts through\nthe page cache, and metal-split-mmap.patch copies the GPU's weights out\nof the file instead of mapping it.  The official GGUF repo has nothing\nbetween Q4_K_M and Q8_0, so both 3-bit files were quantized locally from\nthe official Q8_0 (83.1 GB).\n\n  Q4_K_M  44.2 GiB   1 layer    ~32 tok/s   (the tuner's pick)\n  Q3_K_M  34.9 GiB   51 layers   56.7-60.2  <- now the config\n  Q3_K_S  31.5 GiB   51 layers   62.4-63.1\n\n-c 65536, KV int8, through serve/server.py.  Q3_K_M was verified at the\nstock 37.44 GiB working set, so it needs no sysctl and survives a\nreboot; the footprint reads 0.9 GiB for a 35 GiB model and the SSD is\nsilent, which is the file being mapped rather than copied.\n\nKolibri-1 was always the faster model per token - at ONE GPU layer, with\nthe CPU doing nearly all of it, it already matched Qwen Q2_0 running\nentirely on the GPU - and was only held back by not fitting.\n\nQuality over six German tasks at temperature 0: Q3_K_M is not\ndistinguishable from Q4_K_M on the five that could be compared, Q3_K_S\nis correct but consistently terser, which matches llama-quantize's own\n+0.66 against +1.63 ppl.  Six prompts rule out obvious damage and no\nmore.\n\nNotes for repeating it: llama-quantize is not in engine/ after a normal\nsetup (cmake --build build-llama --target llama-quantize), a split input\nneeds no merging because llama_model_loader finds the other shards from\nsplit.count, and --allow-requantize is required since Q8_0 is already\nquantized - this is requantization, not a clean basis.\n\nsetup.py is unchanged: offering this would mean shipping a quantization\nstep, and the numbers come from one Mac.  docs/MACOS.md points at it.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "tree": {
+        "sha": "c42bdffc5493f16edf90a68e6b57b3f3b5929d53",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/git/trees/c42bdffc5493f16edf90a68e6b57b3f3b5929d53"
+      },
+      "url": "https://api.github.com/repos/shruxx/StrataForMac/git/commits/1231e2beb1cc0ec7a59f345ccbcafb73e8b06fc7",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/1231e2beb1cc0ec7a59f345ccbcafb73e8b06fc7",
+    "html_url": "https://github.com/shruxx/StrataForMac/commit/1231e2beb1cc0ec7a59f345ccbcafb73e8b06fc7",
+    "comments_url": "https://api.github.com/repos/shruxx/StrataForMac/commits/1231e2beb1cc0ec7a59f345ccbcafb73e8b06fc7/comments",
+    "author": {
+      "login": "shruxx",
+      "id": 24369531,
+      "node_id": "MDQ6VXNlcjI0MzY5NTMx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24369531?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/shruxx",
+      "html_url": "https://github.com/shruxx",
+      "followers_url": "https://api.github.com/users/shruxx/followers",
+      "following_url": "https://api.github.com/users/shruxx/following{/other_user}",
+      "gists_url": "https://api.github.com/users/shruxx/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/shruxx/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/shruxx/subscriptions",
+      "organizations_url": "https://api.github.com/users/shruxx/orgs",
+      "repos_url": "https://api.github.com/users/shruxx/repos",
+      "events_url": "https://api.github.com/users/shruxx/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/shruxx/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "shruxx",
+      "id": 24369531,
+      "node_id": "MDQ6VXNlcjI0MzY5NTMx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24369531?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/shruxx",
+      "html_url": "https://github.com/shruxx",
+      "followers_url": "https://api.github.com/users/shruxx/followers",
+      "following_url": "https://api.github.com/users/shruxx/following{/other_user}",
+      "gists_url": "https://api.github.com/users/shruxx/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/shruxx/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/shruxx/subscriptions",
+      "organizations_url": "https://api.github.com/users/shruxx/orgs",
+      "repos_url": "https://api.github.com/users/shruxx/repos",
+      "events_url": "https://api.github.com/users/shruxx/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/shruxx/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "bfd340fe69aa843fa5c8c90f0b089e55553ded87",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/bfd340fe69aa843fa5c8c90f0b089e55553ded87",
+        "html_url": "https://github.com/shruxx/StrataForMac/commit/bfd340fe69aa843fa5c8c90f0b089e55553ded87"
+      }
+    ]
+  },
+  {
+    "sha": "bfd340fe69aa843fa5c8c90f0b089e55553ded87",
+    "node_id": "C_kwDOU6jT4toAKGJmZDM0MGZlNjlhYTg0M2ZhNWM4YzkwZjBiMDg5ZTU1NTUzZGVkODc",
+    "commit": {
+      "author": {
+        "name": "shruxx",
+        "email": "24369531+shruxx@users.noreply.github.com",
+        "date": "2026-10-05T13:31:13Z"
+      },
+      "committer": {
+        "name": "shruxx",
+        "email": "24369531+shruxx@users.noreply.github.com",
+        "date": "2026-10-05T13:31:13Z"
+      },
+      "message": "bench(macos): Qwen3.8-Flash-Next at 34 tok/s, by mapping the file\n\nQwen ran at 10.6 tok/s on a 48 GB M5 Pro: Q2_0 instead of IQ2_XS and\nevery layer on the GPU bring it to 34.0, measured through\nserve/server.py.\n\n  before   IQ2_XS   24 layers   ctx 131072   int8   10.6\n  now      Q2_0     49 layers   ctx  65536   int8   34.0\n  (with iogpu.wired_limit_mb=41984)  ctx 131072      33.8\n\nOf that, the quantization is worth ~10% (11.8 at the same 24 layers) and\nthe layer count the rest.  Neither of the two obvious causes was it: the\nMetal kernels do make Q2_0's dot product far cheaper than IQ2_XS's\ncodebook lookups, and the 26.8 GiB per_layer_token_embd table reads only\n0.2-0.3 MB per token once the model is on the GPU.\n\nWhat it is: the threshold where nearly every tensor in the file belongs\nto the GPU's buffer and llama.cpp maps the file into it instead of\ncopying the GPU's weights out (metal-split-mmap.patch does the copying\nbelow it).  Q2_0, -c 32768: 44 layers 23.8 tok/s, 32.2 GiB footprint,\n31.7 s to load; 47 layers 29.2 tok/s, 0.9 GiB, 11.8 s; 49 layers 33.4.\nQ2_0 is needed to reach that threshold at all - 35.0 GiB against\nIQ2_XS's 36.5, under a 37.44 GiB working set.\n\nSo a model that nearly fits a Mac wants every layer on the GPU and a\ncontext that fits, not the layer tuner's split - the opposite of the\nright answer for Kolibri-1, which does not fit at all.\n\nContext is a memory question only: 65536 and 131072 run at the same\nspeed, and 131072 needs the raised iogpu.wired_limit_mb, which a reboot\nundoes - so the config keeps 65536.  KV quantization is not a lever\n(q4 and int8 measure the same; int8 for the quality).  Quality checked\nat five tasks, temperature 0, both quantizations: no difference.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "tree": {
+        "sha": "dd92e51a4f3951a1a03a33d2fce9a14e72a81873",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/git/trees/dd92e51a4f3951a1a03a33d2fce9a14e72a81873"
+      },
+      "url": "https://api.github.com/repos/shruxx/StrataForMac/git/commits/bfd340fe69aa843fa5c8c90f0b089e55553ded87",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/bfd340fe69aa843fa5c8c90f0b089e55553ded87",
+    "html_url": "https://github.com/shruxx/StrataForMac/commit/bfd340fe69aa843fa5c8c90f0b089e55553ded87",
+    "comments_url": "https://api.github.com/repos/shruxx/StrataForMac/commits/bfd340fe69aa843fa5c8c90f0b089e55553ded87/comments",
+    "author": {
+      "login": "shruxx",
+      "id": 24369531,
+      "node_id": "MDQ6VXNlcjI0MzY5NTMx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24369531?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/shruxx",
+      "html_url": "https://github.com/shruxx",
+      "followers_url": "https://api.github.com/users/shruxx/followers",
+      "following_url": "https://api.github.com/users/shruxx/following{/other_user}",
+      "gists_url": "https://api.github.com/users/shruxx/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/shruxx/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/shruxx/subscriptions",
+      "organizations_url": "https://api.github.com/users/shruxx/orgs",
+      "repos_url": "https://api.github.com/users/shruxx/repos",
+      "events_url": "https://api.github.com/users/shruxx/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/shruxx/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "shruxx",
+      "id": 24369531,
+      "node_id": "MDQ6VXNlcjI0MzY5NTMx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24369531?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/shruxx",
+      "html_url": "https://github.com/shruxx",
+      "followers_url": "https://api.github.com/users/shruxx/followers",
+      "following_url": "https://api.github.com/users/shruxx/following{/other_user}",
+      "gists_url": "https://api.github.com/users/shruxx/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/shruxx/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/shruxx/subscriptions",
+      "organizations_url": "https://api.github.com/users/shruxx/orgs",
+      "repos_url": "https://api.github.com/users/shruxx/repos",
+      "events_url": "https://api.github.com/users/shruxx/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/shruxx/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "4f33f10aad1f5119473882869af4e4861b7a4d07",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/4f33f10aad1f5119473882869af4e4861b7a4d07",
+        "html_url": "https://github.com/shruxx/StrataForMac/commit/4f33f10aad1f5119473882869af4e4861b7a4d07"
+      }
+    ]
+  },
+  {
+    "sha": "4f33f10aad1f5119473882869af4e4861b7a4d07",
+    "node_id": "C_kwDOU6jT4toAKDRmMzNmMTBhYWQxZjUxMTk0NzM4ODI4NjlhZjRlNDg2MWI3YTRkMDc",
+    "commit": {
+      "author": {
+        "name": "shruxx",
+        "email": "24369531+shruxx@users.noreply.github.com",
+        "date": "2026-10-05T11:09:35Z"
+      },
+      "committer": {
+        "name": "shruxx",
+        "email": "24369531+shruxx@users.noreply.github.com",
+        "date": "2026-10-05T11:09:35Z"
+      },
+      "message": "bench(macos): a GPU layer count has to be measured in the server\n\nMeasuring llama-server on its own says Kolibri-1 Q4_K_M wants 30 GPU\nlayers on a 48 GB M5 Pro and runs at 43-48 tok/s.  Measured through\nserve/server.py, the same prompts and the same count give 16-22, and\nthe best count is the 1-5 the standalone tool rates slowest:\n\n  GPU layers   llama-server alone   in the server\n           1                 32.0   32.2\n           5          not measured  32.4\n           9           28.3, 26.1   26.5 - 28.3\n          30           43.7 - 47.9  15.7 - 22.5, alternating\n\nThe two agree at low counts and part by a factor of two at high ones.\nA GPU layer costs the page cache the CPU-side experts are read through:\n30 layers wire 28.7 GiB, which with the ~15.5 GiB read through the cache\nis 44.2 of 48 GiB - enough with nothing else resident, not enough with\nthe server and the runner beside it.  Wired GPU memory cannot be paged\nout, so everything else gives way and the replies alternate between\n~16 and ~22 tok/s as paging comes and goes.  The standalone figures are\nreproducible (9 layers first and last in one run: 28.3 and 26.1), so\nthis is a benchmark leaving out part of the system it predicts, not\ndrift.\n\nSo the runner's tuner was right to keep 1 layer here, and its rule - a\nbusy SSD at the start count means walk towards fewer layers - reads this\nMac correctly.  LayerTuner is unchanged: a change to make it always\nprobe upwards first was written against the standalone curve's peak at\n30 layers, which the server never sees, and reverted.\n\nmac_split_bench.py says all this in its docstring now, and two real bugs\nin it are fixed: it printed a \"runner's count\" computed differently from\nthe runner (26 against the runner's 10 for Qwen, ignoring the\nSTART_GPU_SHARE path a model read from the SSD takes), and it left\n--threads to llama.cpp instead of passing the runner's count, which on\nan M5 Pro is worth about as much as the layer split.\n\nAlso measured: Qwen3.8-Flash-Next IQ2_XS is not held back by the\n28.8 GB per-layer embedding table the old handover suspected.  At 1 GPU\nlayer, where both methods agree, it reads 5.6 MB per token and writes\n6.5 tok/s while Kolibri-1 reads a comparable 3.2 MB and writes 32.0 -\nfive times as fast with more active parameters per token (3.46B against\n~2.4B).  What is left between them is the quantization: Q4_K_M scales\nblocks, IQ2_XS looks codebook entries up.  A k-quant of the same model\n(Q2_0) side by side would settle it and was not measured.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "tree": {
+        "sha": "c777e6ca91a4735e1a451131171a07f41df5cae0",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/git/trees/c777e6ca91a4735e1a451131171a07f41df5cae0"
+      },
+      "url": "https://api.github.com/repos/shruxx/StrataForMac/git/commits/4f33f10aad1f5119473882869af4e4861b7a4d07",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/4f33f10aad1f5119473882869af4e4861b7a4d07",
+    "html_url": "https://github.com/shruxx/StrataForMac/commit/4f33f10aad1f5119473882869af4e4861b7a4d07",
+    "comments_url": "https://api.github.com/repos/shruxx/StrataForMac/commits/4f33f10aad1f5119473882869af4e4861b7a4d07/comments",
+    "author": {
+      "login": "shruxx",
+      "id": 24369531,
+      "node_id": "MDQ6VXNlcjI0MzY5NTMx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24369531?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/shruxx",
+      "html_url": "https://github.com/shruxx",
+      "followers_url": "https://api.github.com/users/shruxx/followers",
+      "following_url": "https://api.github.com/users/shruxx/following{/other_user}",
+      "gists_url": "https://api.github.com/users/shruxx/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/shruxx/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/shruxx/subscriptions",
+      "organizations_url": "https://api.github.com/users/shruxx/orgs",
+      "repos_url": "https://api.github.com/users/shruxx/repos",
+      "events_url": "https://api.github.com/users/shruxx/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/shruxx/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "shruxx",
+      "id": 24369531,
+      "node_id": "MDQ6VXNlcjI0MzY5NTMx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24369531?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/shruxx",
+      "html_url": "https://github.com/shruxx",
+      "followers_url": "https://api.github.com/users/shruxx/followers",
+      "following_url": "https://api.github.com/users/shruxx/following{/other_user}",
+      "gists_url": "https://api.github.com/users/shruxx/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/shruxx/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/shruxx/subscriptions",
+      "organizations_url": "https://api.github.com/users/shruxx/orgs",
+      "repos_url": "https://api.github.com/users/shruxx/repos",
+      "events_url": "https://api.github.com/users/shruxx/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/shruxx/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "e5338fbb8b491f42c25a87b96771f34e6fe2feec",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/e5338fbb8b491f42c25a87b96771f34e6fe2feec",
+        "html_url": "https://github.com/shruxx/StrataForMac/commit/e5338fbb8b491f42c25a87b96771f34e6fe2feec"
+      }
+    ]
+  },
+  {
+    "sha": "e5338fbb8b491f42c25a87b96771f34e6fe2feec",
+    "node_id": "C_kwDOU6jT4toAKGU1MzM4ZmJiOGI0OTFmNDJjMjVhODdiOTY3NzFmMzRlNmZlMmZlZWM",
+    "commit": {
+      "author": {
+        "name": "shruxx",
+        "email": "24369531+shruxx@users.noreply.github.com",
+        "date": "2026-10-05T11:09:16Z"
+      },
+      "committer": {
+        "name": "shruxx",
+        "email": "24369531+shruxx@users.noreply.github.com",
+        "date": "2026-10-05T11:09:16Z"
+      },
+      "message": "fix(native): Kolibri-1's real hidden size and expert FFN\n\ncheck_architecture refused the real Kolibri-1 GGUF with\n\"kolibri1.embedding_length = 2560, expected 6144\", so the native engine\nwould not have run the model at all.  The file's own metadata says\nembedding_length 2560 and expert_feed_forward_length 512; the 6144 was\nn_head * head_dim, the width attn_q projects TO, mistaken for n_embd\n(attn_q.weight is [2560, 6144]).\n\ncheck_one (src/core/layout.cpp) already writes its shape checks\nsymbolically, and with 2560 / 512 all ten of them match the real\ntensors exactly - ffn_gate_exps [2560, 512, 384], attn_k [2560, 512],\nffn_down_shexp [512, 2560], attn_output [6144, 2560].  With the old\nvalues every one failed.\n\nChecked on a 48 GB M5 Pro against Kolibri-1 Q4_K_M: compiling\ncheck_architecture against the file prints the refusal above with 6144\nand accepts with 2560; src/core/layout.cpp compiles clean.  The kernels\nthemselves are untried - strata_core, which builds layout.cpp, is only\nbuilt with CUDA or HIP, so this needs a PC to run end to end.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>",
+      "tree": {
+        "sha": "7c57f7003032ed359348844f9da4b3d8fdbbc1c7",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/git/trees/7c57f7003032ed359348844f9da4b3d8fdbbc1c7"
+      },
+      "url": "https://api.github.com/repos/shruxx/StrataForMac/git/commits/e5338fbb8b491f42c25a87b96771f34e6fe2feec",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/e5338fbb8b491f42c25a87b96771f34e6fe2feec",
+    "html_url": "https://github.com/shruxx/StrataForMac/commit/e5338fbb8b491f42c25a87b96771f34e6fe2feec",
+    "comments_url": "https://api.github.com/repos/shruxx/StrataForMac/commits/e5338fbb8b491f42c25a87b96771f34e6fe2feec/comments",
+    "author": {
+      "login": "shruxx",
+      "id": 24369531,
+      "node_id": "MDQ6VXNlcjI0MzY5NTMx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24369531?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/shruxx",
+      "html_url": "https://github.com/shruxx",
+      "followers_url": "https://api.github.com/users/shruxx/followers",
+      "following_url": "https://api.github.com/users/shruxx/following{/other_user}",
+      "gists_url": "https://api.github.com/users/shruxx/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/shruxx/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/shruxx/subscriptions",
+      "organizations_url": "https://api.github.com/users/shruxx/orgs",
+      "repos_url": "https://api.github.com/users/shruxx/repos",
+      "events_url": "https://api.github.com/users/shruxx/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/shruxx/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "shruxx",
+      "id": 24369531,
+      "node_id": "MDQ6VXNlcjI0MzY5NTMx",
+      "avatar_url": "https://avatars.githubusercontent.com/u/24369531?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/shruxx",
+      "html_url": "https://github.com/shruxx",
+      "followers_url": "https://api.github.com/users/shruxx/followers",
+      "following_url": "https://api.github.com/users/shruxx/following{/other_user}",
+      "gists_url": "https://api.github.com/users/shruxx/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/shruxx/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/shruxx/subscriptions",
+      "organizations_url": "https://api.github.com/users/shruxx/orgs",
+      "repos_url": "https://api.github.com/users/shruxx/repos",
+      "events_url": "https://api.github.com/users/shruxx/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/shruxx/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "1218eb4a9b9590ededf14a7fc0efece802548351",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/1218eb4a9b9590ededf14a7fc0efece802548351",
+        "html_url": "https://github.com/shruxx/StrataForMac/commit/1218eb4a9b9590ededf14a7fc0efece802548351"
+      }
+    ]
+  },
+  {
+    "sha": "1218eb4a9b9590ededf14a7fc0efece802548351",
+    "node_id": "C_kwDOU6jT4toAKDEyMThlYjRhOWI5NTkwZWRlZGYxNGE3ZmMwZWZlY2U4MDI1NDgzNTE",
+    "commit": {
+      "author": {
+        "name": "Admin",
+        "email": "admin@Admins-MacBook-Pro-5.local",
+        "date": "2026-10-05T08:49:42Z"
+      },
+      "committer": {
+        "name": "Admin",
+        "email": "admin@Admins-MacBook-Pro-5.local",
+        "date": "2026-10-05T08:49:42Z"
+      },
+      "message": "docs: handover note for the macOS port\n\nThe state of the macOS port for the next session on the user's M5 Pro:\nhow Strata runs on a Mac, what the fork adds, the measurements, what was\nseen on the M5 Pro, the open items in order, and how to work on it.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+      "tree": {
+        "sha": "a8a06a019384fe587f5b2131fc003b7d8de0459b",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/git/trees/a8a06a019384fe587f5b2131fc003b7d8de0459b"
+      },
+      "url": "https://api.github.com/repos/shruxx/StrataForMac/git/commits/1218eb4a9b9590ededf14a7fc0efece802548351",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/1218eb4a9b9590ededf14a7fc0efece802548351",
+    "html_url": "https://github.com/shruxx/StrataForMac/commit/1218eb4a9b9590ededf14a7fc0efece802548351",
+    "comments_url": "https://api.github.com/repos/shruxx/StrataForMac/commits/1218eb4a9b9590ededf14a7fc0efece802548351/comments",
+    "author": null,
+    "committer": null,
+    "parents": [
+      {
+        "sha": "ded455d4bccdf31904838a8b4f3587e45217ce1a",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/ded455d4bccdf31904838a8b4f3587e45217ce1a",
+        "html_url": "https://github.com/shruxx/StrataForMac/commit/ded455d4bccdf31904838a8b4f3587e45217ce1a"
+      }
+    ]
+  },
+  {
+    "sha": "ded455d4bccdf31904838a8b4f3587e45217ce1a",
+    "node_id": "C_kwDOU6jT4toAKGRlZDQ1NWQ0YmNjZGYzMTkwNDgzOGE4YjRmMzU4N2U0NTIxN2NlMWE",
+    "commit": {
+      "author": {
+        "name": "Admin",
+        "email": "admin@Admins-MacBook-Pro-5.local",
+        "date": "2026-10-05T07:58:48Z"
+      },
+      "committer": {
+        "name": "Admin",
+        "email": "admin@Admins-MacBook-Pro-5.local",
+        "date": "2026-10-05T07:58:48Z"
+      },
+      "message": "fix(macos): count only what has to be in memory\n\nQwen3.8-Flash-Next's per-layer embedding table stays in the GGUF and\nllama.cpp reads its rows while it answers (TENSOR_READ_LAZY, tensors\nover 4 GiB).  The runner counted it as model memory: the Coder IQ1_M\n(58.4 GB in the files: a 28.8 GB table, 25.1 GB of experts, 4.5 GB of\nthe rest) looked too large for a 48 GB Mac and ran the SSD tuning with\n13 of 49 layers on the GPU.  It now subtracts that table (tensor_sizes,\nlazy_bytes): 29.6 GB to hold, fully on the GPU on 48 GB and 64 GB Macs;\n32-36 GB Macs are unchanged.  The memory line shows both parts.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+      "tree": {
+        "sha": "baf3e63172408b994c274b36a8d5e270d918b1e1",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/git/trees/baf3e63172408b994c274b36a8d5e270d918b1e1"
+      },
+      "url": "https://api.github.com/repos/shruxx/StrataForMac/git/commits/ded455d4bccdf31904838a8b4f3587e45217ce1a",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/ded455d4bccdf31904838a8b4f3587e45217ce1a",
+    "html_url": "https://github.com/shruxx/StrataForMac/commit/ded455d4bccdf31904838a8b4f3587e45217ce1a",
+    "comments_url": "https://api.github.com/repos/shruxx/StrataForMac/commits/ded455d4bccdf31904838a8b4f3587e45217ce1a/comments",
+    "author": null,
+    "committer": null,
+    "parents": [
+      {
+        "sha": "53f73cd3cd94f74b150a3c9c77bb96d183d32bf8",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/53f73cd3cd94f74b150a3c9c77bb96d183d32bf8",
+        "html_url": "https://github.com/shruxx/StrataForMac/commit/53f73cd3cd94f74b150a3c9c77bb96d183d32bf8"
+      }
+    ]
+  },
+  {
+    "sha": "53f73cd3cd94f74b150a3c9c77bb96d183d32bf8",
+    "node_id": "C_kwDOU6jT4toAKDUzZjczY2QzY2Q5NGY3NGIxNTBhM2M5Yzc3YmI5NmQxODNkMzJiZjg",
+    "commit": {
+      "author": {
+        "name": "Admin",
+        "email": "admin@Admins-MacBook-Pro-5.local",
+        "date": "2026-10-05T07:40:23Z"
+      },
+      "committer": {
+        "name": "Admin",
+        "email": "admin@Admins-MacBook-Pro-5.local",
+        "date": "2026-10-05T07:40:23Z"
+      },
+      "message": "fix(setup): Kolibri-1 and macOS after the 0.1.39 merge\n\n- Step 7 stopped on a model without an n-gram table (Kolibri-1): 0.1.39's\n  rotational-disk check (#605) stat()ed its PLE file, which is None\n  there.  It is skipped for such a model.\n- get_llama_cpp used main()'s local is_mac: a NameError on every setup\n  run with third_party/llama.cpp already there.  A module-level MAC.\n- macOS never uses the low-RAM mode: the Metal runner reads the GGUF and\n  sizes the GPU's share itself; the mode's experts.bin (45.7 GB for\n  Kolibri-1 Q4_K_M) was never read.  The pack is ~100 MB now.\n\nChecked on a 32 GB M1 Max: ./setup.sh --yes --family kolibri --model\nQ4_K_M --gguf-dir ... --no-start runs through; the server then answers\na chat completion and a Responses API request.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+      "tree": {
+        "sha": "b108440133610b945333457e5d826288cef66098",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/git/trees/b108440133610b945333457e5d826288cef66098"
+      },
+      "url": "https://api.github.com/repos/shruxx/StrataForMac/git/commits/53f73cd3cd94f74b150a3c9c77bb96d183d32bf8",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/53f73cd3cd94f74b150a3c9c77bb96d183d32bf8",
+    "html_url": "https://github.com/shruxx/StrataForMac/commit/53f73cd3cd94f74b150a3c9c77bb96d183d32bf8",
+    "comments_url": "https://api.github.com/repos/shruxx/StrataForMac/commits/53f73cd3cd94f74b150a3c9c77bb96d183d32bf8/comments",
+    "author": null,
+    "committer": null,
+    "parents": [
+      {
+        "sha": "6d7085da04cba8133cd66dd1906ffa1a4b78250a",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/6d7085da04cba8133cd66dd1906ffa1a4b78250a",
+        "html_url": "https://github.com/shruxx/StrataForMac/commit/6d7085da04cba8133cd66dd1906ffa1a4b78250a"
+      }
+    ]
+  },
+  {
+    "sha": "6d7085da04cba8133cd66dd1906ffa1a4b78250a",
+    "node_id": "C_kwDOU6jT4toAKDZkNzA4NWRhMDRjYmE4MTMzY2Q2NmRkMTkwNmZmYTFhNGI3ODI1MGE",
+    "commit": {
+      "author": {
+        "name": "Admin",
+        "email": "admin@Admins-MacBook-Pro-5.local",
+        "date": "2026-10-05T07:29:16Z"
+      },
+      "committer": {
+        "name": "Admin",
+        "email": "admin@Admins-MacBook-Pro-5.local",
+        "date": "2026-10-05T07:29:16Z"
+      },
+      "message": "Merge upstream Strata v0.1.39 (Niko1221/Strata) into the macOS port\n\nUpstream 0.1.39: faster decode and long prompts, parallel requests,\nolder and other hardware as experimental opt-ins, the OpenAI Responses\nAPI, Unsloth UD-IQ4_XS, a Settings view, and fixes.\n\nmacOS adaptations in the merge:\n- CMake: kq_avx1.cpp's AVX flags only on x86; kq_avx1.cpp compiles to a\n  stub on arm64 (only called behind cpu_avx1_ok, false there).\n- expert_layout.cpp: cpu_isa_cap for every platform; cpu_avx1_ok and\n  cpu_sse42_ok (new) inside the x86 block, stubs on arm64.\n- expert_source.cpp: the Mach host statistics fill 0.1.39's HostMemory.\n- pool.cpp: the Mach affinity tags beside the new Windows CPU Sets and\n  Linux affinity code, with 0.1.39's ThreadAffinity signatures.\n- server.py: the model switch beside the Settings view (/config) and\n  the control-body check; the switch's fallback around the engine start\n  with effort_end_args.\n- setup.py / strata_mcp.py: Kolibri-1 after Unsloth (upstream's menu\n  numbers), no older-CPU build or CUDA libraries on a Mac; Kolibri-1 is\n  a 47.5 GB download (it said 44.5).\n- strata_runner.py: an unknown engine command (VRAM, #533) is answered\n  with ERR instead of being dropped.\n- Docs: upstream's text with the macOS parts kept; the claim that\n  Kolibri-1 fits a 48 GB Mac completely is corrected.\n\nBuilt on macOS (arm64): strata-gguf, strata-plan, strata-dequant,\nstrata_kernels_cpu; direct_file_async_test, platform_memory_test,\nexpert_multi_test, pool_stress pass.  All tools/test_setup_*.py, the\nrunner and MCP tests pass; serve/ tests pass except the AMD telemetry\npair and test_responses' json_schema case, which fail the same way on\nplain v0.1.39 on this Mac.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+      "tree": {
+        "sha": "14a75f94a11f21c7dc516bbf02cf3346460ab3d4",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/git/trees/14a75f94a11f21c7dc516bbf02cf3346460ab3d4"
+      },
+      "url": "https://api.github.com/repos/shruxx/StrataForMac/git/commits/6d7085da04cba8133cd66dd1906ffa1a4b78250a",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/6d7085da04cba8133cd66dd1906ffa1a4b78250a",
+    "html_url": "https://github.com/shruxx/StrataForMac/commit/6d7085da04cba8133cd66dd1906ffa1a4b78250a",
+    "comments_url": "https://api.github.com/repos/shruxx/StrataForMac/commits/6d7085da04cba8133cd66dd1906ffa1a4b78250a/comments",
+    "author": null,
+    "committer": null,
+    "parents": [
+      {
+        "sha": "6cc440683273168639e57855ed94999fc3dbe3ed",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/6cc440683273168639e57855ed94999fc3dbe3ed",
+        "html_url": "https://github.com/shruxx/StrataForMac/commit/6cc440683273168639e57855ed94999fc3dbe3ed"
+      },
+      {
+        "sha": "6f32ec070f23ced9f50e704d854d775da52591ab",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/6f32ec070f23ced9f50e704d854d775da52591ab",
+        "html_url": "https://github.com/shruxx/StrataForMac/commit/6f32ec070f23ced9f50e704d854d775da52591ab"
+      }
+    ]
+  },
+  {
+    "sha": "6cc440683273168639e57855ed94999fc3dbe3ed",
+    "node_id": "C_kwDOU6jT4toAKDZjYzQ0MDY4MzI3MzE2ODYzOWU1Nzg1NWVkOTQ5OTlmYzNkYmUzZWQ",
+    "commit": {
+      "author": {
+        "name": "Admin",
+        "email": "admin@Admins-MacBook-Pro-5.local",
+        "date": "2026-10-04T15:48:25Z"
+      },
+      "committer": {
+        "name": "Admin",
+        "email": "admin@Admins-MacBook-Pro-5.local",
+        "date": "2026-10-04T15:48:25Z"
+      },
+      "message": "fix(macos): threads from the fastest core level only\n\nCounting every performance level macOS does not call \"Efficiency\" gave\n15 threads on an M5 Pro (5 + 10 cores), and Kolibri-1 wrote ~15 tok/s\n(9 GPU layers) where it had written ~24-35 with 5 threads (other GPU\nsplits).  Every step waits for its slowest thread, so the runner uses\nthe cores of hw.perflevel0 again.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+      "tree": {
+        "sha": "f8767176cf023be506bc6ecd63ed66350565eea8",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/git/trees/f8767176cf023be506bc6ecd63ed66350565eea8"
+      },
+      "url": "https://api.github.com/repos/shruxx/StrataForMac/git/commits/6cc440683273168639e57855ed94999fc3dbe3ed",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/6cc440683273168639e57855ed94999fc3dbe3ed",
+    "html_url": "https://github.com/shruxx/StrataForMac/commit/6cc440683273168639e57855ed94999fc3dbe3ed",
+    "comments_url": "https://api.github.com/repos/shruxx/StrataForMac/commits/6cc440683273168639e57855ed94999fc3dbe3ed/comments",
+    "author": null,
+    "committer": null,
+    "parents": [
+      {
+        "sha": "143d8a9a2e81340e373c74be0388b681d17ff5a9",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/143d8a9a2e81340e373c74be0388b681d17ff5a9",
+        "html_url": "https://github.com/shruxx/StrataForMac/commit/143d8a9a2e81340e373c74be0388b681d17ff5a9"
+      }
+    ]
+  },
+  {
+    "sha": "143d8a9a2e81340e373c74be0388b681d17ff5a9",
+    "node_id": "C_kwDOU6jT4toAKDE0M2Q4YTlhMmU4MTM0MGUzNzNjNzRiZTAzODhiNjgxZDE3ZmY1YTk",
+    "commit": {
+      "author": {
+        "name": "Admin",
+        "email": "admin@Admins-MacBook-Pro-5.local",
+        "date": "2026-10-04T14:51:22Z"
+      },
+      "committer": {
+        "name": "Admin",
+        "email": "admin@Admins-MacBook-Pro-5.local",
+        "date": "2026-10-04T14:51:22Z"
+      },
+      "message": "perf(macos): tune the GPU layer count from the replies\n\nA model larger than the memory reads the experts it does not hold\nthrough the page cache from the SSD, and every GPU layer holds all its\nexperts and takes that memory from the page cache.  Kolibri-1 Q4_K_M on\na 32 GB M1 Max: 0 / 6 / 12 GPU layers gave 25.7 / 26.1 / 8.2 tok/s with\n0.5 / 9.3 / 81.9 MB per token read from the SSD.\n\nThe runner now starts with 20% of the memory left after the reserve for\nGPU layers and tunes the count (LayerTuner): each count is measured over\n256 output tokens (tok/s and the llama-server process's pageins), then,\n20 s after the last reply, llama-server restarts one step towards more\nGPU layers when the SSD is quiet, else fewer, while that is faster; it\nkeeps the fastest (fewest layers within 3%) in engine/metal-tune.json\nper model and memory size.  On the M1 Max: 5 -> 9 -> 1, kept 1 GPU\nlayer at 31.7 tok/s, 0.4 MB per token from the SSD.\n\nThreads: the cores of every performance level macOS does not call\n\"Efficiency\".  An madvise(MADV_WILLNEED) prefetch of the CPU experts was\nmeasured slower (6.86 vs 7.95 tok/s) and is not included.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+      "tree": {
+        "sha": "16e6cb285fb21327a39fa23ef8f7e288d714424f",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/git/trees/16e6cb285fb21327a39fa23ef8f7e288d714424f"
+      },
+      "url": "https://api.github.com/repos/shruxx/StrataForMac/git/commits/143d8a9a2e81340e373c74be0388b681d17ff5a9",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/143d8a9a2e81340e373c74be0388b681d17ff5a9",
+    "html_url": "https://github.com/shruxx/StrataForMac/commit/143d8a9a2e81340e373c74be0388b681d17ff5a9",
+    "comments_url": "https://api.github.com/repos/shruxx/StrataForMac/commits/143d8a9a2e81340e373c74be0388b681d17ff5a9/comments",
+    "author": null,
+    "committer": null,
+    "parents": [
+      {
+        "sha": "b5ee44516dd324dd66b737526c00f5eebb1568d0",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/b5ee44516dd324dd66b737526c00f5eebb1568d0",
+        "html_url": "https://github.com/shruxx/StrataForMac/commit/b5ee44516dd324dd66b737526c00f5eebb1568d0"
+      }
+    ]
+  },
+  {
+    "sha": "b5ee44516dd324dd66b737526c00f5eebb1568d0",
+    "node_id": "C_kwDOU6jT4toAKGI1ZWU0NDUxNmRkMzI0ZGQ2NmI3Mzc1MjZjMDBmNWVlYmIxNTY4ZDA",
+    "commit": {
+      "author": {
+        "name": "Admin",
+        "email": "admin@Admins-MacBook-Pro-5.local",
+        "date": "2026-10-04T12:31:50Z"
+      },
+      "committer": {
+        "name": "Admin",
+        "email": "admin@Admins-MacBook-Pro-5.local",
+        "date": "2026-10-04T12:31:50Z"
+      },
+      "message": "docs: add Apple Silicon M5 series support across all documentation",
+      "tree": {
+        "sha": "5589d0212f7df4c676bd6c9862e9aa177177b5d7",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/git/trees/5589d0212f7df4c676bd6c9862e9aa177177b5d7"
+      },
+      "url": "https://api.github.com/repos/shruxx/StrataForMac/git/commits/b5ee44516dd324dd66b737526c00f5eebb1568d0",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/b5ee44516dd324dd66b737526c00f5eebb1568d0",
+    "html_url": "https://github.com/shruxx/StrataForMac/commit/b5ee44516dd324dd66b737526c00f5eebb1568d0",
+    "comments_url": "https://api.github.com/repos/shruxx/StrataForMac/commits/b5ee44516dd324dd66b737526c00f5eebb1568d0/comments",
+    "author": null,
+    "committer": null,
+    "parents": [
+      {
+        "sha": "6e3e0b3f3219cba00431a65013e1a3ad57b5623c",
+        "url": "https://api.github.com/repos/shruxx/StrataForMac/commits/6e3e0b3f3219cba00431a65013e1a3ad57b5623c",
+        "html_url": "https://github.com/shruxx/StrataForMac/commit/6e3e0b3f3219cba00431a65013e1a3ad57b5623c"
+      }
+    ]
+  }
+]

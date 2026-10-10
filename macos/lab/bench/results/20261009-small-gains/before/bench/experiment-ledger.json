@@ -1,0 +1,1594 @@
+{
+  "schema": 1,
+  "updated": "2026-10-09",
+  "source": "bench/EXPERIMENT-LEDGER.md",
+  "source_sha256": "0f9f4dc4d1410f791f46e058f98aefe998ee1e2fc5bf3bf6208c2df3b4e8aeaa",
+  "policy": "Read before proposing or retesting. Cite an existing ID, state what materially changed, meet its revisit condition, and append a new result without overwriting old evidence. No benchmarks start automatically.",
+  "scope": "Curated decision register with detailed linked raw histories; not an exhaustive index of every compilation error. Historical settings and memory rules differ.",
+  "entries": [
+    {
+      "id": "P11",
+      "title": "Compact expert/token32 worklist",
+      "status": "Correct component; modest measured gain below model-trial gate, parked.",
+      "settings": "m5-compact / compact-tiles, isolated original-copy control; actual M5 Pro, Q2_0 gate/up/down, F32, T32..512. GPU worklist after unchanged map0, own amax, bounded 654/656 capacity, original matrix arithmetic; no P10 reuse.",
+      "result": "T508 uniform: 13.010602 \u2192 12.402137 ms (4.676686% shorter); T512: 13.028599 \u2192 12.560125 ms (3.595735%). Drift 0.228479% / 0.110273%. Shared gains 9.925744% / 7.893319%; mixed 4.973479% / 4.166039%. T32 uniform loses 1.664%. Real component gain, below the preregistered >10% gate on both uniform cases; no model trial or TPS claim.",
+      "validation": "273 correctness records per engine (91 fixtures, A/B/A); 18 timing cases in fresh ABBA. Two complete dependent blocks, exact finite F32 output digests, all six MM activation/fallback counters pass, immutable inputs/weights, valid maximum-capacity/skew/permuted routes, zero new swap across six launches. Independent Astra raw audit. Corrupt-header/overlap edges are source-reviewed, not runtime-injected.",
+      "revisit": "Materially different worklist/math/data reuse or independently justified new model-latency trial scope/gate declared before execution. Do not rerun unchanged V1 or lower its existing gate after seeing timings. P12 tested only grid order and did not qualify.",
+      "evidence": [
+        {
+          "label": "Complete report",
+          "path": "bench/results/20261009-compact-tiles/REPORT.md"
+        },
+        {
+          "label": "Raw component comparison",
+          "path": "bench/results/20261009-compact-tiles/component/comparison.json"
+        },
+        {
+          "label": "Final verification",
+          "path": "bench/results/20261009-compact-tiles/final-verification.json"
+        }
+      ]
+    },
+    {
+      "id": "P12",
+      "title": "Channel-first compact job order",
+      "status": "Correct component; slower on required uniform cases, parked.",
+      "settings": "m5-compact-cols / compact-cols, original-copy control, independent fresh ABBA. Only transpose compact grid axes, remap logical coordinates and match overflow indexing; otherwise identical V1 arithmetic, worklist, scratch and barriers.",
+      "result": "T508 uniform: 13.000143 \u2192 13.059383 ms (0.455684% longer); T512: 13.036513 \u2192 13.326677 ms (2.225780% longer). Drift 0.204317% / 0.336039%. Shared gains 5.017433% / 2.816913%; mixed 2.213451% / 0.695061%. Smaller uniform/mixed cases generally slower. Fails >10% gate; no model trial, cache-occupancy attribution or TPS gain.",
+      "validation": "273 correctness records per engine (91 fixtures, A/B/A); 18 timing cases in fresh ABBA. Two complete dependent blocks, exact finite F32 output digests, all six MM activation/fallback counters pass, immutable inputs/weights, valid maximum-capacity/skew/permuted routes, zero new swap across six launches. Independent Astra raw audit. Corrupt-header/overlap edges are source-reviewed, not runtime-injected.",
+      "revisit": "Different measured scheduling or data-reuse mechanism with exact original math, complete overhead and fresh preregistered controls. Physical Metal group order is not guaranteed; do not revisit unchanged axis transpose.",
+      "evidence": [
+        {
+          "label": "Complete report",
+          "path": "bench/results/20261009-compact-tiles/REPORT.md"
+        },
+        {
+          "label": "Raw component comparison",
+          "path": "bench/results/20261009-compact-tiles/columns/comparison.json"
+        },
+        {
+          "label": "Final verification",
+          "path": "bench/results/20261009-compact-tiles/final-verification.json"
+        }
+      ]
+    },
+    {
+      "id": "S06",
+      "title": "UTF8-safe token-piece cache",
+      "status": "Parked optional; no qualified service latency gain.",
+      "settings": "Qwen3.5-4B Q4_K_M on unchanged m5-copy; real StrataService, native prompt cache off, token cache empty per request. Independent English code/prose ABBA,256 outputs, excluded warmup+three repeats. Optional stream_piece_cache defaultfalse; nominal1MiB/4096piece budget.",
+      "result": "Code reply3.364070\u21923.365691s (-0.048%quicker), prose3.373194\u21923.367038s (+0.182%); below1%/twice-drift gate. Conversioncalls256\u2192137/175, serializedIDs32896\u2192137/175. No nativeTPS attribution or SSD read/write gain.",
+      "validation": "32 real responses exact; real UTF8prefix comparisons; loadfree invalid/splitUTF8, prefix/reset/eviction, thinking/EOS/cancel/reuse service traces. Zero new swap. Astra verified pinned HTTPendpoint uses raw piece concatenation/lstrip0, not llama_detokenize cleanup. Actual model4B confirmed by verified receipts.",
+      "revisit": "A measured end-to-end bottleneck in text conversion, or changed native streaming interface. Require correct pinned/owned server lifetime and every-prefix/parser parity; do not repeat same model/task to chase tiny noise.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/results/20261009-next-speed-pass/REPORT.md"
+        },
+        {
+          "label": "Raw small-model comparison",
+          "path": "bench/results/20261009-next-speed-pass/streaming/20261009T212918Z-small/comparison.json"
+        },
+        {
+          "label": "Timing sources",
+          "path": "bench/results/20261009-next-speed-pass/streaming/source/pins.json"
+        }
+      ]
+    },
+    {
+      "id": "Q02",
+      "title": "QSA all-pool ranking removal",
+      "status": "Correct bounded trial; no qualified model gain, parked.",
+      "settings": "Unlike Q01, preserve actual scores/cache/mask scatter/n_sel/attention; remove only full-pool top-k and paired gathers. Isolated M5Pro/F16/QSA top2048/ratio4 path, n_pool\u2264512 and exact floatdump bound; actual backendMTL guard. FullQwen3.8 Q2_0/sharedQ3/mixed/8workers/depth3/256output original-copy ABBA/warmup+3.",
+      "result": "Component64pools/T1 -4.898%time,128/T1 -10.145%,512/T512 -22.958%. Modelcode59.387734\u219259.401608TPS(+0.023%),reply+0.028%; prose39.871876\u219239.758446(-0.284%),reply-0.379%. Neither passes1% TPS/reply above own drift; no qualified cache/TTFT gain.",
+      "validation": "102componentfixtures perengine: actualscoring, stockpermutation/pairing, sparsepadding, NaN/Inf/extremes, restrictedmask/groups,CPUscatterreference andcompleteMetalplacement.104modelanswer/cache checks and96fresh/cache/warmupoutputs exact; acceptedfourmodel/sixcomponent launches zero new swap. Marker proves inputpreparation only; no cache-state bit or shaderfrequency claim.22original engines unchanged.",
+      "revisit": "A different costly attention mechanism with exact numeric/cache proof, or a measured workload with much greater exposure. Q01 broader score/mask bypass remains unimplemented; ranking-only result does not qualify it. Preserve excluded fixture/coldload/inactiveguard failures and new full bracket.",
+      "evidence": [
+        {
+          "label": "Detailed report",
+          "path": "bench/results/20261009-next-speed-pass/REPORT.md"
+        },
+        {
+          "label": "Model raw",
+          "path": "bench/results/20261009T215006Z-m5-qsa-all-pools/comparison.json"
+        },
+        {
+          "label": "Component raw",
+          "path": "bench/results/20261009-next-speed-pass/qsa/comparison.json"
+        },
+        {
+          "label": "Manifest",
+          "path": "config/m5_qsa_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "P10",
+      "title": "Adjacent GPU expert route-map reuse",
+      "status": "Exact component passes, below speed gate; no model trial, parked.",
+      "settings": "Isolatedm5-route-map over originalcopy, sameactivation/IDs,Q2[2560,640,512],T32..512,nextSWIGLUconsumesadjacentpairwithinencoder. BorrowpreviousTPE/IDS only, retainownamax, allocationoverlapguard+postbarriertracking. Syntheticvalidtop10routes; normaloptimizer/allocator, two dependentblocks terminalonly, freshABBA/500mswarmup/7x100ms.",
+      "result": "T508uniform two blocks12.978406\u219212.877820ms(+0.775%quicker),T51213.011294\u219212.904925(+0.818%); below3%/twice-drift gate. T127uniform1.164%slower. Componenttimes are not modelTPS or a promptTTFT claim.",
+      "validation": "66fixtures\u00d73 A/B/A phases perengine=396records; exact completeprojection/activation/down/residual digests, strictfulleligibleencoding counts and zero fallbackcounts. T31/513,40/2048IDstrides, ID/input mutations,mixedprecision,terminalonlychecks; fullMetal/onesplit/input/weights preserved. Six accepted launches zero new swap; newbackend572+16mathcasespass. Forcedoverlap/partitionedge source-only guards explicitly not tested. Sol6.1/Astra reviewed.",
+      "revisit": "A different routing/math scheduling mechanism; R03compactexpert/tileworklist is distinct and queued. Do not rebenchmark unchanged mapreuse for a sub1% result or inherit it into R03 baseline. Any futuremodeltest needs normal-path proof and matching prompt/TTFT/reply metrics.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/results/20261009-next-speed-pass/REPORT.md"
+        },
+        {
+          "label": "Component raw",
+          "path": "bench/results/20261009-next-speed-pass/route-map/comparison.json"
+        },
+        {
+          "label": "Before-GPU plan",
+          "path": "bench/results/20261009-next-speed-pass/route-map/plan.json"
+        },
+        {
+          "label": "Manifest",
+          "path": "config/m5_route_map_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "W01",
+      "title": "Ideal helper consumer-removal ceiling",
+      "status": "Descriptive component screen; not a deployable selector or model gain.",
+      "settings": "Unchanged m5-copy/conv-direct packed Q5_K head, K2560/M248320; compare full head/top10/gather against head-only,16 correctness cases each and fresh ABBA sustained timing.",
+      "result": "Mixed1.897290 ->1.690753ms (10.886% less time), alternating1.900853 ->1.689099ms (11.140%). Removes all selection/gather cost with zero replacement; not a model TPS upper bound. All six launches zero new swap.",
+      "validation": "Complete head/input/weight digest parity. The numeric10% reference was recorded after timing began; preserved explicitly as descriptive, not preregistered.",
+      "revisit": "Use actual replacement cost and exact downstream behavior. W02 is the implemented follow-up; do not rerun this ideal floor as a claimed speed feature.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/results/20261009-winner-screen/REPORT.md"
+        },
+        {
+          "label": "raw",
+          "path": "bench/results/20261009-winner-screen/comparison.json"
+        },
+        {
+          "label": "gate provenance",
+          "path": "bench/results/20261009-winner-screen/screen-plan.json"
+        }
+      ]
+    },
+    {
+      "id": "W02",
+      "title": "Exact parallel helper top10",
+      "status": "Small measured benefit, optional trial; below default-adoption gate.",
+      "settings": "New isolated m5-top10 on practical m5-copy/conv-direct patch. Parallel local/global distinct maxima with multiplicities; full ten ordered IDs/logits preserved. Any selected tie, nonfinite or subnormal uses unchanged bitonic+merge. Explicit M5Pro/contiguous248320F32/row1/k10/node-name guard. Same full model/helper/sampler/depth3/8workers/F16/4K/batch512. Component gate predeclared before GPU launch; original-engine model ABBA256+warmup+three repeats, English only.",
+      "result": "Actual complete head/selection/gather1.903671 ->1.749372ms mixed (-8.105%),1.903449 ->1.750035ms alternating (-8.060%). Model code59.379496 ->60.027846TPS (+1.092%, reply0.959% quicker), prose39.937798 ->40.313896 (+0.942%, reply0.829%). Replies save43.893ms/55.364ms. Above corresponding drift, but neither passes both1% thresholds.2K synthetic generation+0.840%, whole reply0.198% slower. Cache/TTFT/prompt improvement not established.",
+      "validation": "16 head cases/4,966,398 score values and30 adversarial selector cases per check; all ten IDs/gather bits, CPU distribution/RNG and suppression behavior exact, fast/fallback/fast graph reuse. Original m5-copy component parity exact. Model104 checks and96 fresh/cache/warmup output comparisons exact; acceptance rates unchanged. Four accepted model launches zero new swap.21 original engines unchanged. Astra/Sol6.1 reviews; marker proves eligible entry only, not fast-branch frequency.",
+      "revisit": "A materially faster exact selection mechanism or a documented workload with larger exposure. Raw-winner shortcut cannot ignore suppression/probability consumers. Preserve ties/exceptions and source/model/normal-path provenance; unchanged rerun is not justified just to cross the1% gate.",
+      "evidence": [
+        {
+          "label": "Detailed report",
+          "path": "bench/results/20261009-top10/REPORT.md"
+        },
+        {
+          "label": "model report",
+          "path": "bench/results/20261009T205909Z-m5-parallel-top10/REPORT.md"
+        },
+        {
+          "label": "model raw",
+          "path": "bench/results/20261009T205909Z-m5-parallel-top10/comparison.json"
+        },
+        {
+          "label": "component raw",
+          "path": "bench/results/20261009-top10/comparison.json"
+        },
+        {
+          "label": "plan",
+          "path": "bench/results/20261009-top10/plan.json"
+        },
+        {
+          "label": "final verification",
+          "path": "bench/results/20261009-top10/model-final-verification.json"
+        },
+        {
+          "label": "reviews",
+          "path": "bench/results/20261009-top10/INDEPENDENT-REVIEWS.md"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_top10_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "Q01",
+      "title": "QSA all-visible shortcut source qualification",
+      "status": "Original predicate unreachable; corrected geometric proof, numeric qualification pending. No shortcut implemented or performance measured.",
+      "settings": "Read-only actual Qwen4exp/cache-order/M-RoPE text/graph-reuse audit. Pool budget<=512; unique contiguous single-sequence cells required.",
+      "result": "Original by_order=false predicate cannot activate: target sets true; nearby false argument means gather=false. Actual by_order=true can satisfy pool/tail causal-prefix proof. Finite source inputs alone do not prevent F16 score overflow/NaN; a current-step bound or predicate with original fallback remains necessary.",
+      "validation": "Source-level visibility proof and counterexamples for holes/duplicate positions/sharing. No GPU fixture or model gain. Ordinary expanded text can be `[p,p,p,0]`; rejecting every is_pos_2d batch is also too broad. Preserve all cache writes, n_sel, attention dispatch and eligibility-aware graph reuse.",
+      "revisit": "Synthetic exact mask/cache/reuse fixture with exceptional scores and continuation across512->576 padded pools. Do not benchmark an inactive guard or enable an unproved numerical shortcut.",
+      "evidence": [
+        {
+          "label": "Qualification and fixture specification",
+          "path": "bench/research/20261009-qsa-qualification.md"
+        }
+      ]
+    },
+    {
+      "id": "D01",
+      "title": "MTP inner loop honors existing server output-budget caps",
+      "status": "Bounded correctness passes; no qualified256-token speed gain, not adopted.",
+      "settings": "Isolated `m5-draftcap` over `m5-copy` / conv-direct; existing per-cycle caps only, configured max3 allocation unchanged. Packed sharedQ3/mixed/eight workers, greedy helper, minimum0, confidence0, Tensor API on, F16/4K/batch512. IndependentABBA,256 outputs, temperature0.6, seed1234, warmup+three repeats; diagnostics off.",
+      "result": "Code59.482\u219259.464TPS (-0.030%), prose39.931\u219240.007 (+0.191%); whole replies -0.027%/+0.157% quicker, below1% and control drift. Code4.568\u21924.569s, prose6.678\u21926.667s. Cached512 +0.978% below2.514% drift. Diagnostic successful helper steps720\u2192702,18 discarded steps\u21920 over240 completed-request cycles; work savings are not a TPS percentage.",
+      "validation": "588 GPU math/residual cases;633 diagnostic tokens exact across22 requests, identical acceptance and actual target row sequences; real cache reuse, seeded repetition, EOS, output limits, cancellation/recovery.84 exact fresh/cache timed outputs and128 checks across four clean launches;19 identical native allocation records each. All zero new swap. Astra independently audited. No hidden-state bit identity, checkpoint restoration or near-context shifting proof.",
+      "revisit": "A known short output-budget workload or materially different omitted-work mechanism has a repeatable complete-response benefit above drift. Do not rerun the same256-token baseline expecting a general speed gain; unpredictable EOS is not solved by this repair.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/results/20261009-draftcap/REPORT.md"
+        },
+        {
+          "label": "full ABBA",
+          "path": "bench/results/20261009T193647Z-m5-draftcap-tail/comparison.json"
+        },
+        {
+          "label": "native-step parity",
+          "path": "bench/features/20261009T193412937896Z-m5-draftcap-qualification/tail-parity.json"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_draftcap_experiment.json"
+        },
+        {
+          "label": "Astra review",
+          "path": "bench/results/20261009-draftcap/ASTRA-REVIEW.md"
+        }
+      ]
+    },
+    {
+      "id": "D02",
+      "title": "True per-cycle cap two with configured maximum-three allocation",
+      "status": "Parked for repeatable extended-output divergence; speed bracket stopped, adaptive controller deferred.",
+      "settings": "Same D01 engine/allocation and early-stop repair, only cap2 override versus ordinary effective3 (`draftcap-tail`). Same precision/weights/placement/sampling, max3, minimum0, greedy helper and confidence0. Short diagnostics preceded256-token ABBA attempt.",
+      "result": "Initial22 requests/633 token IDs match; same-width truncation-only versus real cap2 helper steps792\u2192524,268 discarded\u21920. Compared with ordinary3, cycles240\u2192264, helper702\u2192524, target verification rows942\u2192788. Extended synthetic512 writing diverges in all three repetitions at zero-based index227, the228th emitted token,16545 versus25045. Incomplete English observations code58.944\u219251.226TPS, prose39.594\u219238.930; not a qualified comparison or gain.",
+      "validation": "Prompt hash, seed1234, CPU sampling,256 output count, native/build/model/helper receipts and all non-axis settings match. Mismatch exists in saved running snapshot before owned-runnerSIGINT. Fourteen candidate cases completed; owned model exits cleanly, healthy monitor, no cleanup error and zero new swap. No completedABBA; do not call this a quality regression or assert its numerical root cause. Astra confirms parking; short parity does not cover longer output.",
+      "revisit": "A materially changed implementation first reproduces and repairs the228th-token fixture under exact-output rules, then qualifies longer English prose/code, seeded continuation and changing caps before timing. No unchanged rerun, output-gate relaxation or controller implementation based on this failed policy.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/results/20261009-draftcap/REPORT.md"
+        },
+        {
+          "label": "repeatable mismatch",
+          "path": "bench/results/20261009-draftcap/two-early-output-stop.json"
+        },
+        {
+          "label": "pre-interruption snapshot",
+          "path": "bench/results/20261009-draftcap/two-candidate-at-stop.json"
+        },
+        {
+          "label": "final stopped candidate",
+          "path": "bench/results/20261009T195332Z-m5-draftcap-two-2-draftcap2/result.json"
+        },
+        {
+          "label": "interrupted suite",
+          "path": "bench/results/20261009T195018Z-m5-draftcap-two/comparison.json"
+        },
+        {
+          "label": "initial cap2 parity",
+          "path": "bench/features/20261009T193516053626Z-m5-draftcap-qualification/batch.json"
+        }
+      ]
+    },
+    {
+      "id": "N01",
+      "title": "Target backend sampling with static speculative graph",
+      "status": "Parked for a demonstrated min-p semantics difference; no model TPS trial.",
+      "settings": "Direct actual Metal min-p stage linked to verified `m5-copy` / `conv-direct`; eight seven-logit cases, p=0.5 and production p=0.05, sorted-flag true/false, separated controls and logf(p)/neighboring boundary values. No model loaded. Upstream #30223 graph fix is merged but not backported because it does not alter sampler arithmetic.",
+      "result": "Four separated controls match eligibility; all four boundary cases CPU retain IDs[0,1,2,3] and Metal retains[0,1,2]. CPU >=threshold versus Metal strict STEP. No full-chain, RNG/rollback, generated-token or model-quality result, and no TPS gain measured. Both sorted-flag fixtures use already ordered values.",
+      "validation": "Surviving logits and input bytes unchanged, maximum retained, eight native cases complete, zero new swap, minimum available RAM33.16GiB. Astra audited actual raw/source hashes and endorsed bounded parking. Diagnostic `passed` means the screen completed, not that full backend sampling qualified.",
+      "revisit": "An isolated implementation first matches min-p eligibility/ties and complete-chain selections plus RNG/rollback under exact-semantic rules, or explicit authorization of separate quality-changing work. Do not rerun the same graph fix expecting it to repair arithmetic; do not conflate this with P08 CPU retrieval.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/results/20261009-sampling-embedding/REPORT.md"
+        },
+        {
+          "label": "native cases/hashes",
+          "path": "bench/features/20261009T183544060739Z-m5-backend-sampling-eligibility/checks.json"
+        },
+        {
+          "label": "frozen probe",
+          "path": "bench/features/20261009T183544060739Z-m5-backend-sampling-eligibility/m5_sampling_probe.cpp"
+        },
+        {
+          "label": "Astra review",
+          "path": "bench/results/20261009-sampling-embedding/ASTRA-REVIEW.md"
+        }
+      ]
+    },
+    {
+      "id": "N02",
+      "title": "Upstream common/Qwen4exp embedding gather ordering",
+      "status": "Parked: no removed normal handoff; more planned inputs, no TPS trial.",
+      "settings": "`m5-embedding` isolated #30160 common/Qwen4exp hunks over `m5-copy`, no Gemma/helper graph change; current conv-direct/depth3/sharedQ3/mixed/eight helper workers/4K/F16/batch512. Normal scheduler debug2/verbosity5 diagnostic only, no evaluation callback. Six32-token greedy requests per engine: code/prose/Chinese, synthetic512, cached-followup and identical fresh follow-up.",
+      "result": "Every matched target plan remains CPU\u2192Metal, active CPU GET_ROWS2; Metal planned input tensors27\u219230. Extra inputs belong to inactive mixed-input branch; helper remains CPU\u2192Metal\u2192CPU\u2192Metal, input counts0/14/2/2. No actual transfer-byte or measured slowdown/TPS claim. Topology screen fails to qualify a speed trial.",
+      "validation": "Candidate572 math+16 residual cases; paired192 token IDs/text and draft counts exact; two cached/fresh parity checks,508 reused tokens. Forty request/role/displayed-size comparisons,23 target/139 helper plan dumps per engine. Dumps are rebuild/reallocation plans, not execution counts; printed sizes/names truncated, byte-safe request ranges exclude startup reserves. Both accepted launches zero new swap, min RAM2.149GiB. Hidden-state/logit equality not measured. Astra independently audited raw plans.",
+      "revisit": "A different mechanism removes the observed unnecessary input copies, or a different padding/LoRA/embedding/input-placement workload demonstrates redundant normal crossings. The same upstream merge and unchanged pure-token baseline are insufficient. Preserve inactive graph branches correctly.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/results/20261009-sampling-embedding/REPORT.md"
+        },
+        {
+          "label": "topology and frozen analyzer",
+          "path": "bench/features/20261009T184602948859Z-m5-embedding-topology/topology.json"
+        },
+        {
+          "label": "parity",
+          "path": "bench/features/20261009T184602948859Z-m5-embedding-topology/parity.json"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_embedding_experiment.json"
+        },
+        {
+          "label": "Astra review",
+          "path": "bench/results/20261009-sampling-embedding/ASTRA-REVIEW.md"
+        }
+      ]
+    },
+    {
+      "id": "S01",
+      "title": "Parallel gate/up activation, four outputs per SIMD group",
+      "status": "Parked below gate; component test only.",
+      "settings": "`m5-gate-lanes`, `gate-up4`; preserve original Q2 dot products and uniform reductions, distribute the unchanged SwiGLU epilogue across lanes. A/B/C/C/B/A compares practical unfused control, new parallel version and old serial four-output ablation. Full real R4/R5 and distinct-expert blocks, normal fusion, no timing callbacks.",
+      "result": "Real R4 297.497 \u2192 296.937 us, 0.188% less time versus 0.226% control drift; conservative bracket reduction 0.016%. Real R5 -0.019% time reduction; distinct routes 0.93\u20131.13% slower. Failed the predeclared >=3% R4 reduction, >2x drift and bracket-separation screen. No model trial or TPS gain.",
+      "validation": "58 cases, 11,162,880 F32 values bit-identical; six accepted native runs, zero new swap.",
+      "revisit": "A materially different epilogue/dispatch mechanism with a normal-path cost argument and repeatable complete-block improvement. The new parallel **eight-output** mode was not benchmarked; this result must not be described as testing it. Old serial eight-output failure is P01.",
+      "evidence": [
+        {
+          "label": "Combined report",
+          "path": "bench/results/20261009-sequential-pass/REPORT.md"
+        },
+        {
+          "label": "raw gate evidence",
+          "path": "bench/results/20261009-sequential-pass/gate-lanes.json"
+        },
+        {
+          "label": "pinned manifest",
+          "path": "config/m5_gate_lanes_experiment.json"
+        },
+        {
+          "label": "predeclared screen",
+          "path": "config/m5_sequential_plan.json"
+        }
+      ]
+    },
+    {
+      "id": "S02",
+      "title": "Zero extra Metal encoding workers",
+      "status": "Rejected measured regression; full model.",
+      "settings": "`m5-encoders` / `GGML_M5_LAB_N_CB=0` versus 1, otherwise current control settings; separate 1/0/0/1 bracket. These are command-encoding workers, not helper CPU workers.",
+      "result": "Code 59.442 \u2192 56.135 TPS (-5.563%); prose 39.943 \u2192 37.750 (-5.489%); Chinese 40.669 \u2192 38.390 (-5.605%). Complete replies took about 5.62\u20135.75% longer. Synthetic 512/2048 TPS fell 5.516%/5.102%. Retain one extra worker.",
+      "validation": "Both encoder suites together: 234 prerequisite dependent/state graphs, 168 exact fresh/cached output records and 256 answer/cache checks; eight accepted model launches, zero new swap. Both constructors, effective startup counts, malformed override fallback and stats override covered.",
+      "revisit": "Different backend scheduling implementation, CPU/GPU balance, hardware, or demonstrated encoding contention on a different workload. Repeating this exact count sweep on the same pinned model is low value.",
+      "evidence": [
+        {
+          "label": "Model report",
+          "path": "bench/results/20261009T171405Z-m5-encoders0/REPORT.md"
+        },
+        {
+          "label": "raw comparison",
+          "path": "bench/results/20261009T171405Z-m5-encoders0/comparison.json"
+        },
+        {
+          "label": "prerequisites and log checks",
+          "path": "bench/results/20261009-sequential-pass/encoders0.json"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_encoders_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "S03",
+      "title": "Two extra Metal encoding workers",
+      "status": "Parked, no useful model gain; bounded compatibility limitation.",
+      "settings": "`GGML_M5_LAB_N_CB=2` versus 1, independent 1/2/2/1 bracket. Helper CPU workers remain eight. Fusion matcher remains partition-local; changing command partitions can change fusion opportunities.",
+      "result": "Code 59.467 \u2192 59.325 TPS (-0.239%); prose 39.949 \u2192 39.882 (-0.167%); Chinese 40.607 \u2192 40.583 (-0.061%). Whole-reply changes -0.215%, -0.121%, -0.058%. Synthetic 2048 +0.085% TPS but whole reply -0.324%; no adoption gate met.",
+      "validation": "Same combined coverage as S02. Count two is restricted to the pinned **callback-free** server path. Existing commit logic can leave the main buffer uncommitted with a non-null abort callback. No general callback fix was made. Pinned calloc initializes null; every later assignment is instrumented, and any non-null setter event invalidates a run. Accepted target/helper logs confirm count two and stats disabled.",
+      "revisit": "First fix and validate the non-null callback commit path if general compatibility is required. Performance retry also needs a changed scheduling mechanism or evidence of an encoding bottleneck; callback repair alone is not a promised speed gain.",
+      "evidence": [
+        {
+          "label": "Model report",
+          "path": "bench/results/20261009T172814Z-m5-encoders2/REPORT.md"
+        },
+        {
+          "label": "raw comparison",
+          "path": "bench/results/20261009T172814Z-m5-encoders2/comparison.json"
+        },
+        {
+          "label": "startup/callback evidence",
+          "path": "bench/results/20261009-sequential-pass/encoders2.json"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_encoders_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "S04",
+      "title": "Q5_K single-token vocabulary head, two output rows",
+      "status": "Rejected component regression; no model trial.",
+      "settings": "`m5-head` / `head2`; exact Q5_K K=2560, M=248320, canonical strides, F32 single-token input/output, nsg=2; original unpacking/arithmetic/reduction. Eligible target and helper heads, full vocabulary; no expanded cache or reduced precision. Dependent head \u2192 top10 \u2192 gather graph, terminal sync, untimed pipeline prime, >=500ms warmup, seven >=100ms blocks per input pattern, ABBA.",
+      "result": "Mixed input 1.904677 \u2192 1.957748 ms (+2.786% time); alternating 1.908241 \u2192 1.945478 ms (+1.951%). Control drift 0.10\u20130.26% across the head suites. Failed >=10% complete-operation speedup screen.",
+      "validation": "Each head mode passes 16 cases / 4,966,398 output scores bit-identical to control, all-score CPU references, cancellation/one-hot/zero/scaled/tie cases and exact unsupported-path fallbacks. Both modes together compare 9,932,796 values. Probe RSS <3 GiB; all 11 accepted head launches zero new swap.",
+      "revisit": "Different kernel geometry/data reuse or a changed head workload that explains this regression. Before a model trial, prove actual T1 strides and dispatch in a normal model capture; that capture was not warranted by the failed component screen and remains untested.",
+      "evidence": [
+        {
+          "label": "Head report",
+          "path": "bench/results/20261009-sequential-pass/REPORT.md"
+        },
+        {
+          "label": "raw correctness/timing",
+          "path": "bench/results/20261009-sequential-pass/head.json"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_head_experiment.json"
+        },
+        {
+          "label": "screen",
+          "path": "config/m5_sequential_plan.json"
+        }
+      ]
+    },
+    {
+      "id": "S05",
+      "title": "Q5_K single-token vocabulary head, four output rows",
+      "status": "Rejected component regression; no model trial.",
+      "settings": "Same exact guards and protocol as S04, `head4`, separate ABBA controls; global nr1/nsg2 defaults and all unsupported paths preserved.",
+      "result": "Mixed 1.910208 \u2192 1.931174 ms (+1.098% time); alternating 1.910681 \u2192 1.934325 ms (+1.237%). Failed >=10% complete-operation improvement screen.",
+      "validation": "Same complete correctness/fallback coverage and zero-swap requirement as S04. This is a full-head-plus-consumer measurement, not isolated kernel TPS.",
+      "revisit": "A new mechanism and normal model dispatch proof as S04; a repeat of nr4 alone is not justified.",
+      "evidence": [
+        {
+          "label": "Raw head bracket",
+          "path": "bench/results/20261009-sequential-pass/head.json"
+        },
+        {
+          "label": "report",
+          "path": "bench/results/20261009-sequential-pass/REPORT.md"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_head_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "P01",
+      "title": "Serial fused gate/up, eight outputs",
+      "status": "Rejected component regression.",
+      "settings": "`m5-gate` / `gate-up8`; real captured R4/R5 routes, complete sequential expert block, stock fused-runtime control. Original serial activation epilogue.",
+      "result": "R4 0.2954 \u2192 0.3484 ms (+17.95% time); R5 0.3572 \u2192 0.4138 (+15.84%). Distinct +18.60%/+17.94%; shared +8.50%/+9.45%. Control drift 0.41%/0.71% for real routes. Failed >=10% operator improvement; no TPS trial.",
+      "validation": "58 cases / 11,162,880 exact F32 values. Accepted final suite zero new swap; early fixture/storage failure excluded below.",
+      "revisit": "Change the serial epilogue or underlying work distribution, not the same tile count. S01 is the recorded parallel-epilogue follow-up; its four-output mode also failed to qualify.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/results/20261009-next-few/REPORT.md"
+        },
+        {
+          "label": "raw suite",
+          "path": "bench/results/20261009-next-few/REPORT.json"
+        },
+        {
+          "label": "frozen source hashes",
+          "path": "bench/results/20261009-next-few/source/SHA256.json"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_gate_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "Serial fused gate/up, four outputs",
+      "status": "Parked below gate; component only.",
+      "settings": "Same suite as P01, `gate-up4`.",
+      "result": "R4 0.2949 \u2192 0.2962 ms (+0.42% time, 0.76% drift); R5 0.3575 \u2192 0.3578 (+0.07%, 0.05% drift). Distinct +1.42%/+1.37%; shared 0.99%/0.82% less time. No >=10% real-route win or TPS trial.",
+      "validation": "Same exact 58-case coverage as P01; accepted runs zero new swap.",
+      "revisit": "New mechanism with full real-route evidence. S01 already tests parallel activation at this tile count; do not propose it as an untested idea.",
+      "evidence": [
+        {
+          "label": "Report and raw links",
+          "path": "bench/results/20261009-next-few/REPORT.md"
+        },
+        {
+          "label": "raw suite",
+          "path": "bench/results/20261009-next-few/REPORT.json"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_gate_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "Repeated-expert pair grouping, exact V4",
+      "status": "Rejected component regression.",
+      "settings": "`m5-group` / `expert-group`; eight sequential gate/up/SwiGLU/down/reduction/residual blocks, two full 512-expert weight sets, eight captured routes stratified by reuse, real R4/R5 and distinct/shared controls. Sixty measured graphs, four warmups, no callback tracing during performance.",
+      "result": "Real R4 301.839 \u2192 384.266 us (+27.31% time, 0.71% drift); R5 362.391 \u2192 449.932 (+24.16%, -0.08% drift); distinct +8.65\u20138.78%, shared +22.98\u201326.25%. Failed >=10% real R4 improvement and regression limits. No model TPS run.",
+      "validation": "42 cases, 336 CPU projection references, 9,446,400 exact output values; 750 dispatch markers, unchanged data/padding. Six accepted runs zero new swap; peak RSS 4.48 GiB, minimum RAM 32.03 GiB. Register pressure is a hypothesis, not a measured cause.",
+      "revisit": "A substantially different grouping kernel or measured register/occupancy explanation, with exact arithmetic and dependent sequential graphs. Repeated selections alone do not prove a profitable optimization.",
+      "evidence": [
+        {
+          "label": "Final report",
+          "path": "bench/results/20261009T153117Z-m5-expert-pair-group/REPORT.md"
+        },
+        {
+          "label": "raw comparison",
+          "path": "bench/results/20261009T153117Z-m5-expert-pair-group/comparison.json"
+        },
+        {
+          "label": "plan",
+          "path": "config/m5_group_plan.json"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_group_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "Grouping V2/V3 streamed kernels",
+      "status": "Rejected correctness; performance ineligible.",
+      "settings": "Development variants of P03 with streamed grouped computation.",
+      "result": "Passed CPU tolerance but failed exact stock-bit comparison. Their timings cannot justify adoption. V4 restored known exact assignment ordering and passed correctness, then regressed (P03).",
+      "validation": "V1 was accurate but used independent graphs permitting cross-block concurrency; its throughput timings were excluded from sequential latency claims. V2/V3 are preserved in the final report's development history.",
+      "revisit": "Restore exact accumulation/output behavior before performance testing, or explicitly authorize and evaluate a separate quality-changing experiment. Do not relax the existing speed-only accuracy gate silently.",
+      "evidence": [
+        {
+          "label": "Development history and evidence",
+          "path": "bench/results/20261009T153117Z-m5-expert-pair-group/REPORT.md"
+        },
+        {
+          "label": "raw comparison",
+          "path": "bench/results/20261009T153117Z-m5-expert-pair-group/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "GDN recurrent-state row groups one/two versus four",
+      "status": "Inconclusive / no qualified component gain, parked.",
+      "settings": "`m5-gdn`, `gdn-row1` / `gdn-row2` versus row4; native fused K4 path, actual target T1\u20134 capture, 786432-float slot stride. Final timing uses >=500ms sustained warmup, 512 synchronized samples, four states and unchanged-row4 negative controls. Includes fixture SUM/attention/copy/sync cost, not an isolated kernel.",
+      "result": "Fused T4 controls 0.3989\u20130.4161 ms; row1 0.4052\u20130.4081, row2 0.4024\u20130.4039. T5 controls 0.4020\u20130.4132; row1 0.4049\u20130.4051, row2 0.4054\u20130.4212. No gain above final 4.33% control spread. Initial short bracket had 11.43% drift and was excluded as conclusive evidence. No TPS gain established.",
+      "validation": "32 cases per setting, 960 full output/cache/padding digests and 1,504,438,002 F32 values per setting exact. Retained-prefix rollback and continuation tested; T5/K4 prefix1 explicitly unavailable, not claimed. Accepted final suite zero new swap.",
+      "revisit": "First demonstrate reproducible lower-noise timing or a different fused implementation with a substantial effect. Do not relabel noise as a win or claim all GDN optimization has been disproven.",
+      "evidence": [
+        {
+          "label": "Detailed report",
+          "path": "bench/results/20261009-next-few/REPORT.md"
+        },
+        {
+          "label": "raw suite",
+          "path": "bench/results/20261009-next-few/REPORT.json"
+        },
+        {
+          "label": "frozen hashes",
+          "path": "bench/results/20261009-next-few/source/SHA256.json"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_gdn_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "SSD lookup prefetch for warm short text",
+      "status": "Screened low expected benefit; prefetch not implemented.",
+      "settings": "`m5-lookup` native lookup tracing, 162 attributed operations on the 28.8 GB shard, 90-byte rows / 16 KiB pages; four normal requests, trace/control outputs matched for 392 tokens. Warm short code/prose/Chinese tasks.",
+      "result": "Lookup CPU gather/dequant/scheduling envelope: prose 2.508 ms / 3.3295 s (0.0753%); code 1.885 ms / 2.4972 s (0.0755%); Chinese 2.433 ms / 3.3073 s (0.0736%); warmup 0.2677%. This is an upper-bound envelope, **not measured SSD wait**; overlap may overcount and OS cache is uncontrolled.",
+      "validation": "Paired text/token equality; accepted suite zero new swap. Separate bounded pread probe had first-pass median 123.729 us and repeats 1.708\u20131.833 us, but does not establish native mmap waits, SSD sequential bandwidth or TPS potential.",
+      "revisit": "Cold-cache, sustained long-context or memory-pressure workload with actual normal-path attributed lookup wait >=2% of reply time, before implementing a bounded prefetcher. Fast sequential SSD bandwidth alone does not satisfy this condition. Larger-model paging remains separately untested.",
+      "evidence": [
+        {
+          "label": "Native lookup screen",
+          "path": "bench/results/20261009-next-few/REPORT.md"
+        },
+        {
+          "label": "raw attribution",
+          "path": "bench/results/20261009-next-few/REPORT.json"
+        },
+        {
+          "label": "bounded read context",
+          "path": "bench/results/20261009T085842Z-m5-next-batch/REPORT.md"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_lookup_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "Ten-expert weighted reduction",
+      "status": "Small measured benefit, opt-in; below default-adoption gate.",
+      "settings": "`m5-reduce` / `reduce10`, exact ten-expert reduction beyond conv-direct; separate full-model ABBA, 256 output tokens, three measured repeats, depth3 current helper. Not stacked with other experimental paths.",
+      "result": "Code 59.415 \u2192 59.948 TPS (+0.90%, reply +0.94% quicker); prose 39.845 \u2192 40.262 (+1.05%, +1.02%); Chinese 40.636 \u2192 41.007 (+0.91%, +0.89%). Synthetic +0.86\u20130.87%. Only one real workload reaches both 1% thresholds; keep opt-in, not a default upgrade.",
+      "validation": "Non-NaN operator bits and tested model outputs exact. Together with P08: 256 answer/cache checks, 168 output comparisons, eight accepted full-model launches zero new swap; minimum RAM 2.452 GiB, peak RSS 38.280 GiB.",
+      "revisit": "A materially faster reduction implementation or a different documented workload. Existing benefit is real but small; do not call it a complete failure, a new untested idea or add it arithmetically to other suites.",
+      "evidence": [
+        {
+          "label": "Model comparison",
+          "path": "bench/results/20261009T130146Z-m5-ten-expert-reduction/REPORT.md"
+        },
+        {
+          "label": "raw",
+          "path": "bench/results/20261009T130146Z-m5-ten-expert-reduction/comparison.json"
+        },
+        {
+          "label": "combined decision",
+          "path": "bench/results/20261009-next-three/REPORT.md"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_reduce_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "Sampling-output view / CPU retrieval consolidation",
+      "status": "Parked, no sustained model gain.",
+      "settings": "`m5-sampling` / `sampling-view`; consolidate already-ready output retrieval, retaining CPU/common sampling semantics, full-model ABBA beyond conv-direct.",
+      "result": "Ready retrieval 0.097706 \u2192 0.030565 us per row, saving only 0.067141 us. Code 59.523 \u2192 59.481 TPS (-0.07%), prose 39.983 \u2192 39.977 (-0.01%), Chinese -0.09%, all within bracket drift; synthetic -0.05\u20130.17%. No useful whole-reply gain.",
+      "validation": "Five small-model backend/CPU modes, multiple rows/negative indexing; actual greedy/stochastic and both grammar paths produce identical 18 selections. Full model exact outputs and zero new swap as P07. Initial 0.5 MiB new-swap control excluded completely.",
+      "revisit": "Demonstrate a larger actual retrieval/synchronization bottleneck or new GPU-side sampling mechanism. Future **target backend sampling plus static speculative graph** is distinct and remains untested; do not confuse it with this CPU retrieval change.",
+      "evidence": [
+        {
+          "label": "Model report",
+          "path": "bench/results/20261009T132908Z-m5-sampling-view-clean-retry/REPORT.md"
+        },
+        {
+          "label": "raw",
+          "path": "bench/results/20261009T132908Z-m5-sampling-view-clean-retry/comparison.json"
+        },
+        {
+          "label": "read-cost checks",
+          "path": "bench/features/20261009T132329116485Z-m5-sampling-read_cost-conv-direct/comparison.json"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_sampling_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "P09",
+      "title": "Few-row BF16 TensorOps projections / split-K / specialization",
+      "status": "Parked; no qualified component win. Relaxed precision rejected separately.",
+      "settings": "`m5-hc`; exact stored BF16 weights, F32 activations/output, R4/R5, K/M=10240/320 and 320/10240, preserve residual fusion; five long-K splits, short-K direction and exact-K MMA specialization. Twenty distinct projection copies, 125 MiB working set, normal fusion, no profiling callbacks; scratch <=15 KiB, no weight cache, relaxed_precision=false.",
+      "result": "Specialization down R4 35.580 \u2192 35.417 us (0.46% less time versus 3.21% drift), R5 0.90% slower; up R4 36.174 \u2192 35.613 (1.55% less time versus 2.36% drift), R5 0.78% slower. Long-K split8 down 36.001 \u2192 40.075 us (11.32% more time), R5 14.90% more. Short-K up about 9% more time but 7\u20138% control drift makes exact slowdown uncertain. No >=10% operator win, so no model TPS trial.",
+      "validation": "864 CPU-reference shape/layout cases across 12 processes, unaffected fallback bits exact; eight broader GPU math/residual configurations. Relaxed precision API probe increased rounding error and was rejected before accepted performance tests.",
+      "revisit": "Different data/compute reuse or demonstrated dispatch/occupancy explanation. Quantized **prompt** cooperative-input kernels are a different format and regime; BF16 few-row failure does not rule them out, but they require their own format/precision proof.",
+      "evidence": [
+        {
+          "label": "Detailed report",
+          "path": "bench/results/20261009-next-three/REPORT.md"
+        },
+        {
+          "label": "confirmation brackets",
+          "path": "bench/results/20261009T135603Z-m5-hc-operator-confirmation/comparison.json"
+        },
+        {
+          "label": "complete experiment receipts",
+          "path": "bench/results/20261009-next-three/results.json"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_hc_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "C01",
+      "title": "Scalar row-copy replacement",
+      "status": "Parked, no useful fresh-model gain.",
+      "settings": "`m5-copy` / `copy-scalar` versus stock; 128 fresh tokens, depth3, Tensor API on, eight helper workers, independent bracket within stock/scalar/vector4/direct/direct/vector4/scalar/stock.",
+      "result": "Code 56.501 \u2192 56.496 TPS (-0.01%); prose 42.877 \u2192 42.861 (-0.04%); Chinese +0.17%; synthetic -0.24%/+0.08%. First-token delay generally worsened; no consistent fresh reply benefit.",
+      "validation": "Eight copy model launches, 256 checks, exact fresh/cached tokens, zero new swap, minimum RAM 2.14 GiB; supplementary copy probe 224 bit-exact cases including tails/padding/fallbacks. Archive distinguishes the 47-case probe used at timing from newer 56-case checks.",
+      "revisit": "Show the normal runtime actually executes enough eligible copies or change the copy mechanism materially. Isolated state-copy throughput is insufficient because normal GDN fusion removes the apparent large CPY (C03).",
+      "evidence": [
+        {
+          "label": "Copy report",
+          "path": "bench/results/20261009T112641Z-m5-copy-resume/REPORT.md"
+        },
+        {
+          "label": "raw comparison",
+          "path": "bench/results/20261009T112641Z-m5-copy-resume/comparison.json"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_copy_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "C02",
+      "title": "Four-wide vector row-copy replacement",
+      "status": "No fresh-writing gain; narrow cached signal needs broader proof.",
+      "settings": "Same suite as C01, `copy-v4`.",
+      "result": "Code/prose both -0.24% TPS, Chinese +0.07%; synthetic -0.42%/-0.11%. Cached2048 +2.53% TPS, but only +0.56% whole-reply benefit on a short ledger fixture; cached512 -0.25%. Keep off as general speed feature.",
+      "validation": "Same exact output and zero-swap proof as C01. Cached512 control drift 2.98%; small cached changes there are inconclusive. Copy-only scalar/vector1/4/8 screening does not establish full-model gains; the matched model table tests scalar and vector4.",
+      "revisit": "Multiple realistic cached workloads with repeatable whole-reply benefit, normal dispatch proof and current adoption gate. Do not market this one short fixture as general chat acceleration.",
+      "evidence": [
+        {
+          "label": "Copy report",
+          "path": "bench/results/20261009T112641Z-m5-copy-resume/REPORT.md"
+        },
+        {
+          "label": "raw",
+          "path": "bench/results/20261009T112641Z-m5-copy-resume/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "C03",
+      "title": "Large GDN state CPY inferred from split tracing",
+      "status": "Invalid normal-path bottleneck attribution; optimization target parked.",
+      "settings": "Per-operation split callbacks versus lighter ordinary-dispatch inventory.",
+      "result": "Detailed split tracing interrupted cache fusion and exposed a costly-looking CPY. Lighter normal dispatch captured 123 shapes and no public large unfused GDN state CPY; native fusion already removes it. No valid model gain can be projected from that copy-only cost.",
+      "validation": "Split traces still serve bounded diagnostic purposes, but their operation percentages are not ordinary inference shares. Direct convolution-state CONT removal is a distinct positive result K01.",
+      "revisit": "A normal, uninstrumented or non-disruptively instrumented workload exhibiting the actual copy. Do not optimize this profiler artifact again without that proof.",
+      "evidence": [
+        {
+          "label": "Correction and scope",
+          "path": "bench/results/20261009T112641Z-m5-copy-resume/REPORT.md"
+        },
+        {
+          "label": "normal inventory",
+          "path": "bench/results/20261009T112641Z-m5-copy-resume/shape-inventory/inventory.json"
+        },
+        {
+          "label": "earlier split context",
+          "path": "bench/results/20261009T085842Z-m5-next-batch/REPORT.md"
+        }
+      ]
+    },
+    {
+      "id": "T01",
+      "title": "Blindly raise draft depth to five",
+      "status": "Rejected across measured fresh-writing and cached-follow-up tasks.",
+      "settings": "`mtp-mma`; depth3 writing versus5, depth4 follow-ups versus5, temperature0.6, 128 fresh tokens, confidence0, ABCCBA-style bounded sweeps with fresh controls.",
+      "result": "Writing code 56.43 \u2192 53.54 TPS (-5.12%), prose -14.34%, Chinese -17.19%, synthetic -8.90\u201315.87%. Cached512 68.98 \u2192 67.03 (-2.82%), complete reply 1.36% slower; cached2048 69.40 \u2192 62.16 (-10.43%), reply 6.87% slower.",
+      "validation": "Tensor/depth batch: 20 passes, 600 checks and 4004 prerequisite checks, zero new swap; fresh depth control drift <=0.163%, cached <=0.515%. Shape/acceptance changes can change token paths; no general exact-output claim.",
+      "revisit": "Changed helper/model acceptance or cost-aware adaptation with evidence. Future adaptation stays within maximum3 and is **not** another blind depth5 sweep.",
+      "evidence": [
+        {
+          "label": "Tables and methodology",
+          "path": "bench/M5-RESULTS.md"
+        },
+        {
+          "label": "writing raw",
+          "path": "bench/results/20261007T005423Z-m5-depth-writing/comparison.json"
+        },
+        {
+          "label": "follow-up raw",
+          "path": "bench/results/20261007T010359Z-m5-depth-followup/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "T02",
+      "title": "Raise draft depth to six for fresh writing",
+      "status": "Rejected fresh-writing regression.",
+      "settings": "Same writing suite as T01, depth6 versus3.",
+      "result": "Code 56.43 \u2192 50.38 TPS (-10.72%); prose 42.84 \u2192 34.47 (-19.53%); Chinese 40.16 \u2192 29.91 (-25.52%); synthetic512 -23.88%, synthetic2048 -13.25%. Higher depth adds work and lowers acceptance fraction.",
+      "validation": "Same clean depth-suite evidence as T01. These end-to-end slowdowns do not isolate GPU, CPU or rollback-copy contributions.",
+      "revisit": "New helper with substantially improved accepted-prefix/cycle cost. Existing short cached benefit T03 does not justify using six for general writing.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/M5-RESULTS.md"
+        },
+        {
+          "label": "raw writing sweep",
+          "path": "bench/results/20261007T005423Z-m5-depth-writing/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "T03",
+      "title": "Depth six for short structured cached replies",
+      "status": "Kept as narrow optional trial; long replies do not qualify.",
+      "settings": "Depth6 versus4, cached ledger naturally stops after 25/24 tokens at history512/2048; separate short-structured launcher.",
+      "result": "Cached512 68.98 \u2192 75.50 TPS (+9.44%); complete reply 0.6252 \u2192 0.5947 s (4.88% quicker, about30ms). Cached2048 69.40 \u2192 69.73 (+0.48%); whole reply +0.04%, effectively tied. Fresh writing regresses (T02).",
+      "validation": "Matched cached generation drift <0.17%; nine real API groups pass; zero new swap in speed suite. Structured short-answer rate is not general chat TPS.",
+      "revisit": "A different realistic short-answer task if it can justify a specialized profile. Do not repeat this ledger fixture or advertise75.5 as ordinary writing speed.",
+      "evidence": [
+        {
+          "label": "Scope and app proof",
+          "path": "bench/M5-RESULTS.md"
+        },
+        {
+          "label": "cached raw",
+          "path": "bench/results/20261007T010359Z-m5-depth-followup/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "T04",
+      "title": "Confidence threshold 0.2",
+      "status": "No broad meaningful gain; retained confidence0.",
+      "settings": "`mtp-mma`, separate depth3 writing and depth4 follow-up sweeps, threshold0.2 versus0, temperature0.6, 128 fresh tokens.",
+      "result": "Writing code 56.36 \u2192 56.34 TPS (-0.03%), prose +0.83%, Chinese +0.48%, synthetic -0.16%/-0.05%; follow-up cached essentially flat. No clear general upgrade.",
+      "validation": "Follow-up0.2 reproduces all10 paired fresh outputs. Clean helper/confidence batch: 18 full passes, 540 checks, zero new swap; cached-control variation can exceed small gains. Initial Java-contention/swap attempt excluded below.",
+      "revisit": "New model/helper acceptance distribution or adaptive policy with measured cycle cost, rather than the same fixed threshold sweep.",
+      "evidence": [
+        {
+          "label": "Full helper/confidence report",
+          "path": "bench/M5-HELPER-RESULTS.md"
+        },
+        {
+          "label": "writing raw",
+          "path": "bench/results/20261007T034515Z-m5-confidence-writing/comparison.json"
+        },
+        {
+          "label": "follow-up raw",
+          "path": "bench/results/20261007T035416Z-m5-confidence-followup/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "T05",
+      "title": "Confidence threshold 0.4",
+      "status": "Narrow prose opt-in; rejected as general upgrade.",
+      "settings": "Separate writing depth3/follow-up depth4, threshold0.4 versus0; ordinary launchers unchanged.",
+      "result": "Writing prose 42.83 \u2192 43.61 TPS (+1.83%), reply1.58% quicker; code -0.57%, Chinese -1.33%, synthetic51249.02 \u219245.84 (-6.50%), synthetic2048 -3.72%. Follow-up Chinese +4.22% but code -2.8%, synthetic -4.03%/-6.76%; cached2048 69.42 \u219263.55 (-8.46%), reply5.46% slower. Apparent small cached writing gains are below4.37\u20135.73% control drift.",
+      "validation": "Focused answers pass, but two of10 writing and three of10 follow-up paired fresh outputs change. Higher acceptance percentage mainly reflects fewer proposed tokens, not more accepted work. Clean batch zero new swap; separate prose trial passes nine API groups.",
+      "revisit": "A measured workload-specific selector or materially changed helper. Do not silently combine this quality/path-changing setting with exact-output speed trials or existing opt-ins.",
+      "evidence": [
+        {
+          "label": "Report and limitations",
+          "path": "bench/M5-HELPER-RESULTS.md"
+        },
+        {
+          "label": "writing raw",
+          "path": "bench/results/20261007T034515Z-m5-confidence-writing/comparison.json"
+        },
+        {
+          "label": "follow-up raw",
+          "path": "bench/results/20261007T035416Z-m5-confidence-followup/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "T06",
+      "title": "Six helper CPU workers instead of eight",
+      "status": "Mixed tradeoff, not a balanced default improvement.",
+      "settings": "Helper generation/prompt workers only, target workers8, depth3, `mtp-mma`; do not confuse with encoder-worker S02/S03.",
+      "result": "Generation code +0.77%, prose +1.16%, Chinese +1.09%, synthetic2048 +1.05%; long prompt input 539.26 \u2192521.92 tok/s (-3.21%), TTFT3.7986 \u21923.9247s, whole long reply1.56% slower.",
+      "validation": "All10 paired fresh outputs exact, answer checks and zero new swap in clean helper suite. Earlier mtp-shared/depth2 sweep L07 also finds sub1% generation changes.",
+      "revisit": "Different host CPU contention or helper placement, with input/TTFT/whole reply included. Decode TPS alone is insufficient.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/M5-HELPER-RESULTS.md"
+        },
+        {
+          "label": "raw worker sweep",
+          "path": "bench/results/20261007T040326Z-m5-helper-workers/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "T07",
+      "title": "Twelve helper CPU workers instead of eight",
+      "status": "Small balanced optional benefit, not a large default upgrade.",
+      "settings": "Same isolated worker suite as T06, helper12 versus8, no combination with other trial launchers.",
+      "result": "Code56.33 \u219256.85 TPS (+0.94%); prose +0.76%, Chinese +0.56%, synthetic2048 +0.82%. Long prompt +3.24%, TTFT3.14% quicker; full reply6.3427 \u21926.2025s (2.21% quicker). Separate trial exists; balanced control stays8.",
+      "validation": "All10 paired fresh outputs reproduced; clean suite zero new swap; separate twelve-worker trial passes nine API groups.",
+      "revisit": "New placement/model or contention pattern. Already measured small gain, not an untested route to a major TPS jump; combination needs its own fresh comparison.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/M5-HELPER-RESULTS.md"
+        },
+        {
+          "label": "worker raw",
+          "path": "bench/results/20261007T040326Z-m5-helper-workers/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "T08",
+      "title": "BF16/Q2 few-row Tensor API dispatch thresholds",
+      "status": "Parked, no meaningful gain.",
+      "settings": "Isolated `m5-lab`, stock BF16 threshold4 versus3; Q2 threshold3 versus2, depth3; separate ABBA suites. Dense MMA knobs do not control separate routed `MUL_MAT_ID` experts.",
+      "result": "BF16 code56.37 \u219256.40 TPS (+0.05%), synthetic +0.20\u20130.24%, fresh drift up to0.145%; Q2 code56.41 \u219256.31 (-0.16%), synthetic -0.15\u20130.17%, drift up to0.258%. Neither useful.",
+      "validation": "Matrix batch:24 passes,720 checks,6864 CPU-reference prerequisite checks, zero new swap, minimumRAM3.083GiB. Dense Q2 storage is only73,175,040 bytes outside experts; storage share does not prove runtime cost share.",
+      "revisit": "New dense kernel implementation or actual dispatch/cost evidence on changed shapes. Do not claim these already-tested thresholds optimize routed expert kernels.",
+      "evidence": [
+        {
+          "label": "Matrix report",
+          "path": "bench/M5-GPU-TUNING.md"
+        },
+        {
+          "label": "BF16 raw",
+          "path": "bench/results/20261007T014132Z-m5-bf16-threshold/comparison.json"
+        },
+        {
+          "label": "Q2 raw",
+          "path": "bench/results/20261007T014739Z-m5-q2-threshold/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "T09",
+      "title": "Dense matrix tile limit one",
+      "status": "Rejected small regression.",
+      "settings": "`m5-lab`, tile limit1 versus stock limit4, depth3, separate bracketed matrix-width sweep.",
+      "result": "Code56.46 \u219255.84 TPS (-1.09%); synthetic512 -0.93%,2048 -0.88%. No useful improvement.",
+      "validation": "Same clean matrix batch as T08; candidates measured inside isolated engine after build-parity check, not against unrelated old launcher figures.",
+      "revisit": "Different kernel/shapes or hardware with a reason one tile should win. Existing limit2 benefit is T10.",
+      "evidence": [
+        {
+          "label": "Matrix report",
+          "path": "bench/M5-GPU-TUNING.md"
+        },
+        {
+          "label": "width raw",
+          "path": "bench/results/20261007T015346Z-m5-matrix-width/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "T10",
+      "title": "Dense matrix tile limit two",
+      "status": "Marginal optional benefit; below broad adoption gate.",
+      "settings": "Same suite as T09, limit2 versus4; separate two-tile trial launcher.",
+      "result": "Code56.46 \u219256.68 TPS (+0.39%); prose +0.47%, Chinese +0.55%, synthetic +0.58\u20130.59%; fresh complete replies only0.17\u20130.51% quicker. Long prompt throughput -0.12%. Limited four samples per setting; not universal sub-percent proof.",
+      "validation": "Exact10 measured paired fresh outputs, nine API groups, zero new swap; Chinese control drift0.37%, code/prose about0.05%. Build parity generation within0.17%, but prompt parity not established.",
+      "revisit": "Changed kernel/shape or explicit combined-profile comparison. Existing knob is already tested; cannot claim a new large boost from it.",
+      "evidence": [
+        {
+          "label": "Report and variation",
+          "path": "bench/M5-GPU-TUNING.md"
+        },
+        {
+          "label": "raw width sweep",
+          "path": "bench/results/20261007T015346Z-m5-matrix-width/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "T11",
+      "title": "Dense MMA GPU SIMD groups four/eight",
+      "status": "Rejected measured small regressions.",
+      "settings": "`m5-lab` dense matrix group overrides4/8 versus stock; not CPU workers or encoding workers.",
+      "result": "Request4 code56.45 \u219255.61 TPS (-1.49%), synthetic -1.39%/-1.17%; request8 code56.45 \u219256.25 (-0.35%), synthetic -0.99%/-0.20%; fresh control drift <=0.187%.",
+      "validation": "Same24-pass clean matrix batch as T08. No hardware accelerator occupancy counter was measured.",
+      "revisit": "A different matrix kernel or measured occupancy/register explanation; do not repeat a blind group-count sweep.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/M5-GPU-TUNING.md"
+        },
+        {
+          "label": "raw groups sweep",
+          "path": "bench/results/20261007T020256Z-m5-matrix-workers/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "L01",
+      "title": "Masked Q2 Metal kernel from Meld",
+      "status": "Optional, mixed small result; not a general engine upgrade.",
+      "settings": "`q2-masked` versus original pinned engine, prediction off, temperature0.6, 512 output tokens, 4K/F16, batch512; final adjacent quiet confirmation, not a complete new ABBA.",
+      "result": "Synthetic51237.91 \u219238.01 TPS (+0.27%);204835.55 \u219236.86 (+3.68%). Input throughput -6.09%/-7.29%; short reply0.07% slower, long1.36% quicker but TTFT about0.25s later. Earlier -8.83%/-7.30% figures are confounded by build/browser activity.",
+      "validation": "122 Q2 +2 Q4 CPU-reference GPU tests,108 focused checks across six successful passes. Accumulation changes sampled outputs; no bit-exact claim. Final candidate new swap0.0006GiB, so these historical runs do not satisfy current zero-new-swap adoption. First2.14GiB-swap load excluded.",
+      "revisit": "New kernel design or a full quiet current-protocol comparison justified by actual normal costs. Do not reuse confounded percentages or assume all imported Q2 patches are improvements.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/Q2-METAL.md"
+        },
+        {
+          "label": "final analysis",
+          "path": "bench/results/20261006-q2-confirmation-analysis/COMPARISON.md"
+        },
+        {
+          "label": "original raw",
+          "path": "bench/results/20261006T172232Z-q2-comparison/comparison.json"
+        },
+        {
+          "label": "manifest",
+          "path": "config/q2_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "L02",
+      "title": "Aggressively quantized Q2_0 helper",
+      "status": "Rejected poor draft acceptance and Metal OOM.",
+      "settings": "1.110GB self-contained Q2_0 helper, full GPU, depth2; original runtime. This is helper quantization, not the successful main-model Q2_0 format.",
+      "result": "<2% draft acceptance, partial writing about12\u201316 TPS (recorded medians13.86/14.42), then Metal out-of-memory/streaming failure. Partial failed-run figures are not accepted speed results.",
+      "validation": "Failed native result/log preserved; do not infer safety or quality from loading successfully. Selected Q3 split/shared helper is a different approach.",
+      "revisit": "Demonstrably better helper calibration/quantization and a viable memory layout, then accuracy and acceptance before timing. A smaller file alone is not sufficient.",
+      "evidence": [
+        {
+          "label": "Helper report",
+          "path": "bench/PREDICTION.md"
+        },
+        {
+          "label": "failed raw result",
+          "path": "bench/results/20261006T145347Z-prediction-q2_0-gpu2/result.json"
+        }
+      ]
+    },
+    {
+      "id": "L03",
+      "title": "Put complete helper on GPU",
+      "status": "Rejected at current48GiB working budget; small-batch trial slow.",
+      "settings": "Original Q4/Q2_K GPU helpers and later shared helper full-GPU placement; no raised system GPU memory limit.",
+      "result": "OriginalQ4 and1.491GBQ2_K fail generation within Metal working budget. Shared full-GPU batch512 also fails; batch128 passes focused checks but generates only about4\u201310TPS in a feature trial. Those feature timings are not matched benchmarks.",
+      "validation": "Native OOM/streaming records retained. Loading is insufficient proof of viable generation. Packed mixed placement is the validated alternative.",
+      "revisit": "A substantially smaller, accurate helper with different mapping/working-set requirements or changed hardware budget. Do not repeat full GPU placement unchanged or raise system limits as an unmeasured shortcut.",
+      "evidence": [
+        {
+          "label": "Original helper attempts",
+          "path": "bench/PREDICTION.md"
+        },
+        {
+          "label": "originalQ4 failure",
+          "path": "bench/results/20261006T111640Z-flash-mtp3-ubatch512/result.json"
+        },
+        {
+          "label": "Q2_K failure",
+          "path": "bench/results/20261006T144952Z-prediction-q2-gpu2/result.json"
+        },
+        {
+          "label": "shared512 failure",
+          "path": "bench/results/20261006T182852Z-feature-shared-gpu/result.json"
+        },
+        {
+          "label": "shared128 trial",
+          "path": "bench/results/20261006T183135Z-feature-shared-gpu/result.json"
+        },
+        {
+          "label": "layout explanation",
+          "path": "bench/SHARED-HELPER.md"
+        }
+      ]
+    },
+    {
+      "id": "L04",
+      "title": "Original Q4 helper all CPU / smaller split alternatives",
+      "status": "OriginalQ4 CPU profile rejected for clean-memory baseline; Q2_K split and Q3 CPU-only inferior alternatives.",
+      "settings": "Self-containedQ4 helper CPU, depth3; later smallerQ2_K split and Q3 CPU-only versus selectedQ3 GPU-output split. Historical original engines/settings, not current packed helper.",
+      "result": "Q4 CPU about43\u201345TPS but +1.85GiB swap and longer startup. Q2_K split no new swap but only1\u20136% writing gain with slower prompt startup. Q3 CPU-only no new swap but slower than selected split. No claim of a fresh current ABBA for these early screens.",
+      "validation": "Individual raw results and helper preparation identities retained. Later Q3/shared packed profiles replace these specific memory/layout approaches.",
+      "revisit": "A changed CPU helper/kernel/placement with evidence it avoids swap and improves full replies. Do not restore old heavy CPU helper just because generation TPS looked higher.",
+      "evidence": [
+        {
+          "label": "Helper decisions",
+          "path": "bench/PREDICTION.md"
+        },
+        {
+          "label": "Q4 CPU raw",
+          "path": "bench/results/20261006T111806Z-flash-mtp3-cpu-ubatch512/result.json"
+        },
+        {
+          "label": "Q2_K split",
+          "path": "bench/results/20261006T145142Z-prediction-q2-output2/result.json"
+        },
+        {
+          "label": "historical scoreboard",
+          "path": "bench/RESULTS.md"
+        }
+      ]
+    },
+    {
+      "id": "L05",
+      "title": "106K prediction vocabulary",
+      "status": "Narrow mixed benefit; not adopted as general prediction upgrade.",
+      "settings": "`draft-vocab`, helper106299/248320 tokens, full main vocabulary unchanged, depth2, temperature0.6,128 output tokens; full/subset controls in six-pass comparison. Adds111.5MiB compact head and retains full fallback table.",
+      "result": "Synthetic writing +3.94\u20134.44% versus full helper; code -1.13%; cached generation -9.22%/-10.12% as acceptance drops. Fresh2048 whole reply7.93s versus7.91full/6.66plain, no latency improvement. Reducing helper vocabulary is not free capacity savings.",
+      "validation": "180 focused answers pass, full target out-of-subset token reachable; general output/distribution equivalence not established. One subset run adds53.3MiB swap, others zero; historical report retains it, so suite does not satisfy current clean-memory gate. Initial CPU-routed compact-head attempt was corrected and excluded.",
+      "revisit": "Better vocabulary coverage/selection proven on realistic multilingual/code/cached tasks, memory accounting and complete-reply improvement; any shared-helper combination needs a new independent comparison.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/DRAFT-VOCAB.md"
+        },
+        {
+          "label": "raw comparison",
+          "path": "bench/results/20261006T183950Z-vocab-comparison/comparison.json"
+        },
+        {
+          "label": "manifest",
+          "path": "config/draft_vocab_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "L06",
+      "title": "Shared helper with interleaved CPU/GPU tensors",
+      "status": "Rejected layout; fixed by packed layout.",
+      "settings": "Shared helper small dense tensors on GPU, experts on CPU, but GPU tensors interleaved with CPU weights in GGUF.",
+      "result": "Loader maps from first to last GPU tensor, spanning1183.14MiB although intended GPU weights only45.64MiB; initial mixed generation fails. Repacking CPU experts first/GPU tensors last reduces mapped span to45.64MiB with identical tensor bytes. Do not restore interleaved layout.",
+      "validation": "Packed mixed feature28 checks, zero new swap; 32 retained tensors/metadata byte-verified, full later240-check suite zero new swap. Shared table removal saves521MiB, not96% of whole-model RAM. BorrowedQ5_K output changes proposals relative to originalQ3 output, so no generic bit-equivalence claim.",
+      "revisit": "Only if loader mapping changes are proven to support interleaved placement safely. Normal development should retain the packed helper.",
+      "evidence": [
+        {
+          "label": "Layout report",
+          "path": "bench/SHARED-HELPER.md"
+        },
+        {
+          "label": "failed interleaved raw",
+          "path": "bench/results/20261006T183622Z-feature-shared-mixed/result.json"
+        },
+        {
+          "label": "packed pass",
+          "path": "bench/results/20261006T183903Z-feature-shared-mixed/result.json"
+        },
+        {
+          "label": "shared manifest",
+          "path": "config/mtp_shared_experiment.json"
+        }
+      ]
+    },
+    {
+      "id": "L07",
+      "title": "Original unpatched shared-helper depth/worker sweep",
+      "status": "Historical workload tradeoffs; superseded by few-row MMA engine, not a universal setting win.",
+      "settings": "`mtp-shared` before `mtp-mma`, depths1/3/4 versus2; helperCPU6/12 versus8 in separate depth2 sweep. Temperature0.6,128 output tokens.",
+      "result": "Depth1 Chinese +16.29% and prose +2.74%, but cached -6.93\u20137.92%; depth3 code +5.02% but prose -8.32%; depth4 cached2048 +17.19% and reply9.18% quicker but Chinese -18.77%, prose -13.88%. Worker generation gains all <1%; twelve workers long reply1.6% quicker. No one setting wins every task.",
+      "validation": "Depth240/worker180 focused checks, clean speed suites zero new swap; general exact-token equivalence not claimed. Later functional checks with a restarted VM added swap and must not be called clean speed evidence.",
+      "revisit": "Changes in the current patched engine/acceptance or adaptive selection, with fresh matched controls. Never transfer these old-engine percentages directly to current control. T01\u2013T07 cover later settings.",
+      "evidence": [
+        {
+          "label": "Historical report",
+          "path": "bench/HELPER-TUNING.md"
+        },
+        {
+          "label": "depth raw",
+          "path": "bench/results/20261006T211035Z-tuning-depth/comparison.json"
+        },
+        {
+          "label": "workers raw",
+          "path": "bench/results/20261006T212441Z-tuning-threads/comparison.json"
+        },
+        {
+          "label": "subsequent engine",
+          "path": "bench/METAL-MMA.md"
+        }
+      ]
+    },
+    {
+      "id": "K01",
+      "title": "Direct convolution-state copy without intermediate CONT",
+      "status": "Kept as practical benchmark control / separate optional launcher.",
+      "settings": "`m5-copy` / `conv-direct`, remove intermediateCONT before existing strided convolution-state copy; different operation from the absent large GDN CPY in C03.",
+      "result": "Code56.501 \u219257.258TPS (+1.34%), prose42.877 \u219243.448 (+1.33%), Chinese +1.62%, synthetic204850.016 \u219250.737 (+1.44%). Fresh replies0.75\u20131.59% quicker. Small TTFT changes do not establish a strong latency win.",
+      "validation": "Eight model launches,256 checks, exact fresh/cached outputs, zero new swap. Existing ordinary launchers unchanged; later experiments compare against this improvement.",
+      "revisit": "Already implemented and measured; only new mechanism or explicit stacked-profile comparison needs testing. Do not count its gain again when reporting later comparisons.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/results/20261009T112641Z-m5-copy-resume/REPORT.md"
+        },
+        {
+          "label": "raw",
+          "path": "bench/results/20261009T112641Z-m5-copy-resume/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "K02",
+      "title": "Metal Tensor API enabled",
+      "status": "Retain existing enabled path; measured confirmation, not a newly added accelerator.",
+      "settings": "On/off brackets at writingdepth3 and follow-updepth4, current `mtp-mma`; no separate Neural Engine runtime.",
+      "result": "Writing2048 input312.08 \u2192535.07tok/s (+71.46%), TTFT41.67% shorter, complete reply30.83% quicker; code generation +7.23%, Chinese +12.16%, prose flat. End-to-end differences include changed floating-point paths/acceptance, not pure kernel utilization.",
+      "validation": "Clean20-pass tensor/depth batch; focused checks pass. Hardware AI occupancy and separate Neural Engine use unmeasured.",
+      "revisit": "Future exact-format cooperative-input kernels are new work; simply enabling already-on Tensor API is not another optimization.",
+      "evidence": [
+        {
+          "label": "On/off report",
+          "path": "bench/M5-RESULTS.md"
+        },
+        {
+          "label": "writing raw",
+          "path": "bench/results/20261007T004003Z-m5-tensor-writing/comparison.json"
+        },
+        {
+          "label": "follow-up raw",
+          "path": "bench/results/20261007T004710Z-m5-tensor-followup/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "K03",
+      "title": "8K F16 context",
+      "status": "Validated capacity option; not a decode-speed improvement.",
+      "settings": "Full Flash, same `mtp-mma`, independent4K/8K/8K/4K,128 output tokens; separate exact6144-token recall fixtures at8K. 4K defaults preserved.",
+      "result": "Fresh generation -0.18% to+0.20% versus4K, whole reply changes <0.36%; code56.45 \u219256.46TPS. Six long recall checks pass. Private logged buffers1046.24 \u21921210.75MiB, not physical RAM peak.",
+      "validation": "134 answer/cache/capacity checks; both8K launches zero new swap, >=2.32GiB available. First fixture returned correct facts in Markdown fences and failed strict rawJSON; explicit fixturev2 passed unchanged grader, independent full retry. Initial failure not pooled.",
+      "revisit": "Larger context or stronger long-context quality/capacity study; quantizedKV requires independent correctness evidence and is unnecessary for this measured8K fit. Do not rerun8K merely hoping for higherTPS.",
+      "evidence": [
+        {
+          "label": "Report",
+          "path": "bench/results/20261009T085842Z-m5-next-batch/REPORT.md"
+        },
+        {
+          "label": "accepted raw comparison",
+          "path": "bench/results/20261009T092650Z-context-8k/comparison.json"
+        },
+        {
+          "label": "original format failure",
+          "path": "bench/results/20261009T091833Z-context-8k/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "K04",
+      "title": "Upstream fused-residual correctness fix",
+      "status": "Validated correctness patch; no meaningful measured TPS gain.",
+      "settings": "`m5-correctness` versus `m5-lab` on4B Qwen3.5Q4_K_M and versus current engine on full Flash; independentABBA,128 output tokens,4K.",
+      "result": "Small model fresh generation -0.35% to+0.13%; full model -0.22% to+0.16%, within drift. Keep purpose labeled correctness, not accelerator gain. Full model passing does not prove its actual graph exposed the original faulty fusion.",
+      "validation": "Small163 answer/cache/capacity checks,16 selected residual cases; full128 answer/cache checks,572 general GPU cases per engine plus16 residual reproducer cases. Zero new swap in accepted launches.",
+      "revisit": "Reproduce a relevant faulty graph or validate upstream rebase behavior; no speed rerun needed merely to rediscover the already-flat result.",
+      "evidence": [
+        {
+          "label": "Small model report",
+          "path": "bench/results/20261008T122556Z-small-m5-screening/REPORT.md"
+        },
+        {
+          "label": "full model report",
+          "path": "bench/results/20261009T085842Z-m5-next-batch/REPORT.md"
+        },
+        {
+          "label": "full raw",
+          "path": "bench/results/20261009T085850Z-m5-metal-residual-correctness/comparison.json"
+        },
+        {
+          "label": "manifest",
+          "path": "config/m5_correctness_experiment.json"
+        }
+      ]
+    }
+  ],
+  "excluded_attempts": [
+    {
+      "id": "X01",
+      "attempt": "Original full-model load with Docker active;2.14GiB new swap",
+      "disposition_and_retry_condition": "No speed samples accepted. After authorized VM stop, later trials completed. Retry only with normal admission/quiet host; do not weaken guard.",
+      "evidence": [
+        {
+          "label": "Raw stopped load",
+          "path": "bench/results/20261006T171840Z-q2-1-baseline/result.json"
+        },
+        {
+          "label": "Q2 report",
+          "path": "bench/Q2-METAL.md"
+        }
+      ]
+    },
+    {
+      "id": "X02",
+      "attempt": "Shared comparison interrupted by external Java builds/swap",
+      "disposition_and_retry_condition": "Incomplete suite excluded; quiet independent eight-pass retry is SHARED-HELPER result. No feature regression claim from interrupted control.",
+      "evidence": [
+        {
+          "label": "Interrupted comparison",
+          "path": "bench/results/20261006T185032Z-shared-comparison/comparison.json"
+        },
+        {
+          "label": "context",
+          "path": "bench/results/20261006T185032Z-shared-comparison/interruption-context.json"
+        }
+      ]
+    },
+    {
+      "id": "X03",
+      "attempt": "Confidence/helper initial batch overlapped VoltTracker builds; follow-up +138.18MiB swap then forced cleanup/Metal assertion",
+      "disposition_and_retry_condition": "Entire initial batch excluded, quiet batch retried unchanged; cleanup assertion is not accepted inference evidence.",
+      "evidence": [
+        {
+          "label": "Interruption receipt",
+          "path": "bench/features/20261006-m5-helper-resource-interruption.json"
+        },
+        {
+          "label": "initial writing",
+          "path": "bench/results/20261007T032352Z-m5-confidence-writing/comparison.json"
+        },
+        {
+          "label": "initial follow-up",
+          "path": "bench/results/20261007T033300Z-m5-confidence-followup/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "X04",
+      "attempt": "Earlier operation-profile baseline second launch +60.3MiB swap during build overlap",
+      "disposition_and_retry_condition": "Baseline refresh incomplete; no optimization percentage against its first clean launch. Two clean later launches completed baseline.",
+      "evidence": [
+        {
+          "label": "Operation report",
+          "path": "bench/M5-OPERATION-PROFILE.md"
+        },
+        {
+          "label": "later full baseline",
+          "path": "bench/results/20261009T042329Z-heavy-guarded-trial/REPORT.md"
+        }
+      ]
+    },
+    {
+      "id": "X05",
+      "attempt": "Full heavy trial admitted at31.85GiB, below usual34GiB; +2.625MiB swap during load",
+      "disposition_and_retry_condition": "No speed samples; target-only fallback deferred before launch. Read-only owned-model cache reset restored headroom; two normal-admission clean retries passed.",
+      "evidence": [
+        {
+          "label": "Stopped trial",
+          "path": "bench/results/20261009T041819Z-heavy-guarded-trial/trial.json"
+        },
+        {
+          "label": "complete baseline",
+          "path": "bench/results/20261009T042329Z-heavy-guarded-trial/REPORT.md"
+        }
+      ]
+    },
+    {
+      "id": "X06",
+      "attempt": "Initial8K rawJSON formatting check failed despite correct facts in fences",
+      "disposition_and_retry_condition": "Fixturev2 explicitly asks for rawJSON, unchanged strict grader; fresh complete4K/8K bracket, no pooling. Capacity not judged from partial failure alone.",
+      "evidence": [
+        {
+          "label": "Original context attempt",
+          "path": "bench/results/20261009T091833Z-context-8k/comparison.json"
+        },
+        {
+          "label": "retry",
+          "path": "bench/results/20261009T092650Z-context-8k/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "X07",
+      "attempt": "Sampling-view initial control +0.5MiB swap",
+      "disposition_and_retry_condition": "Excluded completely; full clean independentABBA accepted. Retry only after headroom settles.",
+      "evidence": [
+        {
+          "label": "Initial suite",
+          "path": "bench/results/20261009T132423Z-m5-sampling-view/comparison.json"
+        },
+        {
+          "label": "clean suite",
+          "path": "bench/results/20261009T132908Z-m5-sampling-view-clean-retry/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "X08",
+      "attempt": "Encoder0 initial control passed answers but +983040bytes/0.94MiB global swap",
+      "disposition_and_retry_condition": "Excluded by suite's zero-new-swap rule; fresh unchanged suite accepted after headroom settled. Passed run status alone does not qualify adoption.",
+      "evidence": [
+        {
+          "label": "Excluded run",
+          "path": "bench/results/20261009T171015Z-m5-encoders0-1-conv-direct/result.json"
+        },
+        {
+          "label": "stopped suite",
+          "path": "bench/results/20261009T170959Z-m5-encoders0/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "X09",
+      "attempt": "Clean encoder0 suite initially rejected in postprocessing: app logger prefixes and absent unused callback-setter events",
+      "disposition_and_retry_condition": "Preserve original rejection. Corrected parser accepts exact logger prefix/raw markers and proves null via pinned initialization/instrumented setters; analyzes same raw/source/settings without performance rerun. Any non-null callback still rejected.",
+      "evidence": [
+        {
+          "label": "Original postcheck",
+          "path": "bench/results/20261009T171405Z-m5-encoders0/comparison-postcheck-original.json"
+        },
+        {
+          "label": "corrected comparison",
+          "path": "bench/results/20261009T171405Z-m5-encoders0/comparison.json"
+        }
+      ]
+    },
+    {
+      "id": "X10",
+      "attempt": "Early gate probeSIGBUS: MetalVIEW overCPUINPUT storage",
+      "disposition_and_retry_condition": "Corrected explicit Metal leaf placement/storage validation before accepted correctness/performance. Not a model failure or usable speed result.",
+      "evidence": [
+        {
+          "label": "Final gate history",
+          "path": "bench/results/20261009-next-few/REPORT.md"
+        },
+        {
+          "label": "raw suite",
+          "path": "bench/results/20261009-next-few/REPORT.json"
+        }
+      ]
+    },
+    {
+      "id": "X11",
+      "attempt": "GroupingV1 independent graphs allowed inter-block concurrency; GDN short bracket11.43% drift",
+      "disposition_and_retry_condition": "V1 throughput not sequential latency; replace with dependent fixture. Noisy GDN timing excluded as conclusive; final sustained-warmup bracket still no qualified gain.",
+      "evidence": [
+        {
+          "label": "Grouping history",
+          "path": "bench/results/20261009T153117Z-m5-expert-pair-group/REPORT.md"
+        },
+        {
+          "label": "GDN history",
+          "path": "bench/results/20261009-next-few/REPORT.md"
+        }
+      ]
+    },
+    {
+      "id": "X12",
+      "attempt": "Copy probe same-second artifact collision; early compile/logging/trace-cap/CPU-admission failures",
+      "disposition_and_retry_condition": "Original artifacts retained/excluded. Hardened microsecond IDs and frozen probe-at-model-runs receipt distinguish accepted speed data from supplementary checks. Admission deferral starts no model.",
+      "evidence": [
+        {
+          "label": "Copy report",
+          "path": "bench/results/20261009T112641Z-m5-copy-resume/REPORT.md"
+        },
+        {
+          "label": "copy summary",
+          "path": "bench/results/20261009T112641Z-m5-copy-resume/summary.json"
+        }
+      ]
+    },
+    {
+      "id": "X13",
+      "attempt": "Embedding diagnostic first pair: clean control, candidate admission deferred while RAM settled",
+      "disposition_and_retry_condition": "Candidate loaded no model; incomplete pair excluded as comparative evidence. Preserve both receipts. Independent complete pair after ten-second pause passes; no guard or admission limit weakened. Raw log postprocessing handles byte offsets and known interleaved HTTP notices without rerunning accepted inference or using logged timings as speed evidence.",
+      "evidence": [
+        {
+          "label": "Original control",
+          "path": "bench/features/20261009T184458121799Z-m5-embedding-topology/m5-copy/capture.json"
+        },
+        {
+          "label": "deferred candidate",
+          "path": "bench/features/20261009T184458121799Z-m5-embedding-topology/m5-embedding/capture.json"
+        },
+        {
+          "label": "complete pair",
+          "path": "bench/features/20261009T184602948859Z-m5-embedding-topology/parity.json"
+        }
+      ]
+    },
+    {
+      "id": "X14",
+      "attempt": "Draft-cap diagnostic postprocessor conflated raw remaining/context budget with effective max3, then command normalization did not allow the explicit minimum0/greedy pair's position",
+      "disposition_and_retry_condition": "Preserve original off rejection and frozen runner/raw log. Separate corrected analysis verifies source/build/model/runner identity, offline/resource checks, raw/effective distinction, actual target rows and real cancellation. Canonicalize only the two explicit scope pairs. No model rerun; not a native-feature or speed regression.",
+      "evidence": [
+        {
+          "label": "Original rejected off",
+          "path": "bench/features/20261009T193100376954Z-m5-draftcap-qualification/off/capture.json"
+        },
+        {
+          "label": "corrected analysis",
+          "path": "bench/features/20261009T193100376954Z-m5-draftcap-qualification/off/reanalysis.json"
+        },
+        {
+          "label": "frozen reanalysis",
+          "path": "bench/features/20261009T193100376954Z-m5-draftcap-qualification/reanalysis-runner.py"
+        }
+      ]
+    },
+    {
+      "id": "X15",
+      "attempt": "Completed tail ABBA failed final report-path formatting after output checks: relative path passed to absolute-root relative_to",
+      "disposition_and_retry_condition": "Preserve original rejected comparison. Resolve input paths for future runs; frozen reanalysis recomputes unchanged raw summary and verifies engine/model/settings/math/outputs/allocation/traces/zero-swap evidence. No performance rerun or new source pin.",
+      "evidence": [
+        {
+          "label": "Original rejection",
+          "path": "bench/results/20261009T193647Z-m5-draftcap-tail/comparison-postcheck-original.json"
+        },
+        {
+          "label": "accepted reanalysis",
+          "path": "bench/results/20261009T193647Z-m5-draftcap-tail/comparison.json"
+        },
+        {
+          "label": "frozen analyzer",
+          "path": "bench/results/20261009T193647Z-m5-draftcap-tail/reanalysis-runner.py"
+        }
+      ]
+    },
+    {
+      "id": "X16",
+      "attempt": "Build rejected const pointers; no GPU run",
+      "disposition_and_retry_condition": "Preserved; see attempts.json and detailed ledger. Corrected fixture/build or separate cache-warm full bracket with unchanged zero-swap guard; do not count excluded attempt as a speed result.",
+      "evidence": [
+        {
+          "label": "Raw evidence",
+          "path": "bench/results/20261009-top10/build-attempt-1.log"
+        }
+      ]
+    },
+    {
+      "id": "X17",
+      "attempt": "Two-row fixture gather shape abort; no candidate/perf",
+      "disposition_and_retry_condition": "Preserved; see attempts.json and detailed ledger. Corrected fixture/build or separate cache-warm full bracket with unchanged zero-swap guard; do not count excluded attempt as a speed result.",
+      "evidence": [
+        {
+          "label": "Raw evidence",
+          "path": "bench/results/20261009-top10/20261009T205247140211Z-check-control/result.json"
+        }
+      ]
+    },
+    {
+      "id": "X18",
+      "attempt": "Cold original-model control load:524288bytes swap,0responses",
+      "disposition_and_retry_condition": "Preserved; see attempts.json and detailed ledger. Corrected fixture/build or separate cache-warm full bracket with unchanged zero-swap guard; do not count excluded attempt as a speed result.",
+      "evidence": [
+        {
+          "label": "Raw evidence",
+          "path": "bench/results/20261009T205740Z-m5-parallel-top10-1-conv-direct/result.json"
+        }
+      ]
+    },
+    {
+      "id": "X19",
+      "attempt": "Injected-score fixture made masked pools live; no candidate/TPS result; mask/cleanup corrected.",
+      "disposition_and_retry_condition": "Preserved with raw logs/source. See diagnosis and detailed ledger; no excluded timing pooled into accepted results.",
+      "evidence": [
+        {
+          "label": "Diagnosis",
+          "path": "bench/results/20261009-next-speed-pass/qsa/20261009T213413402049Z-check-control/exclusion.json"
+        }
+      ]
+    },
+    {
+      "id": "X20",
+      "attempt": "Cold original control allocated589824bytes swap;0responses, retryunchangedguard.",
+      "disposition_and_retry_condition": "Preserved with raw logs/source. See diagnosis and detailed ledger; no excluded timing pooled into accepted results.",
+      "evidence": [
+        {
+          "label": "Diagnosis",
+          "path": "bench/results/20261009T214505Z-m5-qsa-all-pools-1-conv-direct/exclusion.json"
+        }
+      ]
+    },
+    {
+      "id": "X21",
+      "attempt": "Inactive Metal-versus-MTL nativeguard; runnerinterrupted, bracketexcluded; correctedsourcefreshABBA.",
+      "disposition_and_retry_condition": "Preserved with raw logs/source. See diagnosis and detailed ledger; no excluded timing pooled into accepted results.",
+      "evidence": [
+        {
+          "label": "Diagnosis",
+          "path": "bench/results/20261009T214536Z-m5-qsa-all-pools/exclusion.json"
+        }
+      ]
+    },
+    {
+      "id": "X22",
+      "attempt": "Original-control Q2_0 weight-slice CONT unsupported;168 correctness records then native abort -6, zero new swap, candidate not executed.",
+      "disposition_and_retry_condition": "Excluded; preserve full original source/runtime/raw bundle. Replace unsupported Q2 CONT with supported strided weight views and accurately label combined shape/stride fallback. Fresh bracket, unchanged candidate/gates.",
+      "evidence": [
+        {
+          "label": "Diagnosis",
+          "path": "bench/results/20261009-compact-tiles/component-initial-excluded/exclusion.json"
+        }
+      ]
+    }
+  ],
+  "remaining_untested": [
+    "Q01 corrected QSA mask/cache/reuse and numerical-bound qualification fixture; shortcut disabled",
+    "Adaptive/mixed-cap controller and held-out policy calibration; parked until D02 extended exactness is repaired",
+    "Quantized prompt cooperative-input kernels focused on English prose and code",
+    "R05 stateless prompt checkpoint savings: source-only lifecycle card; general omission held for false-to-true slot-reuse/split correctness"
+  ],
+  "latest_verification": "bench/results/20261009-compact-tiles/final-verification.json"
+}

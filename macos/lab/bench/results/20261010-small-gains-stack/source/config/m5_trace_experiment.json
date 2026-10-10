@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "id": "m5-trace",
+  "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+  "directory": "vendor/llama-m5-trace",
+  "patch": "patches/mtp-m5-trace.patch",
+  "patch_sha256": "f68f8ac6150a3f5f00ad754a46f9fb69f3b833e031a30a6ebb5bf9168c588e00",
+  "source_diff_sha256": "f68f8ac6150a3f5f00ad754a46f9fb69f3b833e031a30a6ebb5bf9168c588e00",
+  "modified_files": [
+    "common/speculative.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.h",
+    "ggml/src/ggml-metal/ggml-metal-context.h",
+    "ggml/src/ggml-metal/ggml-metal-context.m",
+    "ggml/src/ggml-metal/ggml-metal-device.cpp",
+    "ggml/src/ggml-metal/ggml-metal.cpp",
+    "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+    "src/llama-context.cpp",
+    "src/llama-cparams.h",
+    "src/models/qwen4exp.cpp",
+    "tests/test-backend-ops.cpp",
+    "tools/server/server-context.cpp"
+  ],
+  "features": [
+    "mtp-shared",
+    "m5-tuning",
+    "m5-profile",
+    "m5-phase-profile"
+  ],
+  "components": [
+    {
+      "patch": "patches/mtp-m5-lab.patch",
+      "sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585"
+    }
+  ],
+  "scope": "Separate diagnostic build based on m5-lab. Disabled-by-default server request phases, target/helper Metal labels, original matrix shapes and helper-call wall-time intervals. No shader or math change; existing engines and pins are preserved."
+}

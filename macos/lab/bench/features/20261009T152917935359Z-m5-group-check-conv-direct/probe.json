@@ -1,0 +1,916 @@
+{
+  "status": "passed",
+  "probe": {
+    "engine": {
+      "engine": "m5-group",
+      "directory": "vendor/llama-m5-group",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "494c0f83b822266c7d88ab268d39dc4f576d52356b3f351a7e970c59bbbbdcda",
+      "patch": {
+        "schema": 1,
+        "id": "m5-group",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-group",
+        "patch": "patches/mtp-m5-group.patch",
+        "patch_sha256": "494c0f83b822266c7d88ab268d39dc4f576d52356b3f351a7e970c59bbbbdcda",
+        "source_diff_sha256": "494c0f83b822266c7d88ab268d39dc4f576d52356b3f351a7e970c59bbbbdcda",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal-device.h",
+          "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv.metal",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "ggml/src/ggml-metal/kernels/quantize.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-copy",
+          "m5-group"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-copy.patch",
+            "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+          }
+        ],
+        "scope": "Opt-in R4/R5 exact Q2_0 pair grouping. Separate original singleton and nr0=8 pair kernels, GPU-only bounded map in existing scratch, direct gather/scatter. Preserves known-exact original ordered pair arithmetic. Every per-op map/barrier/dispatch cost included, no new persistent weights or precision change.",
+        "upstream": {
+          "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+          "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+          "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        }
+      },
+      "artifacts": {
+        "llama-server": "c976f0cc89928a54f9afadb41bf293e96896ce7116870c54947f7aeccb0c7624",
+        "libggml-base.0.26.0.dylib": "e0d19bc928c78f4923c65f4f8bbf037bda4693ffc4fd05c9febea26e1230801e",
+        "libggml-base.0.dylib": "e0d19bc928c78f4923c65f4f8bbf037bda4693ffc4fd05c9febea26e1230801e",
+        "libggml-base.dylib": "e0d19bc928c78f4923c65f4f8bbf037bda4693ffc4fd05c9febea26e1230801e",
+        "libggml-blas.0.26.0.dylib": "08072d431c981356fdd9cba2355e115b99693b2f2d01fa6c8efccc4c425ec72c",
+        "libggml-blas.0.dylib": "08072d431c981356fdd9cba2355e115b99693b2f2d01fa6c8efccc4c425ec72c",
+        "libggml-blas.dylib": "08072d431c981356fdd9cba2355e115b99693b2f2d01fa6c8efccc4c425ec72c",
+        "libggml-cpu.0.26.0.dylib": "665bb6d26b208868e11328d4083d82d43f8cf59793f95f935820143d5640f6e6",
+        "libggml-cpu.0.dylib": "665bb6d26b208868e11328d4083d82d43f8cf59793f95f935820143d5640f6e6",
+        "libggml-cpu.dylib": "665bb6d26b208868e11328d4083d82d43f8cf59793f95f935820143d5640f6e6",
+        "libggml-metal.0.26.0.dylib": "cf97eb1e914ddabfad3adc50b6f05612fb0b4cb2bfaf12d20ebf4d9f4848db6b",
+        "libggml-metal.0.dylib": "cf97eb1e914ddabfad3adc50b6f05612fb0b4cb2bfaf12d20ebf4d9f4848db6b",
+        "libggml-metal.dylib": "cf97eb1e914ddabfad3adc50b6f05612fb0b4cb2bfaf12d20ebf4d9f4848db6b",
+        "libggml.0.26.0.dylib": "b519741b5d3d2b52200b65816c45f9b4ba08ce5be6ce43ea0ac6666d03816257",
+        "libggml.0.dylib": "b519741b5d3d2b52200b65816c45f9b4ba08ce5be6ce43ea0ac6666d03816257",
+        "libggml.dylib": "b519741b5d3d2b52200b65816c45f9b4ba08ce5be6ce43ea0ac6666d03816257",
+        "libllama-common.0.6.0.dylib": "6ef3a23dfd8bebef53c39a6507e953d312fc434970f86cc4bcae4a541d06ad86",
+        "libllama-common.0.dylib": "6ef3a23dfd8bebef53c39a6507e953d312fc434970f86cc4bcae4a541d06ad86",
+        "libllama-common.dylib": "6ef3a23dfd8bebef53c39a6507e953d312fc434970f86cc4bcae4a541d06ad86",
+        "libllama-server-impl.dylib": "a72799c805f5ef084732144aa6ef6add8edb75835ac1913ea54eef73dea1726f",
+        "libllama.0.6.0.dylib": "b644e4bcebaee562b78767113ea7c84bf35815a8ca467c02599e3275bc784de6",
+        "libllama.0.dylib": "b644e4bcebaee562b78767113ea7c84bf35815a8ca467c02599e3275bc784de6",
+        "libllama.dylib": "b644e4bcebaee562b78767113ea7c84bf35815a8ca467c02599e3275bc784de6",
+        "libmtmd.0.6.0.dylib": "4c4a09032e0f0895775bc2ecb11d230aee72159b6a8b711b5fd76679cd0ae301",
+        "libmtmd.0.dylib": "4c4a09032e0f0895775bc2ecb11d230aee72159b6a8b711b5fd76679cd0ae301",
+        "libmtmd.dylib": "4c4a09032e0f0895775bc2ecb11d230aee72159b6a8b711b5fd76679cd0ae301"
+      },
+      "build_receipt": {
+        "engine": "m5-group",
+        "directory": "vendor/llama-m5-group",
+        "revision": "d81235049384534c167caea52b85a694f6103d14",
+        "source_diff_sha256": "494c0f83b822266c7d88ab268d39dc4f576d52356b3f351a7e970c59bbbbdcda",
+        "patch": {
+          "schema": 1,
+          "id": "m5-group",
+          "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+          "directory": "vendor/llama-m5-group",
+          "patch": "patches/mtp-m5-group.patch",
+          "patch_sha256": "494c0f83b822266c7d88ab268d39dc4f576d52356b3f351a7e970c59bbbbdcda",
+          "source_diff_sha256": "494c0f83b822266c7d88ab268d39dc4f576d52356b3f351a7e970c59bbbbdcda",
+          "modified_files": [
+            "ggml/src/ggml-metal/ggml-metal-common.cpp",
+            "ggml/src/ggml-metal/ggml-metal-common.h",
+            "ggml/src/ggml-metal/ggml-metal-context.m",
+            "ggml/src/ggml-metal/ggml-metal-device.cpp",
+            "ggml/src/ggml-metal/ggml-metal-device.h",
+            "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+            "ggml/src/ggml-metal/kernels/mul_mv.metal",
+            "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+            "ggml/src/ggml-metal/kernels/quantize.metal",
+            "src/llama-context.cpp",
+            "src/llama-cparams.h",
+            "src/models/qwen4exp.cpp",
+            "tests/test-backend-ops.cpp"
+          ],
+          "features": [
+            "mtp-shared",
+            "m5-tuning",
+            "m5-profile",
+            "m5-copy",
+            "m5-group"
+          ],
+          "components": [
+            {
+              "patch": "patches/mtp-m5-copy.patch",
+              "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+            }
+          ],
+          "scope": "Opt-in R4/R5 exact Q2_0 pair grouping. Separate original singleton and nr0=8 pair kernels, GPU-only bounded map in existing scratch, direct gather/scatter. Preserves known-exact original ordered pair arithmetic. Every per-op map/barrier/dispatch cost included, no new persistent weights or precision change.",
+          "upstream": {
+            "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+            "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+            "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+            "license_file": "patches/LLAMA-LICENSE.txt"
+          }
+        },
+        "artifacts": {
+          "llama-server": "c976f0cc89928a54f9afadb41bf293e96896ce7116870c54947f7aeccb0c7624",
+          "libggml-base.0.26.0.dylib": "e0d19bc928c78f4923c65f4f8bbf037bda4693ffc4fd05c9febea26e1230801e",
+          "libggml-base.0.dylib": "e0d19bc928c78f4923c65f4f8bbf037bda4693ffc4fd05c9febea26e1230801e",
+          "libggml-base.dylib": "e0d19bc928c78f4923c65f4f8bbf037bda4693ffc4fd05c9febea26e1230801e",
+          "libggml-blas.0.26.0.dylib": "08072d431c981356fdd9cba2355e115b99693b2f2d01fa6c8efccc4c425ec72c",
+          "libggml-blas.0.dylib": "08072d431c981356fdd9cba2355e115b99693b2f2d01fa6c8efccc4c425ec72c",
+          "libggml-blas.dylib": "08072d431c981356fdd9cba2355e115b99693b2f2d01fa6c8efccc4c425ec72c",
+          "libggml-cpu.0.26.0.dylib": "665bb6d26b208868e11328d4083d82d43f8cf59793f95f935820143d5640f6e6",
+          "libggml-cpu.0.dylib": "665bb6d26b208868e11328d4083d82d43f8cf59793f95f935820143d5640f6e6",
+          "libggml-cpu.dylib": "665bb6d26b208868e11328d4083d82d43f8cf59793f95f935820143d5640f6e6",
+          "libggml-metal.0.26.0.dylib": "cf97eb1e914ddabfad3adc50b6f05612fb0b4cb2bfaf12d20ebf4d9f4848db6b",
+          "libggml-metal.0.dylib": "cf97eb1e914ddabfad3adc50b6f05612fb0b4cb2bfaf12d20ebf4d9f4848db6b",
+          "libggml-metal.dylib": "cf97eb1e914ddabfad3adc50b6f05612fb0b4cb2bfaf12d20ebf4d9f4848db6b",
+          "libggml.0.26.0.dylib": "b519741b5d3d2b52200b65816c45f9b4ba08ce5be6ce43ea0ac6666d03816257",
+          "libggml.0.dylib": "b519741b5d3d2b52200b65816c45f9b4ba08ce5be6ce43ea0ac6666d03816257",
+          "libggml.dylib": "b519741b5d3d2b52200b65816c45f9b4ba08ce5be6ce43ea0ac6666d03816257",
+          "libllama-common.0.6.0.dylib": "6ef3a23dfd8bebef53c39a6507e953d312fc434970f86cc4bcae4a541d06ad86",
+          "libllama-common.0.dylib": "6ef3a23dfd8bebef53c39a6507e953d312fc434970f86cc4bcae4a541d06ad86",
+          "libllama-common.dylib": "6ef3a23dfd8bebef53c39a6507e953d312fc434970f86cc4bcae4a541d06ad86",
+          "libllama-server-impl.dylib": "a72799c805f5ef084732144aa6ef6add8edb75835ac1913ea54eef73dea1726f",
+          "libllama.0.6.0.dylib": "b644e4bcebaee562b78767113ea7c84bf35815a8ca467c02599e3275bc784de6",
+          "libllama.0.dylib": "b644e4bcebaee562b78767113ea7c84bf35815a8ca467c02599e3275bc784de6",
+          "libllama.dylib": "b644e4bcebaee562b78767113ea7c84bf35815a8ca467c02599e3275bc784de6",
+          "libmtmd.0.6.0.dylib": "4c4a09032e0f0895775bc2ecb11d230aee72159b6a8b711b5fd76679cd0ae301",
+          "libmtmd.0.dylib": "4c4a09032e0f0895775bc2ecb11d230aee72159b6a8b711b5fd76679cd0ae301",
+          "libmtmd.dylib": "4c4a09032e0f0895775bc2ecb11d230aee72159b6a8b711b5fd76679cd0ae301"
+        },
+        "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+        "build_settings": {
+          "CMAKE_BUILD_TYPE": "Release",
+          "GGML_BLAS": "ON",
+          "GGML_CPU": "ON",
+          "GGML_METAL": "ON",
+          "GGML_METAL_EMBED_LIBRARY": "ON",
+          "GGML_NATIVE": "ON",
+          "LLAMA_BUILD_TESTS": "ON",
+          "LLAMA_BUILD_TOOLS": "ON"
+        },
+        "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+      }
+    },
+    "source_sha256": "43955749653181508503371290c331ed5e6223f8b903a134a738907320bab864",
+    "runner_sha256": "40933cd14e67f339546e8341d063347805ba80f822a95655a0ab80e929fea781",
+    "fixture_sha256": "39eb096d5cecd530485f695ef21b671b58a719be7633c992f8fdb2bf619744f5",
+    "binary_sha256": "b6eb72ab6b34aab10becc9682c03e4363ebcec833c6f0b5588d86f8fa564c4fa",
+    "command": [
+      "/usr/bin/c++",
+      "-O3",
+      "-ffp-contract=off",
+      "-std=gnu++17",
+      "-arch",
+      "arm64",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-group/ggml/include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-group/vendor",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/native/m5_group_probe.cpp",
+      "-o",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-group/group-probe",
+      "-Wl,-rpath,/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-group/build/bin",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-group/build/bin/libggml.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-group/build/bin/libggml-base.0.26.0.dylib"
+    ]
+  },
+  "mode": "check",
+  "metal_environment": {
+    "tensor_api": "on",
+    "tuning": "conv-direct",
+    "profile": false,
+    "variables": {
+      "GGML_M5_LAB_CONV_DIRECT": "1",
+      "GGML_METAL_TENSOR_ENABLE": "1",
+      "GGML_M5_LAB_GROUP_TRACE": "1"
+    }
+  },
+  "models_loaded": false,
+  "tps_measured": false,
+  "scope": "Eight sequential gate/up/SwiGLU/down triplets with weighted expert reduction and residual per triplet. All maps, barriers and bridge cost included; two distinct full512 weight sets and eight actual routes per real graph. No callbacks or perf diagnostics. Operator times are not model TPS.",
+  "memory": {
+    "guard": null,
+    "monitor_healthy": true,
+    "monitor_error": null,
+    "samples": 115,
+    "live_samples": 113,
+    "baseline_before_launch": true,
+    "child_exited": true,
+    "launch_baseline": {
+      "swap_used_bytes": 523370496,
+      "available_bytes": 38720438272
+    },
+    "peak_rss_bytes": 4810276864,
+    "minimum_available_bytes": 34685960192,
+    "peak_swap_bytes": 523370496,
+    "swap_growth_bytes": 0,
+    "system_disk_read_bytes": 344064,
+    "sampling_interval_s": 0.25,
+    "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+  },
+  "cases": [
+    {
+      "cpu_nmse": 2.992198166983757e-14,
+      "distinct_experts": [
+        10
+      ],
+      "elements": 38400,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.3737442056415148e-07,
+      "route": "distinct",
+      "route_index": 0,
+      "rows": 1,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 505.708
+    },
+    {
+      "cpu_nmse": 2.936171953613681e-14,
+      "distinct_experts": [
+        20
+      ],
+      "elements": 76800,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.5304836537287656e-07,
+      "route": "distinct",
+      "route_index": 0,
+      "rows": 2,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 959.167
+    },
+    {
+      "cpu_nmse": 3.59195122534704e-14,
+      "distinct_experts": [
+        30
+      ],
+      "elements": 115200,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.5991261409785693e-07,
+      "route": "distinct",
+      "route_index": 0,
+      "rows": 3,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1273.833
+    },
+    {
+      "cpu_nmse": 3.0496928243071225e-14,
+      "distinct_experts": [
+        60
+      ],
+      "elements": 230400,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.7654375639452056e-07,
+      "route": "distinct",
+      "route_index": 0,
+      "rows": 6,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1129.5
+    },
+    {
+      "cpu_nmse": 3.184245724675874e-14,
+      "distinct_experts": [
+        14
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 3.067699703152016e-07,
+      "route": "real",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1516.167
+    },
+    {
+      "cpu_nmse": 3.19111424781952e-14,
+      "distinct_experts": [
+        22
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 3.1255133858820727e-07,
+      "route": "real",
+      "route_index": 1,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1502.458
+    },
+    {
+      "cpu_nmse": 3.212584614080574e-14,
+      "distinct_experts": [
+        24
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.914020535982331e-07,
+      "route": "real",
+      "route_index": 2,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1513.208
+    },
+    {
+      "cpu_nmse": 3.21282717202299e-14,
+      "distinct_experts": [
+        26
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.735184674307334e-07,
+      "route": "real",
+      "route_index": 3,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1588.75
+    },
+    {
+      "cpu_nmse": 3.163576921532561e-14,
+      "distinct_experts": [
+        28
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 3.0515603732794716e-07,
+      "route": "real",
+      "route_index": 4,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1578.584
+    },
+    {
+      "cpu_nmse": 3.1965411034336674e-14,
+      "distinct_experts": [
+        30
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.9169907822534924e-07,
+      "route": "real",
+      "route_index": 5,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1616.625
+    },
+    {
+      "cpu_nmse": 3.21129905061413e-14,
+      "distinct_experts": [
+        33
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.716450406836657e-07,
+      "route": "real",
+      "route_index": 6,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1485.0
+    },
+    {
+      "cpu_nmse": 3.161450915671085e-14,
+      "distinct_experts": [
+        40
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.8658504014345e-07,
+      "route": "real",
+      "route_index": 7,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1500.75
+    },
+    {
+      "cpu_nmse": 3.1716130572722956e-14,
+      "distinct_experts": [
+        40
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.5991261409785693e-07,
+      "route": "distinct",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1500.083
+    },
+    {
+      "cpu_nmse": 3.250202361285116e-14,
+      "distinct_experts": [
+        10
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.71984752053811e-07,
+      "route": "shared",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1480.167
+    },
+    {
+      "cpu_nmse": 3.271847645182616e-14,
+      "distinct_experts": [
+        1
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.797085492112217e-07,
+      "route": "duplicate",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1517.666
+    },
+    {
+      "cpu_nmse": 3.2129777604265415e-14,
+      "distinct_experts": [
+        25
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.71984752053811e-07,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1542.667
+    },
+    {
+      "cpu_nmse": 3.2129777604265415e-14,
+      "distinct_experts": [
+        25
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "input-strided",
+      "max_absolute_error": 2.71984752053811e-07,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1431.667
+    },
+    {
+      "cpu_nmse": 3.2129777604265415e-14,
+      "distinct_experts": [
+        25
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "ids-contiguous",
+      "max_absolute_error": 2.71984752053811e-07,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1481.709
+    },
+    {
+      "cpu_nmse": 3.2129777604265415e-14,
+      "distinct_experts": [
+        25
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "ids-offset",
+      "max_absolute_error": 2.71984752053811e-07,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1495.75
+    },
+    {
+      "cpu_nmse": 3.204104425374727e-14,
+      "distinct_experts": [
+        25
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "weights-strided",
+      "max_absolute_error": 2.9574419180278255e-07,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1472.209
+    },
+    {
+      "cpu_nmse": 2.6553447546163038e-14,
+      "distinct_experts": [
+        25
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "cancel",
+      "max_absolute_error": 3.878449206240475e-07,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1468.041
+    },
+    {
+      "cpu_nmse": 2.4725704153160793e-14,
+      "distinct_experts": [
+        25
+      ],
+      "elements": 153600,
+      "input_ids_preserved": true,
+      "layout": "wide",
+      "max_absolute_error": 2.499925686194615e-05,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1470.208
+    },
+    {
+      "cpu_nmse": 3.293709259154451e-14,
+      "distinct_experts": [
+        13
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.989888479021374e-07,
+      "route": "real",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1481.208
+    },
+    {
+      "cpu_nmse": 3.31739647520516e-14,
+      "distinct_experts": [
+        26
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 3.067699703152016e-07,
+      "route": "real",
+      "route_index": 1,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1323.625
+    },
+    {
+      "cpu_nmse": 3.311252376856909e-14,
+      "distinct_experts": [
+        29
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.9025725822862114e-07,
+      "route": "real",
+      "route_index": 2,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1365.5
+    },
+    {
+      "cpu_nmse": 3.326256624911095e-14,
+      "distinct_experts": [
+        31
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 3.116148983295375e-07,
+      "route": "real",
+      "route_index": 3,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1468.542
+    },
+    {
+      "cpu_nmse": 3.334350841019966e-14,
+      "distinct_experts": [
+        34
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.9169907822534924e-07,
+      "route": "real",
+      "route_index": 4,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1543.417
+    },
+    {
+      "cpu_nmse": 3.365203029589957e-14,
+      "distinct_experts": [
+        36
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.989888479021374e-07,
+      "route": "real",
+      "route_index": 5,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1449.125
+    },
+    {
+      "cpu_nmse": 3.335293185126759e-14,
+      "distinct_experts": [
+        40
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.998392032438346e-07,
+      "route": "real",
+      "route_index": 6,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1564.708
+    },
+    {
+      "cpu_nmse": 3.3360612294487045e-14,
+      "distinct_experts": [
+        50
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.9620588870571396e-07,
+      "route": "real",
+      "route_index": 7,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 977.792
+    },
+    {
+      "cpu_nmse": 3.292413235868148e-14,
+      "distinct_experts": [
+        50
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.7654375639452056e-07,
+      "route": "distinct",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1782.625
+    },
+    {
+      "cpu_nmse": 3.37046065046285e-14,
+      "distinct_experts": [
+        10
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.9025725822862114e-07,
+      "route": "shared",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1425.875
+    },
+    {
+      "cpu_nmse": 3.378511275577159e-14,
+      "distinct_experts": [
+        1
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.797085492112217e-07,
+      "route": "duplicate",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1621.833
+    },
+    {
+      "cpu_nmse": 3.3330959489167314e-14,
+      "distinct_experts": [
+        30
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "plain",
+      "max_absolute_error": 2.9025725822862114e-07,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1707.167
+    },
+    {
+      "cpu_nmse": 3.3330959489167314e-14,
+      "distinct_experts": [
+        30
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "input-strided",
+      "max_absolute_error": 2.9025725822862114e-07,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1878.0
+    },
+    {
+      "cpu_nmse": 3.3330959489167314e-14,
+      "distinct_experts": [
+        30
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "ids-contiguous",
+      "max_absolute_error": 2.9025725822862114e-07,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1514.416
+    },
+    {
+      "cpu_nmse": 3.3330959489167314e-14,
+      "distinct_experts": [
+        30
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "ids-offset",
+      "max_absolute_error": 2.9025725822862114e-07,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1413.917
+    },
+    {
+      "cpu_nmse": 3.340700862110528e-14,
+      "distinct_experts": [
+        30
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "weights-strided",
+      "max_absolute_error": 2.9574419180278255e-07,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1438.125
+    },
+    {
+      "cpu_nmse": 2.6468092515775987e-14,
+      "distinct_experts": [
+        30
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "cancel",
+      "max_absolute_error": 3.878449206240475e-07,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1683.416
+    },
+    {
+      "cpu_nmse": 2.5298233756119003e-14,
+      "distinct_experts": [
+        30
+      ],
+      "elements": 192000,
+      "input_ids_preserved": true,
+      "layout": "wide",
+      "max_absolute_error": 2.8000824443097372e-05,
+      "route": "mixed",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 1,
+      "wall_us_per_triplet": 1922.625
+    },
+    {
+      "cpu_nmse": 2.470497459521935e-14,
+      "distinct_experts": [
+        14,
+        22,
+        24,
+        26,
+        28,
+        30,
+        33,
+        40
+      ],
+      "elements": 1228800,
+      "input_ids_preserved": true,
+      "layout": "chain",
+      "max_absolute_error": 3.067699703152016e-07,
+      "route": "real",
+      "route_index": 0,
+      "rows": 4,
+      "samples": 1,
+      "triplets_per_graph": 8,
+      "wall_us_per_triplet": 297.7865
+    },
+    {
+      "cpu_nmse": 2.97828214978218e-14,
+      "distinct_experts": [
+        13,
+        26,
+        29,
+        31,
+        34,
+        36,
+        40,
+        50
+      ],
+      "elements": 1536000,
+      "input_ids_preserved": true,
+      "layout": "chain",
+      "max_absolute_error": 3.0503878534204887e-07,
+      "route": "real",
+      "route_index": 0,
+      "rows": 5,
+      "samples": 1,
+      "triplets_per_graph": 8,
+      "wall_us_per_triplet": 364.140625
+    }
+  ],
+  "outputs_sha256": "57f9c619e4c98a898b22c782d2ca9dd5b7025c67465915dde8447f6d6edb9e64"
+}

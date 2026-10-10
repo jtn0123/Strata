@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "created_utc": "2026-10-09T23:40:30.606604+00:00",
+  "experiment": "R03 compact expert/token tiles",
+  "control": "m5-copy/conv-direct",
+  "candidate": "m5-compact/compact-tiles",
+  "independent_of": [
+    "P10 route-map reuse",
+    "Q02 QSA ranking",
+    "top10"
+  ],
+  "component_gate": {
+    "t508_t512_uniform_two_complete_blocks_minimum_percent_faster": 10,
+    "comparison": "strictly greater than threshold AND twice absolute own control drift",
+    "exact_all_checked_f32_outputs": true,
+    "full_synced_Metal_no_callback": true,
+    "no_new_swap": true,
+    "fresh_order": [
+      "control",
+      "candidate",
+      "candidate",
+      "control"
+    ]
+  },
+  "model_trial": "Only if component gate passes, then real English code/prose, first-token and whole reply matched fresh bracket; no single-token TPS gain assumed",
+  "defaults_changed": false,
+  "previous_results": "../20261009-next-speed-pass/REPORT.md",
+  "before_sha256": {
+    "scripts/engines.py": "e38ebf1f080f997d2f7a041e997e866a44c1fad60a1fc12df62a458cfd3a35bc",
+    "scripts/metal_environment.py": "612bdcb37724d5a543d36dda0b5085afebf553f1bd0d05aafd5e6a3b6830820d",
+    "scripts/prepare_m5.py": "f5ed9bdb0d87037b05995e8eecff60162b9f06d81c709dfc7ef4508ff35a13cd",
+    "scripts/verify_m5.py": "04dd3775c38f7125a14cee370e09dee680d68b333347e823d3070ec176f7a662",
+    "config/offline_tests.json": "80f68e6abc8c666ea6909f18857f0adaf94b0a08e4ac6ddec2b35b624481c223",
+    "scripts/benchmark_m5_route_map.py": "a259c733b6eb147222c9fac6d3e67bef1dd643d26fe79a7a4c9443d5d1506a70",
+    "native/m5_route_map_probe.cpp": "70388e942d74772836acc67ac2b27986e6ef2dca4dd6cefb68c86a22f8079b95",
+    "bench/M5-NEXT.md": "97b53bf7ef2438dd3651c57e45a210bd09b2905f8c51219fc9e7b9d594181a91",
+    "bench/EXPERIMENT-LEDGER.md": "2d90ac89b793e3a0c4b857fd777bcbd170d9fe43a5729845dae9897d471efeaa",
+    "bench/experiment-ledger.json": "94389dabc84f2466e3343c366d4c5f9c04dbc5e979b17724d2bdb5eb3fe4f5ca"
+  },
+  "original_engine_count": 24,
+  "model_workloads": {
+    "file": "config/m5_compact_workloads.json",
+    "description": "Practical English scheduler code review and performance incident analysis, complete context rather than repeated token filler; own fresh controls required",
+    "context": 4096,
+    "output_tokens": 256,
+    "temperature": 0.6,
+    "seed": 1234,
+    "cached_ledger_retained": true
+  },
+  "model_metric_gates": {
+    "general_tps_adoption": "Existing >=1% TPS and whole reply gain on both real English tasks above each own absolute control drift",
+    "prompt_latency_candidate": "At least1% TTFT gain on BOTH contextual English code/prose, each above twice absolute TTFT control drift; whole reply must improve above its own absolute drift, no material TPS regression (>=1% beyond drift); exact tested outputs and no new swap. Separate latency decision, never relabel as decode TPS gain."
+  }
+}

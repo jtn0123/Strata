@@ -1,0 +1,241 @@
+{
+  "schema": 1,
+  "kind": "m5-synthetic-correctness",
+  "status": "passed",
+  "engine": {
+    "engine": "m5-route-map",
+    "directory": "vendor/llama-m5-route-map",
+    "revision": "d81235049384534c167caea52b85a694f6103d14",
+    "source_diff_sha256": "55117924d185e4ee5cdad9f89b11086a7552736725b570b8d1164cecdaa42cfb",
+    "patch": {
+      "schema": 1,
+      "id": "m5-route-map",
+      "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+      "directory": "vendor/llama-m5-route-map",
+      "patch": "patches/mtp-m5-route-map.patch",
+      "patch_sha256": "55117924d185e4ee5cdad9f89b11086a7552736725b570b8d1164cecdaa42cfb",
+      "source_diff_sha256": "55117924d185e4ee5cdad9f89b11086a7552736725b570b8d1164cecdaa42cfb",
+      "modified_files": [
+        "ggml/src/ggml-metal/ggml-metal-common.cpp",
+        "ggml/src/ggml-metal/ggml-metal-common.h",
+        "ggml/src/ggml-metal/ggml-metal-context.m",
+        "ggml/src/ggml-metal/ggml-metal-device.cpp",
+        "ggml/src/ggml-metal/ggml-metal-device.h",
+        "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+        "ggml/src/ggml-metal/ggml-metal-ops.h",
+        "ggml/src/ggml-metal/ggml-metal.cpp",
+        "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+        "ggml/src/ggml-metal/kernels/quantize.metal",
+        "src/llama-context.cpp",
+        "src/llama-cparams.h",
+        "src/models/qwen4exp.cpp",
+        "tests/test-backend-ops.cpp"
+      ],
+      "features": [
+        "mtp-shared",
+        "m5-tuning",
+        "m5-profile",
+        "m5-copy",
+        "m5-route-map"
+      ],
+      "components": [
+        {
+          "patch": "patches/mtp-m5-copy.patch",
+          "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+        }
+      ],
+      "scope": "Private opt-in M5Pro prompt gate/up pair route-map reuse. Same activation/ID objects, Q2_0[2560,640,512], T32..512, same encoder partition and following SwiGLU consumes both. Borrow only previous TPE/IDS scratch; current amax unchanged. Complete allocation overlap guard and post-barrier scratch tracking. No shader math, graph reorder, model/cache/precision/default changes.",
+      "upstream": {
+        "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+        "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+        "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+        "license_file": "patches/LLAMA-LICENSE.txt"
+      }
+    },
+    "artifacts": {
+      "llama-server": "5c0a8e2913a6452e91f9aaa4b3f8c8ba8d9504c1322d2df142d7268444919094",
+      "libggml-base.0.26.0.dylib": "b36f444ead03bb061ef06dfe05f006cd74ac354f60489743e38ad896223b3a23",
+      "libggml-base.0.dylib": "b36f444ead03bb061ef06dfe05f006cd74ac354f60489743e38ad896223b3a23",
+      "libggml-base.dylib": "b36f444ead03bb061ef06dfe05f006cd74ac354f60489743e38ad896223b3a23",
+      "libggml-blas.0.26.0.dylib": "c52c1d37f68690d6472adefcfdb11eed3d1635f4488d089daffa226001b54b60",
+      "libggml-blas.0.dylib": "c52c1d37f68690d6472adefcfdb11eed3d1635f4488d089daffa226001b54b60",
+      "libggml-blas.dylib": "c52c1d37f68690d6472adefcfdb11eed3d1635f4488d089daffa226001b54b60",
+      "libggml-cpu.0.26.0.dylib": "be7d03901e2ae544db33797cdd2f8d267ad2f42116814fa6bebf85568d5626f5",
+      "libggml-cpu.0.dylib": "be7d03901e2ae544db33797cdd2f8d267ad2f42116814fa6bebf85568d5626f5",
+      "libggml-cpu.dylib": "be7d03901e2ae544db33797cdd2f8d267ad2f42116814fa6bebf85568d5626f5",
+      "libggml-metal.0.26.0.dylib": "3dc84bf0110a223e6e4da2e1ba75c3d02747a575a02eb1b5bdc4be564aff27cd",
+      "libggml-metal.0.dylib": "3dc84bf0110a223e6e4da2e1ba75c3d02747a575a02eb1b5bdc4be564aff27cd",
+      "libggml-metal.dylib": "3dc84bf0110a223e6e4da2e1ba75c3d02747a575a02eb1b5bdc4be564aff27cd",
+      "libggml.0.26.0.dylib": "814d4c3520af9f4bdb286aa358e05da6fddcc17f7668f61a43612901a5008b56",
+      "libggml.0.dylib": "814d4c3520af9f4bdb286aa358e05da6fddcc17f7668f61a43612901a5008b56",
+      "libggml.dylib": "814d4c3520af9f4bdb286aa358e05da6fddcc17f7668f61a43612901a5008b56",
+      "libllama-common.0.6.0.dylib": "7af2972d58b03f42c3938b8045343687fdb31a8d51182ccbe10951f9e29b0062",
+      "libllama-common.0.dylib": "7af2972d58b03f42c3938b8045343687fdb31a8d51182ccbe10951f9e29b0062",
+      "libllama-common.dylib": "7af2972d58b03f42c3938b8045343687fdb31a8d51182ccbe10951f9e29b0062",
+      "libllama-server-impl.dylib": "d0e52abc493768d2a03e489d19e9b9c08688244c7bce3a7dba504dc039b5092b",
+      "libllama.0.6.0.dylib": "2828ebd2bb4335e062420aa0e723e613f2ff0113ea8749dc81b7472efee00355",
+      "libllama.0.dylib": "2828ebd2bb4335e062420aa0e723e613f2ff0113ea8749dc81b7472efee00355",
+      "libllama.dylib": "2828ebd2bb4335e062420aa0e723e613f2ff0113ea8749dc81b7472efee00355",
+      "libmtmd.0.6.0.dylib": "b2b57d08a4b4eeb642b5671a6aa3e9dc7d54b5a1dc50f995e683a7c48c0da052",
+      "libmtmd.0.dylib": "b2b57d08a4b4eeb642b5671a6aa3e9dc7d54b5a1dc50f995e683a7c48c0da052",
+      "libmtmd.dylib": "b2b57d08a4b4eeb642b5671a6aa3e9dc7d54b5a1dc50f995e683a7c48c0da052"
+    },
+    "build_receipt": {
+      "engine": "m5-route-map",
+      "directory": "vendor/llama-m5-route-map",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "55117924d185e4ee5cdad9f89b11086a7552736725b570b8d1164cecdaa42cfb",
+      "patch": {
+        "schema": 1,
+        "id": "m5-route-map",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-route-map",
+        "patch": "patches/mtp-m5-route-map.patch",
+        "patch_sha256": "55117924d185e4ee5cdad9f89b11086a7552736725b570b8d1164cecdaa42cfb",
+        "source_diff_sha256": "55117924d185e4ee5cdad9f89b11086a7552736725b570b8d1164cecdaa42cfb",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal-device.h",
+          "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+          "ggml/src/ggml-metal/ggml-metal-ops.h",
+          "ggml/src/ggml-metal/ggml-metal.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "ggml/src/ggml-metal/kernels/quantize.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-copy",
+          "m5-route-map"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-copy.patch",
+            "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+          }
+        ],
+        "scope": "Private opt-in M5Pro prompt gate/up pair route-map reuse. Same activation/ID objects, Q2_0[2560,640,512], T32..512, same encoder partition and following SwiGLU consumes both. Borrow only previous TPE/IDS scratch; current amax unchanged. Complete allocation overlap guard and post-barrier scratch tracking. No shader math, graph reorder, model/cache/precision/default changes.",
+        "upstream": {
+          "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+          "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+          "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        }
+      },
+      "artifacts": {
+        "llama-server": "5c0a8e2913a6452e91f9aaa4b3f8c8ba8d9504c1322d2df142d7268444919094",
+        "libggml-base.0.26.0.dylib": "b36f444ead03bb061ef06dfe05f006cd74ac354f60489743e38ad896223b3a23",
+        "libggml-base.0.dylib": "b36f444ead03bb061ef06dfe05f006cd74ac354f60489743e38ad896223b3a23",
+        "libggml-base.dylib": "b36f444ead03bb061ef06dfe05f006cd74ac354f60489743e38ad896223b3a23",
+        "libggml-blas.0.26.0.dylib": "c52c1d37f68690d6472adefcfdb11eed3d1635f4488d089daffa226001b54b60",
+        "libggml-blas.0.dylib": "c52c1d37f68690d6472adefcfdb11eed3d1635f4488d089daffa226001b54b60",
+        "libggml-blas.dylib": "c52c1d37f68690d6472adefcfdb11eed3d1635f4488d089daffa226001b54b60",
+        "libggml-cpu.0.26.0.dylib": "be7d03901e2ae544db33797cdd2f8d267ad2f42116814fa6bebf85568d5626f5",
+        "libggml-cpu.0.dylib": "be7d03901e2ae544db33797cdd2f8d267ad2f42116814fa6bebf85568d5626f5",
+        "libggml-cpu.dylib": "be7d03901e2ae544db33797cdd2f8d267ad2f42116814fa6bebf85568d5626f5",
+        "libggml-metal.0.26.0.dylib": "3dc84bf0110a223e6e4da2e1ba75c3d02747a575a02eb1b5bdc4be564aff27cd",
+        "libggml-metal.0.dylib": "3dc84bf0110a223e6e4da2e1ba75c3d02747a575a02eb1b5bdc4be564aff27cd",
+        "libggml-metal.dylib": "3dc84bf0110a223e6e4da2e1ba75c3d02747a575a02eb1b5bdc4be564aff27cd",
+        "libggml.0.26.0.dylib": "814d4c3520af9f4bdb286aa358e05da6fddcc17f7668f61a43612901a5008b56",
+        "libggml.0.dylib": "814d4c3520af9f4bdb286aa358e05da6fddcc17f7668f61a43612901a5008b56",
+        "libggml.dylib": "814d4c3520af9f4bdb286aa358e05da6fddcc17f7668f61a43612901a5008b56",
+        "libllama-common.0.6.0.dylib": "7af2972d58b03f42c3938b8045343687fdb31a8d51182ccbe10951f9e29b0062",
+        "libllama-common.0.dylib": "7af2972d58b03f42c3938b8045343687fdb31a8d51182ccbe10951f9e29b0062",
+        "libllama-common.dylib": "7af2972d58b03f42c3938b8045343687fdb31a8d51182ccbe10951f9e29b0062",
+        "libllama-server-impl.dylib": "d0e52abc493768d2a03e489d19e9b9c08688244c7bce3a7dba504dc039b5092b",
+        "libllama.0.6.0.dylib": "2828ebd2bb4335e062420aa0e723e613f2ff0113ea8749dc81b7472efee00355",
+        "libllama.0.dylib": "2828ebd2bb4335e062420aa0e723e613f2ff0113ea8749dc81b7472efee00355",
+        "libllama.dylib": "2828ebd2bb4335e062420aa0e723e613f2ff0113ea8749dc81b7472efee00355",
+        "libmtmd.0.6.0.dylib": "b2b57d08a4b4eeb642b5671a6aa3e9dc7d54b5a1dc50f995e683a7c48c0da052",
+        "libmtmd.0.dylib": "b2b57d08a4b4eeb642b5671a6aa3e9dc7d54b5a1dc50f995e683a7c48c0da052",
+        "libmtmd.dylib": "b2b57d08a4b4eeb642b5671a6aa3e9dc7d54b5a1dc50f995e683a7c48c0da052"
+      },
+      "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+      "build_settings": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GGML_BLAS": "ON",
+        "GGML_CPU": "ON",
+        "GGML_METAL": "ON",
+        "GGML_METAL_EMBED_LIBRARY": "ON",
+        "GGML_NATIVE": "ON",
+        "LLAMA_BUILD_TESTS": "ON",
+        "LLAMA_BUILD_TOOLS": "ON"
+      },
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+    }
+  },
+  "tester_sha256": "504bb5f8e424bebd41b8be6dc40e44f376496e3970d89e073e454b819c219418",
+  "metal_environment": {
+    "tensor_api": "on",
+    "tuning": "route-map",
+    "profile": false,
+    "variables": {
+      "GGML_M5_LAB_CONV_DIRECT": "1",
+      "GGML_M5_LAB_ROUTE_MAP": "1",
+      "GGML_METAL_TENSOR_ENABLE": "1"
+    }
+  },
+  "params": "type_a=(q2_0|q3_K|bf16|iq4_nl|iq4_xs|q5_K),type_b=f32,.*n=(1|2|3|4|5|6|7|8|9|13|16|32),",
+  "models_loaded": false,
+  "timings_excluded_from_speed_results": true,
+  "check": {
+    "name": "math",
+    "command": [
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-route-map/build/bin/test-backend-ops",
+      "test",
+      "-b",
+      "MTL0",
+      "-o",
+      "MUL_MAT,MUL_MAT_ID",
+      "-p",
+      "type_a=(q2_0|q3_K|bf16|iq4_nl|iq4_xs|q5_K),type_b=f32,.*n=(1|2|3|4|5|6|7|8|9|13|16|32),",
+      "-j",
+      "1"
+    ],
+    "passed": true,
+    "counts": [
+      [
+        572,
+        572
+      ]
+    ],
+    "exit_code": 0,
+    "peak_rss_bytes": 324059136,
+    "system_swap_growth_bytes": 0,
+    "guard": null
+  },
+  "residual_check": {
+    "name": "fused-residual",
+    "command": [
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-route-map/build/bin/test-backend-ops",
+      "test",
+      "-b",
+      "MTL0",
+      "-o",
+      "MUL_MAT_ADD",
+      "-p",
+      "n=(1|2|3|4|5|8|32),.*mode=mm2\\+mm",
+      "-j",
+      "1"
+    ],
+    "passed": true,
+    "counts": [
+      [
+        16,
+        16
+      ]
+    ],
+    "exit_code": 0,
+    "peak_rss_bytes": 99696640,
+    "system_swap_growth_bytes": 0,
+    "guard": null
+  }
+}

@@ -1,0 +1,370 @@
+diff --git a/ggml/src/ggml-metal/ggml-metal-common.cpp b/ggml/src/ggml-metal/ggml-metal-common.cpp
+index 8b065f5..693126a 100644
+--- a/ggml/src/ggml-metal/ggml-metal-common.cpp
++++ b/ggml/src/ggml-metal/ggml-metal-common.cpp
+@@ -5,6 +5,7 @@
+ #include "ggml-impl.h"
+ #include "ggml-backend-impl.h"
+ 
++#include <cstdlib>
+ #include <vector>
+ 
+ // must stay in sync with the kernel_fwht_<type>_<N> templates in misc.metal. Widths up to
+@@ -80,6 +81,22 @@ static bool ggml_metal_mul_mv_mma_type_supported(enum ggml_type type) {
+         case GGML_TYPE_Q4_K:
+         case GGML_TYPE_Q5_K:
+         case GGML_TYPE_Q6_K:
++        case GGML_TYPE_BF16:
++        case GGML_TYPE_Q1_0:
++        case GGML_TYPE_Q2_0:
++        case GGML_TYPE_MXFP4:
++        case GGML_TYPE_Q2_K:
++        case GGML_TYPE_Q3_K:
++        case GGML_TYPE_IQ2_XXS:
++        case GGML_TYPE_IQ2_XS:
++        case GGML_TYPE_IQ2_S:
++        case GGML_TYPE_IQ3_XXS:
++        case GGML_TYPE_IQ3_S:
++        case GGML_TYPE_IQ1_S:
++        case GGML_TYPE_IQ1_M:
++        case GGML_TYPE_IQ4_NL:
++        case GGML_TYPE_IQ4_XS:
++        case GGML_TYPE_TQ2_0:
+             return true;
+         default:
+             return false;
+@@ -101,14 +118,36 @@ static bool ggml_metal_mul_mat_mma_type_ok(const struct ggml_tensor * op) {
+ }
+ 
+ // the fewest src1 rows at which the few-row MMA kernels beat the mat-vec kernels (measured on an M3 Ultra)
++int ggml_metal_m5_lab_int(const char * name, int fallback, int minimum, int maximum) {
++    const char * value = std::getenv(name);
++    if (!value) {
++        return fallback;
++    }
++    char * end = nullptr;
++    const long result = std::strtol(value, &end, 10);
++    GGML_ASSERT(end != value && *end == '\0' && result >= minimum && result <= maximum);
++    return (int) result;
++}
++
+ static int64_t ggml_metal_mul_mv_mma_rows_min(enum ggml_type type) {
++    static const int bf16_min = ggml_metal_m5_lab_int("GGML_M5_LAB_BF16_MIN_ROWS", 4, 1, 16);
++    static const int q2_min = ggml_metal_m5_lab_int("GGML_M5_LAB_Q2_MIN_ROWS", 3, 1, 16);
+     switch (type) {
+         case GGML_TYPE_F32:
+             return 6;
++        case GGML_TYPE_TQ2_0:
++            return 5;
++        case GGML_TYPE_BF16:
++            return bf16_min;
++        case GGML_TYPE_Q2_0:
++            return q2_min;
+         case GGML_TYPE_F16:
+         case GGML_TYPE_Q4_K:
+         case GGML_TYPE_Q5_0:
+         case GGML_TYPE_Q5_1:
++        case GGML_TYPE_Q2_K:
++        case GGML_TYPE_IQ4_NL:
++        case GGML_TYPE_MXFP4:
+             return 3;
+         default:
+             return 2;
+diff --git a/ggml/src/ggml-metal/ggml-metal-common.h b/ggml/src/ggml-metal/ggml-metal-common.h
+index c86d92b..dc05854 100644
+--- a/ggml/src/ggml-metal/ggml-metal-common.h
++++ b/ggml/src/ggml-metal/ggml-metal-common.h
+@@ -65,6 +65,8 @@ enum ggml_metal_mma_kind ggml_metal_mul_mv_mma_kind(enum ggml_type type, int rt)
+ // the src1 tiles of the few-row MMA kernels for mat-mul op: one 8-row tile, or two above 8 rows
+ int ggml_metal_mul_mv_mma_rt(const struct ggml_tensor * op);
+ 
++int ggml_metal_m5_lab_int(const char * name, int fallback, int minimum, int maximum);
++
+ // the weights of K per simdgroup step of the few-row MMA kernel for a src0 type and rt src1 tiles, 0 if none takes the type
+ int64_t ggml_metal_mul_mv_mma_k_step(enum ggml_type type, int rt);
+ 
+diff --git a/ggml/src/ggml-metal/ggml-metal-context.m b/ggml/src/ggml-metal/ggml-metal-context.m
+index e906466..6a3b944 100644
+--- a/ggml/src/ggml-metal/ggml-metal-context.m
++++ b/ggml/src/ggml-metal/ggml-metal-context.m
+@@ -42,6 +42,8 @@
+     bool use_graph_optimize;
+ 
+     int debug_graph;
++    bool m5_lab_profile;
++    uint64_t m5_lab_graph_id;
+ 
+     struct ggml_metal_fusion_info * finfo;
+ 
+@@ -140,6 +142,7 @@ ggml_metal_t ggml_metal_init(ggml_metal_device_t dev) {
+         res->d_queue = dispatch_queue_create("ggml-metal", DISPATCH_QUEUE_CONCURRENT);
+ 
+         res->use_concurrency = getenv("GGML_METAL_CONCURRENCY_DISABLE") == nil;
++        res->m5_lab_profile = getenv("GGML_M5_LAB_PROFILE") != NULL;
+ 
+         {
+             const char * val = getenv("GGML_METAL_GRAPH_DEBUG");
+@@ -499,6 +502,9 @@ enum ggml_status ggml_metal_graph_compute(ggml_metal_t ctx, struct ggml_cgraph *
+ 
+     @autoreleasepool {
+         ctx->gf = gf;
++        if (ctx->m5_lab_profile) {
++            ctx->m5_lab_graph_id++;
++        }
+ 
+         if (ctx->n_cb == 0) {
+             // single-threaded encoding: the whole graph is encoded by one command buffer
+@@ -766,6 +772,34 @@ void ggml_metal_set_n_cb(ggml_metal_t ctx, int n_cb) {
+         ggml_metal_op_free(ctx_op);
+ 
+         if (cb_idx < 2 || ctx->abort_callback == NULL) {
++            if (ctx->m5_lab_profile && idx_end > idx_start) {
++                const uintptr_t context_id = (uintptr_t) ctx;
++                const uint64_t graph_id = ctx->m5_lab_graph_id;
++                const int node_count = idx_end - idx_start;
++                int counts[GGML_OP_COUNT] = {0};
++                for (int i = idx_start; i < idx_end; ++i) {
++                    counts[ctx->gf->nodes[i]->op]++;
++                }
++                NSMutableString * ops = [NSMutableString stringWithString:@"{"];
++                bool first = true;
++                for (int i = 0; i < GGML_OP_COUNT; ++i) {
++                    if (counts[i] == 0) {
++                        continue;
++                    }
++                    [ops appendFormat:@"%s\"%s\":%d", first ? "" : ",", ggml_op_name(i), counts[i]];
++                    first = false;
++                }
++                [ops appendString:@"}"];
++                [cmd_buf addCompletedHandler:^(id<MTLCommandBuffer> completed) {
++                    const double start = completed.GPUStartTime;
++                    const double end = completed.GPUEndTime;
++                    const bool complete = completed.status == MTLCommandBufferStatusCompleted;
++                    const bool valid = complete && end > start && start > 0;
++                    fprintf(stderr, "M5_PROFILE {\"context\":\"%lx\",\"graph\":%llu,\"cb\":%d,\"original_nodes\":%d,\"gpu_start_s\":%.9f,\"gpu_end_s\":%.9f,\"gpu_ms\":%.6f,\"valid\":%s,\"completed\":%s,\"op_counts\":%s}\n",
++                            (unsigned long) context_id, (unsigned long long) graph_id, cb_idx, node_count,
++                            start, end, (end - start)*1000.0, valid ? "true" : "false", complete ? "true" : "false", [ops UTF8String]);
++                }];
++            }
+             [cmd_buf commit];
+         }
+     });
+diff --git a/ggml/src/ggml-metal/ggml-metal-device.cpp b/ggml/src/ggml-metal/ggml-metal-device.cpp
+index 8ac6e08..79c07ab 100644
+--- a/ggml/src/ggml-metal/ggml-metal-device.cpp
++++ b/ggml/src/ggml-metal/ggml-metal-device.cpp
+@@ -841,6 +841,9 @@ static size_t ggml_metal_mul_mv_mma_smem(int nsg, int nt, int rt) {
+ // fewer src0 rows need more simdgroups per threadgroup (a finer K split) to fill the GPU.
+ // the tiles become narrower when the K-slice reduction buffer is too large or when too few threadgroups fill the GPU.
+ static ggml_metal_mma_tiling ggml_metal_op_mul_mat_mma_tiling(const ggml_tensor * op) {
++    static const int nsg_override = ggml_metal_m5_lab_int("GGML_M5_LAB_NSG", 0, 0, 32);
++    static const int nt_max = ggml_metal_m5_lab_int("GGML_M5_LAB_NT_MAX", GGML_METAL_MMA_NT_MAX, 1, GGML_METAL_MMA_NT_MAX);
++    GGML_ASSERT((nt_max & (nt_max - 1)) == 0 && (nsg_override == 0 || (nsg_override & (nsg_override - 1)) == 0));
+     const ggml_type type = op->src[0]->type;
+     const int64_t   ne00 = op->src[0]->ne[0];
+     const int64_t   ne01 = op->src[0]->ne[1];
+@@ -856,11 +859,11 @@ static ggml_metal_mma_tiling ggml_metal_op_mul_mat_mma_tiling(const ggml_tensor
+     } else if (ne01 <= GGML_METAL_MMA_MANY_ROWS) {
+         nsg = GGML_METAL_MMA_NSG_MID_ROWS;
+     }
+-    res.nsg = ggml_metal_halve_to_limit(nsg, n_steps);
++    res.nsg = ggml_metal_halve_to_limit(nsg_override ? nsg_override : nsg, n_steps);
+ 
+     const int64_t nt_smem   = GGML_METAL_MMA_SMEM_MAX/(int64_t) ggml_metal_mul_mv_mma_smem(res.nsg, 1, res.rt);
+     const int64_t nt_rows   = ne01/(GGML_METAL_MIN_THREADGROUPS*GGML_METAL_MMA_TILE);
+-    res.nt = ggml_metal_halve_to_limit(GGML_METAL_MMA_NT_MAX, std::min(nt_smem, nt_rows));
++    res.nt = ggml_metal_halve_to_limit(nt_max, std::min(nt_smem, nt_rows));
+ 
+     return res;
+ }
+diff --git a/ggml/src/ggml-metal/ggml-metal-ops.cpp b/ggml/src/ggml-metal/ggml-metal-ops.cpp
+index dfe46ba..bafbc0c 100644
+--- a/ggml/src/ggml-metal/ggml-metal-ops.cpp
++++ b/ggml/src/ggml-metal/ggml-metal-ops.cpp
+@@ -2476,7 +2476,8 @@ static int ggml_metal_op_mul_mat_mma(ggml_metal_op_t ctx, int idx) {
+ 
+     if (fuse_add) {
+         dst = ctx->node(idx + n_fuse - 1);
+-        res = dst->src[0]->op == GGML_OP_MUL_MAT ? dst->src[1] : dst->src[0];
++        // the residual is the other operand of the ADD, by identity: it can itself be a MUL_MAT output
++        res = dst->src[0] == op ? dst->src[1] : dst->src[0];
+     }
+ 
+     auto pipeline = ggml_metal_library_get_pipeline_mul_mv_mma_auto(lib, op, fuse_add);
+diff --git a/ggml/src/ggml-metal/kernels/mul_mv_mma.metal b/ggml/src/ggml-metal/kernels/mul_mv_mma.metal
+index fcf981a..5cf245d 100644
+--- a/ggml/src/ggml-metal/kernels/mul_mv_mma.metal
++++ b/ggml/src/ggml-metal/kernels/mul_mv_mma.metal
+@@ -605,4 +605,23 @@ MUL_MV_MMA_GEN("q5_1", block_q5_1, 2,     dequantize_q5_1)
+ MUL_MV_MMA_GEN("q4_K", block_q4_K, QK_NL, dequantize_q4_K)
+ MUL_MV_MMA_GEN("q6_K", block_q6_K, QK_NL, dequantize_q6_K)
+ 
++#if defined(GGML_METAL_HAS_BF16)
++MUL_MV_MMA_GEN("bf16",    bfloat4x4,     1,     dequantize_bf16)
++#endif
++MUL_MV_MMA_GEN("q1_0",    block_q1_0,    8,     dequantize_q1_0)
++MUL_MV_MMA_GEN("q2_0",    block_q2_0,    4,     dequantize_q2_0)
++MUL_MV_MMA_GEN("mxfp4",   block_mxfp4,   2,     dequantize_mxfp4)
++MUL_MV_MMA_GEN("q2_K",    block_q2_K,    QK_NL, dequantize_q2_K)
++MUL_MV_MMA_GEN("q3_K",    block_q3_K,    QK_NL, dequantize_q3_K)
++MUL_MV_MMA_GEN("iq2_xxs", block_iq2_xxs, QK_NL, dequantize_iq2_xxs)
++MUL_MV_MMA_GEN("iq2_xs",  block_iq2_xs,  QK_NL, dequantize_iq2_xs)
++MUL_MV_MMA_GEN("iq2_s",   block_iq2_s,   QK_NL, dequantize_iq2_s)
++MUL_MV_MMA_GEN("iq3_xxs", block_iq3_xxs, QK_NL, dequantize_iq3_xxs)
++MUL_MV_MMA_GEN("iq3_s",   block_iq3_s,   QK_NL, dequantize_iq3_s)
++MUL_MV_MMA_GEN("iq1_s",   block_iq1_s,   QK_NL, dequantize_iq1_s)
++MUL_MV_MMA_GEN("iq1_m",   block_iq1_m,   QK_NL, dequantize_iq1_m)
++MUL_MV_MMA_GEN("iq4_nl",  block_iq4_nl,  2,     dequantize_iq4_nl)
++MUL_MV_MMA_GEN("iq4_xs",  block_iq4_xs,  QK_NL, dequantize_iq4_xs)
++MUL_MV_MMA_GEN("tq2_0",   block_tq2_0,   QK_NL, dequantize_tq2_0)
++
+ #undef MUL_MV_MMA_GEN
+diff --git a/src/llama-context.cpp b/src/llama-context.cpp
+index 07b4c61..aa59718 100644
+--- a/src/llama-context.cpp
++++ b/src/llama-context.cpp
+@@ -145,6 +145,20 @@ llama_context::llama_context(
+ 
+     cparams.ctx_other = nullptr;
+ 
++    if (model.arch == LLM_ARCH_QWEN4EXP && (model.tok_embd == nullptr || model.output == nullptr)) {
++        if (params.ctx_type != LLAMA_CONTEXT_TYPE_MTP || params.ctx_other == nullptr) {
++            throw std::runtime_error("QWEN4EXP MTP without embeddings or output requires a target context (-md)");
++        }
++        const llama_model * other = llama_get_model(params.ctx_other);
++        if (other->arch != model.arch || other->hparams.n_embd != model.hparams.n_embd ||
++                other->vocab.n_tokens() != model.vocab.n_tokens() || !other->tok_embd || !other->output) {
++            throw std::runtime_error("QWEN4EXP MTP shared weights disagree with the target architecture or shape");
++        }
++        // Weight borrowing must not enable the Gemma assistant's shared-KV path.
++        cparams.weights_other = other;
++        LLAMA_LOG_INFO("QWEN4EXP MTP: borrowing target embeddings/output; draft KV remains separate\n");
++    }
++
+     // TODO: more generic
+     if (model.arch == LLM_ARCH_GEMMA4_ASSISTANT) {
+         if (params.ctx_other == nullptr) {
+diff --git a/src/llama-cparams.h b/src/llama-cparams.h
+index 004fec5..80b063d 100644
+--- a/src/llama-cparams.h
++++ b/src/llama-cparams.h
+@@ -65,4 +65,5 @@ struct llama_cparams {
+     void * cb_eval_user_data;
+ 
+     llama_context * ctx_other;
++    const llama_model * weights_other = nullptr;
+ };
+diff --git a/src/models/qwen4exp.cpp b/src/models/qwen4exp.cpp
+index 250eb74..9d8d6e9 100644
+--- a/src/models/qwen4exp.cpp
++++ b/src/models/qwen4exp.cpp
+@@ -175,12 +175,12 @@ void llama_model_qwen4exp::load_arch_tensors(llama_model_loader & ml) {
+     const int64_t hc_dim = hc * n_embd;
+     const int64_t hc_lr  = hparams.hc_low_rank;
+ 
+-    // an MTP-only file carries the MTP block, the embeddings and the LM head, but no trunk
++    // an MTP-only file may borrow embeddings and the LM head from its target
+     const bool mtp_only    = n_layer_nextn > 0 && ml.get_weight(tn(LLM_TENSOR_HC_ATTN_NORM, "weight", 0).str().c_str()) == nullptr;
+     const int  trunk_flags = mtp_only ? TENSOR_NOT_REQUIRED : 0;
+     const int  mtp_flags   = ml.load_mtp ? 0 : TENSOR_SKIP;
+ 
+-    tok_embd = create_tensor(tn(LLM_TENSOR_TOKEN_EMBD, "weight"), { n_embd, n_vocab }, 0);
++    tok_embd = create_tensor(tn(LLM_TENSOR_TOKEN_EMBD, "weight"), { n_embd, n_vocab }, trunk_flags);
+ 
+     // there is no output_norm: the final hyper-connection mixer carries it
+     // the gammas load as [n_embd, hc] so the grouped norm multiplies them without a graph reshape
+@@ -189,7 +189,7 @@ void llama_model_qwen4exp::load_arch_tensors(llama_model_loader & ml) {
+     hc_head_up   = create_tensor(tn(LLM_TENSOR_HC_HEAD_UP,   "weight"), { hc_lr, hc_dim }, trunk_flags);
+ 
+     output = create_tensor(tn(LLM_TENSOR_OUTPUT, "weight"), { n_embd, n_vocab }, TENSOR_NOT_REQUIRED);
+-    if (output == NULL) {
++    if (output == NULL && tok_embd != NULL) {
+         output = create_tensor(tn(LLM_TENSOR_TOKEN_EMBD, "weight"), { n_embd, n_vocab }, TENSOR_DUPLICATED);
+     }
+ 
+@@ -555,7 +555,8 @@ llama_model_qwen4exp::graph_mtp::graph_mtp(const llama_model & model, const llm_
+     ggml_set_input(inp->h);
+     ggml_set_name(inp->h, "mtp_h_input");
+ 
+-    ggml_tensor * tok_embd = ggml_get_rows(ctx0, model.tok_embd, inp->tokens);
++    ggml_tensor * tok_embd_w = model.tok_embd ? model.tok_embd : cparams.weights_other->tok_embd;
++    ggml_tensor * tok_embd = ggml_get_rows(ctx0, tok_embd_w, inp->tokens);
+     cb(tok_embd, "mtp_tok_embd", il);
+ 
+     ggml_tensor * h = inp->h;
+@@ -610,7 +611,9 @@ llama_model_qwen4exp::graph_mtp::graph_mtp(const llama_model & model, const llm_
+     cb(cur, "result_norm", -1);
+     res->t_embd = cur;
+ 
+-    cur = build_lora_mm(model.output, cur, model.output_s);
++    ggml_tensor * head_w = model.output ? model.output : cparams.weights_other->output;
++    ggml_tensor * head_s = model.output ? model.output_s : cparams.weights_other->output_s;
++    cur = build_lora_mm(head_w, cur, head_s);
+     cb(cur, "result_output", -1);
+     res->t_logits = cur;
+ 
+diff --git a/tests/test-backend-ops.cpp b/tests/test-backend-ops.cpp
+index d889302..24f6590 100644
+--- a/tests/test-backend-ops.cpp
++++ b/tests/test-backend-ops.cpp
+@@ -7218,6 +7218,7 @@ enum mul_mat_add_mode {
+     MUL_MAT_ADD_ROW,        // mm + a one-row res, which a same-shape fusion must leave alone
+     MUL_MAT_ADD_RES_INPLACE, // res += mm
+     MUL_MAT_ADD_B_INPLACE,   // b += mm: the sum overwrites the mat-mul input (m == k)
++    MUL_MAT_ADD_MM_MM,       // mm2 + mm: the residual is itself a mat-mul output, so both operands are MUL_MAT
+ };
+ 
+ static std::string var_to_str(mul_mat_add_mode mode) {
+@@ -7227,6 +7228,7 @@ static std::string var_to_str(mul_mat_add_mode mode) {
+         case MUL_MAT_ADD_ROW:         return "mm+row";
+         case MUL_MAT_ADD_RES_INPLACE: return "res+=mm";
+         case MUL_MAT_ADD_B_INPLACE:   return "b+=mm";
++        case MUL_MAT_ADD_MM_MM:       return "mm2+mm";
+     }
+     return "unknown";
+ }
+@@ -7272,6 +7274,12 @@ struct test_mul_mat_add : public test_case {
+             case MUL_MAT_ADD_RES_MM:      out = ggml_add(ctx, res, mm);         break;
+             case MUL_MAT_ADD_RES_INPLACE: out = ggml_add_inplace(ctx, res, mm); break;
+             case MUL_MAT_ADD_B_INPLACE:   out = ggml_add_inplace(ctx, b, mm);   break;
++            case MUL_MAT_ADD_MM_MM:
++                {
++                    ggml_tensor * a2  = ggml_new_tensor_2d(ctx, type_a, k, m);
++                    ggml_tensor * mm2 = ggml_mul_mat(ctx, a2, b);
++                    out = ggml_add(ctx, mm2, mm);
++                } break;
+         }
+         ggml_set_name(out, "out");
+ 
+@@ -10381,8 +10389,11 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_eval() {
+             test_cases.emplace_back(new test_mul_mat(GGML_TYPE_Q4_0, GGML_TYPE_F32, m, n, k, {1, 1}, {1, 1}));
+         }
+         test_cases.emplace_back(new test_mul_mat(GGML_TYPE_Q4_0, GGML_TYPE_F32, 64, n, 256, {3, 2}, {2, 1}));
+-        for (ggml_type type_a : {GGML_TYPE_F32, GGML_TYPE_F16, GGML_TYPE_Q4_1, GGML_TYPE_Q5_0, GGML_TYPE_Q5_1, GGML_TYPE_Q8_0,
+-                                 GGML_TYPE_Q4_K, GGML_TYPE_Q5_K, GGML_TYPE_Q6_K}) {
++        for (ggml_type type_a : {GGML_TYPE_F32, GGML_TYPE_F16, GGML_TYPE_BF16, GGML_TYPE_Q4_1, GGML_TYPE_Q5_0, GGML_TYPE_Q5_1,
++                                 GGML_TYPE_Q8_0, GGML_TYPE_Q1_0, GGML_TYPE_Q2_0, GGML_TYPE_MXFP4, GGML_TYPE_Q2_K, GGML_TYPE_Q3_K,
++                                 GGML_TYPE_Q4_K, GGML_TYPE_Q5_K, GGML_TYPE_Q6_K, GGML_TYPE_TQ2_0,
++                                 GGML_TYPE_IQ2_XXS, GGML_TYPE_IQ2_XS, GGML_TYPE_IQ2_S, GGML_TYPE_IQ3_XXS, GGML_TYPE_IQ3_S,
++                                 GGML_TYPE_IQ1_S, GGML_TYPE_IQ1_M, GGML_TYPE_IQ4_NL, GGML_TYPE_IQ4_XS}) {
+             test_cases.emplace_back(new test_mul_mat(type_a, GGML_TYPE_F32, 48,  n, 2560, {1, 1}, {1, 1}));
+             test_cases.emplace_back(new test_mul_mat(type_a, GGML_TYPE_F32, 1000, n, 1024, {1, 1}, {1, 1}));
+             test_cases.emplace_back(new test_mul_mat(type_a, GGML_TYPE_F32, 3000, n, 512,  {1, 1}, {1, 1}));
+@@ -10394,7 +10405,7 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_eval() {
+             }
+         }
+         for (ggml_type type_a : {GGML_TYPE_Q4_0, GGML_TYPE_Q8_0, GGML_TYPE_Q5_K, GGML_TYPE_F16}) {
+-            for (mul_mat_add_mode mode : {MUL_MAT_ADD_MM_RES, MUL_MAT_ADD_RES_MM, MUL_MAT_ADD_ROW, MUL_MAT_ADD_RES_INPLACE}) {
++            for (mul_mat_add_mode mode : {MUL_MAT_ADD_MM_RES, MUL_MAT_ADD_RES_MM, MUL_MAT_ADD_ROW, MUL_MAT_ADD_RES_INPLACE, MUL_MAT_ADD_MM_MM}) {
+                 test_cases.emplace_back(new test_mul_mat_add(type_a, 1000, n, 1024, mode));
+             }
+             test_cases.emplace_back(new test_mul_mat_add(type_a, 2048, n, 2048, MUL_MAT_ADD_B_INPLACE));
+@@ -10405,7 +10416,7 @@ static std::vector<std::unique_ptr<test_case>> make_test_cases_eval() {
+             test_cases.emplace_back(new test_mul_mat(type_a, GGML_TYPE_F32, 1000, n, 1024, {1, 1}, {1, 1}, {0, 1, 2, 3}, 1280));
+         }
+         // a src1 with a nonzero mean, for the zero points and mins of quantized src0 types
+-        for (ggml_type type_a : {GGML_TYPE_Q4_0, GGML_TYPE_Q4_1, GGML_TYPE_Q5_0, GGML_TYPE_Q8_0, GGML_TYPE_Q4_K, GGML_TYPE_Q5_K}) {
++        for (ggml_type type_a : {GGML_TYPE_Q4_0, GGML_TYPE_Q4_1, GGML_TYPE_Q5_0, GGML_TYPE_Q8_0, GGML_TYPE_Q2_K, GGML_TYPE_Q4_K, GGML_TYPE_Q5_K}) {
+             test_cases.emplace_back(new test_mul_mat_pos(type_a, GGML_TYPE_F32, 1000, n, 1024, {1, 1}, {1, 1}));
+         }
+     }

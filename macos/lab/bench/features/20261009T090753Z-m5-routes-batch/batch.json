@@ -1,0 +1,406 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "mode": "routes",
+  "small_smoke": false,
+  "preflight": {
+    "memory": {
+      "total": 51539607552,
+      "available": 40942944256,
+      "percent": 20.6,
+      "used": 7358889984,
+      "free": 2241167360,
+      "active": 3070590976,
+      "inactive": 38653624320,
+      "wired": 4288299008
+    },
+    "swap": {
+      "total": 2147483648,
+      "used": 531234816,
+      "free": 1616248832,
+      "percent": 24.7,
+      "sin": 3440236380160,
+      "sout": 1906966528
+    },
+    "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 86%",
+    "largest_process_groups": [
+      {
+        "name": "T3 Code (Alpha)",
+        "rss_bytes": 340066304
+      },
+      {
+        "name": "T3 Code (Alpha) Helper (Renderer)",
+        "rss_bytes": 255868928
+      },
+      {
+        "name": "mediaanalysisd",
+        "rss_bytes": 195313664
+      },
+      {
+        "name": "codex",
+        "rss_bytes": 108380160
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "rss_bytes": 91291648
+      },
+      {
+        "name": "mdworker_shared",
+        "rss_bytes": 91029504
+      },
+      {
+        "name": "T3 Code (Alpha) Helper",
+        "rss_bytes": 85639168
+      },
+      {
+        "name": "python3.12",
+        "rss_bytes": 36143104
+      },
+      {
+        "name": "loginwindow",
+        "rss_bytes": 35504128
+      },
+      {
+        "name": "cloudflared",
+        "rss_bytes": 32276480
+      },
+      {
+        "name": "WeatherMenu",
+        "rss_bytes": 31440896
+      },
+      {
+        "name": "WiFiman Desktop",
+        "rss_bytes": 28049408
+      }
+    ],
+    "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth.",
+    "required_available_bytes": 36507222016,
+    "pressure_level": 1,
+    "host_cpu_percent_samples": [
+      2.6
+    ],
+    "quiet_host_required": false
+  },
+  "build": {
+    "schema": 1,
+    "engine": {
+      "engine": "m5-trace",
+      "directory": "vendor/llama-m5-trace",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "f68f8ac6150a3f5f00ad754a46f9fb69f3b833e031a30a6ebb5bf9168c588e00",
+      "patch": {
+        "schema": 1,
+        "id": "m5-trace",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-trace",
+        "patch": "patches/mtp-m5-trace.patch",
+        "patch_sha256": "f68f8ac6150a3f5f00ad754a46f9fb69f3b833e031a30a6ebb5bf9168c588e00",
+        "source_diff_sha256": "f68f8ac6150a3f5f00ad754a46f9fb69f3b833e031a30a6ebb5bf9168c588e00",
+        "modified_files": [
+          "common/speculative.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp",
+          "tools/server/server-context.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-phase-profile"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-lab.patch",
+            "sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585"
+          }
+        ],
+        "scope": "Separate diagnostic build based on m5-lab. Disabled-by-default server request phases, target/helper Metal labels, original matrix shapes and helper-call wall-time intervals. No shader or math change; existing engines and pins are preserved."
+      },
+      "artifacts": {
+        "llama-server": "5ea430d2ef5f96583c5612b2720fbc1650c71b38d398a08575c537d4a5751ac0",
+        "libggml-base.0.26.0.dylib": "6ef0be7ea11a6373af2d494700c35431c3c9ed88147bae537bfc4a0ededd90f3",
+        "libggml-base.0.dylib": "6ef0be7ea11a6373af2d494700c35431c3c9ed88147bae537bfc4a0ededd90f3",
+        "libggml-base.dylib": "6ef0be7ea11a6373af2d494700c35431c3c9ed88147bae537bfc4a0ededd90f3",
+        "libggml-blas.0.26.0.dylib": "f071aab6431ac0401db175d73ef8720943ed53c2cd2b449465d3ba0a30733e2e",
+        "libggml-blas.0.dylib": "f071aab6431ac0401db175d73ef8720943ed53c2cd2b449465d3ba0a30733e2e",
+        "libggml-blas.dylib": "f071aab6431ac0401db175d73ef8720943ed53c2cd2b449465d3ba0a30733e2e",
+        "libggml-cpu.0.26.0.dylib": "311f6e9435d571d85d7a85f5334491e532c53490c9be2066630ad17dc6e6f9f4",
+        "libggml-cpu.0.dylib": "311f6e9435d571d85d7a85f5334491e532c53490c9be2066630ad17dc6e6f9f4",
+        "libggml-cpu.dylib": "311f6e9435d571d85d7a85f5334491e532c53490c9be2066630ad17dc6e6f9f4",
+        "libggml-metal.0.26.0.dylib": "2742c60dfe55e5d8fae5430c90c4775aca89f6847e7f09d419ba2a3e2d5c03cf",
+        "libggml-metal.0.dylib": "2742c60dfe55e5d8fae5430c90c4775aca89f6847e7f09d419ba2a3e2d5c03cf",
+        "libggml-metal.dylib": "2742c60dfe55e5d8fae5430c90c4775aca89f6847e7f09d419ba2a3e2d5c03cf",
+        "libggml.0.26.0.dylib": "527ce5d761e75c4816ffa9a86e8745fc78d040f7fe5793300c180301f04f7214",
+        "libggml.0.dylib": "527ce5d761e75c4816ffa9a86e8745fc78d040f7fe5793300c180301f04f7214",
+        "libggml.dylib": "527ce5d761e75c4816ffa9a86e8745fc78d040f7fe5793300c180301f04f7214",
+        "libllama-common.0.6.0.dylib": "9cacc1b44f00c55f422e2a246d4217c67acc756536cc4a564427db0de8e3a51b",
+        "libllama-common.0.dylib": "9cacc1b44f00c55f422e2a246d4217c67acc756536cc4a564427db0de8e3a51b",
+        "libllama-common.dylib": "9cacc1b44f00c55f422e2a246d4217c67acc756536cc4a564427db0de8e3a51b",
+        "libllama-server-impl.dylib": "8bc264aa83285efc8c79ba850dd3ed2760b8b9acc35f80028cb3206905eff108",
+        "libllama.0.6.0.dylib": "bc92e475e04043021b14d6bfbe38cf5c3635eabf0a9d1d7898cf41311b5c6d02",
+        "libllama.0.dylib": "bc92e475e04043021b14d6bfbe38cf5c3635eabf0a9d1d7898cf41311b5c6d02",
+        "libllama.dylib": "bc92e475e04043021b14d6bfbe38cf5c3635eabf0a9d1d7898cf41311b5c6d02",
+        "libmtmd.0.6.0.dylib": "bcae38ff8951f86bb8fe3b1d8db52a7e19914492303338d58c962c05e07181ea",
+        "libmtmd.0.dylib": "bcae38ff8951f86bb8fe3b1d8db52a7e19914492303338d58c962c05e07181ea",
+        "libmtmd.dylib": "bcae38ff8951f86bb8fe3b1d8db52a7e19914492303338d58c962c05e07181ea"
+      },
+      "build_receipt": {
+        "engine": "m5-trace",
+        "directory": "vendor/llama-m5-trace",
+        "revision": "d81235049384534c167caea52b85a694f6103d14",
+        "source_diff_sha256": "f68f8ac6150a3f5f00ad754a46f9fb69f3b833e031a30a6ebb5bf9168c588e00",
+        "patch": {
+          "schema": 1,
+          "id": "m5-trace",
+          "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+          "directory": "vendor/llama-m5-trace",
+          "patch": "patches/mtp-m5-trace.patch",
+          "patch_sha256": "f68f8ac6150a3f5f00ad754a46f9fb69f3b833e031a30a6ebb5bf9168c588e00",
+          "source_diff_sha256": "f68f8ac6150a3f5f00ad754a46f9fb69f3b833e031a30a6ebb5bf9168c588e00",
+          "modified_files": [
+            "common/speculative.cpp",
+            "ggml/src/ggml-metal/ggml-metal-common.cpp",
+            "ggml/src/ggml-metal/ggml-metal-common.h",
+            "ggml/src/ggml-metal/ggml-metal-context.h",
+            "ggml/src/ggml-metal/ggml-metal-context.m",
+            "ggml/src/ggml-metal/ggml-metal-device.cpp",
+            "ggml/src/ggml-metal/ggml-metal.cpp",
+            "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+            "src/llama-context.cpp",
+            "src/llama-cparams.h",
+            "src/models/qwen4exp.cpp",
+            "tests/test-backend-ops.cpp",
+            "tools/server/server-context.cpp"
+          ],
+          "features": [
+            "mtp-shared",
+            "m5-tuning",
+            "m5-profile",
+            "m5-phase-profile"
+          ],
+          "components": [
+            {
+              "patch": "patches/mtp-m5-lab.patch",
+              "sha256": "89c2ae25201831457634406c8df809e2e7042969f313839bfd77440e41189585"
+            }
+          ],
+          "scope": "Separate diagnostic build based on m5-lab. Disabled-by-default server request phases, target/helper Metal labels, original matrix shapes and helper-call wall-time intervals. No shader or math change; existing engines and pins are preserved."
+        },
+        "artifacts": {
+          "llama-server": "5ea430d2ef5f96583c5612b2720fbc1650c71b38d398a08575c537d4a5751ac0",
+          "libggml-base.0.26.0.dylib": "6ef0be7ea11a6373af2d494700c35431c3c9ed88147bae537bfc4a0ededd90f3",
+          "libggml-base.0.dylib": "6ef0be7ea11a6373af2d494700c35431c3c9ed88147bae537bfc4a0ededd90f3",
+          "libggml-base.dylib": "6ef0be7ea11a6373af2d494700c35431c3c9ed88147bae537bfc4a0ededd90f3",
+          "libggml-blas.0.26.0.dylib": "f071aab6431ac0401db175d73ef8720943ed53c2cd2b449465d3ba0a30733e2e",
+          "libggml-blas.0.dylib": "f071aab6431ac0401db175d73ef8720943ed53c2cd2b449465d3ba0a30733e2e",
+          "libggml-blas.dylib": "f071aab6431ac0401db175d73ef8720943ed53c2cd2b449465d3ba0a30733e2e",
+          "libggml-cpu.0.26.0.dylib": "311f6e9435d571d85d7a85f5334491e532c53490c9be2066630ad17dc6e6f9f4",
+          "libggml-cpu.0.dylib": "311f6e9435d571d85d7a85f5334491e532c53490c9be2066630ad17dc6e6f9f4",
+          "libggml-cpu.dylib": "311f6e9435d571d85d7a85f5334491e532c53490c9be2066630ad17dc6e6f9f4",
+          "libggml-metal.0.26.0.dylib": "2742c60dfe55e5d8fae5430c90c4775aca89f6847e7f09d419ba2a3e2d5c03cf",
+          "libggml-metal.0.dylib": "2742c60dfe55e5d8fae5430c90c4775aca89f6847e7f09d419ba2a3e2d5c03cf",
+          "libggml-metal.dylib": "2742c60dfe55e5d8fae5430c90c4775aca89f6847e7f09d419ba2a3e2d5c03cf",
+          "libggml.0.26.0.dylib": "527ce5d761e75c4816ffa9a86e8745fc78d040f7fe5793300c180301f04f7214",
+          "libggml.0.dylib": "527ce5d761e75c4816ffa9a86e8745fc78d040f7fe5793300c180301f04f7214",
+          "libggml.dylib": "527ce5d761e75c4816ffa9a86e8745fc78d040f7fe5793300c180301f04f7214",
+          "libllama-common.0.6.0.dylib": "9cacc1b44f00c55f422e2a246d4217c67acc756536cc4a564427db0de8e3a51b",
+          "libllama-common.0.dylib": "9cacc1b44f00c55f422e2a246d4217c67acc756536cc4a564427db0de8e3a51b",
+          "libllama-common.dylib": "9cacc1b44f00c55f422e2a246d4217c67acc756536cc4a564427db0de8e3a51b",
+          "libllama-server-impl.dylib": "8bc264aa83285efc8c79ba850dd3ed2760b8b9acc35f80028cb3206905eff108",
+          "libllama.0.6.0.dylib": "bc92e475e04043021b14d6bfbe38cf5c3635eabf0a9d1d7898cf41311b5c6d02",
+          "libllama.0.dylib": "bc92e475e04043021b14d6bfbe38cf5c3635eabf0a9d1d7898cf41311b5c6d02",
+          "libllama.dylib": "bc92e475e04043021b14d6bfbe38cf5c3635eabf0a9d1d7898cf41311b5c6d02",
+          "libmtmd.0.6.0.dylib": "bcae38ff8951f86bb8fe3b1d8db52a7e19914492303338d58c962c05e07181ea",
+          "libmtmd.0.dylib": "bcae38ff8951f86bb8fe3b1d8db52a7e19914492303338d58c962c05e07181ea",
+          "libmtmd.dylib": "bcae38ff8951f86bb8fe3b1d8db52a7e19914492303338d58c962c05e07181ea"
+        },
+        "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+        "build_settings": {
+          "CMAKE_BUILD_TYPE": "Release",
+          "GGML_BLAS": "ON",
+          "GGML_CPU": "ON",
+          "GGML_METAL": "ON",
+          "GGML_METAL_EMBED_LIBRARY": "ON",
+          "GGML_NATIVE": "ON",
+          "LLAMA_BUILD_TESTS": "ON",
+          "LLAMA_BUILD_TOOLS": "ON"
+        },
+        "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+      }
+    },
+    "source_sha256": "ff1ddb9427c6deae4c7c5637c17b8b2da13a20d0f765318a72e908056115fc0c",
+    "binary_sha256": "2c75c67b88f76aa6476761d7e1046dac14e33e9828224bf057ee6ea1d149ce06",
+    "archives": {
+      "vendor/llama-m5-trace/build/tools/server/libserver-context.a": "0a2dd6c285c93dd5fb8c35ecfc39d6193076f34b87485a24798dd92c23c55e59",
+      "vendor/llama-m5-trace/build/common/libllama-common-base.a": "f5ee1aa773a442a16cb69fd8f8da8a3a7a13133bc672ea8cc9c42061308ee6a2",
+      "vendor/llama-m5-trace/build/tools/ui/libllama-ui.a": "4e1a7edcf7f852aaf82b5efb4591ceae4ca153bc674d871454925005db6b1050",
+      "vendor/llama-m5-trace/build/vendor/cpp-httplib/libcpp-httplib.a": "7eddd6942a17412c878983c4346c2186a0dc4d5988957cc6c524d1b0f18c23c6"
+    },
+    "command": [
+      "/usr/bin/c++",
+      "-O3",
+      "-DNDEBUG",
+      "-std=gnu++17",
+      "-arch",
+      "arm64",
+      "-DCPPHTTPLIB_OPENSSL_SUPPORT",
+      "-DGGML_BACKEND_SHARED",
+      "-DGGML_SHARED",
+      "-DGGML_USE_BLAS",
+      "-DGGML_USE_CPU",
+      "-DGGML_USE_METAL",
+      "-DLLAMA_SHARED",
+      "-DLLAMA_SUBPROCESS",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/tools/server",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/tools/server",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/common/.",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/vendor/nlohmann/..",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/vendor/sheredom/..",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/src/../include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/ggml/src/../include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/tools/mtmd/.",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/tools/ui",
+      "-isystem",
+      "/opt/homebrew/Cellar/openssl@3/3.6.4/include",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/native/m5_eval_server.cpp",
+      "-o",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-eval/llama-server-m5-eval",
+      "-Wl,-rpath,/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libllama-server-impl.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/tools/server/libserver-context.a",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libllama-common.0.6.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/common/libllama-common-base.a",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libmtmd.0.6.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libllama.0.6.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libggml.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libggml-cpu.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libggml-blas.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libggml-metal.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libggml-base.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/tools/ui/libllama-ui.a",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/vendor/cpp-httplib/libcpp-httplib.a",
+      "/opt/homebrew/Cellar/openssl@3/3.6.4/lib/libssl.3.dylib",
+      "/opt/homebrew/Cellar/openssl@3/3.6.4/lib/libcrypto.3.dylib",
+      "-framework",
+      "CoreFoundation",
+      "-framework",
+      "Security"
+    ],
+    "dynamic_libraries": {
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libllama-server-impl.dylib": "8bc264aa83285efc8c79ba850dd3ed2760b8b9acc35f80028cb3206905eff108",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libllama-common.0.6.0.dylib": "9cacc1b44f00c55f422e2a246d4217c67acc756536cc4a564427db0de8e3a51b",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libmtmd.0.6.0.dylib": "bcae38ff8951f86bb8fe3b1d8db52a7e19914492303338d58c962c05e07181ea",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libllama.0.6.0.dylib": "bc92e475e04043021b14d6bfbe38cf5c3635eabf0a9d1d7898cf41311b5c6d02",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libggml.0.26.0.dylib": "527ce5d761e75c4816ffa9a86e8745fc78d040f7fe5793300c180301f04f7214",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libggml-cpu.0.26.0.dylib": "311f6e9435d571d85d7a85f5334491e532c53490c9be2066630ad17dc6e6f9f4",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libggml-blas.0.26.0.dylib": "f071aab6431ac0401db175d73ef8720943ed53c2cd2b449465d3ba0a30733e2e",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libggml-metal.0.26.0.dylib": "2742c60dfe55e5d8fae5430c90c4775aca89f6847e7f09d419ba2a3e2d5c03cf",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-trace/build/bin/libggml-base.0.26.0.dylib": "6ef0be7ea11a6373af2d494700c35431c3c9ed88147bae537bfc4a0ededd90f3",
+      "/opt/homebrew/Cellar/openssl@3/3.6.4/lib/libssl.3.dylib": "c6ee373222087cf31bc2f3817537d268b3c23e56b7fadd44bbf5c2317caed349",
+      "/opt/homebrew/Cellar/openssl@3/3.6.4/lib/libcrypto.3.dylib": "bae675614cd791d37ec35416ea9f87edcc85407d020810504cf458119b63522c"
+    },
+    "build_toolchain": {
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin",
+      "sdk": "27.0"
+    },
+    "scope": "Diagnostic entry point around existing server libraries. Reads routing IDs or deliberately splits scheduled nodes with an evaluation callback. No vendor, shader, model, launcher or memory-limit changes."
+  },
+  "passes": [
+    {
+      "depth": 3,
+      "control": "depth3-control/capture.json",
+      "capture": "depth3-routes/capture.json",
+      "paired_outputs": 3,
+      "paired_outputs_match": true
+    },
+    {
+      "depth": 4,
+      "control": "depth4-control/capture.json",
+      "capture": "depth4-routes/capture.json",
+      "paired_outputs": 3,
+      "paired_outputs_match": true
+    }
+  ],
+  "timings_excluded_from_speed_results": true,
+  "postflight": {
+    "memory": {
+      "total": 51539607552,
+      "available": 41387327488,
+      "percent": 19.7,
+      "used": 6681640960,
+      "free": 2428928000,
+      "active": 2558328832,
+      "inactive": 38927400960,
+      "wired": 4123312128
+    },
+    "swap": {
+      "total": 2147483648,
+      "used": 531234816,
+      "free": 1616248832,
+      "percent": 24.7,
+      "sin": 3519783321600,
+      "sout": 1910292480
+    },
+    "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 86%",
+    "largest_process_groups": [
+      {
+        "name": "T3 Code (Alpha) Helper (Renderer)",
+        "rss_bytes": 250036224
+      },
+      {
+        "name": "python3.12",
+        "rss_bytes": 249266176
+      },
+      {
+        "name": "T3 Code (Alpha)",
+        "rss_bytes": 213925888
+      },
+      {
+        "name": "codex",
+        "rss_bytes": 97583104
+      },
+      {
+        "name": "T3 Code (Alpha) Helper",
+        "rss_bytes": 69025792
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "rss_bytes": 60768256
+      },
+      {
+        "name": "mdworker_shared",
+        "rss_bytes": 39960576
+      },
+      {
+        "name": "loginwindow",
+        "rss_bytes": 35110912
+      },
+      {
+        "name": "Finder",
+        "rss_bytes": 28573696
+      },
+      {
+        "name": "WiFiman Desktop",
+        "rss_bytes": 27148288
+      },
+      {
+        "name": "ControlCenter",
+        "rss_bytes": 22495232
+      },
+      {
+        "name": "MenuBarAgent",
+        "rss_bytes": 22462464
+      }
+    ],
+    "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth."
+  }
+}

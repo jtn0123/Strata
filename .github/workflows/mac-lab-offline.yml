@@ -1,0 +1,53 @@
+name: Mac lab offline checks
+
+on:
+  pull_request:
+    branches: [mac-m5-lab]
+    paths:
+      - 'macos/lab/**'
+      - 'FORK-NOTES.md'
+      - '.github/workflows/mac-lab-offline.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    # Fixture verification uses macOS F_NOCACHE; preserve the real platform API.
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - name: Install pinned Python dependencies
+        run: |
+          python -m pip install --only-binary :all: --require-hashes -r macos/lab/requirements-ci.lock
+      - name: Restore pinned source dependencies only
+        working-directory: macos/lab
+        env:
+          API_SHELL_REV: 2cc4153409edb3f859187bdf10f13e34972d6ffb
+          LLAMA_REV: d81235049384534c167caea52b85a694f6103d14
+        run: |
+          mkdir -p vendor/Strata-macOS vendor/llama.cpp
+          curl --fail --location --proto '=https' --proto-redir '=https' --retry 3 "https://codeload.github.com/jinzy0623/Strata-macOS/tar.gz/$API_SHELL_REV" -o "$RUNNER_TEMP/api-shell.tar.gz"
+          curl --fail --location --proto '=https' --proto-redir '=https' --retry 3 "https://codeload.github.com/ggml-org/llama.cpp/tar.gz/$LLAMA_REV" -o "$RUNNER_TEMP/llama.tar.gz"
+          tar -xzf "$RUNNER_TEMP/api-shell.tar.gz" --strip-components=1 -C vendor/Strata-macOS
+          tar -xzf "$RUNNER_TEMP/llama.tar.gz" --strip-components=1 -C vendor/llama.cpp
+      - name: Run load-free inventory
+        working-directory: macos/lab
+        run: python scripts/validate_offline.py
+      - name: Check measured campaign protocol
+        working-directory: macos/lab
+        run: python -m unittest discover -s bench/results/20261010-small-gains-stack -p test_sequence.py -v
+      - name: Retain offline receipt and log
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: mac-lab-offline-receipt
+          path: |
+            macos/lab/bench/features/offline-validation.json
+            macos/lab/bench/features/offline-validation.log
+          if-no-files-found: error
