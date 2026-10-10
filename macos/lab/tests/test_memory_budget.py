@@ -2,12 +2,54 @@
 from pathlib import Path
 import sys
 import unittest
+import tempfile
+import json
+from unittest.mock import patch
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
+import memory_budget
 from memory_budget import allocations,report,MIB
 
 
 class BudgetTests(unittest.TestCase):
+    def artifact_fixture(self, root):
+        (root/'bench/results').mkdir(parents=True)
+        (root/'config').mkdir()
+        inventory={'shards':[{'tensors':[{'name':'weight','size_bytes':100}]}]}
+        (root/'bench/results/flash-gguf-inventory.json').write_text(json.dumps(inventory))
+        (root/'config/models.json').write_text(json.dumps({'mtp_shared_packed_q3':{'files':[{'size_bytes':20}]}}))
+
+    def test_cli_rejects_reading_or_writing_outside_benchmark_artifacts(self):
+        with tempfile.TemporaryDirectory() as directory, tempfile.TemporaryDirectory() as external:
+            root=Path(directory); self.artifact_fixture(root)
+            private=Path(external)/'private.log'; private.write_text('private data')
+            output=Path(external)/'user-settings.json'
+            with patch.object(memory_budget,'ROOT',root):
+                with self.assertRaises(ValueError):memory_budget.main(['--log',str(private)])
+                with self.assertRaises(ValueError):memory_budget.main(['--save',str(output)])
+            self.assertFalse(output.exists())
+            self.assertEqual(private.read_text(),'private data')
+
+    def test_cli_rejects_traversal_and_symlink_escape(self):
+        with tempfile.TemporaryDirectory() as directory, tempfile.TemporaryDirectory() as external:
+            root=Path(directory); self.artifact_fixture(root)
+            link=root/'bench/results/escaped';link.symlink_to(external,target_is_directory=True)
+            with patch.object(memory_budget,'ROOT',root):
+                for path in ('bench/../config/overwrite.json',str(link/'overwrite.json')):
+                    with self.subTest(path=path),self.assertRaises(ValueError):memory_budget.main(['--save',path])
+            self.assertFalse((Path(external)/'overwrite.json').exists())
+
+    def test_cli_writes_valid_artifact_once_and_preserves_existing_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);self.artifact_fixture(root)
+            log=root/'bench/results/native.log';log.write_text('load_tensors: loading model tensors\n')
+            output=root/'bench/results/memory/report.json'
+            with patch.object(memory_budget,'ROOT',root):
+                memory_budget.main(['--log',str(log),'--save',str(output)])
+                before=output.read_bytes()
+                with self.assertRaises(FileExistsError):memory_budget.main(['--save',str(output)])
+            self.assertEqual(output.read_bytes(),before)
+
     def test_separate_attention_and_indexer_caches_are_not_overwritten(self):
         text='''load_tensors: loading model tensors
 llama_kv_cache: MTL0 KV buffer size = 96.00 MiB
