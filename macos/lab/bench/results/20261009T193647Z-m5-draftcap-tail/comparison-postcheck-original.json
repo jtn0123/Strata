@@ -1,0 +1,662 @@
+{
+  "schema": 1,
+  "kind": "m5-single-axis-comparison",
+  "experiment": {
+    "id": "draftcap-tail",
+    "engine": "m5-draftcap",
+    "depth": 3,
+    "axis": "m5_tuning",
+    "control": "conv-direct",
+    "candidates": [
+      "draftcap-tail"
+    ],
+    "predict": 256
+  },
+  "order": [
+    "conv-direct",
+    "draftcap-tail",
+    "draftcap-tail",
+    "conv-direct"
+  ],
+  "status": "failed",
+  "repeats": 3,
+  "runs": [
+    {
+      "value": "conv-direct",
+      "run_id": "20261009T193703Z-m5-draftcap-tail-1-conv-direct",
+      "status": "passed"
+    },
+    {
+      "value": "draftcap-tail",
+      "run_id": "20261009T194000Z-m5-draftcap-tail-2-draftcap-tail",
+      "status": "passed"
+    },
+    {
+      "value": "draftcap-tail",
+      "run_id": "20261009T194257Z-m5-draftcap-tail-3-draftcap-tail",
+      "status": "passed"
+    },
+    {
+      "value": "conv-direct",
+      "run_id": "20261009T194552Z-m5-draftcap-tail-4-conv-direct",
+      "status": "passed"
+    }
+  ],
+  "math_checks": [
+    "bench/features/20261009T193648Z-m5-math-m5-draftcap-on-conv-direct/checks.json",
+    "bench/features/20261009T193655Z-m5-math-m5-draftcap-on-draftcap-tail/checks.json"
+  ],
+  "preflight": {
+    "memory": {
+      "total": 51539607552,
+      "available": 39762378752,
+      "percent": 22.9,
+      "used": 7746420736,
+      "free": 958693376,
+      "active": 4277305344,
+      "inactive": 38646251520,
+      "wired": 3469115392
+    },
+    "swap": {
+      "total": 2147483648,
+      "used": 524812288,
+      "free": 1622671360,
+      "percent": 24.4,
+      "sin": 3943524368384,
+      "sout": 2449801216
+    },
+    "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 86%",
+    "largest_process_groups": [
+      {
+        "name": "T3 Code (Alpha) Helper (Renderer)",
+        "rss_bytes": 452657152
+      },
+      {
+        "name": "T3 Code (Alpha)",
+        "rss_bytes": 221413376
+      },
+      {
+        "name": "codex",
+        "rss_bytes": 132022272
+      },
+      {
+        "name": "T3 Code (Alpha) Helper",
+        "rss_bytes": 74399744
+      },
+      {
+        "name": "mdworker_shared",
+        "rss_bytes": 69746688
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "rss_bytes": 63684608
+      },
+      {
+        "name": "node_repl",
+        "rss_bytes": 44744704
+      },
+      {
+        "name": "contactsd",
+        "rss_bytes": 43663360
+      },
+      {
+        "name": "AddressBookSourceSync",
+        "rss_bytes": 40452096
+      },
+      {
+        "name": "ControlCenter",
+        "rss_bytes": 38436864
+      },
+      {
+        "name": "python3.12",
+        "rss_bytes": 35635200
+      },
+      {
+        "name": "WeatherMenu",
+        "rss_bytes": 33341440
+      }
+    ],
+    "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth."
+  },
+  "headroom_waits": [
+    {
+      "required_bytes": 36507222016,
+      "samples": [
+        {
+          "elapsed_s": 0.02425620798021555,
+          "available_bytes": 39755513856,
+          "swap_used_bytes": 524812288
+        }
+      ]
+    },
+    {
+      "required_bytes": 36507222016,
+      "samples": [
+        {
+          "elapsed_s": 0.02703724999446422,
+          "available_bytes": 2588901376,
+          "swap_used_bytes": 524812288
+        },
+        {
+          "elapsed_s": 2.1019740409683436,
+          "available_bytes": 40933933056,
+          "swap_used_bytes": 524812288
+        }
+      ]
+    },
+    {
+      "required_bytes": 36507222016,
+      "samples": [
+        {
+          "elapsed_s": 0.028375792026054114,
+          "available_bytes": 3054764032,
+          "swap_used_bytes": 524812288
+        },
+        {
+          "elapsed_s": 2.0841932499897666,
+          "available_bytes": 41059024896,
+          "swap_used_bytes": 524812288
+        }
+      ]
+    },
+    {
+      "required_bytes": 36507222016,
+      "samples": [
+        {
+          "elapsed_s": 0.028096333029679954,
+          "available_bytes": 41429696512,
+          "swap_used_bytes": 524812288
+        }
+      ]
+    }
+  ],
+  "summary": [
+    {
+      "workload": "chinese",
+      "input_budget": 56,
+      "cached": false,
+      "profiles": {
+        "conv-direct": {
+          "generation_tok_s": 40.65991052833178,
+          "prompt_tok_s": 190.98108869449527,
+          "ttft_s": 0.29377854202175513,
+          "wall_s": 6.56415395802469,
+          "draft_acceptance_percent": 40.17341040462428
+        },
+        "draftcap-tail": {
+          "generation_tok_s": 40.66489260790296,
+          "prompt_tok_s": 189.86501114808635,
+          "ttft_s": 0.295521562511567,
+          "wall_s": 6.565325562522048,
+          "draft_acceptance_percent": 40.17341040462428
+        }
+      },
+      "vs_control": {
+        "conv-direct": {
+          "generation_increase_percent": 0.0,
+          "prompt_increase_percent": 0.0,
+          "ttft_reduction_percent": 0.0,
+          "total_time_reduction_percent": 0.0
+        },
+        "draftcap-tail": {
+          "generation_increase_percent": 0.012253050994059933,
+          "prompt_increase_percent": -0.5843916557593087,
+          "ttft_reduction_percent": -0.5933110287145604,
+          "total_time_reduction_percent": -0.017848522518670862
+        }
+      },
+      "control_passes": [
+        {
+          "generation_tok_s": 40.631881526993915,
+          "prompt_tok_s": 190.09341733651968,
+          "ttft_s": 0.2951575830229558,
+          "wall_s": 6.571081000030972,
+          "draft_acceptance_percent": 40.17341040462428
+        },
+        {
+          "generation_tok_s": 40.68441719811683,
+          "prompt_tok_s": 192.60996825374988,
+          "ttft_s": 0.2912739579915069,
+          "wall_s": 6.560380167036783,
+          "draft_acceptance_percent": 40.17341040462428
+        }
+      ],
+      "control_drift": {
+        "generation_increase_percent": 0.1292966733229317,
+        "prompt_increase_percent": 1.3238495853726384,
+        "ttft_reduction_percent": 1.3157801983853634,
+        "total_time_reduction_percent": 0.16284737616442113
+      }
+    },
+    {
+      "workload": "code",
+      "input_budget": 48,
+      "cached": false,
+      "profiles": {
+        "conv-direct": {
+          "generation_tok_s": 59.48217139404626,
+          "prompt_tok_s": 171.5393096854482,
+          "ttft_s": 0.28034331198432483,
+          "wall_s": 4.568020707985852,
+          "draft_acceptance_percent": 74.57627118644068
+        },
+        "draftcap-tail": {
+          "generation_tok_s": 59.464364122156795,
+          "prompt_tok_s": 171.21773743626693,
+          "ttft_s": 0.280922146019293,
+          "wall_s": 4.569270020496333,
+          "draft_acceptance_percent": 74.57627118644068
+        }
+      },
+      "vs_control": {
+        "conv-direct": {
+          "generation_increase_percent": 0.0,
+          "prompt_increase_percent": 0.0,
+          "ttft_reduction_percent": 0.0,
+          "total_time_reduction_percent": 0.0
+        },
+        "draftcap-tail": {
+          "generation_increase_percent": -0.0299371584327357,
+          "prompt_increase_percent": -0.18746271613832022,
+          "ttft_reduction_percent": -0.20647328123188924,
+          "total_time_reduction_percent": -0.027349099103179952
+        }
+      },
+      "control_passes": [
+        {
+          "generation_tok_s": 59.534996655534016,
+          "prompt_tok_s": 171.93516611444434,
+          "ttft_s": 0.2797527080401778,
+          "wall_s": 4.56318995798938,
+          "draft_acceptance_percent": 74.57627118644068
+        },
+        {
+          "generation_tok_s": 59.45810581864018,
+          "prompt_tok_s": 170.82640833917583,
+          "ttft_s": 0.28157983301207423,
+          "wall_s": 4.569661375018768,
+          "draft_acceptance_percent": 74.57627118644068
+        }
+      ],
+      "control_drift": {
+        "generation_increase_percent": -0.1291523325998023,
+        "prompt_increase_percent": -0.6448696914803875,
+        "ttft_reduction_percent": -0.6531214602698343,
+        "total_time_reduction_percent": -0.14181783114370905
+      }
+    },
+    {
+      "workload": "prose",
+      "input_budget": 53,
+      "cached": false,
+      "profiles": {
+        "conv-direct": {
+          "generation_tok_s": 39.93091352289914,
+          "prompt_tok_s": 182.33515685848573,
+          "ttft_s": 0.2912376665044576,
+          "wall_s": 6.677519229473546,
+          "draft_acceptance_percent": 38.92045454545455
+        },
+        "draftcap-tail": {
+          "generation_tok_s": 40.0072903337051,
+          "prompt_tok_s": 180.52421735203623,
+          "ttft_s": 0.2941450204816647,
+          "wall_s": 6.667066645488376,
+          "draft_acceptance_percent": 38.92045454545455
+        }
+      },
+      "vs_control": {
+        "conv-direct": {
+          "generation_increase_percent": 0.0,
+          "prompt_increase_percent": 0.0,
+          "ttft_reduction_percent": 0.0,
+          "total_time_reduction_percent": 0.0
+        },
+        "draftcap-tail": {
+          "generation_increase_percent": 0.19127238539673463,
+          "prompt_increase_percent": -0.9931927213877922,
+          "ttft_reduction_percent": -0.9982753989558502,
+          "total_time_reduction_percent": 0.1565339406142674
+        }
+      },
+      "control_passes": [
+        {
+          "generation_tok_s": 39.85718311624715,
+          "prompt_tok_s": 181.05421378061695,
+          "ttft_s": 0.29326741700060666,
+          "wall_s": 6.689772040990647,
+          "draft_acceptance_percent": 38.92045454545455
+        },
+        {
+          "generation_tok_s": 39.94775147422869,
+          "prompt_tok_s": 184.9409235879935,
+          "ttft_s": 0.2871173329767771,
+          "wall_s": 6.671947999973781,
+          "draft_acceptance_percent": 38.92045454545455
+        }
+      ],
+      "control_drift": {
+        "generation_increase_percent": 0.22723220985634285,
+        "prompt_increase_percent": 2.146710494176096,
+        "ttft_reduction_percent": 2.097090800856627,
+        "total_time_reduction_percent": 0.26643719558231416
+      }
+    },
+    {
+      "workload": "synthetic",
+      "input_budget": 512,
+      "cached": false,
+      "profiles": {
+        "conv-direct": {
+          "generation_tok_s": 48.47362286879198,
+          "prompt_tok_s": 562.8137344564743,
+          "ttft_s": 0.9103429374808911,
+          "wall_s": 6.178607604524586,
+          "draft_acceptance_percent": 55.400696864111495
+        },
+        "draftcap-tail": {
+          "generation_tok_s": 48.45927112802053,
+          "prompt_tok_s": 553.164389835594,
+          "ttft_s": 0.926240521017462,
+          "wall_s": 6.1881953755219,
+          "draft_acceptance_percent": 55.400696864111495
+        }
+      },
+      "vs_control": {
+        "conv-direct": {
+          "generation_increase_percent": 0.0,
+          "prompt_increase_percent": 0.0,
+          "ttft_reduction_percent": 0.0,
+          "total_time_reduction_percent": 0.0
+        },
+        "draftcap-tail": {
+          "generation_increase_percent": -0.02960732027456059,
+          "prompt_increase_percent": -1.7144827906872218,
+          "ttft_reduction_percent": -1.7463290900638917,
+          "total_time_reduction_percent": -0.15517688791715223
+        }
+      },
+      "control_passes": [
+        {
+          "generation_tok_s": 48.4703701577625,
+          "prompt_tok_s": 564.3987830151242,
+          "ttft_s": 0.9077355840126984,
+          "wall_s": 6.174920417019166,
+          "draft_acceptance_percent": 55.400696864111495
+        },
+        {
+          "generation_tok_s": 48.47687557982145,
+          "prompt_tok_s": 562.3302438118961,
+          "ttft_s": 0.9111170839751139,
+          "wall_s": 6.183461791020818,
+          "draft_acceptance_percent": 55.400696864111495
+        }
+      ],
+      "control_drift": {
+        "generation_increase_percent": 0.013421440846794752,
+        "prompt_increase_percent": -0.3665031296094412,
+        "ttft_reduction_percent": -0.3725203706862912,
+        "total_time_reduction_percent": -0.13832362888612781
+      }
+    },
+    {
+      "workload": "synthetic",
+      "input_budget": 2048,
+      "cached": false,
+      "profiles": {
+        "conv-direct": {
+          "generation_tok_s": 49.89155179099257,
+          "prompt_tok_s": 538.3750946117948,
+          "ttft_s": 3.804858937539393,
+          "wall_s": 8.91773704154184,
+          "draft_acceptance_percent": 61.79775280898876
+        },
+        "draftcap-tail": {
+          "generation_tok_s": 49.97016572378912,
+          "prompt_tok_s": 532.951365197295,
+          "ttft_s": 3.8436012295424007,
+          "wall_s": 8.95016383350594,
+          "draft_acceptance_percent": 61.79775280898876
+        }
+      },
+      "vs_control": {
+        "conv-direct": {
+          "generation_increase_percent": 0.0,
+          "prompt_increase_percent": 0.0,
+          "ttft_reduction_percent": 0.0,
+          "total_time_reduction_percent": 0.0
+        },
+        "draftcap-tail": {
+          "generation_increase_percent": 0.15756962847313094,
+          "prompt_increase_percent": -1.0074257648212126,
+          "ttft_reduction_percent": -1.0182320196097105,
+          "total_time_reduction_percent": -0.36362130676250715
+        }
+      },
+      "control_passes": [
+        {
+          "generation_tok_s": 49.920645749981354,
+          "prompt_tok_s": 538.0194264944093,
+          "ttft_s": 3.8074257919797674,
+          "wall_s": 8.91787937504705,
+          "draft_acceptance_percent": 61.79775280898876
+        },
+        {
+          "generation_tok_s": 49.86245783200379,
+          "prompt_tok_s": 538.582266337346,
+          "ttft_s": 3.80341504100943,
+          "wall_s": 8.917594708036631,
+          "draft_acceptance_percent": 61.79775280898876
+        }
+      ],
+      "control_drift": {
+        "generation_increase_percent": -0.11656082789670563,
+        "prompt_increase_percent": 0.10461329372510875,
+        "ttft_reduction_percent": 0.10534022695297685,
+        "total_time_reduction_percent": 0.003192093080062186
+      }
+    },
+    {
+      "workload": "cached-ledger",
+      "input_budget": 512,
+      "cached": true,
+      "profiles": {
+        "conv-direct": {
+          "generation_tok_s": 69.43153518223042,
+          "prompt_tok_s": 153.11208526773635,
+          "ttft_s": 0.2748847499897238,
+          "wall_s": 0.6207253544998821,
+          "draft_acceptance_percent": 92.98245614035088
+        },
+        "draftcap-tail": {
+          "generation_tok_s": 70.11047718579817,
+          "prompt_tok_s": 153.8360725810839,
+          "ttft_s": 0.27352595850243233,
+          "wall_s": 0.6157608959765639,
+          "draft_acceptance_percent": 92.98245614035088
+        }
+      },
+      "vs_control": {
+        "conv-direct": {
+          "generation_increase_percent": 0.0,
+          "prompt_increase_percent": 0.0,
+          "ttft_reduction_percent": 0.0,
+          "total_time_reduction_percent": 0.0
+        },
+        "draftcap-tail": {
+          "generation_increase_percent": 0.977858262511111,
+          "prompt_increase_percent": 0.4728479218877979,
+          "ttft_reduction_percent": 0.4943131575477544,
+          "total_time_reduction_percent": 0.7997834287465255
+        }
+      },
+      "control_passes": [
+        {
+          "generation_tok_s": 68.79294184416679,
+          "prompt_tok_s": 152.68341094740057,
+          "ttft_s": 0.2757129999808967,
+          "wall_s": 0.6247190000140108,
+          "draft_acceptance_percent": 92.98245614035088
+        },
+        {
+          "generation_tok_s": 70.52248344925466,
+          "prompt_tok_s": 153.5407595880721,
+          "ttft_s": 0.27405649999855086,
+          "wall_s": 0.6146479999879375,
+          "draft_acceptance_percent": 92.98245614035088
+        }
+      ],
+      "control_drift": {
+        "generation_increase_percent": 2.5141265349659214,
+        "prompt_increase_percent": 0.5615204922078121,
+        "ttft_reduction_percent": 0.6008059041324176,
+        "total_time_reduction_percent": 1.6120847974605335
+      }
+    },
+    {
+      "workload": "cached-ledger",
+      "input_budget": 2048,
+      "cached": true,
+      "profiles": {
+        "conv-direct": {
+          "generation_tok_s": 64.19082823305274,
+          "prompt_tok_s": 146.49435953762352,
+          "ttft_s": 0.2874011464882642,
+          "wall_s": 0.6467817085213028,
+          "draft_acceptance_percent": 100.0
+        },
+        "draftcap-tail": {
+          "generation_tok_s": 63.92856262354523,
+          "prompt_tok_s": 146.6539345433922,
+          "ttft_s": 0.2870562079770025,
+          "wall_s": 0.6498379164841026,
+          "draft_acceptance_percent": 100.0
+        }
+      },
+      "vs_control": {
+        "conv-direct": {
+          "generation_increase_percent": 0.0,
+          "prompt_increase_percent": 0.0,
+          "ttft_reduction_percent": 0.0,
+          "total_time_reduction_percent": 0.0
+        },
+        "draftcap-tail": {
+          "generation_increase_percent": -0.4085717799984123,
+          "prompt_increase_percent": 0.10892911254218873,
+          "ttft_reduction_percent": 0.12001988004449737,
+          "total_time_reduction_percent": -0.4725254166180859
+        }
+      },
+      "control_passes": [
+        {
+          "generation_tok_s": 64.31587483571488,
+          "prompt_tok_s": 145.615415818688,
+          "ttft_s": 0.289133666025009,
+          "wall_s": 0.6518243330065161,
+          "draft_acceptance_percent": 100.0
+        },
+        {
+          "generation_tok_s": 64.06578163039059,
+          "prompt_tok_s": 147.46207240387756,
+          "ttft_s": 0.2854944169521332,
+          "wall_s": 0.6446684169932269,
+          "draft_acceptance_percent": 100.0
+        }
+      ],
+      "control_drift": {
+        "generation_increase_percent": -0.38885143980877945,
+        "prompt_increase_percent": 1.2681738226733463,
+        "ttft_reduction_percent": 1.258673582674752,
+        "total_time_reduction_percent": 1.097828916616661
+      }
+    }
+  ],
+  "postflight": {
+    "memory": {
+      "total": 51539607552,
+      "available": 3244687360,
+      "percent": 93.7,
+      "used": 43965120512,
+      "free": 1015939072,
+      "active": 2135949312,
+      "inactive": 2221457408,
+      "wired": 41829171200
+    },
+    "swap": {
+      "total": 2147483648,
+      "used": 524812288,
+      "free": 1622671360,
+      "percent": 24.4,
+      "sin": 3951733342208,
+      "sout": 2456322048
+    },
+    "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 86%",
+    "largest_process_groups": [
+      {
+        "name": "T3 Code (Alpha) Helper (Renderer)",
+        "rss_bytes": 456523776
+      },
+      {
+        "name": "T3 Code (Alpha)",
+        "rss_bytes": 310280192
+      },
+      {
+        "name": "codex",
+        "rss_bytes": 112623616
+      },
+      {
+        "name": "T3 Code (Alpha) Helper",
+        "rss_bytes": 76136448
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "rss_bytes": 72548352
+      },
+      {
+        "name": "node_repl",
+        "rss_bytes": 37552128
+      },
+      {
+        "name": "Finder",
+        "rss_bytes": 35422208
+      },
+      {
+        "name": "WeatherMenu",
+        "rss_bytes": 31686656
+      },
+      {
+        "name": "python3.12",
+        "rss_bytes": 31490048
+      },
+      {
+        "name": "cloudflared",
+        "rss_bytes": 30343168
+      },
+      {
+        "name": "ControlCenter",
+        "rss_bytes": 29294592
+      },
+      {
+        "name": "WiFiman Desktop",
+        "rss_bytes": 25346048
+      }
+    ],
+    "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth."
+  },
+  "output_parity": {
+    "passed": true,
+    "runs": [
+      "20261009T193703Z-m5-draftcap-tail-1-conv-direct",
+      "20261009T194000Z-m5-draftcap-tail-2-draftcap-tail",
+      "20261009T194257Z-m5-draftcap-tail-3-draftcap-tail",
+      "20261009T194552Z-m5-draftcap-tail-4-conv-direct"
+    ],
+    "cases_per_run": 21
+  },
+  "decision": {
+    "measured_speed_candidate": false,
+    "winning_real_workloads": [],
+    "rule": "At least1% TPS and whole-reply gain on two real workloads, each above its own absolute control drift; exact outputs, same actual allocation and max3, helper greedy/n_min0, diagnostics off, zero new swap."
+  },
+  "error": "ValueError: 'bench/features/20261009T193100376954Z-m5-draftcap-qualification/off/reanalysis.json' is not in the subpath of '/Users/justin/Documents/Github/Strata-Mac-Lab'"
+}

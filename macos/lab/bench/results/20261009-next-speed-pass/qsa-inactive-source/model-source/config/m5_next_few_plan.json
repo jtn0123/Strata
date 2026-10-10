@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "control": {
+    "tuning": "conv-direct",
+    "tensor_api": "on",
+    "depth": 3,
+    "helper": "mtp_shared_packed_q3"
+  },
+  "candidates": [
+    {
+      "engine": "m5-gate",
+      "tunings": [
+        "gate-up8",
+        "gate-up4"
+      ],
+      "proof": "Scheduler fusion and strict CPU references, then bit parity for activation/down/residual and fallback outputs."
+    },
+    {
+      "engine": "m5-gdn",
+      "tunings": [
+        "gdn-row4",
+        "gdn-row1",
+        "gdn-row2"
+      ],
+      "proof": "All attention/state values, all retained rollback prefixes and continuation, complete output/cache/padding digests."
+    },
+    {
+      "engine": "m5-lookup",
+      "tuning": "conv-direct",
+      "proof": "Same outputs with native lookup trace, exact file/row/page attribution and request-aligned monotonic intervals."
+    }
+  ],
+  "operator_gate": {
+    "minimum_time_reduction_percent": 10,
+    "must_exceed_control_drift": true,
+    "maximum_adjacent_regression_percent": 2,
+    "baseline_and_candidate_repeats": 2,
+    "normal_fusion": true,
+    "profiling_callbacks": false
+  },
+  "model_gate": {
+    "minimum_gain_percent": 1,
+    "minimum_real_workloads": 2,
+    "fresh_matched_ABBA": true,
+    "exact_tokens_and_text": true,
+    "zero_swap_growth": true
+  },
+  "lookup_screen": {
+    "minimum_full_operation_upper_bound_percent": 2,
+    "workloads": [
+      "prose",
+      "code",
+      "chinese"
+    ],
+    "claims_measured_ssd_wait": false,
+    "next_if_above_threshold": "Attribute page residency or off-CPU demand-read time before implementing bounded macOS prefetch."
+  },
+  "defaults": "All candidates off until qualified. No change to existing launchers or model precision.",
+  "gdn_timing_protocol": {
+    "revision": 2,
+    "sustained_warmup_minimum_ms": 500,
+    "synchronized_samples": 512,
+    "distinct_state_buffers": 4,
+    "reason": "Initial short operator bracket had 11.43 percent fused T4 control drift; retained as inconclusive. Longer warmup and samples address unsettled GPU timing without changing acceptance thresholds.",
+    "negative_control": "Original row4 specialization included among controls."
+  }
+}

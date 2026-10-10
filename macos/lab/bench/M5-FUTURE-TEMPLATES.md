@@ -1,45 +1,52 @@
-# Next M5 experiments: prepared, testing on hold
+# M5 experiment queue: measured progress and remaining work
 
-Prepared October 6, 2026 for the 48 GiB M5 Pro. The user will give the testing go-ahead later. **No model loading, GPU tests or benchmarks were performed in this preparation stage.** No VM, service, model download or app launcher was started or changed.
+Latest incremental update: card 9 now has [three measured copy experiments](results/20261009T112641Z-m5-copy-resume/REPORT.md). Direct convolution-state copy adds 1.33-1.62% fresh TPS with identical outputs and zero new swap. Wide scalar/vector copies give no useful fresh-writing gain. The normal-path shape inventory confirms large GDN copies are already fused away. All 94 offline tests pass; shared matrix and grouped expert-weight work remain candidates.
 
-The [six experiment cards](plans/20261007T055133Z-m5-future/preparation.json) contain a protocol, stop conditions and an empty result template. [Source plan](../config/m5_future_plan.json). These follow the [expert/output-table measurements](M5-OPERATION-PROFILE.md) and [Astra research plan](research/20261006-astra-future-plan.md).
+October 9 update: user-authorized testing has completed cards 1–7 below. [Accepted GPU/context/SSD results](results/20261009T085842Z-m5-next-batch/REPORT.md) retain the original raw-JSON formatting failure and the separate passing fixture-v2 context retry. The full model passes 8K/F16 with essentially unchanged fresh TPS and zero new swap. All 91 offline checks pass; separate attention/indexer KV buffers are now counted. T3 and WiFiman remain open, model servers are stopped, and no VM/Docker/Chrome was restarted. Cards 8–11 remain designs with the measurement dependencies listed below; no automatic work is scheduled.
 
-| Experiment | Purpose | Ready now |
+Original preparation, October 7, 2026: the refreshed [11-card packet](plans/20261007T231811Z-m5-future/preparation.json) records the protocols. [Source plan](../config/m5_future_plan.json). [Complete recreation recipe](M5-PREPARATION-RECIPE.md). [Preparation evidence](M5-REST-PREPARATION.md).
+
+That preparation passed **90 maintained offline tests** before the October 9 accounting regression was added. Its model/GPU/storage runs were held then; the update above is the current state. Native engine and diagnostic receipts remain unchanged.
+
+| Order | Experiment | What is ready |
 | --- | --- | --- |
-| [Real expert reuse](plans/20261007T055133Z-m5-future/expert-reuse/README.md) | See how many predicted tokens select the same experts, separately for each layer | Diagnostic executable, matched-control runner and parser staged; native CPU self-test passed. Model behavior untested. |
-| [Remaining GPU work](plans/20261007T055133Z-m5-future/split-gpu-cost/README.md) | Separate expert, vocabulary, shared matrix, attention/state and other work | Deliberately split diagnostic callback and timestamp attribution staged. Real GPU behavior and output parity untested. |
-| [8K context](plans/20261007T055133Z-m5-future/context-8k/README.md) | Fit larger documents while checking recall, memory and latency | Protocol/fixture design. Existing native setting; long-input harness and quality fixture still need implementation. |
-| [Bounded Mac SSD prefetch](plans/20261007T055133Z-m5-future/macos-row-prefetch/README.md) | Overlap useful lookup reads if file-specific waits are significant | Design only. No prefetch implementation or candidate engine. |
-| [One targeted GPU kernel](plans/20261007T055133Z-m5-future/targeted-gpu-kernel/README.md) | Improve the measured expensive operation with current weight bytes | Design only. Kernel target stays unset until diagnostics establish it. |
-| [Expert paging capacity](plans/20261007T055133Z-m5-future/expert-paging-capacity/README.md) | Investigate larger/higher-precision weights with a defined speed tradeoff | Feasibility design only. No pager, larger-model download or memory allocation. |
+| 1 | Clean baseline refresh | Two clean full-model launches completed; later candidate comparisons have their own fresh controls. |
+| 2 | Upstream Metal residual correctness | 1,160 CPU-reference GPU cases and four full-model launches pass; no useful TPS gain, original Qwen graph exposure unproved. |
+| 3 | Real expert reuse | Full Flash depth3/4 captures pass, all 48 target layers plus helper captured; dominant batch selections repeat about 31–35%. |
+| 4 | Remaining GPU work | Full Flash depth3/4 split captures pass and match controls; shared matrices/state-copy work identified. Instrumentation prevents a normal-runtime cost/occupancy claim. |
+| 5 | RAM accounting | Distinct attention/indexer cache logs retained; 4K/8K allocations and monitored headroom recorded. Component estimates remain separate from physical footprint. |
+| 6 | 8K context | Full 4K/8K/8K/4K fixture-v2 trial passes all 134 checks and zero new swap; six exact-6144-token recall fixtures pass. Initial JSON-fence failure retained. |
+| 7 | Lookup-file reads | 128 offsets / three passes / 6.09 MiB read-only probe passes. First-pass median123.7us, repeats1.7–1.8us; cache state uncontrolled and native wait time unmeasured. |
+| 8 | Native Mac SSD prefetch | Bounded design; implementation awaits evidence of meaningful lookup stalls. |
+| 9 | One targeted GPU kernel | Three isolated copy variants measured; direct convolution copy improves fresh TPS 1.33-1.62%. Wide copies offer no useful fresh-writing gain, and large GDN copies are already fused. Next validate shared matrix or grouped expert weight work in the normal path. |
+| 10 | Larger-model expert paging | Capacity/eviction proof template; needs hot-set data, RAM/SSD budget and an agreed speed tradeoff. |
+| 11 | Quantized KV follow-up | Separate later design after 8K allocations/quality; requires quantized-attention correctness fix first. |
 
-Each result template starts `not-run`, with every measurement and gain empty. The speed protocol brackets candidates with fresh controls in **control/candidate/candidate/control** order, measures first-token and complete-reply time alongside TPS, and requires zero new swap. Historical rates are references, not substitute controls. Diagnostics use matched greedy outputs and their timing stays outside speed history.
+The archived preparation templates remain `not-run`; current measured evidence is linked above. Speed candidates use fresh control/candidate/candidate/control passes, report TPS, first-token delay, complete reply time and control drift, and reject any new swap or quality/provenance failure. Percentages are checked for finite positive input metrics. Historical rates are references only.
 
-## Diagnostic implementation and limits
+The 8K speed comparison uses identical shorter inputs at both capacities. Its three larger recall cases test capacity separately and do not create a 4K TPS comparison. F16 cache, model, helper and workers remain fixed. The saved-data RAM report separates unique weight bytes, helper/repack/private buffers and the lazy file mapping; an accounting sum is not measured physical RAM or proof that 8K fits.
 
-[The new entry point](../native/m5_eval_server.cpp) links existing `m5-trace` libraries; all seven existing engine receipts remain unchanged. It reads selected IDs through the native evaluation callback and checks the padded 2048-byte row stride, ten unique IDs per token, layer names and ID bounds. An independent CPU-only self-test checks padded reads and six invalid-input cases. It initializes no backend.
+The lookup probe reads selected page-aligned ranges via `pread`, verifies bounds and repeated sampled digests, and never writes/purges/preloads the shard. It characterizes file-specific read latency with uncontrolled cache state; it cannot measure actual native mmap waits or establish a model TPS improvement. Native prefetch, kernels and paging remain dependency-gated designs, rather than runnable placeholders.
 
-The split mode requests a synchronization boundary after each computational node. The parser joins GPU buffers to monotonic CPU intervals by submission time, independent of completion-log order; it rejects ambiguous/missing IDs, extra computational operations and uncovered computational buffers. Splitting changes fusion and adds synchronization/command-buffer overhead. Its costs are diagnostic observations, not uninstrumented per-kernel cost, accelerator occupancy or a TPS gain.
-
-The [runner](../scripts/profile_m5_routes.py) uses an unchanged native control, checks paired greedy text/token output, separates prompt/generation and main/helper roles, saves raw evidence and rejects new swap. It requires at least 34 GiB available before a full-model run and a verified diagnostic build. The `--small-smoke` option is prepared for initial plumbing verification; **it has not run**. It cannot establish Flash expert reuse. No end-to-end GPU/model behavior is represented as proven yet.
-
-## Safe preparation commands
-
-These show plans or create cards; they do not run a model:
+## Safe plan/preparation commands
 
 ```sh
-.venv/bin/python scripts/prepare_m5_future.py
+.venv/bin/python scripts/validate_offline.py
 .venv/bin/python scripts/prepare_m5_future.py --prepare
+.venv/bin/python scripts/benchmark_m5_decision_baseline.py
+.venv/bin/python scripts/benchmark_m5.py --experiment metal-residual-correctness
 .venv/bin/python scripts/profile_m5_routes.py
+.venv/bin/python scripts/benchmark_context.py
+.venv/bin/python scripts/memory_budget.py
+.venv/bin/python scripts/profile_lookup_io.py
 ```
 
-`profile_m5_routes.py --build` compiles the diagnostic entry point and runs only its CPU self-test. It preserves existing engines. Commands that add `--run` do execute GPU/model work and must wait for the user's go-ahead. There is no background waiter, trigger, VM cleanup or auto-resume mechanism.
+Card preparation requires a passing offline receipt for the current scripts/tests/config. The explicit gate excludes real sockets and native self-tests/builds/GPU/model suites. A CPU build remains a separate action. Commands adding `--run` execute real work; the October 9 batch was explicitly authorized by the user. Each full-model launch checks normal pressure, a quiet CPU window and at least 34 GiB available RAM. The accepted batch also stops on any new swap and releases only idle owned model-file cache outside measurements when needed. It never stops unrelated work to create headroom.
 
-The first later test should be a small-model split-mode smoke, followed by full-model expert capture and then bounded split profiling. Stop and preserve evidence if output parity or attribution fails. Use those findings to choose which of the later templates earns implementation.
+## Diagnostic interpretation and earlier evidence
 
-## Preparation evidence
+The diagnostic entry point reads ten expert IDs per token, including a padded 2048-byte routing stride, checks bounds/layer roles and records raw evidence. CPU self-test/fatal-stop cases and a bounded Qwen3.5-4B control/split smoke passed earlier; see [the audit preparation](M5-AUDIT-PREPARATION.md). The dense smoke establishes plumbing only, not Flash expert reuse.
 
-- [Preparation receipt](plans/20261007T055133Z-m5-future/preparation.json), all six protocol/result-template files alongside their cards.
-- [Build and final verification](features/20261006-m5-future-preparation.json), adjacent build/self-test logs.
-- [Offline test log](features/20261006-m5-future-offline.log).
-- [Packet generator](../scripts/prepare_m5_future.py) and [offline parser/template tests](../tests/test_m5_future.py).
+Split callbacks remove fusion and add synchronization. GPU buffers are assigned by monotonic submission intervals; ambiguous, untimed computational or uncovered work is rejected. Those costs rank diagnostic paths; they are not original per-kernel costs, accelerator occupancy or ordinary TPS.
+
+The [Astra source-level review](research/20261007-astra-macos-deepdive.md) explains the staged correctness fix and why other forks do not supply a proven current speed upgrade. Our graph already avoids the port's duplicate GDN recurrence. The [earlier six-card packet](plans/20261007T055133Z-m5-future/preparation.json) is retained as history. Larger models/higher precision may trade speed for capacity; unified memory on this Mac does not pool with another PC.

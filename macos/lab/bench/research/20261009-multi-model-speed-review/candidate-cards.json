@@ -1,0 +1,195 @@
+{
+  "status": "RESEARCH_ONLY",
+  "estimates": "Hypothetical investigator low/base/high scenarios, not measured or additive; planning baseline zero",
+  "candidates": [
+    {
+      "id": "R01",
+      "idea": "QSA all-visible selection bypass",
+      "affects": [
+        "decode",
+        "prompt"
+      ],
+      "evidence": "qwen4exp.cpp744-875; indexer.top_k2048; pooling4; padded n_pool guard <=512, not token-count guard. Retain indexer raw/pool KV writes. Same build_attn_qsa n_sel/dispatch. Normal N02 plans identify indexer work, not dispatch time.",
+      "estimate_low_base_high_percent": [
+        -1,
+        1,
+        3
+      ],
+      "estimate_metric": "native decode TPS",
+      "gate": "Mask, hiddenstate, logits and exact English/code continuation around padding/2048 limit; finite-score premise; no dense attention replacement. Require by_order=false, contiguous positions, fast-path eligibility in topology keys; exclude unsupported nonfinite regimes. Test reused graph across pool limit.",
+      "risk": "Mask equivalence and lifecycle; removed mathematical work must actually be redundant."
+    },
+    {
+      "id": "R02",
+      "idea": "Confidence-zero helper winner-only selection",
+      "affects": [
+        "decode"
+      ],
+      "evidence": "Helper already backend top10; current greedy confidence0 uses candidate0; 248320 vocab T1 uses bitonic+merge not radix.",
+      "estimate_low_base_high_percent": [
+        -0.5,
+        0.5,
+        2
+      ],
+      "estimate_metric": "native decode TPS",
+      "gate": "Unique finite maximum uses exact winner; ties/nonfinite original top10 fallback; no hidden full-logit readback; preserve common-sampler bookkeeping; head+consumer component cost.",
+      "risk": "Unstable existing tie semantics and synchronization; no change to target CPU sampling."
+    },
+    {
+      "id": "R03",
+      "idea": "Dispatch only active expert/token tiles during prompts",
+      "affects": [
+        "prompt"
+      ],
+      "evidence": "Metal ops3009 full grid ceil(T/32)*ceil(N/64)*E; mul_mm kernel536-547 early-outs empty token tiles. T512 E512 top10 launches8192 expert/token tiles; useful tile count <=floor((5120+31*512)/32)=656. This is a launch-count bound, not runtime saving. Preserve existing64x32 tile Q2 math.",
+      "estimate_metric": "prompt throughput; native decode0",
+      "gate": "No CPU routing readback; stable GPU prefix sum/list; exact output math/address mapping and dispatch under real routes; total scheduling+map+MMA cost. First prototype may use a static tight upper-bound launch plus GPU prefix map, avoiding indirect dispatch. Preserve math and account for complete extra scheduling cost.",
+      "risk": "Extra scheduling kernel and GPU launch sizing may erase savings. Upstream MLX gather scheduling inspiration not drop-in Q2.",
+      "estimate_low_base_high_percent": [
+        -3,
+        5,
+        12
+      ]
+    },
+    {
+      "id": "R04",
+      "idea": "Reuse expert route map across prompt gate/up/down",
+      "affects": [
+        "prompt"
+      ],
+      "evidence": "Same selected_experts src passes to gate/up/down in llama-graph2241,2254,2355. Metal ops2929-2957 unconditionally rebuilds ID map per MUL_MAT_ID; destination-local scratch allocation2890.",
+      "estimate_metric": "prompt throughput; native decode0",
+      "gate": "Key by IDs pointer/content version+shape+strides+expert count; shared scratch lifetime until last consumer; prove map entries exactly equal, preserve each operation amax independently.",
+      "risk": "Memory alias/reuse across graphs, actual compatible mapping strides, normal fused execution count.",
+      "estimate_low_base_high_percent": [
+        -1,
+        1,
+        4
+      ]
+    },
+    {
+      "id": "R05",
+      "idea": "Skip prompt-reuse checkpoints on explicit cache_prompt=false tasks",
+      "affects": [
+        "TTFT",
+        "whole reply"
+      ],
+      "evidence": "Actual current matched log creates112.571MiB checkpoints despite --cache-ram0/cache_prompt:false, splitting code48token into44+4. PR30188 open draft head d21082b verified.",
+      "estimate_low_base_high_percent": [
+        0,
+        3,
+        15
+      ],
+      "estimate_metric": "short-prompt TTFT reduction",
+      "gate": "First suppress serialization retain prompt splitpoints; second independent change removes extra splits; preserve speculative rollback and cache-enabled restore. D02 extended exact fixture.",
+      "risk": "Prefill arithmetic changes if ubatch splitpoints removed; cached tests should remain unchanged."
+    },
+    {
+      "id": "R06",
+      "idea": "Remove per-token full-response detokenize HTTP calls",
+      "affects": [
+        "display latency",
+        "CPU",
+        "app reply"
+      ],
+      "evidence": "NativeEngine discards native stream text, yields IDs; Service.detok.push re-decodes all IDs; NativeTokenizer.decode /detokenize each token -> N HTTP calls quadratic IDs serialized.",
+      "estimate_low_base_high_percent": [
+        0,
+        0.5,
+        3
+      ],
+      "estimate_metric": "app whole reply reduction, native TPS0",
+      "gate": "Fake-stream exact events/UTF8 incomplete bytes/reasoning/EOS/cancel then actual native-ready vs app-emitted timestamps. English/code still need UTF8 punctuation handling.",
+      "risk": "Stream content event batching versus token IDs, partial UTF8, parser contract, overlapping work hides latency."
+    },
+    {
+      "id": "R07",
+      "idea": "Deferred accepted-only helper catch-up",
+      "affects": [
+        "decode"
+      ],
+      "evidence": "Server processes full verification batch before acceptance. Replay only committed rows with target verified hidden states; first-draft fusion separately.",
+      "estimate_low_base_high_percent": [
+        -3,
+        2,
+        5
+      ],
+      "estimate_metric": "native decode TPS",
+      "gate": "Target verify width unchanged; pending/verify hidden state+KV equality after every accepted prefix, EOS/cancel/cache/restore; D02 fixture; no reuse autoregressive helper hiddenstates.",
+      "risk": "Helper batch-width arithmetic and driver checkpoint-state gaps; high correctness risk."
+    },
+    {
+      "id": "R08",
+      "idea": "Cache alternating llama/scheduler plans",
+      "affects": [
+        "decode"
+      ],
+      "evidence": "Two arenas exist but gf_res_prev_active mustequalchosenarena; outputfalse catchup/outputtrue draft alternation rebuilds+allocates.",
+      "estimate_low_base_high_percent": [
+        -1,
+        0.5,
+        2
+      ],
+      "estimate_metric": "native decode TPS",
+      "gate": "Host build/reset/allocate and normal GPU timelines prove >=2% exposed critical path; no callbacks/addsync; bounded plan/scratch lifetime. Shared scheduler reset/alloc must be included; graph-build-only vs full allocated plan caching are distinct, with duplicate scratch budget measured first.",
+      "risk": "CPU overhead overlapped, memory growth; upstream encoded Metal graph14570 no gain does not prove this path."
+    },
+    {
+      "id": "R09",
+      "idea": "Exact Q2 cooperative-input prompt kernels",
+      "affects": [
+        "prompt"
+      ],
+      "evidence": "Apple WWDC26 supports register distributed cooperative tensors as matmul input. TensorAPI alreadyON. Stored Q2_0 not MX. macOS27.2 SDK27.0 metadata observed, compile eligibility notproven.",
+      "estimate_low_base_high_percent": [
+        -3,
+        2,
+        8
+      ],
+      "estimate_metric": "prompt throughput, native decode base0",
+      "gate": "Compile-only feature eligibility then exact stored Q2 dequant/component math real prompt shapes; register/smem/occupancy and total op cost.",
+      "risk": "Arithmetic order/mixed precision changes, spill/register pressure; earlier BF16 fewrow failure is distinct."
+    },
+    {
+      "id": "R10",
+      "idea": "Repeated prompt tokenization/cache/resume improvements",
+      "affects": [
+        "request preprocessing",
+        "resume TTFT"
+      ],
+      "evidence": "Parent piece cache f346dc6 not active native tokenizer; llama30137 shared immutable cache unmerged and RAM cache0inactive; llama26004 merged recurrent slot persistence useful only save/restore workload.",
+      "estimate_metric": "Native decode0; workload-specific request/resume latency only",
+      "gate": "Prove user uses and pays for this path before adapting; bounded cache memory and identity/restore output proof.",
+      "risk": "User does not prioritize cross-session chat; no host RAM cache enable bydefault."
+    },
+    {
+      "id": "R11",
+      "idea": "Sparse masked grouped-query F16 K/V reuse",
+      "affects": [
+        "decode"
+      ],
+      "evidence": "24 query heads,2KV,D256. QSA n_kv_max>0 forces vector attention;12 query heads reuse same KV source. MLX GQA q1/no-mask/no-sinks kernel not eligible drop-in.",
+      "estimate_low_base_high_percent": [
+        -3,
+        0,
+        3
+      ],
+      "estimate_metric": "native decode TPS",
+      "gate": "Share selected KV while preserving per-query masks and exact per-head reduction; >=15% attention+consumer component gain and enough actual normal-path attention share.",
+      "risk": "Masked sparse T1-4 requires new design; cache bandwidth reuse may already exist; exactness high risk."
+    }
+  ],
+  "recommended_order": [
+    "R02",
+    "R01",
+    "R04",
+    "R03",
+    "R05",
+    "R06",
+    "R08",
+    "R07",
+    "R09",
+    "R11",
+    "R10"
+  ]
+}

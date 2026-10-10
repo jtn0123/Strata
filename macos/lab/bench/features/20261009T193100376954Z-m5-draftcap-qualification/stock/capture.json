@@ -1,0 +1,5480 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "mode": "stock",
+  "engine": {
+    "engine": "m5-copy",
+    "directory": "vendor/llama-m5-copy",
+    "revision": "d81235049384534c167caea52b85a694f6103d14",
+    "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+    "patch": {
+      "schema": 1,
+      "id": "m5-copy",
+      "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+      "directory": "vendor/llama-m5-copy",
+      "patch": "patches/mtp-m5-copy.patch",
+      "patch_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+      "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+      "modified_files": [
+        "ggml/src/ggml-metal/ggml-metal-common.cpp",
+        "ggml/src/ggml-metal/ggml-metal-common.h",
+        "ggml/src/ggml-metal/ggml-metal-context.m",
+        "ggml/src/ggml-metal/ggml-metal-device.cpp",
+        "ggml/src/ggml-metal/ggml-metal-device.h",
+        "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+        "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+        "ggml/src/ggml-metal/kernels/quantize.metal",
+        "src/llama-context.cpp",
+        "src/llama-cparams.h",
+        "src/models/qwen4exp.cpp",
+        "tests/test-backend-ops.cpp"
+      ],
+      "features": [
+        "mtp-shared",
+        "m5-tuning",
+        "m5-profile",
+        "m5-copy"
+      ],
+      "components": [
+        {
+          "patch": "patches/mtp-m5-correctness.patch",
+          "sha256": "f0d397305b8e6dd148bc32eb92ceedbabd7e5f8d5b69a43de4780b468c0fe07b"
+        }
+      ],
+      "scope": "Isolated same-shape wide F32 row copy experiment. Width 0 keeps the existing dispatch; widths 1,4,8 explicitly opt in. Strided rows preserve all source and destination strides. Unaligned vectors and different shapes fall back. No model, cache, rollback or launcher default changes. Separate conv-direct mode skips an intermediate contiguous tensor before the existing strided copy; all rollback slots remain.",
+      "upstream": {
+        "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+        "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+        "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+        "license_file": "patches/LLAMA-LICENSE.txt"
+      }
+    },
+    "artifacts": {
+      "llama-server": "e60bfd1dd90f4a6000f37068605fac8db7cc25d143ca30e11c6b72f8b7af8570",
+      "libggml-base.0.26.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+      "libggml-base.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+      "libggml-base.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+      "libggml-blas.0.26.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+      "libggml-blas.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+      "libggml-blas.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+      "libggml-cpu.0.26.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+      "libggml-cpu.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+      "libggml-cpu.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+      "libggml-metal.0.26.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+      "libggml-metal.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+      "libggml-metal.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+      "libggml.0.26.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+      "libggml.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+      "libggml.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+      "libllama-common.0.6.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+      "libllama-common.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+      "libllama-common.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+      "libllama-server-impl.dylib": "93e778b6fe31a96ea8790af786b29eadda4a8abc7fdbff0774c999e00d558d2b",
+      "libllama.0.6.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+      "libllama.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+      "libllama.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+      "libmtmd.0.6.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+      "libmtmd.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+      "libmtmd.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5"
+    },
+    "build_receipt": {
+      "engine": "m5-copy",
+      "directory": "vendor/llama-m5-copy",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+      "patch": {
+        "schema": 1,
+        "id": "m5-copy",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-copy",
+        "patch": "patches/mtp-m5-copy.patch",
+        "patch_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+        "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal-device.h",
+          "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "ggml/src/ggml-metal/kernels/quantize.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-copy"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-correctness.patch",
+            "sha256": "f0d397305b8e6dd148bc32eb92ceedbabd7e5f8d5b69a43de4780b468c0fe07b"
+          }
+        ],
+        "scope": "Isolated same-shape wide F32 row copy experiment. Width 0 keeps the existing dispatch; widths 1,4,8 explicitly opt in. Strided rows preserve all source and destination strides. Unaligned vectors and different shapes fall back. No model, cache, rollback or launcher default changes. Separate conv-direct mode skips an intermediate contiguous tensor before the existing strided copy; all rollback slots remain.",
+        "upstream": {
+          "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+          "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+          "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        }
+      },
+      "artifacts": {
+        "llama-server": "e60bfd1dd90f4a6000f37068605fac8db7cc25d143ca30e11c6b72f8b7af8570",
+        "libggml-base.0.26.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+        "libggml-base.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+        "libggml-base.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+        "libggml-blas.0.26.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+        "libggml-blas.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+        "libggml-blas.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+        "libggml-cpu.0.26.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+        "libggml-cpu.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+        "libggml-cpu.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+        "libggml-metal.0.26.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+        "libggml-metal.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+        "libggml-metal.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+        "libggml.0.26.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+        "libggml.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+        "libggml.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+        "libllama-common.0.6.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+        "libllama-common.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+        "libllama-common.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+        "libllama-server-impl.dylib": "93e778b6fe31a96ea8790af786b29eadda4a8abc7fdbff0774c999e00d558d2b",
+        "libllama.0.6.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+        "libllama.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+        "libllama.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+        "libmtmd.0.6.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+        "libmtmd.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+        "libmtmd.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5"
+      },
+      "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+      "build_settings": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GGML_BLAS": "ON",
+        "GGML_CPU": "ON",
+        "GGML_METAL": "ON",
+        "GGML_METAL_EMBED_LIBRARY": "ON",
+        "GGML_NATIVE": "ON",
+        "LLAMA_BUILD_TESTS": "ON",
+        "LLAMA_BUILD_TOOLS": "ON"
+      },
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+    }
+  },
+  "model_proof": {
+    "models": {
+      "flash": {
+        "registry": {
+          "repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+          "revision": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+          "files": [
+            {
+              "path": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+              "size_bytes": 37623740192,
+              "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+            },
+            {
+              "path": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+              "size_bytes": 28800138432,
+              "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+            }
+          ]
+        },
+        "files": [
+          {
+            "path": "models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+            "identity": {
+              "device": 16777231,
+              "inode": 12275728,
+              "size": 37623740192,
+              "mtime_ns": 1791285259903817006,
+              "ctime_ns": 1791285274094675655
+            },
+            "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720",
+            "hash_scan_performed": false
+          },
+          {
+            "path": "models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+            "identity": {
+              "device": 16777231,
+              "inode": 12275727,
+              "size": 28800138432,
+              "mtime_ns": 1791285068846386185,
+              "ctime_ns": 1791285081157043840
+            },
+            "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113",
+            "hash_scan_performed": false
+          }
+        ],
+        "routing_geometry": {
+          "general.architecture": "qwen4exp",
+          "qwen4exp.block_count": 48,
+          "qwen4exp.embedding_length": 2560,
+          "qwen4exp.expert_count": 512,
+          "qwen4exp.expert_used_count": 10
+        }
+      },
+      "mtp_shared_packed_q3": {
+        "registry": {
+          "derived": {
+            "source_model": "mtp_shared_q3",
+            "source_sha256": "6b8a04dfd4c60e1bde4b25de96f0d7b0a9a39c2b90cba43e27e199c2d839713d",
+            "layout": "CPU expert tables first, GPU dense tensors last",
+            "required_engine": "mtp-shared",
+            "receipt": "bench/results/20261006T183818Z-prepare-shared-layout/preparation.json"
+          },
+          "files": [
+            {
+              "path": "mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf",
+              "size_bytes": 1251560832,
+              "sha256": "e7e8a4187cbca95f51d82c618e76fe6057a25ba376599fd11bbd2e2c48380954"
+            }
+          ]
+        },
+        "files": [
+          {
+            "path": "models/mtp_shared_packed_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf",
+            "identity": {
+              "device": 16777231,
+              "inode": 13385167,
+              "size": 1251560832,
+              "mtime_ns": 1791311898896296524,
+              "ctime_ns": 1791311903883742578
+            },
+            "sha256": "e7e8a4187cbca95f51d82c618e76fe6057a25ba376599fd11bbd2e2c48380954",
+            "hash_scan_performed": false
+          }
+        ],
+        "routing_geometry": {
+          "general.architecture": "qwen4exp",
+          "qwen4exp.block_count": 49,
+          "qwen4exp.embedding_length": 2560,
+          "qwen4exp.expert_count": 512,
+          "qwen4exp.expert_used_count": 10
+        }
+      }
+    },
+    "hash_io_policy": "Initial or changed files: bounded reads with macOS F_NOCACHE outside measurements. Cached verification uses identity/size/mtime/ctime; not protection against adversarial modification. Headers are read; cache state remains uncontrolled."
+  },
+  "runner_sha256": "b8218470f595f987dd6ea66312ead0655efd74c3a43b6ca1d1e1b65369a84e18",
+  "metal_environment": {
+    "tensor_api": "on",
+    "tuning": "conv-direct",
+    "profile": false,
+    "variables": {
+      "GGML_M5_LAB_CONV_DIRECT": "1",
+      "GGML_METAL_TENSOR_ENABLE": "1",
+      "LLAMA_TRACE": "1"
+    }
+  },
+  "requests": [
+    {
+      "workload": "warmup",
+      "prompt_sha256": "3259200f940953803c668e5368fc377fae96724e72a6afd853a4dadd44812811",
+      "policy": {
+        "count": 8,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 218595,
+      "log_end": 221457,
+      "response": {
+        "ttft_s": 0.3842948750243522,
+        "wall_s": 0.5423741660197265,
+        "text": "Comparing local AI models is a nuanced",
+        "generated_token_ids": [
+          16619,
+          286,
+          2136,
+          14791,
+          3983,
+          369,
+          264,
+          78971
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 8,
+          "tokens_evaluated": 58,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 8,
+            "n_predict": 8,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nExplain how to fairly compare local AI model speed and memory usage. Discuss warmup, input length, repeated trials, background programs, first-token delay, output speed, accuracy, and practical examples. Write about eight hundred words.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": false,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 65,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 58,
+            "prompt_ms": 382.424,
+            "prompt_per_token_ms": 6.59351724137931,
+            "prompt_per_second": 151.66412149865073,
+            "predicted_n": 8,
+            "predicted_ms": 158.106,
+            "predicted_per_token_ms": 22.58657142857143,
+            "predicted_per_second": 44.274094594765536,
+            "draft_n": 5,
+            "draft_n_accepted": 4
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 2,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "limit1",
+      "prompt_sha256": "6eaff0ef1347716b24bbba9d597bc675cfaa5bba18b4d62c7baa57aa5ed1c62b",
+      "policy": {
+        "count": 1,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 221457,
+      "log_end": 224138,
+      "response": {
+        "ttft_s": 0.3389213330228813,
+        "wall_s": 0.3389889580430463,
+        "text": "```",
+        "generated_token_ids": [
+          71093
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 1,
+          "tokens_evaluated": 60,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 1,
+            "n_predict": 1,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nWrite a Python command-line program that compares two JSON benchmark reports. Validate their model and workload identities, calculate throughput and latency changes, reject missing values and zero denominators, and print a clear table. Explain the edge cases and include examples.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": false,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 60,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 60,
+            "prompt_ms": 337.444,
+            "prompt_per_token_ms": 5.624066666666667,
+            "prompt_per_second": 177.80728061545025,
+            "predicted_n": 1,
+            "predicted_ms": 0.001,
+            "predicted_per_token_ms": 0.0,
+            "predicted_per_second": 0.0
+          }
+        }
+      },
+      "acceptance": []
+    },
+    {
+      "workload": "limit2",
+      "prompt_sha256": "6eaff0ef1347716b24bbba9d597bc675cfaa5bba18b4d62c7baa57aa5ed1c62b",
+      "policy": {
+        "count": 2,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 224138,
+      "log_end": 226860,
+      "response": {
+        "ttft_s": 0.3047690420062281,
+        "wall_s": 0.33743279200280085,
+        "text": "```python",
+        "generated_token_ids": [
+          71093,
+          12305
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 2,
+          "tokens_evaluated": 60,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 2,
+            "n_predict": 2,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nWrite a Python command-line program that compares two JSON benchmark reports. Validate their model and workload identities, calculate throughput and latency changes, reject missing values and zero denominators, and print a clear table. Explain the edge cases and include examples.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": false,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 61,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 60,
+            "prompt_ms": 304.035,
+            "prompt_per_token_ms": 5.0672500000000005,
+            "prompt_per_second": 197.34570033055405,
+            "predicted_n": 2,
+            "predicted_ms": 32.619,
+            "predicted_per_token_ms": 32.619,
+            "predicted_per_second": 30.6569790612833
+          }
+        }
+      },
+      "acceptance": []
+    },
+    {
+      "workload": "limit3",
+      "prompt_sha256": "6eaff0ef1347716b24bbba9d597bc675cfaa5bba18b4d62c7baa57aa5ed1c62b",
+      "policy": {
+        "count": 3,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 226860,
+      "log_end": 229899,
+      "response": {
+        "ttft_s": 0.30741150001995265,
+        "wall_s": 0.3625911669805646,
+        "text": "```python\n",
+        "generated_token_ids": [
+          71093,
+          12305,
+          198
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 3,
+          "tokens_evaluated": 60,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 3,
+            "n_predict": 3,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nWrite a Python command-line program that compares two JSON benchmark reports. Validate their model and workload identities, calculate throughput and latency changes, reject missing values and zero denominators, and print a clear table. Explain the edge cases and include examples.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": true,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 62,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 60,
+            "prompt_ms": 306.03,
+            "prompt_per_token_ms": 5.100499999999999,
+            "prompt_per_second": 196.0592098813842,
+            "predicted_n": 3,
+            "predicted_ms": 55.043,
+            "predicted_per_token_ms": 27.5215,
+            "predicted_per_second": 36.3352288211035,
+            "draft_n": 1,
+            "draft_n_accepted": 1
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 1,
+          "drafted": 1,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "limit4",
+      "prompt_sha256": "6eaff0ef1347716b24bbba9d597bc675cfaa5bba18b4d62c7baa57aa5ed1c62b",
+      "policy": {
+        "count": 4,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 229899,
+      "log_end": 232938,
+      "response": {
+        "ttft_s": 0.3293109579826705,
+        "wall_s": 0.39344520797021687,
+        "text": "```python\n#!/",
+        "generated_token_ids": [
+          71093,
+          12305,
+          198,
+          8436
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 4,
+          "tokens_evaluated": 60,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 4,
+            "n_predict": 4,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nWrite a Python command-line program that compares two JSON benchmark reports. Validate their model and workload identities, calculate throughput and latency changes, reject missing values and zero denominators, and print a clear table. Explain the edge cases and include examples.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": true,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 63,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 60,
+            "prompt_ms": 327.828,
+            "prompt_per_token_ms": 5.4638,
+            "prompt_per_second": 183.02280464145835,
+            "predicted_n": 4,
+            "predicted_ms": 63.958,
+            "predicted_per_token_ms": 21.319333333333333,
+            "predicted_per_second": 46.9057819193846,
+            "draft_n": 2,
+            "draft_n_accepted": 2
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 2,
+          "drafted": 2,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "limit5",
+      "prompt_sha256": "6eaff0ef1347716b24bbba9d597bc675cfaa5bba18b4d62c7baa57aa5ed1c62b",
+      "policy": {
+        "count": 5,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 232938,
+      "log_end": 235977,
+      "response": {
+        "ttft_s": 0.3069359580404125,
+        "wall_s": 0.3697484580334276,
+        "text": "```python\n#!/usr",
+        "generated_token_ids": [
+          71093,
+          12305,
+          198,
+          8436,
+          6843
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 5,
+          "tokens_evaluated": 60,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 5,
+            "n_predict": 5,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nWrite a Python command-line program that compares two JSON benchmark reports. Validate their model and workload identities, calculate throughput and latency changes, reject missing values and zero denominators, and print a clear table. Explain the edge cases and include examples.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": true,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 64,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 60,
+            "prompt_ms": 305.715,
+            "prompt_per_token_ms": 5.095249999999999,
+            "prompt_per_second": 196.26122368872973,
+            "predicted_n": 5,
+            "predicted_ms": 62.57,
+            "predicted_per_token_ms": 15.6425,
+            "predicted_per_second": 63.9284001917852,
+            "draft_n": 3,
+            "draft_n_accepted": 3
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "limit7",
+      "prompt_sha256": "6eaff0ef1347716b24bbba9d597bc675cfaa5bba18b4d62c7baa57aa5ed1c62b",
+      "policy": {
+        "count": 7,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 235977,
+      "log_end": 239096,
+      "response": {
+        "ttft_s": 0.3096365829696879,
+        "wall_s": 0.41725612501613796,
+        "text": "```python\n#!/usr/bin/env",
+        "generated_token_ids": [
+          71093,
+          12305,
+          198,
+          8436,
+          6843,
+          8484,
+          13946
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 7,
+          "tokens_evaluated": 60,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 7,
+            "n_predict": 7,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nWrite a Python command-line program that compares two JSON benchmark reports. Validate their model and workload identities, calculate throughput and latency changes, reject missing values and zero denominators, and print a clear table. Explain the edge cases and include examples.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": true,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 66,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 60,
+            "prompt_ms": 308.164,
+            "prompt_per_token_ms": 5.136066666666666,
+            "prompt_per_second": 194.7015225659065,
+            "predicted_n": 7,
+            "predicted_ms": 107.518,
+            "predicted_per_token_ms": 17.919666666666668,
+            "predicted_per_second": 55.80460946074146,
+            "draft_n": 4,
+            "draft_n_accepted": 4
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 1,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "limit8",
+      "prompt_sha256": "6eaff0ef1347716b24bbba9d597bc675cfaa5bba18b4d62c7baa57aa5ed1c62b",
+      "policy": {
+        "count": 8,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 239096,
+      "log_end": 242215,
+      "response": {
+        "ttft_s": 0.3101908339885995,
+        "wall_s": 0.4340202499879524,
+        "text": "```python\n#!/usr/bin/env python",
+        "generated_token_ids": [
+          71093,
+          12305,
+          198,
+          8436,
+          6843,
+          8484,
+          13946,
+          9834
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 8,
+          "tokens_evaluated": 60,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 8,
+            "n_predict": 8,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nWrite a Python command-line program that compares two JSON benchmark reports. Validate their model and workload identities, calculate throughput and latency changes, reject missing values and zero denominators, and print a clear table. Explain the edge cases and include examples.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": true,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 67,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 60,
+            "prompt_ms": 308.953,
+            "prompt_per_token_ms": 5.149216666666666,
+            "prompt_per_second": 194.2042964463851,
+            "predicted_n": 8,
+            "predicted_ms": 123.523,
+            "predicted_per_token_ms": 17.646142857142856,
+            "predicted_per_second": 56.66960808918178,
+            "draft_n": 5,
+            "draft_n_accepted": 5
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 2,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "limit16",
+      "prompt_sha256": "6eaff0ef1347716b24bbba9d597bc675cfaa5bba18b4d62c7baa57aa5ed1c62b",
+      "policy": {
+        "count": 16,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 242215,
+      "log_end": 245495,
+      "response": {
+        "ttft_s": 0.30915666703367606,
+        "wall_s": 0.5411038750316948,
+        "text": "```python\n#!/usr/bin/env python3\n\"\"\"\nCompare two JSON benchmark",
+        "generated_token_ids": [
+          71093,
+          12305,
+          198,
+          8436,
+          6843,
+          8484,
+          13946,
+          9834,
+          18,
+          198,
+          12237,
+          198,
+          26487,
+          1330,
+          4566,
+          27502
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 16,
+          "tokens_evaluated": 60,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 16,
+            "n_predict": 16,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nWrite a Python command-line program that compares two JSON benchmark reports. Validate their model and workload identities, calculate throughput and latency changes, reject missing values and zero denominators, and print a clear table. Explain the edge cases and include examples.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": true,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 75,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 60,
+            "prompt_ms": 307.998,
+            "prompt_per_token_ms": 5.1333,
+            "prompt_per_second": 194.8064597822064,
+            "predicted_n": 16,
+            "predicted_ms": 231.776,
+            "predicted_per_token_ms": 15.451733333333333,
+            "predicted_per_second": 64.71765842882783,
+            "draft_n": 11,
+            "draft_n_accepted": 11
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 2,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "prose-0",
+      "prompt_sha256": "3259200f940953803c668e5368fc377fae96724e72a6afd853a4dadd44812811",
+      "policy": {
+        "count": 64,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 245495,
+      "log_end": 250735,
+      "response": {
+        "ttft_s": 0.31435945798875764,
+        "wall_s": 1.967896040994674,
+        "text": "Comparing local AI models is a nuanced task because raw benchmark numbers often mislead users. A model might claim to generate 100 tokens per second, but if it requires 16GB of RAM to run, it is useless on a laptop with 8GB. To fairly compare speed and memory usage,",
+        "generated_token_ids": [
+          16619,
+          286,
+          2136,
+          14791,
+          3983,
+          369,
+          264,
+          78971,
+          3274,
+          1521,
+          6891,
+          27502,
+          4947,
+          3428,
+          5605,
+          25227,
+          3719,
+          13,
+          357,
+          1558,
+          2493,
+          3591,
+          310,
+          6707,
+          220,
+          16,
+          15,
+          15,
+          10885,
+          791,
+          2018,
+          11,
+          694,
+          413,
+          424,
+          7225,
+          220,
+          16,
+          21,
+          5213,
+          314,
+          21360,
+          310,
+          1542,
+          11,
+          424,
+          369,
+          27906,
+          383,
+          264,
+          20012,
+          440,
+          220,
+          23,
+          5213,
+          13,
+          1946,
+          13733,
+          9150,
+          4478,
+          321,
+          4779,
+          10121,
+          11
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 64,
+          "tokens_evaluated": 58,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 64,
+            "n_predict": 64,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nExplain how to fairly compare local AI model speed and memory usage. Discuss warmup, input length, repeated trials, background programs, first-token delay, output speed, accuracy, and practical examples. Write about eight hundred words.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": false,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 121,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 58,
+            "prompt_ms": 313.224,
+            "prompt_per_token_ms": 5.400413793103448,
+            "prompt_per_second": 185.1709958368452,
+            "predicted_n": 64,
+            "predicted_ms": 1653.318,
+            "predicted_per_token_ms": 26.243142857142857,
+            "predicted_per_second": 38.1051921046042,
+            "draft_n": 87,
+            "draft_n_accepted": 34
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "prose-0.6",
+      "prompt_sha256": "3259200f940953803c668e5368fc377fae96724e72a6afd853a4dadd44812811",
+      "policy": {
+        "count": 64,
+        "temperature": 0.6,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 250735,
+      "log_end": 256176,
+      "response": {
+        "ttft_s": 0.3149197499733418,
+        "wall_s": 2.079738958971575,
+        "text": "Comparing the performance of local AI models is a nuanced challenge. Unlike cloud-based services where latency is dictated by server load and network conditions, local inference is bound by the specific hardware configuration of the user\u2019s machine. To achieve a fair comparison, one must move beyond simple \"tokens per second\" metrics and adopt a rigorous",
+        "generated_token_ids": [
+          16619,
+          286,
+          279,
+          4906,
+          314,
+          2136,
+          14791,
+          3983,
+          369,
+          264,
+          78971,
+          8381,
+          13,
+          25215,
+          9158,
+          5792,
+          3401,
+          1332,
+          37972,
+          369,
+          77627,
+          539,
+          3421,
+          2706,
+          321,
+          3790,
+          4530,
+          11,
+          2136,
+          42903,
+          369,
+          6608,
+          539,
+          279,
+          3050,
+          11436,
+          6343,
+          314,
+          279,
+          1156,
+          725,
+          5484,
+          13,
+          1946,
+          10752,
+          264,
+          6415,
+          11960,
+          11,
+          799,
+          1902,
+          3166,
+          7551,
+          4145,
+          328,
+          29567,
+          791,
+          2018,
+          1,
+          16243,
+          321,
+          10584,
+          264,
+          45332
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 64,
+          "tokens_evaluated": 58,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.6000000238418579,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 64,
+            "n_predict": 64,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nExplain how to fairly compare local AI model speed and memory usage. Discuss warmup, input length, repeated trials, background programs, first-token delay, output speed, accuracy, and practical examples. Write about eight hundred words.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": false,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 121,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 58,
+            "prompt_ms": 313.126,
+            "prompt_per_token_ms": 5.398724137931034,
+            "prompt_per_second": 185.22894936862477,
+            "predicted_n": 64,
+            "predicted_ms": 1764.723,
+            "predicted_per_token_ms": 28.01147619047619,
+            "predicted_per_second": 35.699653713358984,
+            "draft_n": 91,
+            "draft_n_accepted": 32
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 1,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "code-0",
+      "prompt_sha256": "6eaff0ef1347716b24bbba9d597bc675cfaa5bba18b4d62c7baa57aa5ed1c62b",
+      "policy": {
+        "count": 64,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 256176,
+      "log_end": 260568,
+      "response": {
+        "ttft_s": 0.30848545901244506,
+        "wall_s": 1.3635688339709304,
+        "text": "```python\n#!/usr/bin/env python3\n\"\"\"\nCompare two JSON benchmark reports.\n\nUsage:\n    python compare_benchmarks.py report1.json report2.json\n\nEach report should contain:\n    - model: string identifying the model\n    - workload: string identifying the workload\n    - throughput:",
+        "generated_token_ids": [
+          71093,
+          12305,
+          198,
+          8436,
+          6843,
+          8484,
+          13946,
+          9834,
+          18,
+          198,
+          12237,
+          198,
+          26487,
+          1330,
+          4566,
+          27502,
+          6473,
+          13,
+          271,
+          14354,
+          25,
+          198,
+          262,
+          9834,
+          9150,
+          853,
+          19159,
+          15087,
+          6971,
+          1830,
+          16,
+          4182,
+          1830,
+          17,
+          4182,
+          271,
+          4699,
+          1830,
+          1220,
+          6435,
+          25,
+          198,
+          262,
+          471,
+          1558,
+          25,
+          886,
+          23812,
+          279,
+          1558,
+          198,
+          262,
+          471,
+          51797,
+          25,
+          886,
+          23812,
+          279,
+          51797,
+          198,
+          262,
+          471,
+          61610,
+          25
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 64,
+          "tokens_evaluated": 60,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 64,
+            "n_predict": 64,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nWrite a Python command-line program that compares two JSON benchmark reports. Validate their model and workload identities, calculate throughput and latency changes, reject missing values and zero denominators, and print a clear table. Explain the edge cases and include examples.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": true,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 123,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 60,
+            "prompt_ms": 307.284,
+            "prompt_per_token_ms": 5.1213999999999995,
+            "prompt_per_second": 195.25910883742728,
+            "predicted_n": 64,
+            "predicted_ms": 1055.013,
+            "predicted_per_token_ms": 16.746238095238095,
+            "predicted_per_second": 59.7149039869651,
+            "draft_n": 54,
+            "draft_n_accepted": 44
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "code-0.6",
+      "prompt_sha256": "6eaff0ef1347716b24bbba9d597bc675cfaa5bba18b4d62c7baa57aa5ed1c62b",
+      "policy": {
+        "count": 64,
+        "temperature": 0.6,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 260568,
+      "log_end": 265002,
+      "response": {
+        "ttft_s": 0.307786124991253,
+        "wall_s": 1.350745208968874,
+        "text": "```python\n#!/usr/bin/env python3\n\"\"\"\nCompare two JSON benchmark reports.\n\nUsage:\n    python compare_benchmarks.py report1.json report2.json\n\nEach JSON report should contain:\n{\n    \"model\": \"model_name\",\n    \"workload\": \"workload_name\",",
+        "generated_token_ids": [
+          71093,
+          12305,
+          198,
+          8436,
+          6843,
+          8484,
+          13946,
+          9834,
+          18,
+          198,
+          12237,
+          198,
+          26487,
+          1330,
+          4566,
+          27502,
+          6473,
+          13,
+          271,
+          14354,
+          25,
+          198,
+          262,
+          9834,
+          9150,
+          853,
+          19159,
+          15087,
+          6971,
+          1830,
+          16,
+          4182,
+          1830,
+          17,
+          4182,
+          271,
+          4699,
+          4566,
+          1830,
+          1220,
+          6435,
+          25,
+          198,
+          90,
+          198,
+          262,
+          328,
+          2448,
+          763,
+          328,
+          2448,
+          1224,
+          487,
+          198,
+          262,
+          328,
+          1715,
+          1043,
+          763,
+          328,
+          1715,
+          1043,
+          1224,
+          487
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 64,
+          "tokens_evaluated": 60,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.6000000238418579,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 64,
+            "n_predict": 64,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nWrite a Python command-line program that compares two JSON benchmark reports. Validate their model and workload identities, calculate throughput and latency changes, reject missing values and zero denominators, and print a clear table. Explain the edge cases and include examples.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": true,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 123,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 60,
+            "prompt_ms": 306.807,
+            "prompt_per_token_ms": 5.11345,
+            "prompt_per_second": 195.56268272888167,
+            "predicted_n": 64,
+            "predicted_ms": 1042.901,
+            "predicted_per_token_ms": 16.55398412698413,
+            "predicted_per_second": 60.40841844048476,
+            "draft_n": 54,
+            "draft_n_accepted": 44
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "chinese-0",
+      "prompt_sha256": "7685925f0e1ff4e8b9c22f3e5d43a67d528221464f39a502c17377369c6a8b06",
+      "policy": {
+        "count": 64,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 265002,
+      "log_end": 270205,
+      "response": {
+        "ttft_s": 0.34906425001099706,
+        "wall_s": 1.965007291000802,
+        "text": "\u516c\u5e73\u6bd4\u8f83\u4e24\u4e2a\u672c\u5730\u4eba\u5de5\u667a\u80fd\u6a21\u578b\u7684\u6027\u80fd\uff0c\u4e0d\u80fd\u4ec5\u51ed\u201c\u611f\u89c9\u5feb\u201d\u6216\u201c\u6162\u201d\uff0c\u5fc5\u987b\u5efa\u7acb\u4e00\u5957\u4e25\u8c28\u3001\u53ef\u590d\u73b0\u7684\u6d4b\u8bd5\u6d41\u7a0b\u3002\u9996\u5148\uff0c**\u9884\u70ed\uff08Warm-up\uff09**\u81f3\u5173\u91cd\u8981\u3002\u6a21\u578b\u52a0\u8f7d\u540e\uff0c\u9996\u6b21\u8fd0\u884c\u5f80\u5f80\u56e0\u7f13\u5b58\u672a\u547d\u4e2d\u6216\u5185\u5b58\u5206\u914d\u5bfc\u81f4\u5ef6\u8fdf\u6781\u9ad8\u3002\u56e0\u6b64\uff0c\u5728\u6b63\u5f0f\u6d4b\u8bd5",
+        "generated_token_ids": [
+          99657,
+          97016,
+          97889,
+          103862,
+          109015,
+          103725,
+          115554,
+          3709,
+          96849,
+          96725,
+          97963,
+          2005,
+          98414,
+          96239,
+          828,
+          96348,
+          2005,
+          97448,
+          32478,
+          97240,
+          98255,
+          109345,
+          110490,
+          5205,
+          95824,
+          96374,
+          95963,
+          95726,
+          99449,
+          98440,
+          1710,
+          99924,
+          3709,
+          332,
+          118797,
+          9616,
+          91986,
+          5072,
+          203309,
+          113870,
+          1710,
+          103725,
+          102173,
+          95946,
+          3709,
+          103789,
+          98836,
+          101615,
+          96161,
+          111734,
+          96449,
+          105426,
+          96348,
+          108777,
+          100679,
+          97994,
+          111667,
+          118487,
+          1710,
+          100532,
+          3709,
+          95772,
+          98438,
+          99449
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 64,
+          "tokens_evaluated": 56,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 64,
+            "n_predict": 64,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\n\u8bf7\u7528\u4e2d\u6587\u8be6\u7ec6\u89e3\u91ca\u5982\u4f55\u516c\u5e73\u6bd4\u8f83\u4e24\u4e2a\u672c\u5730\u4eba\u5de5\u667a\u80fd\u6a21\u578b\u8fd0\u884c\u7a0b\u5e8f\u7684\u6027\u80fd\u3002\u8ba8\u8bba\u9884\u70ed\u3001\u8f93\u5165\u957f\u5ea6\u3001\u91cd\u590d\u6d4b\u8bd5\u3001\u540e\u53f0\u7a0b\u5e8f\u3001\u9996\u5b57\u5ef6\u8fdf\u3001\u751f\u6210\u901f\u5ea6\u548c\u5185\u5b58\uff0c\u7ed9\u51fa\u5177\u4f53\u4f8b\u5b50\uff0c\u5199\u7ea6\u516b\u767e\u5b57\u3002<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": false,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 119,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 56,
+            "prompt_ms": 347.648,
+            "prompt_per_token_ms": 6.208,
+            "prompt_per_second": 161.08247422680412,
+            "predicted_n": 64,
+            "predicted_ms": 1615.838,
+            "predicted_per_token_ms": 25.648222222222223,
+            "predicted_per_second": 38.989057071315315,
+            "draft_n": 82,
+            "draft_n_accepted": 35
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 1,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "chinese-0.6",
+      "prompt_sha256": "7685925f0e1ff4e8b9c22f3e5d43a67d528221464f39a502c17377369c6a8b06",
+      "policy": {
+        "count": 64,
+        "temperature": 0.6,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 270205,
+      "log_end": 275530,
+      "response": {
+        "ttft_s": 0.3064004590269178,
+        "wall_s": 1.9276164170005359,
+        "text": "\u516c\u5e73\u6bd4\u8f83\u4e24\u4e2a\u672c\u5730\u4eba\u5de5\u667a\u80fd\u6a21\u578b\u7684\u6027\u80fd\uff0c\u4e0d\u80fd\u4ec5\u51ed\u201c\u611f\u89c9\u5feb\u201d\u6216\u201c\u6162\u201d\uff0c\u5fc5\u987b\u5efa\u7acb\u4e25\u8c28\u7684\u63a7\u5236\u53d8\u91cf\u4f53\u7cfb\u3002\u9996\u5148\uff0c**\u9884\u70ed\uff08Warm-up\uff09**\u81f3\u5173\u91cd\u8981\u3002\u6a21\u578b\u9996\u6b21\u52a0\u8f7d\u65f6\u9700\u5c06\u6743\u91cd\u4ece\u786c\u76d8\u8bfb\u53d6\u81f3\u663e\u5b58\u6216\u5185\u5b58\uff0c\u8fd9\u4e00\u8fc7\u7a0b\u8017\u65f6\u6781\u957f\u4e14\u4e0d\u53ef\u590d\u73b0\u3002\u56e0\u6b64\uff0c",
+        "generated_token_ids": [
+          99657,
+          97016,
+          97889,
+          103862,
+          109015,
+          103725,
+          115554,
+          3709,
+          96849,
+          96725,
+          97963,
+          2005,
+          98414,
+          96239,
+          828,
+          96348,
+          2005,
+          97448,
+          32478,
+          97240,
+          98255,
+          110490,
+          113813,
+          104201,
+          98141,
+          1710,
+          99924,
+          3709,
+          332,
+          118797,
+          9616,
+          91986,
+          5072,
+          203309,
+          113870,
+          1710,
+          103725,
+          103789,
+          102173,
+          95865,
+          96195,
+          96123,
+          113726,
+          96200,
+          104723,
+          111388,
+          96337,
+          96547,
+          96458,
+          96348,
+          108777,
+          3709,
+          97884,
+          97424,
+          124445,
+          96376,
+          95940,
+          97447,
+          97196,
+          96374,
+          95963,
+          1710,
+          100532,
+          3709
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 64,
+          "tokens_evaluated": 56,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.6000000238418579,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 64,
+            "n_predict": 64,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\n\u8bf7\u7528\u4e2d\u6587\u8be6\u7ec6\u89e3\u91ca\u5982\u4f55\u516c\u5e73\u6bd4\u8f83\u4e24\u4e2a\u672c\u5730\u4eba\u5de5\u667a\u80fd\u6a21\u578b\u8fd0\u884c\u7a0b\u5e8f\u7684\u6027\u80fd\u3002\u8ba8\u8bba\u9884\u70ed\u3001\u8f93\u5165\u957f\u5ea6\u3001\u91cd\u590d\u6d4b\u8bd5\u3001\u540e\u53f0\u7a0b\u5e8f\u3001\u9996\u5b57\u5ef6\u8fdf\u3001\u751f\u6210\u901f\u5ea6\u548c\u5185\u5b58\uff0c\u7ed9\u51fa\u5177\u4f53\u4f8b\u5b50\uff0c\u5199\u7ea6\u516b\u767e\u5b57\u3002<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": false,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 119,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 56,
+            "prompt_ms": 305.059,
+            "prompt_per_token_ms": 5.447482142857143,
+            "prompt_per_second": 183.57104691223665,
+            "predicted_n": 64,
+            "predicted_ms": 1621.035,
+            "predicted_per_token_ms": 25.73071428571429,
+            "predicted_per_second": 38.86405907336979,
+            "draft_n": 87,
+            "draft_n_accepted": 34
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "seed-repeat",
+      "prompt_sha256": "6eaff0ef1347716b24bbba9d597bc675cfaa5bba18b4d62c7baa57aa5ed1c62b",
+      "policy": {
+        "count": 64,
+        "temperature": 0.6,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 275530,
+      "log_end": 279923,
+      "response": {
+        "ttft_s": 0.3132193330093287,
+        "wall_s": 1.3173269160324708,
+        "text": "```python\n#!/usr/bin/env python3\n\"\"\"\nCompare two JSON benchmark reports.\n\nUsage:\n    python compare_benchmarks.py report1.json report2.json\n\nEach JSON report should contain:\n{\n    \"model\": \"model_name\",\n    \"workload\": \"workload_name\",",
+        "generated_token_ids": [
+          71093,
+          12305,
+          198,
+          8436,
+          6843,
+          8484,
+          13946,
+          9834,
+          18,
+          198,
+          12237,
+          198,
+          26487,
+          1330,
+          4566,
+          27502,
+          6473,
+          13,
+          271,
+          14354,
+          25,
+          198,
+          262,
+          9834,
+          9150,
+          853,
+          19159,
+          15087,
+          6971,
+          1830,
+          16,
+          4182,
+          1830,
+          17,
+          4182,
+          271,
+          4699,
+          4566,
+          1830,
+          1220,
+          6435,
+          25,
+          198,
+          90,
+          198,
+          262,
+          328,
+          2448,
+          763,
+          328,
+          2448,
+          1224,
+          487,
+          198,
+          262,
+          328,
+          1715,
+          1043,
+          763,
+          328,
+          1715,
+          1043,
+          1224,
+          487
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 64,
+          "tokens_evaluated": 60,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.6000000238418579,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 64,
+            "n_predict": 64,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nWrite a Python command-line program that compares two JSON benchmark reports. Validate their model and workload identities, calculate throughput and latency changes, reject missing values and zero denominators, and print a clear table. Explain the edge cases and include examples.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": true,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 123,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 60,
+            "prompt_ms": 311.755,
+            "prompt_per_token_ms": 5.195916666666666,
+            "prompt_per_second": 192.4588218312457,
+            "predicted_n": 64,
+            "predicted_ms": 1004.076,
+            "predicted_per_token_ms": 15.937714285714286,
+            "predicted_per_second": 62.744254418988206,
+            "draft_n": 54,
+            "draft_n_accepted": 44
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "normal-eos",
+      "prompt_sha256": "0600fed29da49b2828137195ebb06d78c1b43a257b1cc501fc78161d2c6de816",
+      "policy": {
+        "count": 64,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": false,
+        "seed": 1234
+      },
+      "log_begin": 279923,
+      "log_end": 282964,
+      "response": {
+        "ttft_s": 0.48868112498894334,
+        "wall_s": 0.5477058329852298,
+        "text": "42",
+        "generated_token_ids": [
+          19,
+          17,
+          248046
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 3,
+          "tokens_evaluated": 28,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 64,
+            "n_predict": 64,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": false,
+            "stream": true,
+            "logit_bias": [],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nWhat is 17 plus 25? Reply with only the number.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": false,
+          "truncated": false,
+          "stop_type": "eos",
+          "stopping_word": "",
+          "tokens_cached": 30,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 28,
+            "prompt_ms": 487.533,
+            "prompt_per_token_ms": 17.411892857142856,
+            "prompt_per_second": 57.43200973062336,
+            "predicted_n": 3,
+            "predicted_ms": 58.91,
+            "predicted_per_token_ms": 29.455,
+            "predicted_per_second": 33.950093362756746,
+            "draft_n": 3,
+            "draft_n_accepted": 1
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "continuation-first",
+      "prompt_sha256": "3259200f940953803c668e5368fc377fae96724e72a6afd853a4dadd44812811",
+      "policy": {
+        "count": 32,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 282964,
+      "log_end": 287113,
+      "response": {
+        "ttft_s": 0.30467912496533245,
+        "wall_s": 1.1172454999759793,
+        "text": "Comparing local AI models is a nuanced task because raw benchmark numbers often mislead users. A model might claim to generate 100 tokens per second,",
+        "generated_token_ids": [
+          16619,
+          286,
+          2136,
+          14791,
+          3983,
+          369,
+          264,
+          78971,
+          3274,
+          1521,
+          6891,
+          27502,
+          4947,
+          3428,
+          5605,
+          25227,
+          3719,
+          13,
+          357,
+          1558,
+          2493,
+          3591,
+          310,
+          6707,
+          220,
+          16,
+          15,
+          15,
+          10885,
+          791,
+          2018,
+          11
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 32,
+          "tokens_evaluated": 58,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 32,
+            "n_predict": 32,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nExplain how to fairly compare local AI model speed and memory usage. Discuss warmup, input length, repeated trials, background programs, first-token delay, output speed, accuracy, and practical examples. Write about eight hundred words.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": false,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 89,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 58,
+            "prompt_ms": 304.037,
+            "prompt_per_token_ms": 5.24201724137931,
+            "prompt_per_second": 190.76625542285973,
+            "predicted_n": 32,
+            "predicted_ms": 812.346,
+            "predicted_per_token_ms": 26.204709677419356,
+            "predicted_per_second": 38.16107914607815,
+            "draft_n": 45,
+            "draft_n_accepted": 16
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "cached-followup",
+      "prompt_sha256": "4bced12b471317a5b72046291d654ca7b85c36b6fd2103d77f5e1e739d39ee5e",
+      "policy": {
+        "count": 32,
+        "temperature": 0,
+        "cached": true,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 287113,
+      "log_end": 291116,
+      "response": {
+        "ttft_s": 0.1664283339632675,
+        "wall_s": 0.9335890419897623,
+        "text": "For instance, comparing a 7B parameter model running on a laptop with 8GB of RAM against a 13B model on a desktop with ",
+        "generated_token_ids": [
+          2381,
+          2774,
+          11,
+          25456,
+          264,
+          220,
+          22,
+          33,
+          5555,
+          1558,
+          4162,
+          383,
+          264,
+          20012,
+          440,
+          220,
+          23,
+          5213,
+          314,
+          21360,
+          2272,
+          264,
+          220,
+          16,
+          18,
+          33,
+          1558,
+          383,
+          264,
+          16985,
+          440,
+          220
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 32,
+          "tokens_evaluated": 97,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 32,
+            "n_predict": 32,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nExplain how to fairly compare local AI model speed and memory usage. Discuss warmup, input length, repeated trials, background programs, first-token delay, output speed, accuracy, and practical examples. Write about eight hundred words.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\nComparing local AI models is a nuanced task because raw benchmark numbers often mislead users. A model might claim to generate 100 tokens per second,\nGive one concrete example.\n",
+          "has_new_line": false,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 128,
+          "timings": {
+            "cache_n": 89,
+            "prompt_n": 8,
+            "prompt_ms": 165.229,
+            "prompt_per_token_ms": 20.653625,
+            "prompt_per_second": 48.41765065454611,
+            "predicted_n": 32,
+            "predicted_ms": 767.026,
+            "predicted_per_token_ms": 24.742774193548385,
+            "predicted_per_second": 40.41583988026482,
+            "draft_n": 38,
+            "draft_n_accepted": 18
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 2,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "fresh-followup",
+      "prompt_sha256": "4bced12b471317a5b72046291d654ca7b85c36b6fd2103d77f5e1e739d39ee5e",
+      "policy": {
+        "count": 32,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 291116,
+      "log_end": 295505,
+      "response": {
+        "ttft_s": 0.4161378330318257,
+        "wall_s": 1.1241594169987366,
+        "text": "For instance, comparing a 7B parameter model running on a laptop with 8GB of RAM against a 13B model on a desktop with ",
+        "generated_token_ids": [
+          2381,
+          2774,
+          11,
+          25456,
+          264,
+          220,
+          22,
+          33,
+          5555,
+          1558,
+          4162,
+          383,
+          264,
+          20012,
+          440,
+          220,
+          23,
+          5213,
+          314,
+          21360,
+          2272,
+          264,
+          220,
+          16,
+          18,
+          33,
+          1558,
+          383,
+          264,
+          16985,
+          440,
+          220
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 32,
+          "tokens_evaluated": 97,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 32,
+            "n_predict": 32,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nExplain how to fairly compare local AI model speed and memory usage. Discuss warmup, input length, repeated trials, background programs, first-token delay, output speed, accuracy, and practical examples. Write about eight hundred words.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\nComparing local AI models is a nuanced task because raw benchmark numbers often mislead users. A model might claim to generate 100 tokens per second,\nGive one concrete example.\n",
+          "has_new_line": false,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 128,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 97,
+            "prompt_ms": 415.012,
+            "prompt_per_token_ms": 4.278474226804124,
+            "prompt_per_second": 233.7281813537922,
+            "predicted_n": 32,
+            "predicted_ms": 707.87,
+            "predicted_per_token_ms": 22.83451612903226,
+            "predicted_per_second": 43.79335188664586,
+            "draft_n": 38,
+            "draft_n_accepted": 18
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 2,
+          "drafted": 2,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "after-cancel",
+      "prompt_sha256": "0600fed29da49b2828137195ebb06d78c1b43a257b1cc501fc78161d2c6de816",
+      "policy": {
+        "count": 16,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 297835,
+      "log_end": 301376,
+      "response": {
+        "ttft_s": 0.2861064170137979,
+        "wall_s": 0.6789340000250377,
+        "text": "42.0000000000000",
+        "generated_token_ids": [
+          19,
+          17,
+          13,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 16,
+          "tokens_evaluated": 28,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 16,
+            "n_predict": 16,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nWhat is 17 plus 25? Reply with only the number.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": false,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 43,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 28,
+            "prompt_ms": 284.811,
+            "prompt_per_token_ms": 10.171821428571429,
+            "prompt_per_second": 98.31080962462826,
+            "predicted_n": 16,
+            "predicted_ms": 392.725,
+            "predicted_per_token_ms": 26.18166666666667,
+            "predicted_per_second": 38.19466547838819,
+            "draft_n": 19,
+            "draft_n_accepted": 8
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 1,
+          "restored": false
+        }
+      ]
+    },
+    {
+      "workload": "after-context-rejection",
+      "prompt_sha256": "0600fed29da49b2828137195ebb06d78c1b43a257b1cc501fc78161d2c6de816",
+      "policy": {
+        "count": 16,
+        "temperature": 0,
+        "cached": false,
+        "ignore_eos": true,
+        "seed": 1234
+      },
+      "log_begin": 302920,
+      "log_end": 306462,
+      "response": {
+        "ttft_s": 0.28551591600989923,
+        "wall_s": 0.6602474160026759,
+        "text": "42.0000000000000",
+        "generated_token_ids": [
+          19,
+          17,
+          13,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15
+        ],
+        "final": {
+          "index": 0,
+          "content": "",
+          "tokens": [],
+          "id_slot": 0,
+          "stop": true,
+          "model": "flash",
+          "tokens_predicted": 16,
+          "tokens_evaluated": 28,
+          "generation_settings": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "dry_sequence_breakers": [
+              "\n",
+              ":",
+              "\"",
+              "*"
+            ],
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "stop": [],
+            "max_tokens": 16,
+            "n_predict": 16,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "logit_bias": [
+              {
+                "bias": null,
+                "token": 248044
+              },
+              {
+                "bias": null,
+                "token": 248046
+              },
+              {
+                "bias": null,
+                "token": 248063
+              },
+              {
+                "bias": null,
+                "token": 248064
+              },
+              {
+                "bias": null,
+                "token": 248065
+              }
+            ],
+            "n_probs": 0,
+            "min_keep": 0,
+            "grammar": "",
+            "grammar_lazy": false,
+            "grammar_triggers": [],
+            "preserved_tokens": [],
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "prompt": "<|im_start|>user\nWhat is 17 plus 25? Reply with only the number.<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n",
+          "has_new_line": false,
+          "truncated": false,
+          "stop_type": "limit",
+          "stopping_word": "",
+          "tokens_cached": 43,
+          "timings": {
+            "cache_n": 0,
+            "prompt_n": 28,
+            "prompt_ms": 284.368,
+            "prompt_per_token_ms": 10.156,
+            "prompt_per_second": 98.46396218983853,
+            "predicted_n": 16,
+            "predicted_ms": 374.621,
+            "predicted_per_token_ms": 24.974733333333333,
+            "predicted_per_second": 40.04046756588659,
+            "draft_n": 19,
+            "draft_n_accepted": 8
+          }
+        }
+      },
+      "acceptance": [
+        {
+          "accepted": 1,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 0,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 3,
+          "drafted": 3,
+          "restored": false
+        },
+        {
+          "accepted": 1,
+          "drafted": 1,
+          "restored": false
+        }
+      ]
+    }
+  ],
+  "timings_excluded_from_speed_results": true,
+  "scope": "Single slot; global max3 allocation; helper greedy; n_min0; confidence0; normal scheduler and no callback",
+  "models_loaded": true,
+  "headroom": {
+    "required_bytes": 36507222016,
+    "samples": [
+      {
+        "elapsed_s": 0.027427959023043513,
+        "available_bytes": 39778566144,
+        "swap_used_bytes": 524812288
+      }
+    ]
+  },
+  "preflight": {
+    "memory": {
+      "total": 51539607552,
+      "available": 39778402304,
+      "percent": 22.8,
+      "used": 8566931456,
+      "free": 34602909696,
+      "active": 5003608064,
+      "inactive": 4937613312,
+      "wired": 3563323392
+    },
+    "swap": {
+      "total": 2147483648,
+      "used": 524812288,
+      "free": 1622671360,
+      "percent": 24.4,
+      "sin": 3901577445376,
+      "sout": 2436726784
+    },
+    "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 88%",
+    "largest_process_groups": [
+      {
+        "name": "mediaanalysisd",
+        "rss_bytes": 1376878592
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "rss_bytes": 648593408
+      },
+      {
+        "name": "T3 Code (Alpha) Helper (Renderer)",
+        "rss_bytes": 526270464
+      },
+      {
+        "name": "T3 Code (Alpha)",
+        "rss_bytes": 371032064
+      },
+      {
+        "name": "codex",
+        "rss_bytes": 251658240
+      },
+      {
+        "name": "python3.12",
+        "rss_bytes": 108199936
+      },
+      {
+        "name": "node_repl",
+        "rss_bytes": 97927168
+      },
+      {
+        "name": "textunderstandingd",
+        "rss_bytes": 90767360
+      },
+      {
+        "name": "T3 Code (Alpha) Helper",
+        "rss_bytes": 84934656
+      },
+      {
+        "name": "node",
+        "rss_bytes": 80740352
+      },
+      {
+        "name": "NewsTag",
+        "rss_bytes": 60293120
+      },
+      {
+        "name": "MenuBarAgent",
+        "rss_bytes": 57507840
+      }
+    ],
+    "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth.",
+    "required_available_bytes": 36507222016,
+    "pressure_level": 1,
+    "host_cpu_percent_samples": [
+      1.8,
+      1.5,
+      3.0
+    ],
+    "quiet_host_required": true
+  },
+  "command": [
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-copy/build/bin/llama-server",
+    "-m",
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "49885",
+    "-c",
+    "4096",
+    "-b",
+    "512",
+    "-ub",
+    "512",
+    "-t",
+    "8",
+    "-tb",
+    "8",
+    "-ngl",
+    "all",
+    "-fit",
+    "off",
+    "-fa",
+    "on",
+    "-lm",
+    "mmap",
+    "-lzm",
+    "on",
+    "-np",
+    "1",
+    "-ctk",
+    "f16",
+    "-ctv",
+    "f16",
+    "--cache-ram",
+    "0",
+    "--spec-type",
+    "draft-mtp",
+    "--spec-draft-n-max",
+    "3",
+    "--metrics",
+    "--jinja",
+    "--no-webui",
+    "--alias",
+    "flash",
+    "--verbosity",
+    "4",
+    "--cors-origins",
+    "localhost",
+    "-md",
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/models/mtp_shared_packed_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf",
+    "--spec-draft-ngl",
+    "all",
+    "--spec-draft-cpu-moe",
+    "--no-op-offload",
+    "--spec-draft-threads",
+    "8",
+    "--spec-draft-threads-batch",
+    "8",
+    "--spec-draft-p-min",
+    "0.0",
+    "--spec-draft-n-min",
+    "0",
+    "--spec-draft-sampling",
+    "greedy",
+    "--slots"
+  ],
+  "ready_s": 9.525913334044162,
+  "cancellation": {
+    "received_token_ids": [
+      16619,
+      286,
+      2136,
+      14791,
+      3983
+    ],
+    "slots": [
+      [
+        {
+          "id": 0,
+          "n_ctx": 4096,
+          "speculative": true,
+          "is_processing": true,
+          "id_task": 291,
+          "n_prompt_tokens": 62,
+          "n_prompt_tokens_processed": 58,
+          "n_prompt_tokens_cache": 0,
+          "params": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "max_tokens": 2048,
+            "n_predict": 2048,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "n_probs": 0,
+            "min_keep": 0,
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "next_token": [
+            {
+              "has_next_token": true,
+              "has_new_line": false,
+              "n_remain": 2043,
+              "n_decoded": 5
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "id": 0,
+          "n_ctx": 4096,
+          "speculative": true,
+          "is_processing": false,
+          "id_task": 291,
+          "n_prompt_tokens": 65,
+          "n_prompt_tokens_processed": 0,
+          "n_prompt_tokens_cache": 0,
+          "params": {
+            "seed": 1234,
+            "temperature": 0.0,
+            "dynatemp_range": 0.0,
+            "dynatemp_exponent": 1.0,
+            "top_k": 20,
+            "top_p": 0.949999988079071,
+            "min_p": 0.05000000074505806,
+            "top_n_sigma": -1.0,
+            "xtc_probability": 0.0,
+            "xtc_threshold": 0.10000000149011612,
+            "typical_p": 1.0,
+            "repeat_last_n": 64,
+            "repeat_penalty": 1.0,
+            "presence_penalty": 0.0,
+            "frequency_penalty": 0.0,
+            "dry_multiplier": 0.0,
+            "dry_base": 1.75,
+            "dry_allowed_length": 2,
+            "dry_penalty_last_n": 64,
+            "mirostat": 0,
+            "mirostat_tau": 5.0,
+            "mirostat_eta": 0.10000000149011612,
+            "adaptive_target": -1.0,
+            "adaptive_decay": 0.8999999761581421,
+            "max_tokens": 2048,
+            "n_predict": 2048,
+            "n_keep": 0,
+            "n_discard": 0,
+            "ignore_eos": true,
+            "stream": true,
+            "n_probs": 0,
+            "min_keep": 0,
+            "chat_format": "Content-only",
+            "reasoning_format": "deepseek",
+            "reasoning_in_content": false,
+            "generation_prompt": "",
+            "samplers": [
+              "penalties",
+              "dry",
+              "top_n_sigma",
+              "top_k",
+              "typ_p",
+              "top_p",
+              "min_p",
+              "xtc",
+              "temperature"
+            ],
+            "speculative.types": "none,draft-mtp",
+            "timings_per_token": false,
+            "post_sampling_probs": false,
+            "backend_sampling": false,
+            "lora": []
+          },
+          "next_token": [
+            {
+              "has_next_token": true,
+              "has_new_line": false,
+              "n_remain": -1,
+              "n_decoded": 0
+            }
+          ]
+        }
+      ]
+    ],
+    "idle_s": 0.2652806250262074,
+    "log_begin": 295505,
+    "log_end": 297835
+  },
+  "oversized_prompt_rejection": {
+    "prompt_tokens": 4200,
+    "error": "HTTP 400 /completion: {\"error\":{\"code\":400,\"message\":\"request (4200 tokens) exceeds the available context size (4096 tokens), try increasing it\",\"type\":\"exceed_context_size_error\",\"n_prompt_tokens\":4200,\"n_ctx\":4096}}",
+    "context_shift_exercised": false
+  },
+  "memory": {
+    "guard": null,
+    "monitor_healthy": true,
+    "monitor_error": null,
+    "samples": 150,
+    "live_samples": 149,
+    "baseline_before_launch": true,
+    "child_exited": true,
+    "launch_baseline": {
+      "swap_used_bytes": 524812288,
+      "available_bytes": 39775567872
+    },
+    "peak_rss_bytes": 39441793024,
+    "minimum_available_bytes": 2382430208,
+    "peak_swap_bytes": 524812288,
+    "swap_growth_bytes": 0,
+    "system_disk_read_bytes": 39670665216,
+    "sampling_interval_s": 0.25,
+    "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+  },
+  "native_summary": {
+    "cycles": 0,
+    "discarded_helper_steps": 0,
+    "acceptance_counts": {
+      "full": 86,
+      "checkpoint_restore": 0,
+      "partial": 94,
+      "zero": 60
+    },
+    "actual_successful_helper_decode_calls": true,
+    "hidden_state_bit_identity_measured": false,
+    "speed_gain_measured": false
+  }
+}

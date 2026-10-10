@@ -1,0 +1,101 @@
+{
+  "experiment": {
+    "id": "context-8k",
+    "title": "Try more useful context",
+    "priority": 6,
+    "implementation": "Executable ABBA harness and three seeded exact-6144-token recall fixtures are staged. Offline geometry and comparison rejection tests pass; real tokenizer, recall, rollback and 8K memory remain untested.",
+    "kind": "capacity",
+    "depends_on": [
+      "memory-accounting"
+    ],
+    "hypothesis": "8K context may fit with useful headroom and allow larger documents without unacceptable latency or quality loss.",
+    "only_change": "Context capacity 4096 to 8192. Keep F16 cache, engine, helper depth and workers fixed.",
+    "control_engine": "mtp-mma",
+    "candidate_engine": "mtp-mma",
+    "axis": "context",
+    "control_value": 4096,
+    "candidate_value": 8192,
+    "plan_command": [
+      ".venv/bin/python",
+      "scripts/benchmark_context.py"
+    ],
+    "future_run_command": [
+      ".venv/bin/python",
+      "scripts/benchmark_context.py",
+      "--run"
+    ],
+    "prerequisites": [
+      "Testing go-ahead",
+      "Offline gate passed for current sources",
+      "Fresh controls and quiet host with 34 GiB available",
+      "Saved allocation accounting reviewed; actual 8K fit remains unproved"
+    ],
+    "proof": [
+      "ABBA timing on identical 512/2048-token inputs and 128-token outputs",
+      "Separate 6144-token retrieval fixture at 8K with room for output",
+      "Facts at beginning/middle/end and distractors; verify exact answers",
+      "Target/helper KV, recurrent state, QSA and scratch allocations logged separately",
+      "Zero new swap"
+    ],
+    "result_fields": [
+      "matched_tps",
+      "matched_ttft",
+      "matched_reply_time",
+      "6144_token_retrieval_accuracy",
+      "cache_and_state_bytes",
+      "peak_memory"
+    ],
+    "stop_if": [
+      "Memory guard",
+      "Retrieval/rollback failure",
+      "No useful headroom"
+    ],
+    "limits": "Higher configured capacity is not proof of long-input quality. The 6144-token case has no 4K TPS comparison. A separate quantized-cache trial may follow; do not combine it with this test."
+  },
+  "control": {
+    "engine": "mtp-mma",
+    "model": "flash",
+    "draft_model": "mtp_shared_packed_q3",
+    "context": 4096,
+    "batch": 512,
+    "ubatch": 512,
+    "cache_type": "f16",
+    "draft": 3,
+    "draft_threads": 8,
+    "draft_p_min": 0.0,
+    "tensor_api": "on",
+    "temperature": 0.6,
+    "seed": 1234,
+    "fresh_output_tokens": 128,
+    "matched_inputs": [
+      512,
+      2048
+    ],
+    "warmups_per_workload": 1,
+    "repeats_per_launch": 2
+  },
+  "comparison": {
+    "order": [
+      "control",
+      "candidate",
+      "candidate",
+      "control"
+    ],
+    "new_swap_required_bytes": 0,
+    "emergency_swap_guard_bytes": 134217728,
+    "minimum_available_during_run_bytes": 1073741824,
+    "minimum_available_before_full_model_bytes": 36507222016,
+    "metrics": [
+      "generation_tok_s",
+      "prompt_tok_s",
+      "ttft_s",
+      "wall_s",
+      "draft_acceptance_percent",
+      "minimum_available_bytes",
+      "swap_growth_bytes"
+    ],
+    "adoption_gate": "At least 5 percent median complete-task improvement on the chosen workload, or useful capacity gain with an explicitly accepted speed tradeoff; no unexplained quality failure or new swap. Report control drift and all raw passes.",
+    "percentage_rules": "TPS gain = 100*(candidate/control-1). Time reduction = 100*(1-candidate/control). Requires finite positive matched metrics. Do not add percentages from separate experiments.",
+    "historical_reference_only": "bench/features/20261007T052606Z-m5-decision-baseline/review.json"
+  }
+}

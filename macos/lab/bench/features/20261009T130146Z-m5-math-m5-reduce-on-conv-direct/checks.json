@@ -1,0 +1,242 @@
+{
+  "schema": 1,
+  "kind": "m5-synthetic-correctness",
+  "status": "passed",
+  "engine": {
+    "engine": "m5-reduce",
+    "directory": "vendor/llama-m5-reduce",
+    "revision": "d81235049384534c167caea52b85a694f6103d14",
+    "source_diff_sha256": "c1c5d4a73736d41840ae2297534664f3c8205562ec6bcad5a4c7bb9f34255336",
+    "patch": {
+      "schema": 1,
+      "id": "m5-reduce",
+      "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+      "directory": "vendor/llama-m5-reduce",
+      "patch": "patches/mtp-m5-reduce.patch",
+      "patch_sha256": "c1c5d4a73736d41840ae2297534664f3c8205562ec6bcad5a4c7bb9f34255336",
+      "source_diff_sha256": "c1c5d4a73736d41840ae2297534664f3c8205562ec6bcad5a4c7bb9f34255336",
+      "modified_files": [
+        "ggml/src/ggml-metal/ggml-metal-common.cpp",
+        "ggml/src/ggml-metal/ggml-metal-common.h",
+        "ggml/src/ggml-metal/ggml-metal-context.m",
+        "ggml/src/ggml-metal/ggml-metal-device.cpp",
+        "ggml/src/ggml-metal/ggml-metal-device.h",
+        "ggml/src/ggml-metal/ggml-metal-fusion.cpp",
+        "ggml/src/ggml-metal/ggml-metal-fusion.h",
+        "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+        "ggml/src/ggml-metal/kernels/argsort.metal",
+        "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+        "ggml/src/ggml-metal/kernels/quantize.metal",
+        "src/llama-context.cpp",
+        "src/llama-cparams.h",
+        "src/models/qwen4exp.cpp",
+        "tests/test-backend-ops.cpp"
+      ],
+      "features": [
+        "mtp-shared",
+        "m5-tuning",
+        "m5-profile",
+        "m5-copy",
+        "m5-reduce"
+      ],
+      "components": [
+        {
+          "patch": "patches/mtp-m5-copy.patch",
+          "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+        }
+      ],
+      "scope": "Isolated opt-in ten-expert MoE weighted reduction with noncontracted ordered F32 products/additions. All previous fusion checks and fallback paths remain. conv-direct controls retain the measured copy improvement; reduce10 changes only weighted reduction. No precision, model, cache, rollback or default launcher changes.",
+      "upstream": {
+        "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+        "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+        "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+        "license_file": "patches/LLAMA-LICENSE.txt"
+      }
+    },
+    "artifacts": {
+      "llama-server": "e5b39eaf07fb0c89eeccef6cbccc6cd264ecbeebbcff543c66e800643f508e0f",
+      "libggml-base.0.26.0.dylib": "ceb4cb7ab95c89fc15ec2c4851d3b5be2df003cec0b6b081fa2f1f541bfd070e",
+      "libggml-base.0.dylib": "ceb4cb7ab95c89fc15ec2c4851d3b5be2df003cec0b6b081fa2f1f541bfd070e",
+      "libggml-base.dylib": "ceb4cb7ab95c89fc15ec2c4851d3b5be2df003cec0b6b081fa2f1f541bfd070e",
+      "libggml-blas.0.26.0.dylib": "280ed1a069dae92a9974d196a817381853d4f078f4a9aa4f3a84354e2fac6b54",
+      "libggml-blas.0.dylib": "280ed1a069dae92a9974d196a817381853d4f078f4a9aa4f3a84354e2fac6b54",
+      "libggml-blas.dylib": "280ed1a069dae92a9974d196a817381853d4f078f4a9aa4f3a84354e2fac6b54",
+      "libggml-cpu.0.26.0.dylib": "3d60661267abdb3cb8ad3293041d3fdd5cd2d70d0552e6aa4a4e4aa2b9848a13",
+      "libggml-cpu.0.dylib": "3d60661267abdb3cb8ad3293041d3fdd5cd2d70d0552e6aa4a4e4aa2b9848a13",
+      "libggml-cpu.dylib": "3d60661267abdb3cb8ad3293041d3fdd5cd2d70d0552e6aa4a4e4aa2b9848a13",
+      "libggml-metal.0.26.0.dylib": "7f36d72e90cdf399e4515de2fa7beb0be0280145115c4a1f7185565262bd26dd",
+      "libggml-metal.0.dylib": "7f36d72e90cdf399e4515de2fa7beb0be0280145115c4a1f7185565262bd26dd",
+      "libggml-metal.dylib": "7f36d72e90cdf399e4515de2fa7beb0be0280145115c4a1f7185565262bd26dd",
+      "libggml.0.26.0.dylib": "b95006c3b97b65691349660e71d8594b8c20faef553a89b9ef375096269aa891",
+      "libggml.0.dylib": "b95006c3b97b65691349660e71d8594b8c20faef553a89b9ef375096269aa891",
+      "libggml.dylib": "b95006c3b97b65691349660e71d8594b8c20faef553a89b9ef375096269aa891",
+      "libllama-common.0.6.0.dylib": "3777da584183e07a7985cb4aed6823aa02d07dfd0c261d4432d8b411f5c6466d",
+      "libllama-common.0.dylib": "3777da584183e07a7985cb4aed6823aa02d07dfd0c261d4432d8b411f5c6466d",
+      "libllama-common.dylib": "3777da584183e07a7985cb4aed6823aa02d07dfd0c261d4432d8b411f5c6466d",
+      "libllama-server-impl.dylib": "3f02f76272039f0afdb8879261fb54d01ec9f03a065f6cdfb4d2464936cd03bc",
+      "libllama.0.6.0.dylib": "00465be2b55f332d2a216327afd048eb11f4cda02ed7ec246f32b0e785608636",
+      "libllama.0.dylib": "00465be2b55f332d2a216327afd048eb11f4cda02ed7ec246f32b0e785608636",
+      "libllama.dylib": "00465be2b55f332d2a216327afd048eb11f4cda02ed7ec246f32b0e785608636",
+      "libmtmd.0.6.0.dylib": "f626b38730f97a1a5468538749e1cffd65b19debfcf9085fdf757542a9670c34",
+      "libmtmd.0.dylib": "f626b38730f97a1a5468538749e1cffd65b19debfcf9085fdf757542a9670c34",
+      "libmtmd.dylib": "f626b38730f97a1a5468538749e1cffd65b19debfcf9085fdf757542a9670c34"
+    },
+    "build_receipt": {
+      "engine": "m5-reduce",
+      "directory": "vendor/llama-m5-reduce",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "c1c5d4a73736d41840ae2297534664f3c8205562ec6bcad5a4c7bb9f34255336",
+      "patch": {
+        "schema": 1,
+        "id": "m5-reduce",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-reduce",
+        "patch": "patches/mtp-m5-reduce.patch",
+        "patch_sha256": "c1c5d4a73736d41840ae2297534664f3c8205562ec6bcad5a4c7bb9f34255336",
+        "source_diff_sha256": "c1c5d4a73736d41840ae2297534664f3c8205562ec6bcad5a4c7bb9f34255336",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal-device.h",
+          "ggml/src/ggml-metal/ggml-metal-fusion.cpp",
+          "ggml/src/ggml-metal/ggml-metal-fusion.h",
+          "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+          "ggml/src/ggml-metal/kernels/argsort.metal",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "ggml/src/ggml-metal/kernels/quantize.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-copy",
+          "m5-reduce"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-copy.patch",
+            "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+          }
+        ],
+        "scope": "Isolated opt-in ten-expert MoE weighted reduction with noncontracted ordered F32 products/additions. All previous fusion checks and fallback paths remain. conv-direct controls retain the measured copy improvement; reduce10 changes only weighted reduction. No precision, model, cache, rollback or default launcher changes.",
+        "upstream": {
+          "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+          "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+          "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        }
+      },
+      "artifacts": {
+        "llama-server": "e5b39eaf07fb0c89eeccef6cbccc6cd264ecbeebbcff543c66e800643f508e0f",
+        "libggml-base.0.26.0.dylib": "ceb4cb7ab95c89fc15ec2c4851d3b5be2df003cec0b6b081fa2f1f541bfd070e",
+        "libggml-base.0.dylib": "ceb4cb7ab95c89fc15ec2c4851d3b5be2df003cec0b6b081fa2f1f541bfd070e",
+        "libggml-base.dylib": "ceb4cb7ab95c89fc15ec2c4851d3b5be2df003cec0b6b081fa2f1f541bfd070e",
+        "libggml-blas.0.26.0.dylib": "280ed1a069dae92a9974d196a817381853d4f078f4a9aa4f3a84354e2fac6b54",
+        "libggml-blas.0.dylib": "280ed1a069dae92a9974d196a817381853d4f078f4a9aa4f3a84354e2fac6b54",
+        "libggml-blas.dylib": "280ed1a069dae92a9974d196a817381853d4f078f4a9aa4f3a84354e2fac6b54",
+        "libggml-cpu.0.26.0.dylib": "3d60661267abdb3cb8ad3293041d3fdd5cd2d70d0552e6aa4a4e4aa2b9848a13",
+        "libggml-cpu.0.dylib": "3d60661267abdb3cb8ad3293041d3fdd5cd2d70d0552e6aa4a4e4aa2b9848a13",
+        "libggml-cpu.dylib": "3d60661267abdb3cb8ad3293041d3fdd5cd2d70d0552e6aa4a4e4aa2b9848a13",
+        "libggml-metal.0.26.0.dylib": "7f36d72e90cdf399e4515de2fa7beb0be0280145115c4a1f7185565262bd26dd",
+        "libggml-metal.0.dylib": "7f36d72e90cdf399e4515de2fa7beb0be0280145115c4a1f7185565262bd26dd",
+        "libggml-metal.dylib": "7f36d72e90cdf399e4515de2fa7beb0be0280145115c4a1f7185565262bd26dd",
+        "libggml.0.26.0.dylib": "b95006c3b97b65691349660e71d8594b8c20faef553a89b9ef375096269aa891",
+        "libggml.0.dylib": "b95006c3b97b65691349660e71d8594b8c20faef553a89b9ef375096269aa891",
+        "libggml.dylib": "b95006c3b97b65691349660e71d8594b8c20faef553a89b9ef375096269aa891",
+        "libllama-common.0.6.0.dylib": "3777da584183e07a7985cb4aed6823aa02d07dfd0c261d4432d8b411f5c6466d",
+        "libllama-common.0.dylib": "3777da584183e07a7985cb4aed6823aa02d07dfd0c261d4432d8b411f5c6466d",
+        "libllama-common.dylib": "3777da584183e07a7985cb4aed6823aa02d07dfd0c261d4432d8b411f5c6466d",
+        "libllama-server-impl.dylib": "3f02f76272039f0afdb8879261fb54d01ec9f03a065f6cdfb4d2464936cd03bc",
+        "libllama.0.6.0.dylib": "00465be2b55f332d2a216327afd048eb11f4cda02ed7ec246f32b0e785608636",
+        "libllama.0.dylib": "00465be2b55f332d2a216327afd048eb11f4cda02ed7ec246f32b0e785608636",
+        "libllama.dylib": "00465be2b55f332d2a216327afd048eb11f4cda02ed7ec246f32b0e785608636",
+        "libmtmd.0.6.0.dylib": "f626b38730f97a1a5468538749e1cffd65b19debfcf9085fdf757542a9670c34",
+        "libmtmd.0.dylib": "f626b38730f97a1a5468538749e1cffd65b19debfcf9085fdf757542a9670c34",
+        "libmtmd.dylib": "f626b38730f97a1a5468538749e1cffd65b19debfcf9085fdf757542a9670c34"
+      },
+      "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+      "build_settings": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GGML_BLAS": "ON",
+        "GGML_CPU": "ON",
+        "GGML_METAL": "ON",
+        "GGML_METAL_EMBED_LIBRARY": "ON",
+        "GGML_NATIVE": "ON",
+        "LLAMA_BUILD_TESTS": "ON",
+        "LLAMA_BUILD_TOOLS": "ON"
+      },
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+    }
+  },
+  "tester_sha256": "3a966be7fe8628af7dda8af5e76c7cc5a1736195440cd3b448eeb0cbaefef8d5",
+  "metal_environment": {
+    "tensor_api": "on",
+    "tuning": "conv-direct",
+    "profile": false,
+    "variables": {
+      "GGML_M5_LAB_CONV_DIRECT": "1",
+      "GGML_METAL_TENSOR_ENABLE": "1"
+    }
+  },
+  "params": "type_a=(q2_0|q3_K|bf16|iq4_nl|iq4_xs|q5_K),type_b=f32,.*n=(1|2|3|4|5|6|7|8|9|13|16|32),",
+  "models_loaded": false,
+  "timings_excluded_from_speed_results": true,
+  "check": {
+    "name": "math",
+    "command": [
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-reduce/build/bin/test-backend-ops",
+      "test",
+      "-b",
+      "MTL0",
+      "-o",
+      "MUL_MAT,MUL_MAT_ID",
+      "-p",
+      "type_a=(q2_0|q3_K|bf16|iq4_nl|iq4_xs|q5_K),type_b=f32,.*n=(1|2|3|4|5|6|7|8|9|13|16|32),",
+      "-j",
+      "1"
+    ],
+    "passed": true,
+    "counts": [
+      [
+        572,
+        572
+      ]
+    ],
+    "exit_code": 0,
+    "peak_rss_bytes": 329678848,
+    "system_swap_growth_bytes": 0,
+    "guard": null
+  },
+  "residual_check": {
+    "name": "fused-residual",
+    "command": [
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-reduce/build/bin/test-backend-ops",
+      "test",
+      "-b",
+      "MTL0",
+      "-o",
+      "MUL_MAT_ADD",
+      "-p",
+      "n=(1|2|3|4|5|8|32),.*mode=mm2\\+mm",
+      "-j",
+      "1"
+    ],
+    "passed": true,
+    "counts": [
+      [
+        16,
+        16
+      ]
+    ],
+    "exit_code": 0,
+    "peak_rss_bytes": 98009088,
+    "system_swap_growth_bytes": 0,
+    "guard": null
+  }
+}

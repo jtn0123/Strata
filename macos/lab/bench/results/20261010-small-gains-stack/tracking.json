@@ -1,0 +1,280 @@
+{
+  "status": "completed",
+  "plan": "bench/results/20261010-small-gains-stack/plan.json",
+  "frozen_sha256": "e4901661de549969bb5155df0641ec2bf26d530d5e553dfde7af36c9b8c5da5f",
+  "runs": [
+    {
+      "label": "w02-fresh-screen",
+      "features": [
+        "top10"
+      ],
+      "control_features": [],
+      "cohort": "short",
+      "output_tokens": 256,
+      "path": "bench/results/20261010T071156Z-m5-stack-v2-w02-fresh-screen",
+      "decision": {
+        "eligible_for_confirmation": false,
+        "common_metric_scopes": [],
+        "workload_scopes": {
+          "code": [
+            "generation",
+            "reply"
+          ],
+          "prose": []
+        },
+        "memory_clean": true,
+        "rule": "Positive gains above 2x own control drift; both candidate launches beat both controls; same scope on English code/prose; generation/reply regressions use original floor; Fixed 10 ms ceiling on every candidate/control launch pair; remaining criteria unchanged. Exact-output/resource/activation gates mandatory.",
+        "ttft_policy": "Fixed 10 ms ceiling on every candidate/control launch pair; remaining criteria unchanged.",
+        "safety_passed": false
+      },
+      "cached_followup": {
+        "required": false,
+        "flags": [],
+        "default_promotion_blocked": false,
+        "note": "Cached timing is a separate diagnostic. Flagged losses require independent follow-up before default promotion."
+      },
+      "comparison_sha256": "f5fa85fd65b58e9301d1ef5567f59f23e1ffb205b999d4b0bf0bc9c68eb7d78c"
+    },
+    {
+      "label": "p07-long-safety",
+      "features": [
+        "reduce"
+      ],
+      "control_features": [],
+      "cohort": "long",
+      "output_tokens": 256,
+      "path": "bench/results/20261010T071813Z-m5-stack-v2-p07-long-safety",
+      "decision": {
+        "eligible_for_confirmation": true,
+        "common_metric_scopes": [
+          "generation"
+        ],
+        "workload_scopes": {
+          "code": [
+            "generation"
+          ],
+          "prose": [
+            "generation"
+          ]
+        },
+        "memory_clean": true,
+        "rule": "Positive gains above 2x own control drift; both candidate launches beat both controls; same scope on English code/prose; generation/reply regressions use original floor; Original relative regression rule. Exact-output/resource/activation gates mandatory.",
+        "ttft_policy": "Original relative regression rule.",
+        "safety_passed": true
+      },
+      "cached_followup": {
+        "required": false,
+        "flags": [],
+        "default_promotion_blocked": false,
+        "note": "Cached timing is a separate diagnostic. Flagged losses require independent follow-up before default promotion."
+      },
+      "comparison_sha256": "d6cd3752a46880aa3deb7458ecc2694bc38505356bc6be4888cdd631d9037c9d"
+    },
+    {
+      "label": "p07-short-answer-safety",
+      "features": [
+        "reduce"
+      ],
+      "control_features": [],
+      "cohort": "short",
+      "output_tokens": 32,
+      "path": "bench/results/20261010T072514Z-m5-stack-v2-p07-short-answer-safety",
+      "decision": {
+        "eligible_for_confirmation": false,
+        "common_metric_scopes": [],
+        "workload_scopes": {
+          "code": [],
+          "prose": [
+            "generation",
+            "reply",
+            "prompt-latency"
+          ]
+        },
+        "memory_clean": true,
+        "rule": "Positive gains above 2x own control drift; both candidate launches beat both controls; same scope on English code/prose; generation/reply regressions use original floor; Original relative regression rule. Exact-output/resource/activation gates mandatory.",
+        "ttft_policy": "Original relative regression rule.",
+        "safety_passed": true
+      },
+      "cached_followup": {
+        "required": false,
+        "flags": [],
+        "default_promotion_blocked": false,
+        "note": "Cached timing is a separate diagnostic. Flagged losses require independent follow-up before default promotion."
+      },
+      "comparison_sha256": "dc20ce69b9d8aff10101035b12b42702270349ab1d336b32d06a7804dfe53709"
+    }
+  ],
+  "winner": [
+    "reduce"
+  ],
+  "promotion": "not performed by benchmark driver",
+  "exclusions": [],
+  "preflight": {
+    "headroom": {
+      "required_bytes": 36507222016,
+      "samples": [
+        {
+          "elapsed_s": 0.018150708987377584,
+          "available_bytes": 38116425728,
+          "swap_used_bytes": 529137664
+        }
+      ]
+    },
+    "quiet_host": {
+      "memory": {
+        "total": 51539607552,
+        "available": 38116425728,
+        "percent": 26.0,
+        "used": 10588700672,
+        "free": 31565004800,
+        "active": 6557810688,
+        "inactive": 6522044416,
+        "wired": 4030889984
+      },
+      "swap": {
+        "total": 2147483648,
+        "used": 529137664,
+        "free": 1618345984,
+        "percent": 24.6,
+        "sin": 4176333373440,
+        "sout": 2686304256
+      },
+      "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 88%",
+      "largest_process_groups": [
+        {
+          "name": "com.apple.WebKit.WebContent",
+          "rss_bytes": 1086767104
+        },
+        {
+          "name": "T3 Code (Alpha) Helper (Renderer)",
+          "rss_bytes": 608288768
+        },
+        {
+          "name": "mdworker_shared",
+          "rss_bytes": 428228608
+        },
+        {
+          "name": "T3 Code (Alpha)",
+          "rss_bytes": 385695744
+        },
+        {
+          "name": "sirittsd",
+          "rss_bytes": 352174080
+        },
+        {
+          "name": "codex",
+          "rss_bytes": 286523392
+        },
+        {
+          "name": "amsengagementd",
+          "rss_bytes": 143540224
+        },
+        {
+          "name": "corespotlightd",
+          "rss_bytes": 129875968
+        },
+        {
+          "name": "node",
+          "rss_bytes": 95371264
+        },
+        {
+          "name": "mediaanalysisd",
+          "rss_bytes": 94568448
+        },
+        {
+          "name": "contactsd",
+          "rss_bytes": 91357184
+        },
+        {
+          "name": "WiFiman Desktop",
+          "rss_bytes": 78561280
+        }
+      ],
+      "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth.",
+      "required_available_bytes": 36507222016,
+      "pressure_level": 1,
+      "host_cpu_percent_samples": [
+        1.2,
+        0.6,
+        0.6
+      ],
+      "quiet_host_required": true
+    }
+  },
+  "w02_confirmed": false,
+  "winner_profile": "small-reduce",
+  "promotion_eligible": true,
+  "host_after": {
+    "memory": {
+      "total": 51539607552,
+      "available": 27968733184,
+      "percent": 45.7,
+      "used": 19342934016,
+      "free": 1683767296,
+      "active": 2502262784,
+      "inactive": 26275561472,
+      "wired": 16840671232
+    },
+    "swap": {
+      "total": 2147483648,
+      "used": 529137664,
+      "free": 1618345984,
+      "percent": 24.6,
+      "sin": 4233918709760,
+      "sout": 2709028864
+    },
+    "pressure": "The system has 51539607552 (3145728 pages with a page size of 16384).\nSystem-wide memory free percentage: 86%",
+    "largest_process_groups": [
+      {
+        "name": "T3 Code (Alpha) Helper (Renderer)",
+        "rss_bytes": 504414208
+      },
+      {
+        "name": "T3 Code (Alpha)",
+        "rss_bytes": 235307008
+      },
+      {
+        "name": "mediaanalysisd",
+        "rss_bytes": 197558272
+      },
+      {
+        "name": "codex",
+        "rss_bytes": 92569600
+      },
+      {
+        "name": "com.apple.WebKit.WebContent",
+        "rss_bytes": 56852480
+      },
+      {
+        "name": "mdworker_shared",
+        "rss_bytes": 55590912
+      },
+      {
+        "name": "python3.12",
+        "rss_bytes": 28803072
+      },
+      {
+        "name": "WiFiman Desktop",
+        "rss_bytes": 28721152
+      },
+      {
+        "name": "ControlCenter",
+        "rss_bytes": 28344320
+      },
+      {
+        "name": "T3 Code (Alpha) Helper",
+        "rss_bytes": 27852800
+      },
+      {
+        "name": "Finder",
+        "rss_bytes": 25133056
+      },
+      {
+        "name": "MenuBarAgent",
+        "rss_bytes": 20987904
+      }
+    ],
+    "note": "Process RSS can double-count shared pages and omit Metal/compressed memory. Available RAM is reclaimable, not simply unused. Existing swap is separate from new swap growth."
+  },
+  "completed_utc": "2026-10-10T07:28:44.578771+00:00"
+}

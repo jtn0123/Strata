@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "authorization": "User: Do them sequentially. Confirm W02 with the proposed 10 ms allowance, measure P07 plus W02 together if it qualifies, and promote the verified winner.",
+  "historical_plan": "config/m5_small_gains_plan.json",
+  "historical_results_unchanged": true,
+  "ttft_allowance_ms": 10,
+  "ttft_rule": "For W02 and combined profiles, every candidate launch median must be at most 10 ms slower than every control launch median. Fixed absolute ceiling; never inflate it using drift. P07-only retains the original relative regression rule.",
+  "gain_rule": "Unchanged: no fixed minimum percent; positive gain strictly above twice own control drift, and both candidate launch medians beat both controls. Average the two launch medians per arm. No statistical significance claim.",
+  "other_guards": "Unchanged generation/reply regression floors, exact fresh/warmup/cached outputs, healthy monitor, zero new swap, memory gate, actual feature encoding receipts. Cached diagnostic losses block promotion.",
+  "sequence": [
+    "Fresh W02 short screen, then one fresh independent short confirmation only if screen qualifies generation and reply on both English tasks.",
+    "If both W02 brackets qualify, test P07 plus W02 against original m5-copy/conv-direct, short English cohort.",
+    "If combined qualifies generation and reply, compare combined against P07 alone in a fresh short ABBA to establish whether stacking adds repeatable benefit.",
+    "Candidate winner is combined only if its incremental bracket also qualifies generation and reply. Otherwise retain previously confirmed P07. No alternative combinations or performance retries.",
+    "Test selected winner against original control on long English prompts and short 32-token answers. Safety brackets need clean resources/output/cache and no material generation/reply/TTFT regressions, rather than a claim of new gains.",
+    "If combined fails a safety bracket, test the predefined P07 fallback in both safety cohorts. If P07 fails safety, leave the launcher unchanged.",
+    "Promote only a winner with passing safety checks; verify normal-launcher arguments, application API and clean shutdown. Preserve a rollback launcher. No benchmark or app server left running."
+  ],
+  "settings": "Same Qwen3.8-Flash-Next Q2_0 and packed shared Q3 helper; depth3/confidence0, mixed placement,8helperCPUworkers,TensorAPIon,F16KV,4K context,batch512,temp0.6/seed1234. Three repetitions after one warmup per task per independent launch. ABBA. Fresh output256 except predefined short-answer safety output32. English code/prose only; cached512/2048 separate.",
+  "resources": "Unchanged 34 GiB available before each launch, quiet host, normal pressure. One model-cache cleanup before this campaign if needed; no cache cleaning between benchmark arms. T3 and WiFiman preserved. No administrator prompt or VM restart.",
+  "failure_policy": "Preserve failed and incomplete runs. Resource/parity/activation failures stop the campaign. No performance retry, partial pooling, criterion changes or automatic default promotion by the benchmark driver.",
+  "promotion_scope": "Q2_0 Flash with packed Q3 helper on this 48 GiB M5 Pro. Measured speed claims apply only to named workloads. Normal Start Strata.command changes after validation; scripts/run.py explicit generic defaults remain available and small-model CLI remains supported."
+}

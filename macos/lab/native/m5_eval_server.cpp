@@ -31,10 +31,14 @@ int route_layer(const char * name) {
     return int(layer);
 }
 
-json extract_ids(const ggml_tensor * t, const std::vector<uint8_t> & raw) {
+void validate_route(const ggml_tensor * t) {
     require(t->type == GGML_TYPE_I32 && t->ne[0] == 10 && t->ne[1] >= 1 && t->ne[1] <= 6 &&
             t->ne[2] == 1 && t->ne[3] == 1 && t->nb[0] == sizeof(int32_t) && t->nb[1] == 512*sizeof(int32_t),
             "Unexpected expert routing geometry or stride");
+}
+
+json extract_ids(const ggml_tensor * t, const std::vector<uint8_t> & raw) {
+    validate_route(t);
     json rows = json::array();
     for (int r = 0; r < t->ne[1]; ++r) {
         std::vector<int32_t> ids;
@@ -59,23 +63,40 @@ void emit(const char * marker, const json & data) {
 struct state {
     std::string mode;
     uint64_t serial = 0;
+    uint64_t empty_events = 0;
     int64_t start = 0;
     ggml_tensor * pending = nullptr;
     bool failed = false;
     std::mutex mutex;
 };
 
+[[noreturn]] void fatal(state & s, const char * message) {
+    s.failed = true;
+    emit("M5_EVAL_ERROR", {{"message", message}, {"fatal", true}, {"exit_code", 86}});
+    std::fflush(stderr);
+    // callback false is not a scheduler abort. This diagnostic child must stop here.
+    std::_Exit(86);
+}
+
 bool eval(ggml_tensor * t, bool ask, void * userdata) {
     auto & s = *static_cast<state *>(userdata);
     std::lock_guard<std::mutex> lock(s.mutex);
     try {
+        require(!s.failed, "Callback invoked after fatal diagnostic failure");
         const int layer = route_layer(t->name);
         const bool route = layer >= 0 && t->ne[1] >= 1 && t->ne[1] <= 6;
         const bool metadata = t->op == GGML_OP_NONE || t->op == GGML_OP_VIEW || t->op == GGML_OP_RESHAPE ||
                               t->op == GGML_OP_PERMUTE || t->op == GGML_OP_TRANSPOSE;
         const bool wanted = route || (s.mode == "split" && !metadata && ggml_nelements(t) > 0);
         if (ask) {
-            if (!wanted || s.failed) return false;
+            if (s.mode == "split" && !metadata && ggml_is_empty(t)) {
+                require(!s.pending && ++s.empty_events <= 300000, "Empty-node event cap or callback overlap");
+                emit("M5_EVAL_EMPTY", {{"serial", s.serial+1}, {"cpu_us", ggml_time_us()},
+                    {"name", t->name}, {"op", ggml_op_name(t->op)},
+                    {"dst", std::vector<int64_t>(t->ne,t->ne+4)}});
+                return false; // Metal explicitly skips empty tensors before encoding.
+            }
+            if (!wanted) return false;
             require(!s.pending && s.serial < 300000, "Overlapping callback or diagnostic event limit reached");
             s.pending = t; s.start = ggml_time_us(); ++s.serial;
             auto dims = [](const ggml_tensor * p) { return std::vector<int64_t>(p->ne, p->ne+4); };
@@ -88,6 +109,7 @@ bool eval(ggml_tensor * t, bool ask, void * userdata) {
         require(wanted && s.pending == t, "Callback completion does not match its start");
         // The scheduler synchronizes before calling ask=false. IDs are read, never written.
         if (route) {
+            validate_route(t);
             std::vector<uint8_t> bytes(ggml_nbytes(t));
             ggml_backend_tensor_get(t, bytes.data(), 0, bytes.size());
             emit("M5_ROUTE", {{"serial", s.serial}, {"cpu_us", ggml_time_us()}, {"layer", layer},
@@ -98,7 +120,9 @@ bool eval(ggml_tensor * t, bool ask, void * userdata) {
         s.pending = nullptr;
         return true;
     } catch (const std::exception & error) {
-        s.failed = true; emit("M5_EVAL_ERROR", {{"message", error.what()}}); return false;
+        fatal(s, error.what());
+    } catch (...) {
+        fatal(s, "Unknown diagnostic callback failure");
     }
 }
 
@@ -127,12 +151,37 @@ void self_test() {
     bad = 1; std::memcpy(raw.data(), &bad, 4);
     expect_failure([&] { extract_ids(&tensor, raw); });
     require(rejected == 6, "Invalid routing input was accepted");
+    state data; data.mode = "split";
+    ggml_tensor operation{}; operation.op = GGML_OP_ADD;
+    std::strcpy(operation.name, "cpu-only-fixture");
+    for (auto & dim : operation.ne) dim = 1;
+    require(eval(&operation, true, &data) && eval(&operation, false, &data) && !data.pending,
+            "Valid callback state transition failed");
     std::puts("M5 eval self-test passed: padded stride, layer roles, six invalid inputs; no backend initialized");
+}
+
+void failure_test(const char * kind) {
+    state data; data.mode = "split";
+    ggml_tensor tensor{}; tensor.op = GGML_OP_ADD;
+    std::strcpy(tensor.name, "cpu-only-fixture");
+    for (auto & dim : tensor.ne) dim = 1;
+    if (!std::strcmp(kind, "cap")) data.serial = 300000;
+    else if (!std::strcmp(kind, "overlap")) data.pending = &tensor;
+    else if (!std::strcmp(kind, "completion")) { eval(&tensor, false, &data); std::_Exit(2); }
+    else if (!std::strcmp(kind, "failed")) data.failed = true;
+    else if (!std::strcmp(kind, "extraction")) {
+        std::strcpy(tensor.name, "ffn_moe_topk-0"); tensor.type = GGML_TYPE_I32;
+        tensor.ne[0] = 9; tensor.nb[0] = 4; tensor.nb[1] = 2048;
+        eval(&tensor, true, &data); eval(&tensor, false, &data); std::_Exit(2);
+    } else throw std::runtime_error("Unknown CPU failure fixture");
+    eval(&tensor, true, &data);
+    std::_Exit(2); // Failure handling must never return to the request.
 }
 } // namespace
 
 int main(int argc, char ** argv) {
     if (argc == 2 && std::strcmp(argv[1], "--self-test") == 0) { self_test(); return 0; }
+    if (argc == 3 && std::strcmp(argv[1], "--self-test-failure") == 0) { failure_test(argv[2]); return 2; }
     state data;
     const char * mode = std::getenv("GGML_M5_LAB_EVAL_MODE");
     data.mode = mode ? mode : "control";

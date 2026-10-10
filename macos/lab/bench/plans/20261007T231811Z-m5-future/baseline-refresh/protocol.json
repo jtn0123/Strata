@@ -1,0 +1,90 @@
+{
+  "experiment": {
+    "id": "baseline-refresh",
+    "title": "Complete the clean baseline refresh",
+    "priority": 1,
+    "kind": "model-benchmark",
+    "implementation": "Two-launch writing baseline runner exists; prior second launch was rejected for new swap. Refresh remains incomplete.",
+    "only_change": "No settings change: depth 3, eight helper workers, Tensor API on, F16 4K cache.",
+    "plan_command": [
+      ".venv/bin/python",
+      "scripts/benchmark_m5_decision_baseline.py"
+    ],
+    "future_run_command": [
+      ".venv/bin/python",
+      "scripts/benchmark_m5_decision_baseline.py",
+      "--run"
+    ],
+    "depends_on": [],
+    "hypothesis": "A clean repeat establishes current comparison conditions.",
+    "control_engine": "mtp-mma",
+    "candidate_engine": null,
+    "prerequisites": [
+      "Explicit testing go-ahead for any --run command",
+      "Offline validation receipt matches current sources",
+      "Quiet host; leave unrelated VM/build work alone"
+    ],
+    "proof": [
+      "Two accepted launches with identical prompts/settings/hashes",
+      "Monitor healthy; owned server exits; zero new swap",
+      "128-token synthetic/code/prose/Chinese replies and cached task checks"
+    ],
+    "result_fields": [
+      "generation_tok_s",
+      "ttft_s",
+      "wall_s",
+      "control_drift"
+    ],
+    "stop_if": [
+      "Invalid evidence or source drift",
+      "Unexpected quality failure or new swap"
+    ],
+    "limits": "Historical single-launch numbers are references. A refresh provides no optimization gain by itself."
+  },
+  "control": {
+    "engine": "mtp-mma",
+    "model": "flash",
+    "draft_model": "mtp_shared_packed_q3",
+    "context": 4096,
+    "batch": 512,
+    "ubatch": 512,
+    "cache_type": "f16",
+    "draft": 3,
+    "draft_threads": 8,
+    "draft_p_min": 0.0,
+    "tensor_api": "on",
+    "temperature": 0.6,
+    "seed": 1234,
+    "fresh_output_tokens": 128,
+    "matched_inputs": [
+      512,
+      2048
+    ],
+    "warmups_per_workload": 1,
+    "repeats_per_launch": 2
+  },
+  "comparison": {
+    "order": [
+      "control",
+      "candidate",
+      "candidate",
+      "control"
+    ],
+    "new_swap_required_bytes": 0,
+    "emergency_swap_guard_bytes": 134217728,
+    "minimum_available_during_run_bytes": 1073741824,
+    "minimum_available_before_full_model_bytes": 36507222016,
+    "metrics": [
+      "generation_tok_s",
+      "prompt_tok_s",
+      "ttft_s",
+      "wall_s",
+      "draft_acceptance_percent",
+      "minimum_available_bytes",
+      "swap_growth_bytes"
+    ],
+    "adoption_gate": "At least 5 percent median complete-task improvement on the chosen workload, or useful capacity gain with an explicitly accepted speed tradeoff; no unexplained quality failure or new swap. Report control drift and all raw passes.",
+    "percentage_rules": "TPS gain = 100*(candidate/control-1). Time reduction = 100*(1-candidate/control). Requires finite positive matched metrics. Do not add percentages from separate experiments.",
+    "historical_reference_only": "bench/features/20261007T052606Z-m5-decision-baseline/review.json"
+  }
+}

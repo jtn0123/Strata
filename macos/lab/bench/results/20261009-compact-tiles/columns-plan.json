@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "created_utc": "2026-10-09T23:53:09.897143+00:00",
+  "variant": "V2 output-channel-first compact grid",
+  "control": "original m5-copy / conv-direct",
+  "candidate": "isolated m5-compact-cols / compact-cols",
+  "predecessor": "component/comparison.json",
+  "predecessor_qualified": false,
+  "only_change": "Transpose bounded compact grid axes and remap to the original logical64x32 coordinates, including overflow filler indexing. Same worklist/map0/barriers/weights/math/precision/allocations. V1 native and evidence stay untouched.",
+  "hypothesis": "Grouping output-channel tiles for one expert/token tile may improve activation locality; physical Metal group scheduling is not guaranteed. Not a measured hardware/cache attribution.",
+  "required_correctness": "Same complete273-record original-engine oracle, six individual projection counters, full valid maxcapacity/skew/shared/fallback/repeated data checks, no new swap.",
+  "fresh_order": [
+    "control",
+    "candidate",
+    "candidate",
+    "control"
+  ],
+  "gate": "Strictly greater than10% complete two-block gain on BOTH T508/T512uniform above2x own absolutecontrol drift; identical outputs; no new swap. No model trial if gate fails. No TPS inference from component ms.",
+  "model_plan": "Same English contextual code/prose and separate TPS/reply/first-token gates in plan.json",
+  "preserved_v1": {
+    "config/m5_compact_experiment.json": "fca2de046bdb8284ebded57107f9b382215afe222bf97266640756f112d674c3",
+    "patches/mtp-m5-compact.patch": "f00bde8d2ec960aa5c89db32b1e87c4fea6423d80974acbacc9fefc1f0dd9164",
+    "bench/results/20261009-compact-tiles/component/comparison.json": "abbcc1ed7751bc13f514e04ee3411847dff8eecb35d78bef60c7898815da13dd"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "m5-hc",
+  "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+  "directory": "vendor/llama-m5-hc",
+  "patch": "patches/mtp-m5-hc.patch",
+  "patch_sha256": "5a631f0eaee8e6a0995d7d066c318335bf03f626d9ad481266cfe89136965137",
+  "source_diff_sha256": "5a631f0eaee8e6a0995d7d066c318335bf03f626d9ad481266cfe89136965137",
+  "modified_files": [
+    "ggml/src/ggml-metal/ggml-metal-common.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.h",
+    "ggml/src/ggml-metal/ggml-metal-context.m",
+    "ggml/src/ggml-metal/ggml-metal-device.cpp",
+    "ggml/src/ggml-metal/ggml-metal-device.h",
+    "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+    "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+    "ggml/src/ggml-metal/kernels/quantize.metal",
+    "src/llama-context.cpp",
+    "src/llama-cparams.h",
+    "src/models/qwen4exp.cpp",
+    "tests/test-backend-ops.cpp"
+  ],
+  "features": [
+    "mtp-shared",
+    "m5-tuning",
+    "m5-profile",
+    "m5-copy",
+    "m5-hc"
+  ],
+  "components": [
+    {
+      "patch": "patches/mtp-m5-copy.patch",
+      "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+    }
+  ],
+  "scope": "Opt-in exact-shape shared BF16 projection TensorOps with non-relaxed F32 inputs/outputs, bounded static scratch and existing residual fusion. Each direction independently gated to contiguous one-batch T=4..5. Separate exact-K specialization of the unchanged MMA math. No new model weights or default changes.",
+  "upstream": {
+    "pull_request": "https://github.com/ml-explore/mlx/pull/4640",
+    "merge": "3c40e8f92d0cce0866fc2f436f9b5096cf3b0ea7",
+    "followup_merge": "a87691d2de8b6185fdca6b565c755596f3f66df4",
+    "license_file": "patches/MLX-LICENSE.txt",
+    "adaptation": "Register input and split-K design; mixed F32/BF16/F32 with relaxed_precision=false, masked short token rows, exact shapes and existing residual contract."
+  }
+}

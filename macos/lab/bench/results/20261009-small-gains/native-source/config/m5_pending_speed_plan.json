@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "testing_status": "Residual correctness and incremental copy comparisons complete; reproductions require explicit --run.",
+  "automatic_execution": false,
+  "experiments": [
+    {
+      "id": "metal-residual-correctness",
+      "axis": "engine",
+      "engine": "m5-lab",
+      "depth": 3,
+      "control": "m5-lab",
+      "candidates": [
+        "m5-correctness"
+      ]
+    },
+    {
+      "id": "copy-kernels",
+      "axis": "m5_tuning",
+      "engine": "m5-copy",
+      "depth": 3,
+      "control": "stock",
+      "candidates": [
+        "copy-scalar",
+        "copy-v4",
+        "conv-direct"
+      ]
+    }
+  ],
+  "note": "Isolated upstream #30100 correctness backport. Run the reproducing mm2+mm GPU cases before the matched model comparison. No current Qwen trigger or TPS gain is established. Existing launchers keep their engine.",
+  "copy_note": "Incremental user-authorized full model stock/scalar/vector4/direct-convolution/reversed comparison. Vector8 also has copy-only tests. No copy-only gain is a TPS claim.",
+  "completed_results": {
+    "metal-residual-correctness": "bench/results/20261009T085850Z-m5-metal-residual-correctness/comparison.json",
+    "copy-kernels": "bench/results/20261009T112641Z-m5-copy-resume/comparison.json"
+  }
+}

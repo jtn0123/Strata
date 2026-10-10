@@ -1,0 +1,394 @@
+{
+  "schema": 1,
+  "run_id": "20261009T041826Z-heavy-trial-optimized-mtp-1",
+  "status": "failed",
+  "settings": {
+    "model": "flash",
+    "label": "heavy-trial-optimized-mtp-1",
+    "comparison_profile": "mtp-mma",
+    "engine": "mtp-mma",
+    "draft_vocab": "off",
+    "context": 4096,
+    "batch": 512,
+    "ubatch": 512,
+    "cache_type": "f16",
+    "spec": "draft-mtp",
+    "draft": 3,
+    "draft_placement": "mixed",
+    "draft_model": "mtp_shared_packed_q3",
+    "threads": 8,
+    "temperature": 0.6,
+    "extended_checks": true,
+    "repeats": 3,
+    "warmups": 1,
+    "predict": 128,
+    "prompts": [
+      512,
+      2048
+    ],
+    "real_workloads": true,
+    "cached_workloads": true,
+    "draft_threads": 8,
+    "draft_p_min": 0.0,
+    "tensor_api": "on",
+    "m5_tuning": "stock",
+    "swap_guard_bytes": 0,
+    "minimum_available_bytes": 1073741824,
+    "require_quiet_host": false,
+    "capacity_trial": true
+  },
+  "command": [
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-mtp-mma/build/bin/llama-server",
+    "-m",
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/models/flash/Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "58318",
+    "-c",
+    "4096",
+    "-b",
+    "512",
+    "-ub",
+    "512",
+    "-t",
+    "8",
+    "-tb",
+    "8",
+    "-ngl",
+    "all",
+    "-fit",
+    "off",
+    "-fa",
+    "on",
+    "-lm",
+    "mmap",
+    "-lzm",
+    "on",
+    "-np",
+    "1",
+    "-ctk",
+    "f16",
+    "-ctv",
+    "f16",
+    "--cache-ram",
+    "0",
+    "--spec-type",
+    "draft-mtp",
+    "--spec-draft-n-max",
+    "3",
+    "--metrics",
+    "--jinja",
+    "--no-webui",
+    "--alias",
+    "flash",
+    "--verbosity",
+    "4",
+    "--cors-origins",
+    "localhost",
+    "-md",
+    "/Users/justin/Documents/Github/Strata-Mac-Lab/models/mtp_shared_packed_q3/mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf",
+    "--spec-draft-ngl",
+    "all",
+    "--spec-draft-cpu-moe",
+    "--no-op-offload",
+    "--spec-draft-threads",
+    "8",
+    "--spec-draft-threads-batch",
+    "8",
+    "--spec-draft-p-min",
+    "0.0"
+  ],
+  "runtime": {
+    "llama_cpp": {
+      "repository": "https://github.com/ggml-org/llama.cpp.git",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "tag": "v0.6.0"
+    },
+    "strata_macos": {
+      "repository": "https://github.com/jinzy0623/Strata-macOS.git",
+      "revision": "2cc4153409edb3f859187bdf10f13e34972d6ffb"
+    },
+    "build_flags": [
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DGGML_METAL=ON",
+      "-DGGML_METAL_EMBED_LIBRARY=ON",
+      "-DLLAMA_BUILD_TESTS=OFF",
+      "-DLLAMA_BUILD_EXAMPLES=OFF",
+      "-DLLAMA_BUILD_TOOLS=ON"
+    ]
+  },
+  "model": {
+    "repository": "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF",
+    "revision": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",
+    "files": [
+      {
+        "path": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00001-of-00002.gguf",
+        "size_bytes": 37623740192,
+        "sha256": "69820c02ec7d0b45ef2ebb19d6620299db749fe2aded7f39f93c6b88b199b720"
+      },
+      {
+        "path": "Q2_0/Qwen3.8-Flash-Next-GSQ-RCO-Q2_0-00002-of-00002.gguf",
+        "size_bytes": 28800138432,
+        "sha256": "316b46f3a2dbd68c900f43136ab9449f9dcc3725dfd8c794847c204bc161e113"
+      }
+    ]
+  },
+  "host_before": {
+    "os": "macOS-27.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "chip": "Apple M5 Pro",
+    "ram_bytes": 51539607552,
+    "cpu_count": 18,
+    "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=36831331)\t100%; charged; 0:00 remaining present: true",
+    "power_settings": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n womp                 0\n displaysleep         10\n networkoversleep     0\n sleep                1\n lessbright           0\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                0\n tcpkeepalive         1\n disksleep            10",
+    "thermal_status": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+    "gpu_wired_limit": "iogpu.wired_limit_mb: 0",
+    "vm_stat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                  1033686.\nPages active:                                 698413.\nPages inactive:                               994884.\nPages speculative:                             60486.\nPages throttled:                                   0.\nPages wired down:                             263673.\nPages purgeable:                               48640.\n\"Translation faults\":                     6694575887.\nPages copy-on-write:                       198055093.\nPages zero filled:                        3126103793.\nPages reactivated:                         164268430.\nPages purged:                               33217595.\nFile-backed pages:                           1097059.\nAnonymous pages:                              656724.\nPages stored in compressor:                    88023.\nPages occupied by compressor:                  34081.\nDecompressions:                            112166508.\nCompressions:                              139841790.\nPageins:                                   190686830.\nPageouts:                                     114550.\nSwapins:                                      585789.\nSwapouts:                                    1024417.\nPages tagged:                                 216325.\nPages tagged resident:                        207555.\nPages tagged compressed:                        8770.\nPages tag-storage:                             98304.\nPages tag-storage holding tags:                10924.\nPages tag-storage free:                        21277.\nPages tag-storage non-tag pageable:            65718.\nPages tag-storage non-tag wired:                   8.\nBytes of compressed tags:                    1303808.\nTagged compressions:                         3432750.\nTagged decompressions:                       3073317.",
+    "swap": {
+      "total": 2147483648,
+      "used": 536870912,
+      "free": 1610612736,
+      "percent": 25.0,
+      "sin": 3124213022720,
+      "sout": 1876787200
+    },
+    "available_bytes": 34228813824
+  },
+  "cases": [],
+  "warmups": [],
+  "checks": [],
+  "selected_engine": {
+    "engine": "mtp-mma",
+    "directory": "vendor/llama-mtp-mma",
+    "revision": "d81235049384534c167caea52b85a694f6103d14",
+    "source_diff_sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3",
+    "patch": {
+      "schema": 1,
+      "id": "mtp-mma",
+      "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+      "directory": "vendor/llama-mtp-mma",
+      "patch": "patches/mtp-shared-mma.patch",
+      "patch_sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3",
+      "source_diff_sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3",
+      "modified_files": [
+        "ggml/src/ggml-metal/ggml-metal-common.cpp",
+        "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+        "src/llama-context.cpp",
+        "src/llama-cparams.h",
+        "src/models/qwen4exp.cpp",
+        "tests/test-backend-ops.cpp"
+      ],
+      "features": [
+        "mtp-shared"
+      ],
+      "components": [
+        {
+          "patch": "patches/mtp-shared-weights.patch",
+          "sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a"
+        },
+        {
+          "patch": "patches/metal-mma-types-upstream.patch",
+          "sha256": "5e1b5354768370e5960e2eb3f66f46dd0fbc8f4396c34e99dfac89f49f1cf53c"
+        }
+      ],
+      "upstream": {
+        "repository": "https://github.com/pratiknarola-t/llama.cpp",
+        "revision": "b0cb151326e6b436c265c641f23235864f7de090",
+        "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30065",
+        "license_file": "patches/LLAMA-LICENSE.txt"
+      },
+      "scope": "Unchanged shared helper patch plus unchanged upstream few-row dense MUL_MAT dispatch/kernel/test additions. No MUL_MAT_ID expert kernel change; no memory limit override."
+    },
+    "artifacts": {
+      "llama-server": "3929bd1340d72a4d208ba6c50eaa7a537e24815c00e9078c784cc2ff42815963",
+      "libggml-base.0.26.0.dylib": "8afd36425a51a37d4d3b414e2ab2b5a2cda69d29c5540a5a447c4a6b6d56aef5",
+      "libggml-base.0.dylib": "8afd36425a51a37d4d3b414e2ab2b5a2cda69d29c5540a5a447c4a6b6d56aef5",
+      "libggml-base.dylib": "8afd36425a51a37d4d3b414e2ab2b5a2cda69d29c5540a5a447c4a6b6d56aef5",
+      "libggml-blas.0.26.0.dylib": "ecb2b284d5fd9ebda32e474021bf2ac646428e7f31f2f1fbff5eb2d03dcf5fb6",
+      "libggml-blas.0.dylib": "ecb2b284d5fd9ebda32e474021bf2ac646428e7f31f2f1fbff5eb2d03dcf5fb6",
+      "libggml-blas.dylib": "ecb2b284d5fd9ebda32e474021bf2ac646428e7f31f2f1fbff5eb2d03dcf5fb6",
+      "libggml-cpu.0.26.0.dylib": "1900a146e5a609b37543300e137e61e038ec21919f24b8a33b747e5cfecf2bcd",
+      "libggml-cpu.0.dylib": "1900a146e5a609b37543300e137e61e038ec21919f24b8a33b747e5cfecf2bcd",
+      "libggml-cpu.dylib": "1900a146e5a609b37543300e137e61e038ec21919f24b8a33b747e5cfecf2bcd",
+      "libggml-metal.0.26.0.dylib": "8575fa62cc24abb421151a041f206f869769962c49a04e9b6f5d1815cad26808",
+      "libggml-metal.0.dylib": "8575fa62cc24abb421151a041f206f869769962c49a04e9b6f5d1815cad26808",
+      "libggml-metal.dylib": "8575fa62cc24abb421151a041f206f869769962c49a04e9b6f5d1815cad26808",
+      "libggml.0.26.0.dylib": "07019e507d3d90316b2ca7acdc7c6121645b2d83e63caf3948e27ca7e8558b99",
+      "libggml.0.dylib": "07019e507d3d90316b2ca7acdc7c6121645b2d83e63caf3948e27ca7e8558b99",
+      "libggml.dylib": "07019e507d3d90316b2ca7acdc7c6121645b2d83e63caf3948e27ca7e8558b99",
+      "libllama-common.0.6.0.dylib": "1f9514c38123e46bfe2fb4abc198ca20ac7022f52bc3a558e525da9f3cfb24b7",
+      "libllama-common.0.dylib": "1f9514c38123e46bfe2fb4abc198ca20ac7022f52bc3a558e525da9f3cfb24b7",
+      "libllama-common.dylib": "1f9514c38123e46bfe2fb4abc198ca20ac7022f52bc3a558e525da9f3cfb24b7",
+      "libllama-server-impl.dylib": "1e087f285fb81986a17beac2c7ee9aa2db7bf04f569dc0c4ab69bc48f8817657",
+      "libllama.0.6.0.dylib": "ed0637c57cbf717f205165dce0e74b1aad3b732e1e3e101dcb5642e34c34a619",
+      "libllama.0.dylib": "ed0637c57cbf717f205165dce0e74b1aad3b732e1e3e101dcb5642e34c34a619",
+      "libllama.dylib": "ed0637c57cbf717f205165dce0e74b1aad3b732e1e3e101dcb5642e34c34a619",
+      "libmtmd.0.6.0.dylib": "552d93946163c6f27ac889adf07d796488e7510566349c29d29dbfe485734a8d",
+      "libmtmd.0.dylib": "552d93946163c6f27ac889adf07d796488e7510566349c29d29dbfe485734a8d",
+      "libmtmd.dylib": "552d93946163c6f27ac889adf07d796488e7510566349c29d29dbfe485734a8d"
+    },
+    "build_receipt": {
+      "engine": "mtp-mma",
+      "directory": "vendor/llama-mtp-mma",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3",
+      "patch": {
+        "schema": 1,
+        "id": "mtp-mma",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-mtp-mma",
+        "patch": "patches/mtp-shared-mma.patch",
+        "patch_sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3",
+        "source_diff_sha256": "ed6dab8501728fffab87c3ab72cb18cc30a2731405cb7de6018bda10758549f3",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-shared-weights.patch",
+            "sha256": "ba8131bbad45a5a56b8818db94bdbfbd55fa83518358c63210011c49e1fa8a8a"
+          },
+          {
+            "patch": "patches/metal-mma-types-upstream.patch",
+            "sha256": "5e1b5354768370e5960e2eb3f66f46dd0fbc8f4396c34e99dfac89f49f1cf53c"
+          }
+        ],
+        "upstream": {
+          "repository": "https://github.com/pratiknarola-t/llama.cpp",
+          "revision": "b0cb151326e6b436c265c641f23235864f7de090",
+          "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30065",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        },
+        "scope": "Unchanged shared helper patch plus unchanged upstream few-row dense MUL_MAT dispatch/kernel/test additions. No MUL_MAT_ID expert kernel change; no memory limit override."
+      },
+      "artifacts": {
+        "llama-server": "3929bd1340d72a4d208ba6c50eaa7a537e24815c00e9078c784cc2ff42815963",
+        "libggml-base.0.26.0.dylib": "8afd36425a51a37d4d3b414e2ab2b5a2cda69d29c5540a5a447c4a6b6d56aef5",
+        "libggml-base.0.dylib": "8afd36425a51a37d4d3b414e2ab2b5a2cda69d29c5540a5a447c4a6b6d56aef5",
+        "libggml-base.dylib": "8afd36425a51a37d4d3b414e2ab2b5a2cda69d29c5540a5a447c4a6b6d56aef5",
+        "libggml-blas.0.26.0.dylib": "ecb2b284d5fd9ebda32e474021bf2ac646428e7f31f2f1fbff5eb2d03dcf5fb6",
+        "libggml-blas.0.dylib": "ecb2b284d5fd9ebda32e474021bf2ac646428e7f31f2f1fbff5eb2d03dcf5fb6",
+        "libggml-blas.dylib": "ecb2b284d5fd9ebda32e474021bf2ac646428e7f31f2f1fbff5eb2d03dcf5fb6",
+        "libggml-cpu.0.26.0.dylib": "1900a146e5a609b37543300e137e61e038ec21919f24b8a33b747e5cfecf2bcd",
+        "libggml-cpu.0.dylib": "1900a146e5a609b37543300e137e61e038ec21919f24b8a33b747e5cfecf2bcd",
+        "libggml-cpu.dylib": "1900a146e5a609b37543300e137e61e038ec21919f24b8a33b747e5cfecf2bcd",
+        "libggml-metal.0.26.0.dylib": "8575fa62cc24abb421151a041f206f869769962c49a04e9b6f5d1815cad26808",
+        "libggml-metal.0.dylib": "8575fa62cc24abb421151a041f206f869769962c49a04e9b6f5d1815cad26808",
+        "libggml-metal.dylib": "8575fa62cc24abb421151a041f206f869769962c49a04e9b6f5d1815cad26808",
+        "libggml.0.26.0.dylib": "07019e507d3d90316b2ca7acdc7c6121645b2d83e63caf3948e27ca7e8558b99",
+        "libggml.0.dylib": "07019e507d3d90316b2ca7acdc7c6121645b2d83e63caf3948e27ca7e8558b99",
+        "libggml.dylib": "07019e507d3d90316b2ca7acdc7c6121645b2d83e63caf3948e27ca7e8558b99",
+        "libllama-common.0.6.0.dylib": "1f9514c38123e46bfe2fb4abc198ca20ac7022f52bc3a558e525da9f3cfb24b7",
+        "libllama-common.0.dylib": "1f9514c38123e46bfe2fb4abc198ca20ac7022f52bc3a558e525da9f3cfb24b7",
+        "libllama-common.dylib": "1f9514c38123e46bfe2fb4abc198ca20ac7022f52bc3a558e525da9f3cfb24b7",
+        "libllama-server-impl.dylib": "1e087f285fb81986a17beac2c7ee9aa2db7bf04f569dc0c4ab69bc48f8817657",
+        "libllama.0.6.0.dylib": "ed0637c57cbf717f205165dce0e74b1aad3b732e1e3e101dcb5642e34c34a619",
+        "libllama.0.dylib": "ed0637c57cbf717f205165dce0e74b1aad3b732e1e3e101dcb5642e34c34a619",
+        "libllama.dylib": "ed0637c57cbf717f205165dce0e74b1aad3b732e1e3e101dcb5642e34c34a619",
+        "libmtmd.0.6.0.dylib": "552d93946163c6f27ac889adf07d796488e7510566349c29d29dbfe485734a8d",
+        "libmtmd.0.dylib": "552d93946163c6f27ac889adf07d796488e7510566349c29d29dbfe485734a8d",
+        "libmtmd.dylib": "552d93946163c6f27ac889adf07d796488e7510566349c29d29dbfe485734a8d"
+      },
+      "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+      "build_settings": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GGML_BLAS": "ON",
+        "GGML_CPU": "ON",
+        "GGML_METAL": "ON",
+        "GGML_METAL_EMBED_LIBRARY": "ON",
+        "GGML_NATIVE": "ON",
+        "LLAMA_BUILD_TESTS": "ON",
+        "LLAMA_BUILD_TOOLS": "ON"
+      },
+      "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+    }
+  },
+  "draft_vocabulary": null,
+  "metal_environment": {
+    "tensor_api": "on",
+    "tuning": "stock",
+    "profile": false,
+    "variables": {
+      "GGML_METAL_TENSOR_ENABLE": "1"
+    }
+  },
+  "method": "Single slot, full Metal offload, fixed seed 1234; sampling temperature is recorded in settings. Exact synthetic chat prompt sizes and fixed output count from settings; no prompt reuse; ignore EOS for timing only. No model downloads during a run. Warm OS file cache is uncontrolled. TTFT includes HTTP and prompt evaluation. Correctness checks use normal EOS handling.",
+  "actual_sources": {
+    "llama_cpp": {
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "dirty": ""
+    },
+    "strata_macos": {
+      "revision": "2cc4153409edb3f859187bdf10f13e34972d6ffb",
+      "dirty": ""
+    }
+  },
+  "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+  "draft_model": {
+    "derived": {
+      "source_model": "mtp_shared_q3",
+      "source_sha256": "6b8a04dfd4c60e1bde4b25de96f0d7b0a9a39c2b90cba43e27e199c2d839713d",
+      "layout": "CPU expert tables first, GPU dense tensors last",
+      "required_engine": "mtp-shared",
+      "receipt": "bench/results/20261006T183818Z-prepare-shared-layout/preparation.json"
+    },
+    "files": [
+      {
+        "path": "mtp-Qwen3.8-Flash-Next-Q3_K_S-shared-packed.gguf",
+        "size_bytes": 1251560832,
+        "sha256": "e7e8a4187cbca95f51d82c618e76fe6057a25ba376599fd11bbd2e2c48380954"
+      }
+    ]
+  },
+  "error": "RuntimeError: Server exited during load with code -15; see server.log",
+  "memory": {
+    "guard": "Stopped: swap grew by over 0 MiB or available memory stayed below 1024 MiB for 4 seconds",
+    "monitor_healthy": true,
+    "monitor_error": null,
+    "samples": 30,
+    "live_samples": 29,
+    "baseline_before_launch": true,
+    "child_exited": true,
+    "launch_baseline": {
+      "swap_used_bytes": 536870912,
+      "available_bytes": 34195488768
+    },
+    "peak_rss_bytes": 31474155520,
+    "minimum_available_bytes": 27550744576,
+    "peak_swap_bytes": 539623424,
+    "swap_growth_bytes": 2752512,
+    "system_disk_read_bytes": 37645914112,
+    "sampling_interval_s": 0.25,
+    "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+  },
+  "host_after": {
+    "os": "macOS-27.2-arm64-arm-64bit",
+    "machine": "arm64",
+    "chip": "Apple M5 Pro",
+    "ram_bytes": 51539607552,
+    "cpu_count": 18,
+    "power": "Now drawing from 'AC Power'\n -InternalBattery-0 (id=36831331)\t100%; charged; 0:00 remaining present: true",
+    "power_settings": "Battery Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n womp                 0\n displaysleep         10\n networkoversleep     0\n sleep                1\n lessbright           0\n tcpkeepalive         1\n disksleep            10\nAC Power:\n Sleep On Power Button 1\n powermode            0\n standby              1\n ttyskeepawake        1\n hibernatemode        3\n powernap             1\n hibernatefile        /var/vm/sleepimage\n displaysleep         10\n womp                 1\n networkoversleep     0\n sleep                0\n tcpkeepalive         1\n disksleep            10",
+    "thermal_status": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\nNote: No CPU power status has been recorded",
+    "gpu_wired_limit": "iogpu.wired_limit_mb: 0",
+    "vm_stat": "Mach Virtual Memory Statistics: (page size of 16384 bytes)\nPages free:                                    52405.\nPages active:                                 967359.\nPages inactive:                              1751963.\nPages speculative:                             16479.\nPages throttled:                                   0.\nPages wired down:                             256646.\nPages purgeable:                                4737.\n\"Translation faults\":                     6696956593.\nPages copy-on-write:                       198062505.\nPages zero filled:                        3126144412.\nPages reactivated:                         164448451.\nPages purged:                               33265153.\nFile-backed pages:                           2227106.\nAnonymous pages:                              508695.\nPages stored in compressor:                   120133.\nPages occupied by compressor:                  40371.\nDecompressions:                            112166919.\nCompressions:                              139877525.\nPageins:                                   192984857.\nPageouts:                                     114951.\nSwapins:                                      585789.\nSwapouts:                                    1024585.\nPages tagged:                                 204735.\nPages tagged resident:                        192560.\nPages tagged compressed:                       12175.\nPages tag-storage:                             98304.\nPages tag-storage holding tags:                10834.\nPages tag-storage free:                        30274.\nPages tag-storage non-tag pageable:            56721.\nPages tag-storage non-tag wired:                   8.\nBytes of compressed tags:                    1903104.\nTagged compressions:                         3436181.\nTagged decompressions:                       3073343.",
+    "swap": {
+      "total": 2147483648,
+      "used": 539623424,
+      "free": 1607860224,
+      "percent": 25.1,
+      "sin": 3161863897088,
+      "sout": 1883357184
+    },
+    "available_bytes": 29834264576
+  }
+}

@@ -1,0 +1,229 @@
+{
+  "status": "failed",
+  "probe": {
+    "engine": {
+      "engine": "m5-hc",
+      "directory": "vendor/llama-m5-hc",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "7dc4f75d0e522f4e79c32aa0141d2c35370cc0c092a562e2e575fabf2195e7d6",
+      "patch": {
+        "schema": 1,
+        "id": "m5-hc",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-hc",
+        "patch": "patches/mtp-m5-hc.patch",
+        "patch_sha256": "7dc4f75d0e522f4e79c32aa0141d2c35370cc0c092a562e2e575fabf2195e7d6",
+        "source_diff_sha256": "7dc4f75d0e522f4e79c32aa0141d2c35370cc0c092a562e2e575fabf2195e7d6",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal-device.h",
+          "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "ggml/src/ggml-metal/kernels/quantize.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-copy",
+          "m5-hc"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-copy.patch",
+            "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+          }
+        ],
+        "scope": "Opt-in exact-shape shared BF16 projection TensorOps with non-relaxed F32 inputs/outputs, bounded static scratch and existing residual fusion. Each direction independently gated to contiguous one-batch T=3..5. Separate exact-K specialization of the unchanged MMA math. No new model weights or default changes.",
+        "upstream": {
+          "pull_request": "https://github.com/ml-explore/mlx/pull/4640",
+          "merge": "3c40e8f92d0cce0866fc2f436f9b5096cf3b0ea7",
+          "followup_merge": "a87691d2de8b6185fdca6b565c755596f3f66df4",
+          "license_file": "patches/MLX-LICENSE.txt",
+          "adaptation": "Register input and split-K design; mixed F32/BF16/F32 with relaxed_precision=false, masked short token rows, exact shapes and existing residual contract."
+        }
+      },
+      "artifacts": {
+        "llama-server": "79930b976d898746cb350f933b185f5f23105407c0fbe303023b1a22d8e95d86",
+        "libggml-base.0.26.0.dylib": "5066c80d47dea9ba20068cb45161330855c1b107d8eff5a130db1e7793e0ba6b",
+        "libggml-base.0.dylib": "5066c80d47dea9ba20068cb45161330855c1b107d8eff5a130db1e7793e0ba6b",
+        "libggml-base.dylib": "5066c80d47dea9ba20068cb45161330855c1b107d8eff5a130db1e7793e0ba6b",
+        "libggml-blas.0.26.0.dylib": "fe5d8e892e515f1d1c2c8b74449ff2bbf7f440eefdf78a6ec2ce75d6473e426c",
+        "libggml-blas.0.dylib": "fe5d8e892e515f1d1c2c8b74449ff2bbf7f440eefdf78a6ec2ce75d6473e426c",
+        "libggml-blas.dylib": "fe5d8e892e515f1d1c2c8b74449ff2bbf7f440eefdf78a6ec2ce75d6473e426c",
+        "libggml-cpu.0.26.0.dylib": "19bb68f62e726792a7e8fb016f31194ee3c344c64543efb6c9357d1eb27a8404",
+        "libggml-cpu.0.dylib": "19bb68f62e726792a7e8fb016f31194ee3c344c64543efb6c9357d1eb27a8404",
+        "libggml-cpu.dylib": "19bb68f62e726792a7e8fb016f31194ee3c344c64543efb6c9357d1eb27a8404",
+        "libggml-metal.0.26.0.dylib": "989c02d0837741c062255161ca005caa6c0a347a1ef78527e06bb37a54d711b3",
+        "libggml-metal.0.dylib": "989c02d0837741c062255161ca005caa6c0a347a1ef78527e06bb37a54d711b3",
+        "libggml-metal.dylib": "989c02d0837741c062255161ca005caa6c0a347a1ef78527e06bb37a54d711b3",
+        "libggml.0.26.0.dylib": "963bdbc39f065f6f8e1873d402f7506faec7f84b5b674e3a7cb60dc19d9c7bc7",
+        "libggml.0.dylib": "963bdbc39f065f6f8e1873d402f7506faec7f84b5b674e3a7cb60dc19d9c7bc7",
+        "libggml.dylib": "963bdbc39f065f6f8e1873d402f7506faec7f84b5b674e3a7cb60dc19d9c7bc7",
+        "libllama-common.0.6.0.dylib": "9d8eabfa5abfea672670379f41d3678c8a5dd465035bba52606d77db6c5b2ff5",
+        "libllama-common.0.dylib": "9d8eabfa5abfea672670379f41d3678c8a5dd465035bba52606d77db6c5b2ff5",
+        "libllama-common.dylib": "9d8eabfa5abfea672670379f41d3678c8a5dd465035bba52606d77db6c5b2ff5",
+        "libllama-server-impl.dylib": "ac21703795cc2ce3310361720a88cee2914e173e909455092872d3a90086e28f",
+        "libllama.0.6.0.dylib": "2c5e4a1817d6e17e3ada7808adb488897d656cda7484ebc14d5679c89badabcf",
+        "libllama.0.dylib": "2c5e4a1817d6e17e3ada7808adb488897d656cda7484ebc14d5679c89badabcf",
+        "libllama.dylib": "2c5e4a1817d6e17e3ada7808adb488897d656cda7484ebc14d5679c89badabcf",
+        "libmtmd.0.6.0.dylib": "68b141588191f17dabf0ee430d0f84a6c8ac06d022b0e99d2f4d56bad4df2e63",
+        "libmtmd.0.dylib": "68b141588191f17dabf0ee430d0f84a6c8ac06d022b0e99d2f4d56bad4df2e63",
+        "libmtmd.dylib": "68b141588191f17dabf0ee430d0f84a6c8ac06d022b0e99d2f4d56bad4df2e63"
+      },
+      "build_receipt": {
+        "engine": "m5-hc",
+        "directory": "vendor/llama-m5-hc",
+        "revision": "d81235049384534c167caea52b85a694f6103d14",
+        "source_diff_sha256": "7dc4f75d0e522f4e79c32aa0141d2c35370cc0c092a562e2e575fabf2195e7d6",
+        "patch": {
+          "schema": 1,
+          "id": "m5-hc",
+          "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+          "directory": "vendor/llama-m5-hc",
+          "patch": "patches/mtp-m5-hc.patch",
+          "patch_sha256": "7dc4f75d0e522f4e79c32aa0141d2c35370cc0c092a562e2e575fabf2195e7d6",
+          "source_diff_sha256": "7dc4f75d0e522f4e79c32aa0141d2c35370cc0c092a562e2e575fabf2195e7d6",
+          "modified_files": [
+            "ggml/src/ggml-metal/ggml-metal-common.cpp",
+            "ggml/src/ggml-metal/ggml-metal-common.h",
+            "ggml/src/ggml-metal/ggml-metal-context.m",
+            "ggml/src/ggml-metal/ggml-metal-device.cpp",
+            "ggml/src/ggml-metal/ggml-metal-device.h",
+            "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+            "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+            "ggml/src/ggml-metal/kernels/quantize.metal",
+            "src/llama-context.cpp",
+            "src/llama-cparams.h",
+            "src/models/qwen4exp.cpp",
+            "tests/test-backend-ops.cpp"
+          ],
+          "features": [
+            "mtp-shared",
+            "m5-tuning",
+            "m5-profile",
+            "m5-copy",
+            "m5-hc"
+          ],
+          "components": [
+            {
+              "patch": "patches/mtp-m5-copy.patch",
+              "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+            }
+          ],
+          "scope": "Opt-in exact-shape shared BF16 projection TensorOps with non-relaxed F32 inputs/outputs, bounded static scratch and existing residual fusion. Each direction independently gated to contiguous one-batch T=3..5. Separate exact-K specialization of the unchanged MMA math. No new model weights or default changes.",
+          "upstream": {
+            "pull_request": "https://github.com/ml-explore/mlx/pull/4640",
+            "merge": "3c40e8f92d0cce0866fc2f436f9b5096cf3b0ea7",
+            "followup_merge": "a87691d2de8b6185fdca6b565c755596f3f66df4",
+            "license_file": "patches/MLX-LICENSE.txt",
+            "adaptation": "Register input and split-K design; mixed F32/BF16/F32 with relaxed_precision=false, masked short token rows, exact shapes and existing residual contract."
+          }
+        },
+        "artifacts": {
+          "llama-server": "79930b976d898746cb350f933b185f5f23105407c0fbe303023b1a22d8e95d86",
+          "libggml-base.0.26.0.dylib": "5066c80d47dea9ba20068cb45161330855c1b107d8eff5a130db1e7793e0ba6b",
+          "libggml-base.0.dylib": "5066c80d47dea9ba20068cb45161330855c1b107d8eff5a130db1e7793e0ba6b",
+          "libggml-base.dylib": "5066c80d47dea9ba20068cb45161330855c1b107d8eff5a130db1e7793e0ba6b",
+          "libggml-blas.0.26.0.dylib": "fe5d8e892e515f1d1c2c8b74449ff2bbf7f440eefdf78a6ec2ce75d6473e426c",
+          "libggml-blas.0.dylib": "fe5d8e892e515f1d1c2c8b74449ff2bbf7f440eefdf78a6ec2ce75d6473e426c",
+          "libggml-blas.dylib": "fe5d8e892e515f1d1c2c8b74449ff2bbf7f440eefdf78a6ec2ce75d6473e426c",
+          "libggml-cpu.0.26.0.dylib": "19bb68f62e726792a7e8fb016f31194ee3c344c64543efb6c9357d1eb27a8404",
+          "libggml-cpu.0.dylib": "19bb68f62e726792a7e8fb016f31194ee3c344c64543efb6c9357d1eb27a8404",
+          "libggml-cpu.dylib": "19bb68f62e726792a7e8fb016f31194ee3c344c64543efb6c9357d1eb27a8404",
+          "libggml-metal.0.26.0.dylib": "989c02d0837741c062255161ca005caa6c0a347a1ef78527e06bb37a54d711b3",
+          "libggml-metal.0.dylib": "989c02d0837741c062255161ca005caa6c0a347a1ef78527e06bb37a54d711b3",
+          "libggml-metal.dylib": "989c02d0837741c062255161ca005caa6c0a347a1ef78527e06bb37a54d711b3",
+          "libggml.0.26.0.dylib": "963bdbc39f065f6f8e1873d402f7506faec7f84b5b674e3a7cb60dc19d9c7bc7",
+          "libggml.0.dylib": "963bdbc39f065f6f8e1873d402f7506faec7f84b5b674e3a7cb60dc19d9c7bc7",
+          "libggml.dylib": "963bdbc39f065f6f8e1873d402f7506faec7f84b5b674e3a7cb60dc19d9c7bc7",
+          "libllama-common.0.6.0.dylib": "9d8eabfa5abfea672670379f41d3678c8a5dd465035bba52606d77db6c5b2ff5",
+          "libllama-common.0.dylib": "9d8eabfa5abfea672670379f41d3678c8a5dd465035bba52606d77db6c5b2ff5",
+          "libllama-common.dylib": "9d8eabfa5abfea672670379f41d3678c8a5dd465035bba52606d77db6c5b2ff5",
+          "libllama-server-impl.dylib": "ac21703795cc2ce3310361720a88cee2914e173e909455092872d3a90086e28f",
+          "libllama.0.6.0.dylib": "2c5e4a1817d6e17e3ada7808adb488897d656cda7484ebc14d5679c89badabcf",
+          "libllama.0.dylib": "2c5e4a1817d6e17e3ada7808adb488897d656cda7484ebc14d5679c89badabcf",
+          "libllama.dylib": "2c5e4a1817d6e17e3ada7808adb488897d656cda7484ebc14d5679c89badabcf",
+          "libmtmd.0.6.0.dylib": "68b141588191f17dabf0ee430d0f84a6c8ac06d022b0e99d2f4d56bad4df2e63",
+          "libmtmd.0.dylib": "68b141588191f17dabf0ee430d0f84a6c8ac06d022b0e99d2f4d56bad4df2e63",
+          "libmtmd.dylib": "68b141588191f17dabf0ee430d0f84a6c8ac06d022b0e99d2f4d56bad4df2e63"
+        },
+        "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+        "build_settings": {
+          "CMAKE_BUILD_TYPE": "Release",
+          "GGML_BLAS": "ON",
+          "GGML_CPU": "ON",
+          "GGML_METAL": "ON",
+          "GGML_METAL_EMBED_LIBRARY": "ON",
+          "GGML_NATIVE": "ON",
+          "LLAMA_BUILD_TESTS": "ON",
+          "LLAMA_BUILD_TOOLS": "ON"
+        },
+        "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+      }
+    },
+    "source_sha256": "03fc5af1344f6b07d4b19b02db98bb9c91b19575e0bb0dd5b2381a8eb262f916",
+    "runner_sha256": "92cad022b6693b18fc9dd5622677d6a2d2cea52749360ad749e62b6972b6fafb",
+    "binary_sha256": "4a69eedc4b0558871d37274da4cfe7af426ebbd308e8aac537ddac2dfd9dfd24",
+    "command": [
+      "/usr/bin/c++",
+      "-O3",
+      "-ffp-contract=off",
+      "-std=gnu++17",
+      "-arch",
+      "arm64",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-hc/ggml/include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-hc/vendor",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/native/m5_hc_probe.cpp",
+      "-o",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-hc/hc-probe",
+      "-Wl,-rpath,/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-hc/build/bin",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-hc/build/bin/libggml.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-hc/build/bin/libggml-base.0.26.0.dylib"
+    ]
+  },
+  "mode": "check",
+  "metal_environment": {
+    "tensor_api": "on",
+    "tuning": "hc-down-ks1",
+    "profile": false,
+    "variables": {
+      "GGML_M5_LAB_CONV_DIRECT": "1",
+      "GGML_M5_LAB_HC_TENSOR": "1",
+      "GGML_M5_LAB_HC_DOWN_SPLIT": "1",
+      "GGML_METAL_TENSOR_ENABLE": "1",
+      "GGML_M5_LAB_HC_TRACE": "1"
+    }
+  },
+  "models_loaded": false,
+  "tps_measured": false,
+  "scope": "Checks include masked short rows, strides, residual fusion and exposed intermediates. Perf uses normal fusion and 20 distinct 6.55MB weight copies per graph; no per-op callbacks.",
+  "memory": {
+    "guard": null,
+    "monitor_healthy": true,
+    "monitor_error": null,
+    "samples": 6,
+    "live_samples": 4,
+    "baseline_before_launch": true,
+    "child_exited": true,
+    "launch_baseline": {
+      "swap_used_bytes": 523370496,
+      "available_bytes": 40413773824
+    },
+    "peak_rss_bytes": 120881152,
+    "minimum_available_bytes": 40389656576,
+    "peak_swap_bytes": 523370496,
+    "swap_growth_bytes": 0,
+    "system_disk_read_bytes": 561152,
+    "sampling_interval_s": 0.25,
+    "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+  },
+  "error": "ValueError: New-kernel route or fallback coverage differs"
+}

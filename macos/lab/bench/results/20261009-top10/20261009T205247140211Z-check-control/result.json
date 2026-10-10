@@ -1,0 +1,236 @@
+{
+  "status": "failed",
+  "scope": "control",
+  "mode": "check",
+  "probe": {
+    "engine": {
+      "engine": "m5-top10",
+      "directory": "vendor/llama-m5-top10",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "79197b40591f2cd48db15b8b0adc0fff23d12a42329168835193c7fe7a23388e",
+      "patch": {
+        "schema": 1,
+        "id": "m5-top10",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-top10",
+        "patch": "patches/mtp-m5-top10.patch",
+        "patch_sha256": "79197b40591f2cd48db15b8b0adc0fff23d12a42329168835193c7fe7a23388e",
+        "source_diff_sha256": "79197b40591f2cd48db15b8b0adc0fff23d12a42329168835193c7fe7a23388e",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal-device.h",
+          "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+          "ggml/src/ggml-metal/ggml-metal.cpp",
+          "ggml/src/ggml-metal/kernels/argsort.metal",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "ggml/src/ggml-metal/kernels/quantize.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-copy",
+          "m5-top10"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-copy.patch",
+            "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+          }
+        ],
+        "scope": "Opt-in M5 Pro parallel exact top10 selection for contiguous248320F32 logits,row1,k10,sampling node. Numeric exceptional inputs, subnormals and any top10 tie use unchanged bitonic+merge. Other tensors and disabled mode retain old dispatch. No model, sampler, cache or launcher defaults changed.",
+        "upstream": {
+          "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+          "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+          "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        }
+      },
+      "artifacts": {
+        "llama-server": "cc5b8b13f8887059319f792f5569638889d0466ec7a8eb0a4c50a850ce217b25",
+        "libggml-base.0.26.0.dylib": "352bad3a2856463f294f05e59fe29e85b803573cc8e48f3357c6b40842e72168",
+        "libggml-base.0.dylib": "352bad3a2856463f294f05e59fe29e85b803573cc8e48f3357c6b40842e72168",
+        "libggml-base.dylib": "352bad3a2856463f294f05e59fe29e85b803573cc8e48f3357c6b40842e72168",
+        "libggml-blas.0.26.0.dylib": "2f7f975049f33991f9a8b23b269737a52625370f196547bb5245e2d29291aaa8",
+        "libggml-blas.0.dylib": "2f7f975049f33991f9a8b23b269737a52625370f196547bb5245e2d29291aaa8",
+        "libggml-blas.dylib": "2f7f975049f33991f9a8b23b269737a52625370f196547bb5245e2d29291aaa8",
+        "libggml-cpu.0.26.0.dylib": "068d267ed4605e7488acf7c48d46e01d0a1c583b8bdb76e6f28ef109b46afd03",
+        "libggml-cpu.0.dylib": "068d267ed4605e7488acf7c48d46e01d0a1c583b8bdb76e6f28ef109b46afd03",
+        "libggml-cpu.dylib": "068d267ed4605e7488acf7c48d46e01d0a1c583b8bdb76e6f28ef109b46afd03",
+        "libggml-metal.0.26.0.dylib": "4370869b67978ce6a4cc8458d87502c16a154358afcb76be5874cac2a26ffe26",
+        "libggml-metal.0.dylib": "4370869b67978ce6a4cc8458d87502c16a154358afcb76be5874cac2a26ffe26",
+        "libggml-metal.dylib": "4370869b67978ce6a4cc8458d87502c16a154358afcb76be5874cac2a26ffe26",
+        "libggml.0.26.0.dylib": "88fa45ce947c15dc2696207e3541f7d52d066bb79e7878fd911582135ffe6e9d",
+        "libggml.0.dylib": "88fa45ce947c15dc2696207e3541f7d52d066bb79e7878fd911582135ffe6e9d",
+        "libggml.dylib": "88fa45ce947c15dc2696207e3541f7d52d066bb79e7878fd911582135ffe6e9d",
+        "libllama-common.0.6.0.dylib": "5513a66be4f1b6f82115517e88b5aa003d98c508f09c892e7157c539b5d3f633",
+        "libllama-common.0.dylib": "5513a66be4f1b6f82115517e88b5aa003d98c508f09c892e7157c539b5d3f633",
+        "libllama-common.dylib": "5513a66be4f1b6f82115517e88b5aa003d98c508f09c892e7157c539b5d3f633",
+        "libllama-server-impl.dylib": "9177a2fb3b89bc9520f17501aaa44c64f587e38b9ccaffb32608c5ae06aec28c",
+        "libllama.0.6.0.dylib": "78c3be4f4d36ca46a4aa7d9d20c8114a8202accbeb8b096c5effa78c749dd5c7",
+        "libllama.0.dylib": "78c3be4f4d36ca46a4aa7d9d20c8114a8202accbeb8b096c5effa78c749dd5c7",
+        "libllama.dylib": "78c3be4f4d36ca46a4aa7d9d20c8114a8202accbeb8b096c5effa78c749dd5c7",
+        "libmtmd.0.6.0.dylib": "35a2bdbfed4e72610519324607f9ee9700aad0c66274775055981cc11cf96e16",
+        "libmtmd.0.dylib": "35a2bdbfed4e72610519324607f9ee9700aad0c66274775055981cc11cf96e16",
+        "libmtmd.dylib": "35a2bdbfed4e72610519324607f9ee9700aad0c66274775055981cc11cf96e16"
+      },
+      "build_receipt": {
+        "engine": "m5-top10",
+        "directory": "vendor/llama-m5-top10",
+        "revision": "d81235049384534c167caea52b85a694f6103d14",
+        "source_diff_sha256": "79197b40591f2cd48db15b8b0adc0fff23d12a42329168835193c7fe7a23388e",
+        "patch": {
+          "schema": 1,
+          "id": "m5-top10",
+          "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+          "directory": "vendor/llama-m5-top10",
+          "patch": "patches/mtp-m5-top10.patch",
+          "patch_sha256": "79197b40591f2cd48db15b8b0adc0fff23d12a42329168835193c7fe7a23388e",
+          "source_diff_sha256": "79197b40591f2cd48db15b8b0adc0fff23d12a42329168835193c7fe7a23388e",
+          "modified_files": [
+            "ggml/src/ggml-metal/ggml-metal-common.cpp",
+            "ggml/src/ggml-metal/ggml-metal-common.h",
+            "ggml/src/ggml-metal/ggml-metal-context.m",
+            "ggml/src/ggml-metal/ggml-metal-device.cpp",
+            "ggml/src/ggml-metal/ggml-metal-device.h",
+            "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+            "ggml/src/ggml-metal/ggml-metal.cpp",
+            "ggml/src/ggml-metal/kernels/argsort.metal",
+            "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+            "ggml/src/ggml-metal/kernels/quantize.metal",
+            "src/llama-context.cpp",
+            "src/llama-cparams.h",
+            "src/models/qwen4exp.cpp",
+            "tests/test-backend-ops.cpp"
+          ],
+          "features": [
+            "mtp-shared",
+            "m5-tuning",
+            "m5-profile",
+            "m5-copy",
+            "m5-top10"
+          ],
+          "components": [
+            {
+              "patch": "patches/mtp-m5-copy.patch",
+              "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+            }
+          ],
+          "scope": "Opt-in M5 Pro parallel exact top10 selection for contiguous248320F32 logits,row1,k10,sampling node. Numeric exceptional inputs, subnormals and any top10 tie use unchanged bitonic+merge. Other tensors and disabled mode retain old dispatch. No model, sampler, cache or launcher defaults changed.",
+          "upstream": {
+            "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+            "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+            "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+            "license_file": "patches/LLAMA-LICENSE.txt"
+          }
+        },
+        "artifacts": {
+          "llama-server": "cc5b8b13f8887059319f792f5569638889d0466ec7a8eb0a4c50a850ce217b25",
+          "libggml-base.0.26.0.dylib": "352bad3a2856463f294f05e59fe29e85b803573cc8e48f3357c6b40842e72168",
+          "libggml-base.0.dylib": "352bad3a2856463f294f05e59fe29e85b803573cc8e48f3357c6b40842e72168",
+          "libggml-base.dylib": "352bad3a2856463f294f05e59fe29e85b803573cc8e48f3357c6b40842e72168",
+          "libggml-blas.0.26.0.dylib": "2f7f975049f33991f9a8b23b269737a52625370f196547bb5245e2d29291aaa8",
+          "libggml-blas.0.dylib": "2f7f975049f33991f9a8b23b269737a52625370f196547bb5245e2d29291aaa8",
+          "libggml-blas.dylib": "2f7f975049f33991f9a8b23b269737a52625370f196547bb5245e2d29291aaa8",
+          "libggml-cpu.0.26.0.dylib": "068d267ed4605e7488acf7c48d46e01d0a1c583b8bdb76e6f28ef109b46afd03",
+          "libggml-cpu.0.dylib": "068d267ed4605e7488acf7c48d46e01d0a1c583b8bdb76e6f28ef109b46afd03",
+          "libggml-cpu.dylib": "068d267ed4605e7488acf7c48d46e01d0a1c583b8bdb76e6f28ef109b46afd03",
+          "libggml-metal.0.26.0.dylib": "4370869b67978ce6a4cc8458d87502c16a154358afcb76be5874cac2a26ffe26",
+          "libggml-metal.0.dylib": "4370869b67978ce6a4cc8458d87502c16a154358afcb76be5874cac2a26ffe26",
+          "libggml-metal.dylib": "4370869b67978ce6a4cc8458d87502c16a154358afcb76be5874cac2a26ffe26",
+          "libggml.0.26.0.dylib": "88fa45ce947c15dc2696207e3541f7d52d066bb79e7878fd911582135ffe6e9d",
+          "libggml.0.dylib": "88fa45ce947c15dc2696207e3541f7d52d066bb79e7878fd911582135ffe6e9d",
+          "libggml.dylib": "88fa45ce947c15dc2696207e3541f7d52d066bb79e7878fd911582135ffe6e9d",
+          "libllama-common.0.6.0.dylib": "5513a66be4f1b6f82115517e88b5aa003d98c508f09c892e7157c539b5d3f633",
+          "libllama-common.0.dylib": "5513a66be4f1b6f82115517e88b5aa003d98c508f09c892e7157c539b5d3f633",
+          "libllama-common.dylib": "5513a66be4f1b6f82115517e88b5aa003d98c508f09c892e7157c539b5d3f633",
+          "libllama-server-impl.dylib": "9177a2fb3b89bc9520f17501aaa44c64f587e38b9ccaffb32608c5ae06aec28c",
+          "libllama.0.6.0.dylib": "78c3be4f4d36ca46a4aa7d9d20c8114a8202accbeb8b096c5effa78c749dd5c7",
+          "libllama.0.dylib": "78c3be4f4d36ca46a4aa7d9d20c8114a8202accbeb8b096c5effa78c749dd5c7",
+          "libllama.dylib": "78c3be4f4d36ca46a4aa7d9d20c8114a8202accbeb8b096c5effa78c749dd5c7",
+          "libmtmd.0.6.0.dylib": "35a2bdbfed4e72610519324607f9ee9700aad0c66274775055981cc11cf96e16",
+          "libmtmd.0.dylib": "35a2bdbfed4e72610519324607f9ee9700aad0c66274775055981cc11cf96e16",
+          "libmtmd.dylib": "35a2bdbfed4e72610519324607f9ee9700aad0c66274775055981cc11cf96e16"
+        },
+        "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+        "build_settings": {
+          "CMAKE_BUILD_TYPE": "Release",
+          "GGML_BLAS": "ON",
+          "GGML_CPU": "ON",
+          "GGML_METAL": "ON",
+          "GGML_METAL_EMBED_LIBRARY": "ON",
+          "GGML_NATIVE": "ON",
+          "LLAMA_BUILD_TESTS": "ON",
+          "LLAMA_BUILD_TOOLS": "ON"
+        },
+        "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+      }
+    },
+    "source_sha256": "012a10d62336be23a88bcfefd3d52edfaba2a97fd2d5ee3b05527421bc112469",
+    "runner_sha256": "28001de7c4864ea6ec130a3ef7ba0a6b42def5787112a8ca4f4084b0e2c50261",
+    "dependencies": {
+      "benchmark.py": "c00bc75c2a2036450d65251a2621f2c4ed79914c89558532641ba54358aca0cc",
+      "check_memory.py": "3af26bba58b77fd47d9993126009f188c951aecaddff6d2e82febd5c3a83eada",
+      "engines.py": "a2ec0ab9be48cddca8f82776855481c23bddacfc006bc639ba1e5ab8fddcf0e4",
+      "metal_environment.py": "e2b79adf9580de5af1e90bb2759c761f3844b63905f7d3a829ad21830492f35c",
+      "validate_offline.py": "e2ec5c1777411e131c64bf436e91b8beccc19ecc18da62809b19cd53d0184c06"
+    },
+    "binary_sha256": "e2806254a05a5636153d71c1972c8385aa90861e806f33e46c79ce74bda4b810",
+    "command": [
+      "/usr/bin/c++",
+      "-O3",
+      "-ffp-contract=off",
+      "-std=gnu++17",
+      "-arch",
+      "arm64",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-top10/include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-top10/ggml/include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-top10/vendor",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/native/m5_top10_probe.cpp",
+      "-o",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-top10/top10-probe",
+      "-Wl,-rpath,/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-top10/build/bin",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-top10/build/bin/libllama.0.6.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-top10/build/bin/libggml.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-top10/build/bin/libggml-base.0.26.0.dylib"
+    ]
+  },
+  "metal_environment": {
+    "tensor_api": "on",
+    "tuning": "conv-direct",
+    "profile": false,
+    "variables": {
+      "GGML_M5_LAB_CONV_DIRECT": "1",
+      "GGML_METAL_TENSOR_ENABLE": "1"
+    }
+  },
+  "native_returncode": -6,
+  "memory": {
+    "guard": null,
+    "monitor_healthy": true,
+    "monitor_error": null,
+    "samples": 45,
+    "live_samples": 44,
+    "baseline_before_launch": true,
+    "child_exited": true,
+    "launch_baseline": {
+      "swap_used_bytes": 524812288,
+      "available_bytes": 40212217856
+    },
+    "peak_rss_bytes": 1512882176,
+    "minimum_available_bytes": 38995853312,
+    "peak_swap_bytes": 524812288,
+    "swap_growth_bytes": 0,
+    "system_disk_read_bytes": 33382400,
+    "sampling_interval_s": 0.25,
+    "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+  },
+  "error": "RuntimeError: Native component or memory gate failed"
+}

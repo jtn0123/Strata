@@ -1,0 +1,96 @@
+{
+  "experiment": {
+    "id": "metal-residual-correctness",
+    "title": "Validate the isolated upstream Metal correctness fix",
+    "priority": 2,
+    "kind": "native-candidate",
+    "implementation": "Separate m5-correctness source, manifest, server and operation tester are built. GPU math and model comparisons are held.",
+    "only_change": "Apply upstream residual-source identity fix #30100 to m5-lab; no changed model or launch defaults.",
+    "plan_command": [
+      ".venv/bin/python",
+      "scripts/benchmark_m5.py",
+      "--experiment",
+      "metal-residual-correctness"
+    ],
+    "future_run_command": [
+      ".venv/bin/python",
+      "scripts/benchmark_m5.py",
+      "--experiment",
+      "metal-residual-correctness",
+      "--run"
+    ],
+    "depends_on": [
+      "baseline-refresh"
+    ],
+    "hypothesis": "The fused matrix-plus-residual operation must select the correct input; no TPS improvement is assumed.",
+    "control_engine": "m5-lab",
+    "candidate_engine": "m5-correctness",
+    "prerequisites": [
+      "Explicit testing go-ahead for any --run command",
+      "Offline validation receipt matches current sources",
+      "Quiet host; leave unrelated VM/build work alone"
+    ],
+    "proof": [
+      "MUL_MAT_ADD mm2+mm CPU-reference GPU check, plus existing math checks",
+      "Fresh m5-lab/correctness/correctness/m5-lab controls",
+      "Quality and zero-swap gates; report speed/latency without assuming a gain"
+    ],
+    "result_fields": [
+      "math_check",
+      "matched_tps",
+      "ttft",
+      "reply_time"
+    ],
+    "stop_if": [
+      "Invalid evidence or source drift",
+      "Unexpected quality failure or new swap"
+    ],
+    "limits": "Fix is absent locally and staged, but the current Qwen graph has not been proven to trigger the faulty fusion."
+  },
+  "control": {
+    "engine": "mtp-mma",
+    "model": "flash",
+    "draft_model": "mtp_shared_packed_q3",
+    "context": 4096,
+    "batch": 512,
+    "ubatch": 512,
+    "cache_type": "f16",
+    "draft": 3,
+    "draft_threads": 8,
+    "draft_p_min": 0.0,
+    "tensor_api": "on",
+    "temperature": 0.6,
+    "seed": 1234,
+    "fresh_output_tokens": 128,
+    "matched_inputs": [
+      512,
+      2048
+    ],
+    "warmups_per_workload": 1,
+    "repeats_per_launch": 2
+  },
+  "comparison": {
+    "order": [
+      "control",
+      "candidate",
+      "candidate",
+      "control"
+    ],
+    "new_swap_required_bytes": 0,
+    "emergency_swap_guard_bytes": 134217728,
+    "minimum_available_during_run_bytes": 1073741824,
+    "minimum_available_before_full_model_bytes": 36507222016,
+    "metrics": [
+      "generation_tok_s",
+      "prompt_tok_s",
+      "ttft_s",
+      "wall_s",
+      "draft_acceptance_percent",
+      "minimum_available_bytes",
+      "swap_growth_bytes"
+    ],
+    "adoption_gate": "At least 5 percent median complete-task improvement on the chosen workload, or useful capacity gain with an explicitly accepted speed tradeoff; no unexplained quality failure or new swap. Report control drift and all raw passes.",
+    "percentage_rules": "TPS gain = 100*(candidate/control-1). Time reduction = 100*(1-candidate/control). Requires finite positive matched metrics. Do not add percentages from separate experiments.",
+    "historical_reference_only": "bench/features/20261007T052606Z-m5-decision-baseline/review.json"
+  }
+}

@@ -1,0 +1,416 @@
+{
+  "status": "passed",
+  "scope": "control",
+  "mode": "perf",
+  "probe": {
+    "engine": {
+      "engine": "m5-copy",
+      "directory": "vendor/llama-m5-copy",
+      "revision": "d81235049384534c167caea52b85a694f6103d14",
+      "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+      "patch": {
+        "schema": 1,
+        "id": "m5-copy",
+        "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+        "directory": "vendor/llama-m5-copy",
+        "patch": "patches/mtp-m5-copy.patch",
+        "patch_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+        "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+        "modified_files": [
+          "ggml/src/ggml-metal/ggml-metal-common.cpp",
+          "ggml/src/ggml-metal/ggml-metal-common.h",
+          "ggml/src/ggml-metal/ggml-metal-context.m",
+          "ggml/src/ggml-metal/ggml-metal-device.cpp",
+          "ggml/src/ggml-metal/ggml-metal-device.h",
+          "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+          "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+          "ggml/src/ggml-metal/kernels/quantize.metal",
+          "src/llama-context.cpp",
+          "src/llama-cparams.h",
+          "src/models/qwen4exp.cpp",
+          "tests/test-backend-ops.cpp"
+        ],
+        "features": [
+          "mtp-shared",
+          "m5-tuning",
+          "m5-profile",
+          "m5-copy"
+        ],
+        "components": [
+          {
+            "patch": "patches/mtp-m5-correctness.patch",
+            "sha256": "f0d397305b8e6dd148bc32eb92ceedbabd7e5f8d5b69a43de4780b468c0fe07b"
+          }
+        ],
+        "scope": "Isolated same-shape wide F32 row copy experiment. Width 0 keeps the existing dispatch; widths 1,4,8 explicitly opt in. Strided rows preserve all source and destination strides. Unaligned vectors and different shapes fall back. No model, cache, rollback or launcher default changes. Separate conv-direct mode skips an intermediate contiguous tensor before the existing strided copy; all rollback slots remain.",
+        "upstream": {
+          "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+          "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+          "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+          "license_file": "patches/LLAMA-LICENSE.txt"
+        }
+      },
+      "artifacts": {
+        "llama-server": "e60bfd1dd90f4a6000f37068605fac8db7cc25d143ca30e11c6b72f8b7af8570",
+        "libggml-base.0.26.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+        "libggml-base.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+        "libggml-base.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+        "libggml-blas.0.26.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+        "libggml-blas.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+        "libggml-blas.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+        "libggml-cpu.0.26.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+        "libggml-cpu.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+        "libggml-cpu.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+        "libggml-metal.0.26.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+        "libggml-metal.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+        "libggml-metal.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+        "libggml.0.26.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+        "libggml.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+        "libggml.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+        "libllama-common.0.6.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+        "libllama-common.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+        "libllama-common.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+        "libllama-server-impl.dylib": "93e778b6fe31a96ea8790af786b29eadda4a8abc7fdbff0774c999e00d558d2b",
+        "libllama.0.6.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+        "libllama.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+        "libllama.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+        "libmtmd.0.6.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+        "libmtmd.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+        "libmtmd.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5"
+      },
+      "build_receipt": {
+        "engine": "m5-copy",
+        "directory": "vendor/llama-m5-copy",
+        "revision": "d81235049384534c167caea52b85a694f6103d14",
+        "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+        "patch": {
+          "schema": 1,
+          "id": "m5-copy",
+          "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+          "directory": "vendor/llama-m5-copy",
+          "patch": "patches/mtp-m5-copy.patch",
+          "patch_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+          "source_diff_sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640",
+          "modified_files": [
+            "ggml/src/ggml-metal/ggml-metal-common.cpp",
+            "ggml/src/ggml-metal/ggml-metal-common.h",
+            "ggml/src/ggml-metal/ggml-metal-context.m",
+            "ggml/src/ggml-metal/ggml-metal-device.cpp",
+            "ggml/src/ggml-metal/ggml-metal-device.h",
+            "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+            "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+            "ggml/src/ggml-metal/kernels/quantize.metal",
+            "src/llama-context.cpp",
+            "src/llama-cparams.h",
+            "src/models/qwen4exp.cpp",
+            "tests/test-backend-ops.cpp"
+          ],
+          "features": [
+            "mtp-shared",
+            "m5-tuning",
+            "m5-profile",
+            "m5-copy"
+          ],
+          "components": [
+            {
+              "patch": "patches/mtp-m5-correctness.patch",
+              "sha256": "f0d397305b8e6dd148bc32eb92ceedbabd7e5f8d5b69a43de4780b468c0fe07b"
+            }
+          ],
+          "scope": "Isolated same-shape wide F32 row copy experiment. Width 0 keeps the existing dispatch; widths 1,4,8 explicitly opt in. Strided rows preserve all source and destination strides. Unaligned vectors and different shapes fall back. No model, cache, rollback or launcher default changes. Separate conv-direct mode skips an intermediate contiguous tensor before the existing strided copy; all rollback slots remain.",
+          "upstream": {
+            "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+            "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+            "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+            "license_file": "patches/LLAMA-LICENSE.txt"
+          }
+        },
+        "artifacts": {
+          "llama-server": "e60bfd1dd90f4a6000f37068605fac8db7cc25d143ca30e11c6b72f8b7af8570",
+          "libggml-base.0.26.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+          "libggml-base.0.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+          "libggml-base.dylib": "4b091b2f512a9f2b46de8900469c4d27347cf859aea0cf2fabb4298a36e9eafc",
+          "libggml-blas.0.26.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+          "libggml-blas.0.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+          "libggml-blas.dylib": "b1ea31f858cc42ab61efe3ef221c746a2916ff588ef0f27acf4cf50858df710d",
+          "libggml-cpu.0.26.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+          "libggml-cpu.0.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+          "libggml-cpu.dylib": "6be7d0632e019c4c30d44481c98579c2d29985be8dd04d52f8fe59760eea3d42",
+          "libggml-metal.0.26.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+          "libggml-metal.0.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+          "libggml-metal.dylib": "9abe7246c3889ae5b2934db0119f28f029c50df779a68b48c4596333c433a7de",
+          "libggml.0.26.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+          "libggml.0.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+          "libggml.dylib": "3b091671ee51b9836de36ec260753df7e3641c3d95cc2a9a2b4318370b0caffc",
+          "libllama-common.0.6.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+          "libllama-common.0.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+          "libllama-common.dylib": "c9bf5a8d49a6c3c196a8bbfcf7996ac6d511f771d4d6039f8ab7346976896968",
+          "libllama-server-impl.dylib": "93e778b6fe31a96ea8790af786b29eadda4a8abc7fdbff0774c999e00d558d2b",
+          "libllama.0.6.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+          "libllama.0.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+          "libllama.dylib": "86b5a59507c950cc2833f87cbf8a68e010e52b385c42aff974f8e5127458d722",
+          "libmtmd.0.6.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+          "libmtmd.0.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5",
+          "libmtmd.dylib": "a186cce7d6ace92a80f70d3169f5e26d578a2fe6c1047c34fc0bb977da2cc9d5"
+        },
+        "binary_version": "version: 0.6.0-dev (build 1, commit d812350)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64",
+        "build_settings": {
+          "CMAKE_BUILD_TYPE": "Release",
+          "GGML_BLAS": "ON",
+          "GGML_CPU": "ON",
+          "GGML_METAL": "ON",
+          "GGML_METAL_EMBED_LIBRARY": "ON",
+          "GGML_NATIVE": "ON",
+          "LLAMA_BUILD_TESTS": "ON",
+          "LLAMA_BUILD_TOOLS": "ON"
+        },
+        "compiler": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.2.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin"
+      }
+    },
+    "source_sha256": "499f9ec9da85eae02e35d4bc0894cfc9c1949f5c95817bfd1e51f2ea28aa794e",
+    "runner_sha256": "aa77f9d1a21aa275c6979449d9c3c353279db6c999bd0623013299b976337276",
+    "dependencies": {
+      "benchmark.py": "c00bc75c2a2036450d65251a2621f2c4ed79914c89558532641ba54358aca0cc",
+      "check_memory.py": "3af26bba58b77fd47d9993126009f188c951aecaddff6d2e82febd5c3a83eada",
+      "engines.py": "8270ab9c74873e1c2c7a6dcc1605e740888b36ae8db5c1801033828e0888ed14",
+      "metal_environment.py": "1cdf30798fc56be9007ff5d00322133ef33ce014fc8c6f1b904bc9c2bd09cd83",
+      "validate_offline.py": "e2ec5c1777411e131c64bf436e91b8beccc19ecc18da62809b19cd53d0184c06"
+    },
+    "binary_sha256": "f582bb607152ab6f31b4664bea8f86ffbdeecc5da9d68f49676a2e8c2800ef98",
+    "command": [
+      "/usr/bin/c++",
+      "-O3",
+      "-ffp-contract=off",
+      "-std=gnu++17",
+      "-arch",
+      "arm64",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-copy/ggml/include",
+      "-I/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-copy/vendor",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/native/m5_winner_ceiling_probe.cpp",
+      "-o",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/bench/runtime/m5-winner-ceiling/winner-ceiling",
+      "-Wl,-rpath,/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-copy/build/bin",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-copy/build/bin/libggml.0.26.0.dylib",
+      "/Users/justin/Documents/Github/Strata-Mac-Lab/vendor/llama-m5-copy/build/bin/libggml-base.0.26.0.dylib"
+    ]
+  },
+  "metal_environment": {
+    "tensor_api": "on",
+    "tuning": "conv-direct",
+    "profile": false,
+    "variables": {
+      "GGML_M5_LAB_CONV_DIRECT": "1",
+      "GGML_METAL_TENSOR_ENABLE": "1"
+    }
+  },
+  "native_returncode": 0,
+  "memory": {
+    "guard": null,
+    "monitor_healthy": true,
+    "monitor_error": null,
+    "samples": 15,
+    "live_samples": 14,
+    "baseline_before_launch": true,
+    "child_exited": true,
+    "launch_baseline": {
+      "swap_used_bytes": 524812288,
+      "available_bytes": 39912374272
+    },
+    "peak_rss_bytes": 979582976,
+    "minimum_available_bytes": 39861469184,
+    "peak_swap_bytes": 524812288,
+    "swap_growth_bytes": 0,
+    "system_disk_read_bytes": 32768,
+    "sampling_interval_s": 0.25,
+    "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."
+  },
+  "cases": [
+    {
+      "all_nodes_metal": true,
+      "allocation_bound_bytes": 944185408,
+      "block_iterations": [
+        53,
+        53,
+        53,
+        53,
+        53,
+        53,
+        54
+      ],
+      "block_us": [
+        101151.375,
+        100663.75,
+        100494.792,
+        100708.875,
+        100890.333,
+        100806.083,
+        101775.667
+      ],
+      "block_us_per_iteration": [
+        1908.5165094339623,
+        1899.316037735849,
+        1896.1281509433963,
+        1900.1674528301887,
+        1903.5911886792453,
+        1902.0015660377358,
+        1884.734574074074
+      ],
+      "consumer_chain": "head-top_k10-gather",
+      "consumers": [
+        {
+          "above_cutoff": 9,
+          "cutoff_ties": 1,
+          "ids": [
+            28770,
+            19711,
+            166503,
+            50550,
+            49144,
+            168291,
+            26106,
+            226472,
+            76474,
+            173374
+          ],
+          "tie_safe": true,
+          "values": [
+            722.3253784179688,
+            695.7282104492188,
+            686.5211181640625,
+            682.239501953125,
+            663.3927612304688,
+            663.3659057617188,
+            660.9784545898438,
+            644.2107543945312,
+            625.6520385742188,
+            618.1190185546875
+          ]
+        }
+      ],
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 0.0,
+      "cpu_reference_values": 0,
+      "elements": 248320,
+      "eligible": true,
+      "graph_buffer_bytes": 2990144,
+      "id": "mixed",
+      "input_sha256": "e43448e020c52b745e6abc6a960033722dd82ba5dc04da38ed3672d6c0592c0a",
+      "inputs_preserved": true,
+      "k": 2560,
+      "m": 248320,
+      "max_absolute_error": 0.0,
+      "max_bound_ratio": 0.0,
+      "median_us": 1900.1674528301887,
+      "output_sha256": "9568f1471f9b09a036166f13e0136cffac0cda9f8f47b7654bd8d29650f91af4",
+      "pipeline_primed": true,
+      "rows": 1,
+      "scheduler_splits": 1,
+      "warmup_iterations": 262,
+      "warmup_us": 500420.5,
+      "weight_sha256": "56b0508225f073b2bb80f53e7fb5a5b44db73e38533928210e8fff9e9fffd8fd"
+    },
+    {
+      "all_nodes_metal": true,
+      "allocation_bound_bytes": 944185408,
+      "block_iterations": [
+        53,
+        53,
+        53,
+        53,
+        53,
+        53,
+        53
+      ],
+      "block_us": [
+        100657.75,
+        100629.875,
+        100516.0,
+        100786.583,
+        101173.125,
+        100075.542,
+        100677.417
+      ],
+      "block_us_per_iteration": [
+        1899.2028301886792,
+        1898.676886792453,
+        1896.5283018867924,
+        1901.633641509434,
+        1908.926886792453,
+        1888.2177735849057,
+        1899.5739056603775
+      ],
+      "consumer_chain": "head-top_k10-gather",
+      "consumers": [
+        {
+          "above_cutoff": 9,
+          "cutoff_ties": 1,
+          "ids": [
+            188258,
+            170576,
+            75626,
+            223013,
+            123048,
+            108446,
+            215922,
+            41184,
+            243335,
+            207041
+          ],
+          "tie_safe": true,
+          "values": [
+            928.8082885742188,
+            878.5467529296875,
+            867.6236572265625,
+            861.11572265625,
+            857.8529052734375,
+            845.35107421875,
+            840.2062377929688,
+            838.6378173828125,
+            834.7677612304688,
+            833.9251708984375
+          ]
+        }
+      ],
+      "cpu_compute_nodes": 0,
+      "cpu_nmse": 0.0,
+      "cpu_reference_values": 0,
+      "elements": 248320,
+      "eligible": true,
+      "graph_buffer_bytes": 2990144,
+      "id": "alternating",
+      "input_sha256": "1f2c35c7ae255640bad831d09a3dd8d60016c78b77cad6cf3ee2516ee5eccba7",
+      "inputs_preserved": true,
+      "k": 2560,
+      "m": 248320,
+      "max_absolute_error": 0.0,
+      "max_bound_ratio": 0.0,
+      "median_us": 1899.2028301886792,
+      "output_sha256": "234ccfff0f5cb3589cbe5200709cf386c399e1e4183ffd92e5dae5cf8e17e66a",
+      "pipeline_primed": true,
+      "rows": 1,
+      "scheduler_splits": 1,
+      "warmup_iterations": 264,
+      "warmup_us": 501863.459,
+      "weight_sha256": "56b0508225f073b2bb80f53e7fb5a5b44db73e38533928210e8fff9e9fffd8fd"
+    }
+  ],
+  "done": {
+    "cases": 2,
+    "expanded_weight_cache": false,
+    "max_probe_bytes": 3221225472,
+    "mode": "perf",
+    "models_loaded": false,
+    "scope": "control",
+    "weights": [
+      {
+        "bytes": 437043200,
+        "padded": false,
+        "preserved": true,
+        "sha256": "56b0508225f073b2bb80f53e7fb5a5b44db73e38533928210e8fff9e9fffd8fd"
+      }
+    ],
+    "weights_preserved": true
+  },
+  "native_log_sha256": "e3201dd62d8767111da7356d5c9b460347e89994fa3a289c5cd8e88ccea1e912",
+  "outputs_sha256": "bab3be48ceec2bceb48063b598468a6e78c5bd8d702a6f6a4634f2394173b1c7"
+}
