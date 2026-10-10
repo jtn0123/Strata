@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "control": {
+    "engine": "m5-copy",
+    "tuning": "conv-direct",
+    "tensor_api": "on",
+    "depth": 3,
+    "helper": "mtp_shared_packed_q3",
+    "helper_threads": 8,
+    "kv": "f16",
+    "context": 4096
+  },
+  "order": [
+    "gate-lanes",
+    "encoder-threads",
+    "q5-single-token-head"
+  ],
+  "candidates": [
+    {
+      "id": "gate-lanes",
+      "engine": "m5-gate-lanes",
+      "mode": "gate-up4",
+      "screen": {
+        "real_R4_minimum_reduction_percent": 3,
+        "minimum_gain_to_absolute_control_drift_ratio": 2,
+        "both_candidate_launches_faster_than_both_controls": true,
+        "real_R5_maximum_regression_percent": 2,
+        "all_distinct_maximum_regression_percent": 5,
+        "exact_bits": true,
+        "normal_dispatch_required": true
+      },
+      "hypothesized_tps_low_base_high_percent": [
+        -1,
+        0,
+        1
+      ]
+    },
+    {
+      "id": "encoder-threads",
+      "modes": [
+        0,
+        2
+      ],
+      "control": 1,
+      "scope": "Initialization-only extra encoding threads, all other graph/worker settings unchanged",
+      "hypothesized_tps_low_base_high_percent": [
+        -2,
+        0,
+        2
+      ],
+      "count2_limitation": "Only callback-free model path; original non-null abort callback behavior unsupported and not adopted"
+    },
+    {
+      "id": "q5-single-token-head",
+      "modes": [
+        2,
+        4
+      ],
+      "control": 1,
+      "scope": "Exact Q5_K K2560 M248320 F32 single-row full-vocabulary head; covers target and helper when eligible; original arithmetic and fallbacks",
+      "minimum_complete_head_time_reduction_percent": 10,
+      "hypothesized_tps_low_base_high_percent": [
+        -2,
+        0.5,
+        2
+      ]
+    }
+  ],
+  "adoption": {
+    "minimum_fresh_tps_gain_percent": 1,
+    "minimum_whole_reply_time_reduction_percent": 1,
+    "minimum_real_workloads": 2,
+    "must_exceed_control_drift": true,
+    "exact_outputs": true,
+    "zero_new_swap": true,
+    "independent_ABBA": true,
+    "reply_improvement_must_exceed_reply_control_drift": true
+  },
+  "defaults": "All candidates off until qualified. No precision/model/context change. Gains not additive. Only root executes serialized native/model tests.",
+  "remaining_queue": [
+    "Target backend sampling with merged static graph prerequisite",
+    "Embedding graph ordering after proving fewer actual crossings",
+    "Cost-aware draft length within existing maximum3",
+    "Quantized prompt cooperative-input path"
+  ],
+  "rejected_retries": [
+    "Expert grouping",
+    "Prior serial gate tiles",
+    "GDN row-group tuning",
+    "SSD prefetch without a lookup bottleneck"
+  ]
+}

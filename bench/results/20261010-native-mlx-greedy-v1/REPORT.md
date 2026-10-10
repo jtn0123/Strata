@@ -1,0 +1,7 @@
+# Native/MLX greedy screen: admission held
+
+The first native/MLX English greedy-output screen is implemented, passes the 188-test offline gate and has frozen exact inputs/runtime/model/reference pins plus 168 archived source/config/test files. It would compare four 128-token code/prose replies against the prior qualified MLX output IDs, with prediction helpers disabled and native F32 KV. This is an initial output screen, not full internal-state, numerical, quality, API or speed qualification.
+
+**Execution stopped before launching a model process or sending any request.** The original 34 GiB native admission check refused the available RAM reading. The post-refusal host snapshot is 33.976 GiB available, with old swap unchanged. No model/GPU response, correctness result or performance gain was produced. The earlier global 60-second cleanup settle crossed 34 GiB, but that did not guarantee headroom in the actual supervisor process. Parent setup overhead and background variation are not independently attributed.
+
+[Original failed receipt](result.json), [classification and revisit conditions](exclusion.json), [immutable preregistration](frozen.json), [source archive](source/) are preserved. This campaign cannot automatically retry or overwrite existing results. The native 34 GiB admission, 1 GiB sustained floor, normal pressure and zero-new-swap rules remain unchanged. A later fresh campaign must independently qualify resources in its actual supervisor before any model launch. The normal P07 app and earlier accepted MLX timings are unchanged.
