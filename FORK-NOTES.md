@@ -14,6 +14,14 @@ The `mac/validated-m5-keepers` branch submits this checkpoint for review against
 
 ## Historical checkpoints
 
+## Next test preparation — held
+
+The separate `mac/next-tests-v1` branch prepares [the next sequential tests](macos/lab/bench/results/20261010-next-tests/README.md) over the checkpoint submitted in [PR #1](https://github.com/jtn0123/Strata/pull/1). It adds an opt-in bounded whole-input cache and a private sixteen-row prompt-tile engine, with fresh frozen protocols and empty metrics. Both candidates remain disabled in the ordinary launcher. The input-cache screen uses the existing Qwen3.5-4B Q4_K_M first; the tile screen checks complete GPU blocks before any full-model trial.
+
+174 offline tests pass; all 28 native engine source/build receipts and both frozen campaigns verify in the original lab. The new engine and paired probes are compiled, but no model/GPU benchmark ran. MLX source and isolated dependencies are installed and syntax/dependency-checked; device initialization, physical memory admission and a bounded model supervisor remain pending. Helper graph reuse remains a design awaiting exposed planning cost. No gain, larger-model fit or promotion is claimed. Models, vendor sources and environments remain excluded from Git. Held commands run from the original `Strata-Mac-Lab` checkout with its provisioned native engines; importing these files alone does not provision a fresh fork checkout.
+
+## Earlier history
+
 The dated experiments below describe their settings and decisions at the time. The current launcher and next research queue are described above; earlier TPS and percentage figures use different workloads and cannot be added together.
 
 The lab was imported through Git subtree without squashing. Its original setup, conversation-caching, prediction-helper and source-review commits remain in this branch's ancestry. [Raw results](macos/lab/bench/RESULTS.md), [prediction tradeoffs](macos/lab/bench/PREDICTION.md) and the [October 6 source review](macos/lab/bench/UPSTREAM-SCAN.md) are preserved.
