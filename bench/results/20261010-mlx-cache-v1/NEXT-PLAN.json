@@ -1,0 +1,41 @@
+{
+  "status": "design only; no runner or model launch",
+  "id": "U10-01-after-cache-v1",
+  "prior_comparison": "bench/results/20261010-mlx-cache-v1/comparison.json",
+  "prior_decision": "12 GB cache qualifies within MLX; no native promotion",
+  "adoption": false,
+  "ordered": [
+    {
+      "id": "U10-01-native-compatibility",
+      "purpose": "Establish native versus MLX numerical, output and conversation-state compatibility before app adoption",
+      "requirements": [
+        "Pin common full model bytes, exact rendered English inputs and token IDs; greedy sampling without helper/lookup in both engines first",
+        "Keep native 34 GiB admission, zero new swap and normal pressure; sequential owned processes, no simultaneous full engines",
+        "Declare representable tensor/state and logit comparisons with justified tolerances before running; position checks alone are insufficient",
+        "Preserve output divergence and diagnose it; no speed percentage from mismatched outputs or incompatible state",
+        "Follow with cancellation, sampled output, conversation/cache, API and longer-context checks as independent stages"
+      ]
+    },
+    {
+      "id": "U10-01-cache-16GB",
+      "purpose": "Test whether further engine cache reduces remaining logical pager misses",
+      "requirements": [
+        "New immutable preregistration and runner; fresh 12/16/16/12 decimal GB launches with English inputs and disabled helper features",
+        "Fresh memory feasibility first: 16 GB cache adds approximately 3.73 GiB budget over 12 GB, but actual host minimum is unmeasured",
+        "Do not infer safety from arithmetic alone or reduce the existing 8 GiB floor/normal-pressure/zero-swap gates",
+        "Three measured repeats per workload after fixed warmups, exact token/finish/position checks; both candidates beat controls above twice own drift",
+        "Report only against fresh MLX 12 GB controls; no percentages added to P07"
+      ]
+    },
+    {
+      "id": "R08-helper-plan-exposure",
+      "purpose": "Find reusable native helper planning work before designing optimization",
+      "requirements": [
+        "Separate design; implementation not yet available",
+        "Measure exposed planning critical path and full reply cost with exact output/state gates",
+        "Keep current P07 helper and launcher unchanged until a qualified comparison"
+      ]
+    }
+  ],
+  "no_automatic_trigger": true
+}
