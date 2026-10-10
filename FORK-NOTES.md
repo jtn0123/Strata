@@ -2,6 +2,18 @@
 
 This fork starts from Niko1221/Strata commit `82f46a8c8f475f001ad76d92f58f4a4f8ffb0253` (v0.1.40.1). The `main` branch tracks that parent checkpoint. Mac work lives on `mac-m5-lab`, under [macos/lab](macos/lab/README.md).
 
+## Current checkpoint — October 10, 2026
+
+The accumulated Mac experiment work is committed locally and imported through Git subtree. The normal no-argument launcher now selects the validated P07 exact ten-expert reduction with the shared packed Q3 helper, mixed placement, eight workers, maximum draft depth three, Tensor API on, 4K context, F16 KV and batch/ubatch 512. Previously measured short-prompt/256-output generation is **60.08 TPS English code / 40.38 TPS English prose**. Longer-prompt safety measurements are separate. [Rollout, exact output checks, memory evidence and rollback](macos/lab/bench/results/20261010-small-gains-stack/REPORT.md).
+
+The new W02 bracket fails its prospective first-token latency ceiling on prose, so W02 remains optional and disabled in the normal launcher; P11 remains parked. The committed ledger preserves every earlier attempt, exclusion and revisit condition. All 156 offline tests and five campaign protocol tests pass, and the frozen source/native qualification evidence verifies. A clean committed export also passes all 156 offline tests after adding only the pinned vendor source dependencies, with no model or native build copied.
+
+[Fresh upstream/fork research](macos/lab/bench/research/20261010-upstream-refresh/REPORT.md) screened metadata for 1,811 public direct forks and inspected relevant sources. The strongest new lead is the independently published full-model MLX engine, with compressed-weight kernels and an explicit SSD expert pager. Its larger-Mac speeds and different default precision are not validated on this 48 GiB M5. Smaller expert prompt tiles, helper plan reuse and bounded input tokenization caching are queued behind feasibility/exposure checks. Remote PC layer stages and PC-to-Mac prefill handoff are later experiments. No new engine was installed or benchmarked in this review; these commits have not been pushed.
+
+## Historical checkpoints
+
+The dated experiments below describe their settings and decisions at the time. The current launcher and next research queue are described above; earlier TPS and percentage figures use different workloads and cannot be added together.
+
 The lab was imported through Git subtree without squashing. Its original setup, conversation-caching, prediction-helper and source-review commits remain in this branch's ancestry. [Raw results](macos/lab/bench/RESULTS.md), [prediction tradeoffs](macos/lab/bench/PREDICTION.md) and the [October 6 source review](macos/lab/bench/UPSTREAM-SCAN.md) are preserved.
 
 The tested profile uses the pinned Strata macOS API shell and native llama.cpp Metal engine defined in `macos/lab/config/runtime.json`. Importing the lab into this fresh parent fork does not upgrade either runtime. The actual benchmarks were measured from the original `Strata-Mac-Lab` directory; absolute paths in their immutable records describe that machine and run.
