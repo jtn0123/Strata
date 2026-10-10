@@ -1,0 +1,43 @@
+{
+  "status": "defined; runner not yet implemented; no new execution",
+  "created_utc": "2026-10-10T13:08:41.734797+00:00",
+  "id": "U10-01-NEXT",
+  "purpose": "Measure warmed English full-model MLX performance and cache-budget exposure, then establish native compatibility before any adoption",
+  "model": "Full Qwen3.8-Flash-Next GSQ-RCO Q2_0, all experts, same pinned shards",
+  "source_revision": "4b6ce302ef41d9cab54985e4aa99fe52f4fd89f2",
+  "dtype": "float32",
+  "sampling": {
+    "temperature": 0,
+    "seed": 1234
+  },
+  "engine": {
+    "mtp": false,
+    "suffix_lookup": false,
+    "guess_rows": false,
+    "prompt_chunk_tokens": 32,
+    "max_context_tokens": 512
+  },
+  "cache_budgets_decimal_GB": [
+    6,
+    12,
+    12,
+    6
+  ],
+  "language": "English code and prose only",
+  "output_limit": 128,
+  "warmup": "Two excluded 128-token answers per fresh owned process, fixed code then prose. Reset model conversation state before every answer; retain the bounded expert cache within a launch. Record initial cold responses separately, not pooled with the warmed comparison.",
+  "measurement": "Three alternating code/prose measured repeats per launch, exact full input/output token and finish parity; compare launch medians from four independent ABBA processes. No automatic retry/partial resume.",
+  "gates": [
+    "Preregister exact rendered prompts, helper/source/model/dependency receipts and runner hashes before execution",
+    "Zero new swap, normal pressure, 28 GiB prelaunch admission, 8 GiB sustained availability floor, owned-child monitor with a bounded timeout; no other jobs stopped mid-bracket",
+    "Both candidate launches beat both controls; improvement above twice own control drift, no fixed minimum percent",
+    "Exact outputs across budgets; no material first-token or reply/generation regression beyond max(1 percent, twice own drift)",
+    "Changing budgets, dtype, inputs, runner or resource rules after launch requires a new campaign; preserve partial failures",
+    "Report gains only against fresh warmed MLX controls; never add to P07 or pool with the 16-token feasibility pilot"
+  ],
+  "afterward": [
+    "Original native English greedy-output/state comparison under existing native 34 GiB admission and zero-swap guards",
+    "Separate sampled-output/API/cancellation/cache and long-context evaluation before production/keeper discussion"
+  ],
+  "adoption": false
+}

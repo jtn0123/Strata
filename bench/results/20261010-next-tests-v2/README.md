@@ -1,5 +1,7 @@
-# Refreshed held campaigns
+# Sequential campaigns: preparation and execution
 
-These campaigns include the memory-report path containment and non-overwrite fix found during PR review. The original campaigns are preserved under [the first preparation](../20261010-next-tests/README.md) and were never run.
+The campaigns prepared here have now executed. [Results and decisions](REPORT.md), [machine-readable metrics](REPORT.json), and [post-run verification](post-run-verification.json) supersede the earlier held status. U10-03 is parked, U10-02 is rejected for performance, and U10-01 has bounded MLX feasibility evidence. No new candidate is promoted.
 
-Use the same sequential commands: `scripts/benchmark_input_cache.py --run` for the pinned 4B Service test, then `scripts/benchmark_m5_tile16.py --run` for the complete GPU-block screen. Their frozen rules, workloads and acceptance limits are unchanged. Source hashes and offline qualification are fresh. No model or GPU benchmark has run; all performance fields remain empty. The MLX environment receipt and helper-reuse design retain their previous boundaries.
+The original preparation was superseded before execution by the memory-report path containment fix. Its frozen inputs remain under [the first preparation](../20261010-next-tests/README.md). Both v2 `frozen.json` records and the archived source remain unchanged. The earlier empty result sheets and preparation verification are historical preparation receipts, not current results.
+
+The original sequential commands were `scripts/benchmark_input_cache.py --run` and `scripts/benchmark_m5_tile16.py --run`. They deliberately reject automatic retry or partial resume. Further work requires a newly declared campaign; do not rerun these unchanged attempts. MLX device, loader and response source/protocol/receipts are in their respective directories. R08 remains a design awaiting exposed helper-planning cost.
