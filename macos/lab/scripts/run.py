@@ -100,6 +100,11 @@ def execute(args):
             (folder / "settings.json").write_text(json.dumps(vars(args), indent=2) + "\n")
             policy = admit_model(args.model)
             (folder / "memory-policy.json").write_text(json.dumps(policy, indent=2) + "\n")
+            config['performance'] = {key: getattr(args, key) for key in
+                ('model', 'engine', 'context', 'cache_type', 'spec', 'draft', 'draft_model', 'lookup_profile', 'tensor_api', 'm5_tuning', 'ubatch', 'draft_threads', 'draft_placement', 'draft_p_min')}
+            config['performance'].update(monitor_file=str(folder / 'memory.jsonl'),
+                                         initial_swap_bytes=policy['baseline']['swap_used_bytes'])
+            config_path.write_text(json.dumps(config, indent=2) + "\n")
             native = subprocess.Popen(command, stdout=log, stderr=log, env=native_env)
             monitor = app_monitor(native, folder / "memory.jsonl", policy)
             monitor.thread.start()

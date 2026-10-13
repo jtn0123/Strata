@@ -37,3 +37,35 @@ test("numeric speed updates have a stable announcement", () => {
   assert.equal(first.announcement, next.announcement);
   assert.notEqual(next.announcement, state.status("idle", "Idle").announcement);
 });
+
+test("a new request never overwrites an earlier reply's timing", () => {
+  const timing = new StrataUIState.RequestTiming();
+  const old = {text: "earlier", performanceTiming: {total_ms: 90}};
+  const current = {text: "new reply"};
+  timing.begin(current, 100, "mock");
+  timing.record(old, false, 101);
+  assert.equal(old.performanceTiming.total_ms, 90);
+  timing.record(current, true, 110);
+  timing.record(current, false, 125);
+  assert.equal(current.performanceTiming.first_text_ms, 10);
+  assert.equal(current.performanceTiming.total_ms, 25);
+  assert.equal(current.performanceTiming.finish, "completed");
+});
+
+test("initial rendering and post-request rendering cannot invent timings", () => {
+  const timing = new StrataUIState.RequestTiming(), message = {text: "saved reply"};
+  timing.record(message, false, 10);
+  assert.equal(message.performanceTiming, undefined);
+  timing.begin(message, 100, "model"); timing.end();
+  timing.record(message, false, 200);
+  assert.equal(message.performanceTiming, undefined);
+});
+
+test("failed requests retain their duration without inventing first text", () => {
+  const timing = new StrataUIState.RequestTiming(), message = {error: "request failed"};
+  timing.begin(message, 100, "mock");
+  timing.record(message, false, 150);
+  assert.equal(message.performanceTiming.first_text_ms, undefined);
+  assert.equal(message.performanceTiming.total_ms, 50);
+  assert.equal(message.performanceTiming.finish, "error");
+});

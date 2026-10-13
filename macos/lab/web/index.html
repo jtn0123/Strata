@@ -100,6 +100,19 @@
   <section class="view view--monitor" id="view-monitor" role="tabpanel" aria-labelledby="tab-btn-monitor" hidden>
     <div class="monitor">
       <div class="monitor-heading"><div><span class="eyebrow">Under the hood</span><h1 class="page-title">A pulse on your model.</h1><p>Live readings, recent requests, and room to keep thinking.</p></div><span class="monitor-summary" id="monitor-summary">Waiting for the server</span></div>
+      <div class="performance-head"><div><span class="card-title">Performance</span><span class="performance-mode" id="perf-mode">Waiting for measurements</span></div>
+        <button class="st-btn st-btn--secondary" id="perf-export" type="button">Export metrics</button></div>
+      <div class="performance-grid" id="perf-cards">
+        <div class="st-card perf-card"><span>Generation</span><strong id="perf-generation">–</strong><small id="perf-generation-detail">Tokens per second, last request</small></div>
+        <div class="st-card perf-card"><span>First token</span><strong id="perf-first">–</strong><small>Server wait after queue admission</small></div>
+        <div class="st-card perf-card"><span>Full response</span><strong id="perf-total">–</strong><small>Server time, including thinking</small></div>
+        <div class="st-card perf-card"><span>Prompt reading</span><strong id="perf-prompt">–</strong><small>Engine tokens per second</small></div>
+        <div class="st-card perf-card"><span>Helper acceptance</span><strong id="perf-draft">–</strong><small>Accepted drafts / proposed drafts</small></div>
+        <div class="st-card perf-card"><span>Prompt reuse</span><strong id="perf-reuse">–</strong><small>Cached input from the last request</small></div>
+      </div>
+      <div class="resource-strip" id="perf-resources"></div>
+      <p class="telemetry-note" id="perf-settings">Measurements appear after a request finishes.</p>
+      <p class="telemetry-note" id="perf-history">Recorded measurements stay in this browser.</p>
       <div class="st-card state-card">
         <div class="state-card__head">
           <span class="card-title">Model state</span>
@@ -238,5 +251,6 @@
 <script src="/web/app.js"></script>
 <script src="/web/ui-state.js"></script>
 <script src="/web/mac.js"></script>
+<script src="/web/performance.js"></script>
 </body>
 </html>

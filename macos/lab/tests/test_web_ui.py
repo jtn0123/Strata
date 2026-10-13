@@ -44,11 +44,12 @@ class WebUITests(unittest.TestCase):
         self.assertIn('id="api-key"', body)
         self.assertIn('/web/mac.js', body)
         self.assertLess(body.index('/web/ui-state.js'), body.index('/web/mac.js'))
+        self.assertIn('/web/performance.js', body)
         self.assertNotIn('https://cdn', body)
         self.assertEqual(int(h.headers['Content-Length']), len(h.wfile.getvalue()))
 
     def test_css_and_js_mime_and_cache_allow_refresh(self):
-        for path, mime in [('/web/mac.css?v=2', 'text/css'), ('/web/mac.js', 'text/javascript'), ('/web/ui-state.js', 'text/javascript')]:
+        for path, mime in [('/web/mac.css?v=2', 'text/css'), ('/web/mac.js', 'text/javascript'), ('/web/ui-state.js', 'text/javascript'), ('/web/performance.js', 'text/javascript')]:
             with self.subTest(path=path):
                 h = self.handler(path)
                 h.do_GET()

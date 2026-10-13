@@ -8,6 +8,13 @@ from native_backend import create_backend
 register_backend("metal-native", create_backend)
 from serve import server
 from web_ui import mac_handler_factory
+from performance_metrics import tracked_service
+import json
+from pathlib import Path
+config = {}
+if '--config' in sys.argv:
+    config = json.loads(Path(sys.argv[sys.argv.index('--config') + 1]).read_text()).get('performance', {})
+server.Service = tracked_service(server.Service, server.MockEngine, config)
 server.make_handler = mac_handler_factory(server.make_handler)
 main = server.main
 

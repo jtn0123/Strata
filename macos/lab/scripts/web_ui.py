@@ -7,6 +7,7 @@ ASSETS = {
     '/web/mac.css': ('mac.css', 'text/css; charset=utf-8'),
     '/web/mac.js': ('mac.js', 'text/javascript; charset=utf-8'),
     '/web/ui-state.js': ('ui-state.js', 'text/javascript; charset=utf-8'),
+    '/web/performance.js': ('performance.js', 'text/javascript; charset=utf-8'),
 }
 
 

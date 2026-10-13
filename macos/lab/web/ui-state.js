@@ -20,4 +20,23 @@ class StrataUIState {
   }
 }
 
-if (typeof module !== "undefined") module.exports = StrataUIState;
+class StrataRequestTiming {
+  begin(message, started, kind) { this.message = message; this.started = started; this.kind = kind; }
+  record(message, streaming, now) {
+    if (message !== this.message || !Number.isFinite(this.started)) return;
+    const timing = message.performanceTiming ||= {measurement_kind: this.kind};
+    const elapsed = Math.max(0, now - this.started);
+    if (timing.first_text_ms == null && (message.text || message.reasoning)) timing.first_text_ms = elapsed;
+    if (!streaming) {
+      timing.total_ms = elapsed;
+      timing.finish = message.error ? "error" : message.stopped ? "stopped" : "completed";
+    }
+    return timing;
+  }
+  end() { this.message = null; this.started = null; }
+}
+
+if (typeof module !== "undefined") {
+  module.exports = StrataUIState;
+  module.exports.RequestTiming = StrataRequestTiming;
+}

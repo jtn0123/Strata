@@ -50,3 +50,24 @@ node --test tests/ui_state.test.cjs
 Final local validation: 178 Python offline tests, five campaign-protocol tests and four JavaScript state tests
 pass. The CI workflow runs the JavaScript checks under Node 22. Review prompts, model responses, detailed grades
 and screenshots live under the ignored `.Codex/ui-ux-audit/` and `.Codex/ui-ux-grade-report.md` paths.
+
+## Performance tracking
+
+Monitor now shows generation speed and its timing source, server first-token/full-response time, native prompt
+reading, draft acceptance and prompt reuse. Chat replies show browser first-text/full-request timing, including
+transport and queue wait. These scopes are deliberately labeled separately. Mock previews are marked as test
+data and unavailable counters stay blank.
+
+The local server keeps 30 recent requests; this browser keeps up to 200 timing/settings records across reloads.
+Export includes numerical measurements and a settings whitelist, with no prompts, replies, file paths or API
+keys. Its resource snapshot is current, not a per-request peak. Available RAM and total system swap are sampled
+locally; model RSS, pressure and swap growth reuse the existing owned launch guard when available. No extra
+pressure subprocess or native profiling callback is added.
+
+The maintained API shell's metrics payload is extended additively through a Service subclass; authentication,
+queueing, cancellation, sampling and generation still use the pinned implementations. Normal/native/mocked
+timing sources must be kept separate when comparing measurements. The default model/profile is unchanged.
+
+[Research queue and metric definitions](../bench/research/20261013-performance-tracking/REPORT.md). No new model
+or GPU benchmark was run for this UI change. Latest local validation: 185 offline tests, five campaign-protocol
+tests, seven JavaScript regression tests and eight actual HTTP smoke groups using a mock engine.
