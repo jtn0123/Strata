@@ -1,5 +1,9 @@
 # Strata Mac Lab
 
+## Maintained profiles
+
+`Start Strata.command` runs the balanced P07 profile. `Start Strata - Code Editing.command` uses confirmed lookup plus MTP for edits to supplied files. Both verify provenance and use the strict app memory policy. [Adoption decisions and validation](bench/PERMANENT-PROFILES.md).
+
 Local, measured experiments for an Apple M5 Pro with 48 GiB unified memory. This workspace keeps Strata's existing Mac interface and uses a revision-pinned native llama.cpp Metal server behind it. All inference stays on the Mac.
 
 Latest: [P07 is validated and installed in the normal launcher](bench/results/20261010-small-gains-stack/REPORT.md). Its prior independent confirmation adds +0.61% code/+0.79% prose generation over the direct-copy profile. New longer-prompt and 32-token answer safety checks pass; 12 full-model launches, 312 answer/cache checks and 192 exact output signatures have zero new swap. The actual Strata API passes 16 English answer checks plus streaming and clean shutdown. W02 adds +0.58–0.71% TPS but exceeds the declared 10 ms startup ceiling on prose, so stacking remains untested. Double-click `Start Strata.command` for P07; `Start Strata - Original Baseline.command` restores the earlier profile. No model server is left running.
