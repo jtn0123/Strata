@@ -31,7 +31,7 @@ def inventory(root=ROOT):
 
 
 def fingerprint(root=ROOT):
-    paths = sorted([*(root / 'scripts').glob('*.py'), *(root / 'tests').glob('test_*.py'),
+    paths = sorted([*(root / 'scripts').glob('*.py'), *(root / 'tests').glob('test_*.py'), *(root / 'tests').glob('*.test.cjs'),
                     *(root / 'config').glob('*.json'), *(root / 'web').glob('*.html'),
                     *(root / 'web').glob('*.css'), *(root / 'web').glob('*.js')])
     return {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}

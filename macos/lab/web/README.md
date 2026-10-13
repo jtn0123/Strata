@@ -1,7 +1,7 @@
 # Mac workspace
 
 The Mac launcher serves this page over the pinned API shell. `scripts/web_ui.py` replaces only the homepage and
-`/web/mac.css` and `/web/mac.js`; API routes, authentication, sampling, cancellation, native engine settings and
+`/web/mac.css`, `/web/mac.js` and `/web/ui-state.js`; API routes, authentication, sampling, cancellation, native engine settings and
 the shell's original assets stay with the pinned server. The upstream download is not modified.
 
 `index.html` derives from `jinzy0623/Strata-macOS` at `2cc4153409edb3f859187bdf10f13e34972d6ffb`, retaining its
@@ -26,3 +26,27 @@ Mock replies and speeds are not model performance measurements. No new TPS claim
 Run `scripts/validate_offline.py` after editing: the receipt now fingerprints HTML, CSS and JavaScript too.
 Browser checks cover both themes, desktop/mobile layouts, prompt drafting, a complete mock SSE reply, tabs,
 dialog focus. Separate HTTP checks validate authentication and path rejection. Screenshots and raw verification receipts remain local.
+
+## Polish loop
+
+Two programmatic, read-only Opus 5.5 reviews moved the subjective overall assessment from B- to B+.
+The main fixes keep offline/API-key failures visible through cached tab renders, mark readings stale until a
+fresh response arrives, announce phase changes rather than every speed update, preserve an existing draft,
+and stabilize the welcome text against the older shell's health callback. Empty speed charts no longer imply
+zero; memory uses GiB. Copper button shadows and distinct starter icons remove inherited visual leftovers.
+
+The mobile composer measured 212.5 to 139 pixels (-34.6%); the desktop conversation composer measured 178.5
+pixels (-16.0%). Main mobile toolbar controls and the theme control measure 44 pixels at 320/390px widths.
+The settings body scrolls to Apply on a 320x640 viewport and returns focus after closing. These are browser
+layout/interaction measurements, not generation performance gains. Physical VoiceOver and mobile soft-keyboard
+behavior remain manual checks; the announcer's DOM behavior was checked directly.
+
+Run the pure status-state regression tests separately from the network-free Python gate:
+
+```sh
+node --test tests/ui_state.test.cjs
+```
+
+Final local validation: 178 Python offline tests, five campaign-protocol tests and four JavaScript state tests
+pass. The CI workflow runs the JavaScript checks under Node 22. Review prompts, model responses, detailed grades
+and screenshots live under the ignored `.Codex/ui-ux-audit/` and `.Codex/ui-ux-grade-report.md` paths.

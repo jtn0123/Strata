@@ -2,14 +2,28 @@
 "use strict";
 (() => {
   const input = document.getElementById("input");
+  const subtitle = document.getElementById("chat-empty-sub");
+  const welcomeText = "Ask a question, work through some code, or give your next idea a place to start.";
+  const keepWelcomeCopy = () => { if (subtitle.textContent !== welcomeText) subtitle.textContent = welcomeText; };
+  new MutationObserver(keepWelcomeCopy).observe(subtitle, {childList: true, characterData: true, subtree: true});
+  keepWelcomeCopy();
   document.querySelectorAll("[data-prompt]").forEach((button) => {
     button.addEventListener("click", () => {
       if (busy) return;
+      if (input.value.trim()) {
+        toast("info", "Your draft is still here", "Clear the message first to use a starter.");
+        input.focus();
+        return;
+      }
       input.value = button.dataset.prompt;
       input.dispatchEvent(new Event("input", {bubbles: true}));
       input.focus();
     });
   });
+  const compact = matchMedia("(max-width: 700px)");
+  const resizeInput = () => { input.rows = compact.matches || messages.length ? 1 : 2; autosize(); };
+  compact.addEventListener("change", resizeInput);
+  resizeInput();
 
   // Upstream 6a7c6f82: do not magnify tiny disk noise into full-height spikes.
   const originalSpark = spark;
@@ -40,6 +54,7 @@
   const originalRenderChat = renderChat;
   renderChat = () => {
     originalRenderChat();
+    resizeInput();
     if (!messages.length) document.getElementById("chat-scroll").scrollTop = 0;
   };
   if (!messages.length) document.getElementById("chat-scroll").scrollTop = 0;
@@ -64,24 +79,43 @@
   });
 
   const originalSetPill = setPill;
+  const connection = new StrataUIState();
+  let announced = "", pendingAnnouncement = "", announcementQueued = false;
   setPill = (state, text) => {
-    originalSetPill(state, state === "idle" ? "Ready" : text);
-    document.getElementById("pill").title = text;
-    document.getElementById("pill").setAttribute("aria-label", text);
-    if (state === "error") {
-      document.getElementById("monitor-summary").textContent = text + " · readings unavailable";
+    const status = connection.status(state, text);
+    originalSetPill(status.state, status.label);
+    const pill = document.getElementById("pill");
+    pill.dataset.state = status.state;
+    pill.title = status.announcement;
+    pill.setAttribute("aria-label", status.announcement);
+    pendingAnnouncement = status.announcement;
+    if (!announcementQueued) {
+      announcementQueued = true;
+      queueMicrotask(() => {
+        announcementQueued = false;
+        if (announced !== pendingAnnouncement) {
+          document.getElementById("pill-live").textContent = pendingAnnouncement;
+          announced = pendingAnnouncement;
+        }
+      });
     }
+    document.getElementById("connection-banner").hidden = status.state !== "error";
+    document.getElementById("connection-message").textContent = status.label === "Key needed"
+      ? "Add your API key in About → Settings to connect."
+      : "Can’t reach the local server. Reconnecting… Monitor shows the last readings.";
+    document.querySelector(".monitor").dataset.stale = String(status.state === "error");
+    if (status.state === "error") document.getElementById("monitor-summary").textContent = status.announcement + " · readings are stale";
   };
 
   const originalRender = render;
   render = (metrics) => {
+    connection.receive(metrics);
     originalRender(metrics);
     const hw = metrics.hardware || {}, engine = metrics.engine || {};
     const model = engine.model || health.model || "Local model";
-    document.getElementById("workspace-model").textContent = model;
-    document.getElementById("chat-empty-sub").textContent = "Ask a question, work through some code, or give your next idea a place to start.";
+    document.getElementById("workspace-model").textContent = model + (connection.problem ? " · last seen" : "");
     const summary = document.getElementById("monitor-summary");
-    summary.textContent = hw.ram_total && hw.ram_used != null
+    summary.textContent = connection.problem ? connection.problem + " · readings are stale" : hw.ram_total && hw.ram_used != null
       ? `${gb(hw.ram_used)} / ${gb(hw.ram_total, 0)} GiB system memory in use`
       : "System memory is not reported by this backend";
     const unavailable = [];
@@ -95,6 +129,10 @@
       ? `${unavailable.join(", ")} ${unavailable.length === 1 ? "is" : "are"} not reported by this backend. Missing readings are hidden, not treated as zero.`
       : "Hardware readings come from the server. Disk activity includes other work on this Mac.";
     document.getElementById("gpu-fact-note").hidden = !!(metrics.hardware_static || {}).gpu_name;
+    const unmeasuredSpeed = document.getElementById("mv-speed").textContent.trim() === "–";
+    document.getElementById("sp-speed").style.visibility = unmeasuredSpeed ? "hidden" : "visible";
+    if (unmeasuredSpeed) document.getElementById("ms-speed").textContent = "Not measured yet";
+    if (hw.ram_total) document.getElementById("ram-text").textContent = `${gb(hw.ram_used)} / ${gb(hw.ram_total, 0)} GiB`;
     // These CUDA labels do not describe a backend that supplies no such counters.
     for (const [id, available] of [["slots-text", !!engine.expert_slots], ["temp-text", hw.gpu_temp != null]]) {
       const row = document.getElementById(id).closest(".bar-row");
@@ -105,6 +143,8 @@
       const labels = [...document.querySelectorAll("#facts-hw dt")];
       const gpu = labels.find((el) => el.textContent === "GPU");
       if (gpu) gpu.nextElementSibling.textContent = "Not reported by this backend";
+      const ram = labels.find((el) => el.textContent === "RAM");
+      if (ram && hw.ram_total) ram.nextElementSibling.textContent = `${gb(hw.ram_total, 0)} GiB`;
     }
   };
   if (lastMetrics) render(lastMetrics);

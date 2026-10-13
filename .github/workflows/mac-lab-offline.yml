@@ -22,6 +22,9 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.12'
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
       - name: Install pinned Python dependencies
         run: |
           python -m pip install --only-binary :all: --require-hashes -r macos/lab/requirements-ci.lock
@@ -42,6 +45,11 @@ jobs:
       - name: Check measured campaign protocol
         working-directory: macos/lab
         run: python -m unittest discover -s bench/results/20261010-small-gains-stack -p test_sequence.py -v
+      - name: Check browser status transitions
+        run: |
+          node --check macos/lab/web/mac.js
+          node --check macos/lab/web/ui-state.js
+          node --test macos/lab/tests/ui_state.test.cjs
       - name: Retain offline receipt and log
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
