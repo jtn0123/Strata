@@ -18,6 +18,9 @@ from engines import ENGINES, verify_engine
 from draft_vocab import experiment_environment
 from check_memory import assert_no_model_server
 from metal_environment import TUNING, configure
+from runtime_profiles import lookup_command
+from runtime_memory import admit_model, app_monitor
+from model_provenance import verify_models
 
 
 def assert_ports_available(ports):
@@ -47,6 +50,7 @@ def main(argv=None):
     ap.add_argument("--tensor-api", choices=["auto", "on", "off"], default="auto")
     ap.add_argument("--m5-tuning", choices=TUNING, default="stock")
     ap.add_argument("--prompt-cache", action=argparse.BooleanOptionalAction, default=True)
+    ap.add_argument("--lookup-profile", choices=["off", "code-edit"], default="off")
     args = ap.parse_args(argv)
     if args.draft_vocab != "off" and args.spec != "draft-mtp":
         ap.error("The draft vocabulary requires --spec draft-mtp")
@@ -56,10 +60,14 @@ def main(argv=None):
 
 
 def execute(args):
+    # Reject unsupported lookup settings before any native process can launch.
+    lookup_command(['--spec-type', args.spec], args)
     native_env, vocab_info = experiment_environment(args.engine, args.draft_vocab)
     native_env, metal_info = configure(native_env, args.engine, args.tensor_api, args.m5_tuning)
     assert_no_model_server()
     engine_info = verify_engine(args.engine)
+    model_ids = [args.model] + ([args.draft_model] if args.spec == 'draft-mtp' else [])
+    model_info = verify_models(model_ids)
     def interrupted(signum, frame):
         raise KeyboardInterrupt
     signal.signal(signal.SIGTERM, interrupted)
@@ -83,13 +91,17 @@ def execute(args):
                                      draft_placement=args.draft_placement, draft_model=args.draft_model,
                                      engine=args.engine, draft_threads=args.draft_threads,
                                      draft_p_min=args.draft_p_min)
+            command = lookup_command(command, args)
             (folder / "command.json").write_text(json.dumps(command, indent=2) + "\n")
             (folder / "engine.json").write_text(json.dumps(engine_info, indent=2) + "\n")
             (folder / "draft-vocabulary.json").write_text(json.dumps(vocab_info, indent=2) + "\n")
             (folder / "metal-environment.json").write_text(json.dumps(metal_info, indent=2) + "\n")
-            launch_baseline = Monitor.baseline()
+            (folder / "models.json").write_text(json.dumps(model_info, indent=2) + "\n")
+            (folder / "settings.json").write_text(json.dumps(vars(args), indent=2) + "\n")
+            policy = admit_model(args.model)
+            (folder / "memory-policy.json").write_text(json.dumps(policy, indent=2) + "\n")
             native = subprocess.Popen(command, stdout=log, stderr=log, env=native_env)
-            monitor = Monitor(native, folder / "memory.jsonl", baseline=launch_baseline)
+            monitor = app_monitor(native, folder / "memory.jsonl", policy)
             monitor.thread.start()
             wait_ready(native, config["native_url"])
             app = subprocess.Popen([sys.executable, str(ROOT / "scripts/strata_server.py"),

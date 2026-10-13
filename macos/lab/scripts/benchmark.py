@@ -42,14 +42,24 @@ def host_snapshot():
 
 class Monitor:
     @staticmethod
+    def read_pressure_level():
+        level = int(subprocess.check_output(
+            ['sysctl', '-n', 'kern.memorystatus_vm_pressure_level'], text=True, timeout=2))
+        if level not in (1, 2, 4):
+            raise ValueError('Invalid macOS pressure level')
+        return level
+
+    @staticmethod
     def baseline():
         return {"swap_used_bytes": psutil.swap_memory().used,
                 "available_bytes": psutil.virtual_memory().available}
 
-    def __init__(self, process, path, swap_guard_bytes=2 * 1024**3, minimum_available_bytes=384 * 1024**2, *, baseline=None):
+    def __init__(self, process, path, swap_guard_bytes=2 * 1024**3, minimum_available_bytes=384 * 1024**2, *, baseline=None, require_normal_pressure=False):
         self.process, self.path = process, path
         self.swap_guard_bytes = swap_guard_bytes
         self.minimum_available_bytes = minimum_available_bytes
+        self.require_normal_pressure = require_normal_pressure
+        self.pressure_samples, self.pressure_live_samples, self.peak_pressure_level = 0, 0, None
         self.done = threading.Event()
         self.baseline_before_launch = baseline is not None
         self.launch_baseline = baseline if baseline is not None else self.baseline()
@@ -84,6 +94,12 @@ class Monitor:
                   "available_bytes": vm.available, "swap_used_bytes": swap.used,
                   "system_disk_read_bytes": io.read_bytes if io else None,
                   "system_disk_write_bytes": io.write_bytes if io else None}
+        if self.require_normal_pressure:
+            level = self.read_pressure_level()
+            sample['pressure_level'] = level
+            self.pressure_samples += 1
+            self.pressure_live_samples += int(mem is not None)
+            self.peak_pressure_level = max(self.peak_pressure_level or level, level)
         self.first_sample = self.first_sample or sample
         self.latest_sample = sample
         self.sample_count += 1
@@ -92,6 +108,13 @@ class Monitor:
         self.minimum_available = min(self.minimum_available, vm.available)
         self.peak_swap = max(self.peak_swap, swap.used)
         return sample
+
+    def pressure_guard(self, sample):
+        if self.require_normal_pressure and sample['pressure_level'] != 1:
+            self.guard = self.guard or f"Stopped: macOS pressure level {sample['pressure_level']} is not normal"
+            self.stop_owned_child()
+            return True
+        return False
 
     def run(self):
         low_since = None
@@ -106,6 +129,8 @@ class Monitor:
                     sample = self.sample(mem)
                     stream.write(json.dumps(sample) + "\n")
                     stream.flush()
+                    if self.pressure_guard(sample):
+                        return
                     if sample["available_bytes"] < self.minimum_available_bytes:
                         low_since = low_since or time.monotonic()
                     else:
@@ -132,6 +157,7 @@ class Monitor:
         else:
             try:
                 sample = self.sample()
+                self.pressure_guard(sample)
                 with self.path.open("a") as stream:
                     stream.write(json.dumps({**sample, "after_child_exit": self.process.poll() is not None}) + "\n")
             except Exception as error:
@@ -152,6 +178,12 @@ class Monitor:
                 "minimum_available_bytes": self.minimum_available,
                 "peak_swap_bytes": self.peak_swap,
                 "swap_growth_bytes": max(0, self.peak_swap - self.initial_swap),
+                "normal_pressure_required": self.require_normal_pressure,
+                "pressure_samples": self.pressure_samples,
+                "pressure_live_samples": self.pressure_live_samples,
+                "peak_pressure_level": self.peak_pressure_level,
+                "normal_pressure_observed": (bool(self.pressure_live_samples) and self.peak_pressure_level == 1 and
+                    not self.monitor_error) if self.require_normal_pressure else None,
                 "system_disk_read_bytes": latest_read - first_read if first_read is not None and latest_read is not None else None,
                 "sampling_interval_s": 0.25,
                 "note": "RSS is not total Metal memory. Disk counters include all system activity. See native allocation log and vm_stat."}
