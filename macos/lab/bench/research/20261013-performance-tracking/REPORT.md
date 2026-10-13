@@ -2,7 +2,8 @@
 
 Researched 2026-10-13 against current GitHub API state and the local experiment ledger. The UI now records
 timings and settings, but this pass did not load a model, compile a candidate engine or establish a new TPS gain.
-The maintained balanced/editing settings and model bytes remain unchanged.
+The maintained balanced/editing settings and model bytes remain unchanged. This opening describes the initial
+research snapshot; later real-model checks and a fresh parent update are recorded below.
 
 ## What is measured
 
@@ -51,6 +52,12 @@ The browser request included thinking; controlled editing comparisons disabled i
 E01/E02 and real-monitor entries for measured scopes, rejected attempts and local evidence locations.
 
 ## Avoid unchanged retries
+
+The subsequent long-English diagnostic crosses the lookup screen on its first document (145.288ms,2.940% of
+reply time), while its replay is0.0328%. Cache state stays unknown and no prefetch gain is measured. The parent
+now also has its own native Mac Metal engine; previous out-of-scope statements are historical. Its48GiB
+defaults stream experts and omit MTP, so there is no basis for transferring its larger-Mac TPS to this lab.
+See the [updated source/budget evidence and next gates](../20261013-parent-mac-refresh/REPORT.md).
 
 The ledger already parks stream-piece conversion caching (correct, no qualified whole-reply gain), W02 helper
 selection (unconfirmed or outside latency gates), fixed depth/cap variants with divergence, route-map reuse,
