@@ -9,7 +9,7 @@ BASE = ['flash', '--engine', 'm5-small-stack', '--m5-tuning', 'small-reduce',
 PROFILES = {
     'balanced': dict(arguments=BASE, description='Normal English chat and code generation.'),
     'code-edit': dict(arguments=BASE + ['--lookup-profile', 'code-edit'],
-                     description='Edits to supplied code. Confirmed on one Python file; broader speed coverage is pending.'),
+                     description='Edits to supplied files. Faster complete replies confirmed on two Python, two JavaScript and two JSON fixtures.'),
 }
 
 

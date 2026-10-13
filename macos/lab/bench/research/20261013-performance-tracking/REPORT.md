@@ -42,6 +42,14 @@ For #30405 the fresh REST API confirms the merge; the fetched HTML still showed 
 Its reported M2 Ultra/192 GB/IQ4 measurements are neither M5 Pro results nor predictions for our Q2 model.
 No new kernel, paging, sampling, power or helper policy was enabled by this research.
 
+Later same-day validation used the real maintained full-model editing app. It reproduced the backend losing
+the final native timing packet when the shell closed at EOS. The bounded EOS-only counter handoff now preserves
+generation/prompt rates, draft acceptance and cache reuse; cancellation and missing-final data remain separate.
+Two complete-file API checks, all nine API/lifecycle groups, the actual browser timing badges/Monitor, and export
+privacy passed with normal pressure and zero new swap. These are functional observations, not a new speedup.
+The browser request included thinking; controlled editing comparisons disabled it. See the decision ledger's
+E01/E02 and real-monitor entries for measured scopes, rejected attempts and local evidence locations.
+
 ## Avoid unchanged retries
 
 The ledger already parks stream-piece conversion caching (correct, no qualified whole-reply gain), W02 helper

@@ -9,9 +9,18 @@ Both profiles include the previously validated GPU MMA path, packed shared Q3 he
 | Earlier GPU MMA | About16.8% higher generation TPS in matched depth-three code/prose comparisons. |
 | Shared helper weights | Removes521MiB of duplicated helper tables; all target experts retained. |
 | P07 | Independently confirmed +0.61% code/+0.79% prose generation, with reply and safety checks. |
-| Editing lookup | Independent first-file confirmation71.3 to84.4TPS (+18.4%); complete replies11.2% sooner, first token61ms later. One Python-file speed fixture; broader coverage pending. |
+| Editing lookup, historical one-file result | Independent first-file confirmation71.3 to84.4TPS (+18.4%); complete replies11.2% sooner, first token61ms later. Broader October13 validation is recorded below. |
 
 The percentages come from separate matched experiments and are not added together. Editing is a dedicated option, not a general chat-rate claim.
+
+October13 broader coverage now confirms the existing editing profile on six disjoint files: two each in Python,
+JavaScript and JSON. In the independent held-out bracket, first edits improved Python73.105→87.414TPS (+19.573%),
+JavaScript72.966→87.789 (+20.314%) and JSON73.108→86.697 (+18.587%). Complete replies were15.163%,14.899% and13.676%
+faster respectively. Warmed edits reached89.6–89.9TPS, with22.7–22.9% higher generation on those held-out files.
+All96 complete-file replies across the accepted screen and confirmation matched verbatim and by token ID.
+All eight accepted launches used normal pressure and zero new swap, with at least3.05GiB available during the
+model runs. These are editing workload results using the same existing profile, not an additional percentage
+to stack onto the historical18.4% or a new ordinary-chat speed. See E01 in the decision ledger for exclusions.
 
 ## Resource policy and validation
 

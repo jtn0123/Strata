@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "cases": [
+    {
+      "name": "python-client",
+      "language": "python",
+      "cohort": "screen",
+      "old": "DEFAULT_TIMEOUT_SECONDS = 12",
+      "new": "DEFAULT_TIMEOUT_SECONDS = 20",
+      "source": "from dataclasses import dataclass\n\nDEFAULT_TIMEOUT_SECONDS = 12\n\n\n@dataclass(frozen=True)\nclass RequestOptions:\n    timeout_seconds: int = DEFAULT_TIMEOUT_SECONDS\n    retries: int = 2\n    verify_tls: bool = True\n\n    def validate(self):\n        if self.timeout_seconds <= 0:\n            raise ValueError(\"timeout must be positive\")\n        if self.retries < 0:\n            raise ValueError(\"retries cannot be negative\")\n        return self\n\n\nclass RequestCounter:\n    def __init__(self):\n        self.successes = 0\n        self.failures = 0\n\n    def record(self, succeeded):\n        if succeeded:\n            self.successes += 1\n        else:\n            self.failures += 1\n\n    def summary(self):\n        total = self.successes + self.failures\n        return {\n            \"total\": total,\n            \"successes\": self.successes,\n            \"failures\": self.failures,\n            \"success_rate\": self.successes / total if total else 0.0,\n        }\n"
+    },
+    {
+      "name": "javascript-queue",
+      "language": "javascript",
+      "cohort": "screen",
+      "old": "const RETRY_LIMIT = 2;",
+      "new": "const RETRY_LIMIT = 5;",
+      "source": "const RETRY_LIMIT = 2;\n\nexport class WorkQueue {\n  constructor() {\n    this.pending = [];\n    this.completed = [];\n    this.failed = [];\n  }\n\n  enqueue(id, payload) {\n    if (this.pending.some((item) => item.id === id)) {\n      throw new Error(\"duplicate work id\");\n    }\n    this.pending.push({ id, payload, attempts: 0 });\n  }\n\n  take() {\n    return this.pending.shift() ?? null;\n  }\n\n  finish(item, result) {\n    this.completed.push({ id: item.id, result });\n  }\n\n  retry(item) {\n    const next = { ...item, attempts: item.attempts + 1 };\n    if (next.attempts > RETRY_LIMIT) {\n      this.failed.push(next);\n      return false;\n    }\n    this.pending.push(next);\n    return true;\n  }\n\n  counts() {\n    return {\n      pending: this.pending.length,\n      completed: this.completed.length,\n      failed: this.failed.length,\n    };\n  }\n}\n"
+    },
+    {
+      "name": "json-workers",
+      "language": "json",
+      "cohort": "screen",
+      "old": "\"retryLimit\": 3",
+      "new": "\"retryLimit\": 6",
+      "source": "{\n  \"version\": 1,\n  \"scheduler\": {\n    \"enabled\": true,\n    \"retryLimit\": 3,\n    \"timeoutSeconds\": 45,\n    \"backoff\": {\n      \"initialSeconds\": 1,\n      \"maximumSeconds\": 30,\n      \"multiplier\": 2\n    }\n  },\n  \"workers\": [\n    {\n      \"name\": \"amber\",\n      \"queues\": [\"reports\", \"exports\"],\n      \"concurrency\": 2,\n      \"enabled\": true\n    },\n    {\n      \"name\": \"birch\",\n      \"queues\": [\"index\"],\n      \"concurrency\": 1,\n      \"enabled\": true\n    }\n  ],\n  \"logging\": {\n    \"level\": \"info\",\n    \"includePayload\": false,\n    \"retentionDays\": 7\n  },\n  \"health\": {\n    \"intervalSeconds\": 15,\n    \"failureThreshold\": 4\n  }\n}\n"
+    },
+    {
+      "name": "python-ledger",
+      "language": "python",
+      "cohort": "confirm",
+      "old": "MAX_RECENT_EVENTS = 24",
+      "new": "MAX_RECENT_EVENTS = 40",
+      "source": "from collections import deque\n\nMAX_RECENT_EVENTS = 24\n\n\nclass EventLedger:\n    def __init__(self):\n        self.recent = deque(maxlen=MAX_RECENT_EVENTS)\n        self.totals = {}\n        self.sequence = 0\n\n    def append(self, kind, value):\n        if not isinstance(kind, str) or not kind:\n            raise ValueError(\"kind must be a nonempty string\")\n        self.sequence += 1\n        event = {\n            \"sequence\": self.sequence,\n            \"kind\": kind,\n            \"value\": value,\n        }\n        self.recent.append(event)\n        self.totals[kind] = self.totals.get(kind, 0) + 1\n        return event.copy()\n\n    def since(self, sequence):\n        return [\n            event.copy()\n            for event in self.recent\n            if event[\"sequence\"] > sequence\n        ]\n\n    def counts(self):\n        return dict(sorted(self.totals.items()))\n\n    def clear(self):\n        self.recent.clear()\n        self.totals.clear()\n"
+    },
+    {
+      "name": "javascript-catalog",
+      "language": "javascript",
+      "cohort": "confirm",
+      "old": "const PAGE_SIZE = 10;",
+      "new": "const PAGE_SIZE = 25;",
+      "source": "const PAGE_SIZE = 10;\n\nexport class Catalog {\n  constructor(items = []) {\n    this.items = new Map(items.map((item) => [item.id, { ...item }]));\n  }\n\n  add(item) {\n    if (!item.id || this.items.has(item.id)) {\n      throw new Error(\"id must be unique\");\n    }\n    this.items.set(item.id, { ...item });\n  }\n\n  find(id) {\n    const item = this.items.get(id);\n    return item ? { ...item } : null;\n  }\n\n  remove(id) {\n    return this.items.delete(id);\n  }\n\n  page(number = 1) {\n    if (!Number.isInteger(number) || number < 1) {\n      throw new Error(\"page number must be positive\");\n    }\n    const sorted = [...this.items.values()].sort((a, b) =>\n      a.id.localeCompare(b.id)\n    );\n    const offset = (number - 1) * PAGE_SIZE;\n    return sorted.slice(offset, offset + PAGE_SIZE).map((item) => ({ ...item }));\n  }\n\n  get size() {\n    return this.items.size;\n  }\n}\n"
+    },
+    {
+      "name": "json-client",
+      "language": "json",
+      "cohort": "confirm",
+      "old": "\"timeoutSeconds\": 18",
+      "new": "\"timeoutSeconds\": 27",
+      "source": "{\n  \"schemaVersion\": 2,\n  \"client\": {\n    \"name\": \"sample-client\",\n    \"timeoutSeconds\": 18,\n    \"maximumAttempts\": 4,\n    \"headers\": {\n      \"accept\": \"application/json\",\n      \"cacheControl\": \"no-cache\"\n    }\n  },\n  \"features\": {\n    \"compression\": true,\n    \"telemetry\": false,\n    \"retryOnTimeout\": true\n  },\n  \"limits\": {\n    \"maximumBodyBytes\": 65536,\n    \"maximumPending\": 8\n  },\n  \"routes\": [\n    {\n      \"name\": \"summary\",\n      \"method\": \"GET\",\n      \"path\": \"/summary\"\n    },\n    {\n      \"name\": \"events\",\n      \"method\": \"POST\",\n      \"path\": \"/events\"\n    }\n  ],\n  \"health\": {\n    \"enabled\": true,\n    \"intervalSeconds\": 30\n  }\n}\n"
+    }
+  ]
+}

@@ -84,9 +84,10 @@ class NativeTemplate:
 
 
 class NativeEngine:
-    def __init__(self, base, props, model_id, prompt_cache=True):
+    def __init__(self, base, props, model_id, prompt_cache=True, *, stop_ids=()):
         self.base = base
         self.prompt_cache = prompt_cache
+        self.stop_ids = set(stop_ids)
         self.max_context = props["default_generation_settings"]["n_ctx"]
         self.last = {}
         self.info = {"backend": "metal-native-http", "version": props["build_info"],
@@ -95,6 +96,7 @@ class NativeEngine:
                      "prompt_cache": prompt_cache}
 
     def generate(self, ids, max_new, sampling, cancel):
+        self.last = {}
         if cancel.is_set():
             return
         url = urlparse(self.base)
@@ -107,13 +109,17 @@ class NativeEngine:
                 payload[key] = sampling[key]
         events = queue.Queue()
         stopped = threading.Event()
-        self.last = {}
+        final_ready = threading.Event()
+        final_record = None
+        final_consumed = False
+        last_token = None
         started, first, count = time.monotonic(), None, 0
         connection.request("POST", "/completion", body=json.dumps(payload),
                            headers={"Content-Type": "application/json"})
         transport = connection.sock
 
         def pump():
+            nonlocal final_record
             try:
                 response = connection.getresponse()
                 if response.status != 200:
@@ -122,10 +128,15 @@ class NativeEngine:
                     if stopped.is_set():
                         break
                     if line.startswith(b"data: "):
-                        events.put(json.loads(line[6:]))
+                        item = json.loads(line[6:])
+                        if item.get('stop'):
+                            final_record = item
+                            final_ready.set()
+                        events.put(item)
             except BaseException as error:
                 events.put(error)
             finally:
+                final_ready.set()  # EOF/error must not make finalization wait for its deadline.
                 events.put(None)
 
         reader = threading.Thread(target=pump, daemon=True)
@@ -148,15 +159,27 @@ class NativeEngine:
                         return
                     first = first or time.monotonic()
                     count += 1
+                    last_token = token
                     yield token
                 if item.get("stop"):
-                    timing = item.get("timings", {})
+                    final_consumed = True
+                    break
+        finally:
+            # The pinned shell closes this generator as soon as it sees EOS. Native
+            # timing follows in another SSE packet. Drain only that normal completion,
+            # bounded to 0.5s and responsive to cancellation; never wait on a user stop.
+            normal_stop = last_token in self.stop_ids
+            if normal_stop and not cancel.is_set():
+                deadline = time.monotonic() + 0.5
+                while not final_ready.is_set() and not cancel.is_set() and time.monotonic() < deadline:
+                    final_ready.wait(min(0.05, max(0, deadline - time.monotonic())))
+            if not cancel.is_set() and (final_consumed or normal_stop) and final_record:
+                timing = final_record.get('timings')
+                if isinstance(timing, dict) and timing:
                     self.last = {"generated": count, "prompt_tokens": len(ids),
                                  "prompt_ms": timing.get("prompt_ms"),
                                  "decode_ms": timing.get("predicted_ms"),
-                                 "native_timings": timing, "reused": timing.get("cache_n", 0)}
-                    break
-        finally:
+                                 "native_timings": dict(timing), "reused": timing.get("cache_n")}
             stopped.set()
             if transport:
                 try:
@@ -196,5 +219,5 @@ def create_backend(config):
     prompt_cache = config.get("prompt_cache", True)
     if not isinstance(prompt_cache, bool):
         raise ValueError("prompt_cache must be a boolean")
-    return BackendBundle(NativeEngine(base, props, config["model_name"], prompt_cache), tokenizer,
+    return BackendBundle(NativeEngine(base, props, config["model_name"], prompt_cache, stop_ids=stops), tokenizer,
                          NativeTemplate(base), stops)

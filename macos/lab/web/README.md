@@ -71,3 +71,15 @@ timing sources must be kept separate when comparing measurements. The default mo
 [Research queue and metric definitions](../bench/research/20261013-performance-tracking/REPORT.md). No new model
 or GPU benchmark was run for this UI change. Latest local validation: 185 offline tests, five campaign-protocol
 tests, seven JavaScript regression tests and eight actual HTTP smoke groups using a mock engine.
+
+The later October13 real-model check now verifies these fields in the maintained editing app. The backend
+retains the final native timing packet when the shell closes at EOS, with an EOS-only0.5second deadline and
+responsive cancellation. Missing/cancelled counters remain unknown; a cancelled new request cannot inherit
+the preceding request's metrics. The Monitor's draft acceptance covers all proposed tokens, including lookup
+drafts. It does not isolate the MTP helper's acceptance.
+
+Real complete-file API requests, all nine API/lifecycle integration groups, browser timing badges and numeric
+export privacy passed with normal pressure/zero new swap. Current validation:207 offline tests, five campaign
+protocol checks, seven JavaScript tests and18 CPU-only native matcher cases. Browser observations and controlled
+editing benchmarks use different prompts/thinking settings and are not interchangeable speed comparisons.
+Detailed results and exclusions are in the [decision ledger](../bench/EXPERIMENT-LEDGER.md).
