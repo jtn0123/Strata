@@ -1,5 +1,9 @@
 # Strata Mac Lab
 
+## Mac workspace
+
+The maintained [Mac web interface](web/README.md) adds prompt shortcuts, responsive light/dark layouts and keyboard-accessible settings over the pinned API shell. It hides unavailable GPU readings instead of implying they are zero. Preview it without loading a model using `.venv/bin/python scripts/strata_server.py --engine mock --port 8116` from this directory. Mock response speeds are not benchmarks.
+
 ## Maintained profiles
 
 `Start Strata.command` runs the balanced P07 profile. `Start Strata - Code Editing.command` uses confirmed lookup plus MTP for edits to supplied files. Both verify provenance and use the strict app memory policy. [Adoption decisions and validation](bench/PERMANENT-PROFILES.md).

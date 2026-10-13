@@ -34,3 +34,17 @@ class OfflineGateTests(unittest.TestCase):
             gate.require_pass(root)
             source.write_text('after')
             with self.assertRaisesRegex(RuntimeError, 'stale'): gate.require_pass(root)
+
+    def test_changed_ui_asset_invalidates_a_passed_receipt(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for path in ('config', 'tests', 'scripts', 'web', 'bench/features'):
+                (root / path).mkdir(parents=True, exist_ok=True)
+            (root / 'config/offline_tests.json').write_text(json.dumps({'included': [], 'excluded': {}}))
+            asset = root / 'web/mac.js'
+            asset.write_text('before')
+            receipt = root / 'bench/features/offline-validation.json'
+            receipt.write_text(json.dumps({'status': 'passed', 'sources': gate.fingerprint(root)}))
+            gate.require_pass(root)
+            asset.write_text('after')
+            with self.assertRaisesRegex(RuntimeError, 'stale'): gate.require_pass(root)
