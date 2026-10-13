@@ -203,7 +203,7 @@ def wait_ready(process, base, timeout=600):
     raise TimeoutError("Server did not become ready within 600 seconds")
 
 
-def stream_completion(base, payload):
+def stream_completion(base, payload, observer=None):
     started, first, final = time.monotonic(), None, None
     text, ids = [], []
     req = urllib.request.Request(base + "/completion", data=json.dumps(payload).encode(),
@@ -213,6 +213,8 @@ def stream_completion(base, payload):
             if not line.startswith(b"data: "):
                 continue
             item = json.loads(line[6:])
+            if observer is not None:
+                observer(item, time.monotonic() - started)
             if first is None and (item.get("tokens") or item.get("content")):
                 first = time.monotonic()
             text.append(item.get("content", ""))

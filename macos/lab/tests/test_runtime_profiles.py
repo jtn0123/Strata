@@ -8,7 +8,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import run
 import runtime_memory
-from runtime_profiles import lookup_command
+from runtime_profiles import PROFILES, lookup_command, main as profile_main
 
 
 class RuntimeProfileTests(unittest.TestCase):
@@ -27,7 +27,7 @@ class RuntimeProfileTests(unittest.TestCase):
         self.assertEqual(actual[actual.index('--spec-ngram-mod-n-max') + 1], '3')
 
     def test_unqualified_lookup_combinations_fail_before_engine_or_launch(self):
-        for changes in (dict(model='small'), dict(draft=6), dict(engine='mtp-mma'),
+        for changes in (dict(model='small'), dict(draft=6), dict(engine='mtp-mma'), dict(batch=1536),
                         dict(m5_tuning='small-reduce-top10'), dict(cache_type='q8_0')):
             with self.subTest(changes=changes), patch.object(run, 'verify_engine') as engine, \
                     patch.object(run.subprocess, 'Popen') as launch:
@@ -37,6 +37,26 @@ class RuntimeProfileTests(unittest.TestCase):
     def test_normal_profile_does_not_enable_lookup(self):
         command = ['--spec-type', 'draft-mtp']
         self.assertEqual(lookup_command(command, self.args(lookup_profile='off')), command)
+
+    def test_invalid_chunk_sizes_are_refused_before_engine_or_model_load(self):
+        for values in (dict(batch=512,ubatch=1536),dict(batch=0),dict(ubatch=0),dict(batch=8192)):
+            with patch.object(run,'verify_engine') as engine, patch.object(run.subprocess,'Popen') as launch:
+                with self.assertRaisesRegex(ValueError,'silent clamping'):
+                    run.execute(self.args(lookup_profile='off',**values))
+                engine.assert_not_called(); launch.assert_not_called()
+
+    def test_long_document_mode_is_separate_and_selects_both_real_limits(self):
+        before=list(PROFILES['balanced']['arguments'])
+        with patch.object(run,'main') as start:
+            profile_main(['--profile','long-documents'])
+        arguments=start.call_args.args[0]
+        self.assertEqual(arguments[arguments.index('--batch')+1],'1536')
+        self.assertEqual(arguments[arguments.index('--ubatch')+1],'1536')
+        self.assertNotIn('--lookup-profile',arguments)
+        self.assertEqual(PROFILES['balanced']['arguments'],before)
+        for name in ('balanced','code-edit'):
+            a=PROFILES[name]['arguments']
+            self.assertEqual(a[a.index('--ubatch')+1],'512')
 
     def test_low_headroom_refused(self):
         with patch.object(runtime_memory.Monitor, 'baseline', return_value=dict(available_bytes=33*1024**3)), \

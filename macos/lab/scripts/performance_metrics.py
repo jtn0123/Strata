@@ -75,7 +75,7 @@ def resources(config):
 
 def tracked_service(original, mock_type, config=None):
     config = dict(config or {})
-    allowed = ('model', 'engine', 'context', 'cache_type', 'spec', 'draft', 'draft_model', 'lookup_profile', 'tensor_api', 'm5_tuning', 'ubatch', 'draft_threads', 'draft_placement', 'draft_p_min')
+    allowed = ('model', 'engine', 'context', 'cache_type', 'spec', 'draft', 'draft_model', 'lookup_profile', 'tensor_api', 'm5_tuning', 'batch', 'ubatch', 'draft_threads', 'draft_placement', 'draft_p_min')
 
     class TrackedService(original):
         def __init__(self, *args, **kwargs):

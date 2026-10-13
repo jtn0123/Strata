@@ -69,13 +69,14 @@ class PerformanceTests(unittest.TestCase):
                 self.engine=Mock(); self.engine.last={}
                 self.status={}; self.history=deque(maxlen=30)
             def metrics(self): return dict(requests=list(self.history),original='unchanged')
-        Service=perf.tracked_service(Original,Mock,dict(model='small',engine='baseline',api_key='synthetic-secret',model_path='private-path'))
+        Service=perf.tracked_service(Original,Mock,dict(model='small',engine='baseline',batch=1536,ubatch=1536,
+            api_key='synthetic-secret',model_path='private-path'))
         service=Service();service.history.append(dict(finish='stop'))
         with patch.object(perf,'resources',return_value={}): result=service.metrics()
         self.assertEqual(result['original'],'unchanged')
         self.assertEqual(service.history.maxlen,30)
         self.assertEqual(result['performance']['measurement_kind'],'mock')
-        self.assertEqual(result['performance']['settings'],dict(model='small',engine='baseline'))
+        self.assertEqual(result['performance']['settings'],dict(model='small',engine='baseline',batch=1536,ubatch=1536))
         self.assertNotIn('synthetic-secret',json.dumps(result))
         self.assertNotIn('private-path',json.dumps(result))
 

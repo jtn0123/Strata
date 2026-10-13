@@ -4,7 +4,7 @@
   const duration = (ms) => !valid(ms) ? "–" : ms > 0 && ms < 1 ? "<1 ms" : ms < 1000 ? `${fmt(ms)} ms` : `${fmt(ms / 1000, 2)} s`;
   const rate = (value) => valid(value) && value > 0 ? `${fmt(value, 1)} tok/s` : "–";
   const requestKeys = ["time", "finish", "measurement_kind", "prompt_tokens", "output_tokens", "reused", "generation_tps", "generation_source", "prompt_tps", "server_first_token_ms", "server_duration_ms", "draft_acceptance_percent"];
-  const settingKeys = ["model", "engine", "context", "cache_type", "spec", "draft", "draft_model", "lookup_profile", "tensor_api", "m5_tuning", "ubatch", "draft_threads", "draft_placement", "draft_p_min"];
+  const settingKeys = ["model", "engine", "context", "cache_type", "spec", "draft", "draft_model", "lookup_profile", "tensor_api", "m5_tuning", "batch", "ubatch", "draft_threads", "draft_placement", "draft_p_min"];
   const onlySettings = (value = {}) => Object.fromEntries(settingKeys.filter((key) => key in value).map((key) => [key, value[key]]));
   const saved = store.get("performance.history", []);
   let recorded = Array.isArray(saved) ? saved.filter((row) => row && typeof row === "object" && valid(row.time)).slice(-200) : [];
@@ -65,7 +65,8 @@
       ["Memory pressure", pressure],
     ];
     $("perf-resources").innerHTML = bits.map(([label, value]) => `<span>${esc(label)} <strong>${esc(value)}</strong></span>`).join("");
-    const identity = [metrics.engine?.model, settings.engine, settings.context && `${ctxfmt(settings.context)} context`, settings.cache_type, settings.spec, settings.draft != null && `draft ${settings.draft}`, settings.lookup_profile && `lookup ${settings.lookup_profile}`].filter(Boolean).join(" · ");
+    const chunks = valid(settings.batch) && valid(settings.ubatch) ? `prompt chunks ${settings.ubatch} / batch ${settings.batch}` : null;
+    const identity = [metrics.engine?.model, settings.engine, settings.context && `${ctxfmt(settings.context)} context`, settings.cache_type, settings.spec, settings.draft != null && `draft ${settings.draft}`, settings.lookup_profile && `lookup ${settings.lookup_profile}`, chunks].filter(Boolean).join(" · ");
     $("perf-settings").textContent = `${identity}. Server timing excludes queue/transport. Browser timing appears under your reply. Compare matched workloads and settings; recent chat measurements vary. Disk readings cover the whole Mac.`;
     const head = $("req-body").closest("table").querySelector("thead");
     head.innerHTML = "<tr><th>Time</th><th>Status</th><th class='num'>Input</th><th class='num'>Output</th><th class='num'>First token</th><th class='num'>Generation</th><th class='num'>Total</th><th class='num'>Reused</th></tr>";

@@ -19,12 +19,14 @@ from benchmark_m5_small_gains import feature_receipts
 
 import argparse
 parser=argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--profile',choices=('balanced','code-edit'),required=True)
+parser.add_argument('--profile',choices=('balanced','code-edit','long-documents'),required=True)
 parser.add_argument('--output',type=Path,required=True,help='New output directory; never overwrites a previous run')
 options=parser.parse_args() if __name__=='__main__' else None
-ROLE='control' if options and options.profile=='balanced' else 'lookup'
+ROLE='lookup' if options and options.profile=='code-edit' else 'control'
 OUT=options.output.resolve() if options else None
-LAUNCHER=ROOT/('Start Strata.command' if ROLE=='control' else 'Start Strata - Code Editing.command')
+LAUNCHERS={'balanced':'Start Strata.command','code-edit':'Start Strata - Code Editing.command',
+           'long-documents':'Start Strata - Long Documents.command'}
+LAUNCHER=ROOT/LAUNCHERS[options.profile] if options else None
 SOURCE=ROOT/'scripts/runtime_profiles.py'
 
 
@@ -62,6 +64,8 @@ def main():
             command=json.loads((runtime/'command.json').read_text())
             expected={'--spec-type':'draft-mtp' if ROLE=='control' else 'ngram-mod,draft-mtp','--spec-draft-n-max':'3',
                '--spec-draft-threads':'8','--spec-draft-p-min':'0.0'}
+            size='1536' if options.profile=='long-documents' else '512'
+            expected.update({'-b':size,'-ub':size})
             if ROLE=='lookup':expected.update({'--spec-ngram-mod-n-match':'16','--spec-ngram-mod-n-min':'1','--spec-ngram-mod-n-max':'3'})
             if any(command[command.index(k)+1]!=v for k,v in expected.items()):raise RuntimeError('Actual app command differs from qualified lookup profile')
             metal=json.loads((runtime/'metal-environment.json').read_text())
@@ -104,6 +108,20 @@ def main():
                     event=json.loads(value);pieces.append(event['choices'][0].get('delta',{}).get('content',''))
             if ''.join(pieces).strip()!='391' or not done:raise RuntimeError('Actual app SSE output/completion failed')
             record['streaming_check']=dict(passed=True,text=''.join(pieces),done_marker=done)
+            if options.profile=='long-documents':
+                from benchmark_prompt_chunks import cases, quality
+                long_case=cases()[0]
+                response=request('http://127.0.0.1:8095','/v1/chat/completions',dict(model='flash',
+                    messages=[dict(role='user',content=long_case['content'])],temperature=0,seed=1234,
+                    max_tokens=256,chat_template_kwargs=dict(enable_thinking=False)))
+                choice=response['choices'][0]
+                if choice['finish_reason']!='stop' or not quality(long_case,choice['message']['content']):
+                    raise RuntimeError('Long-document API facts or normal stop failed')
+                metrics=request('http://127.0.0.1:8095','/metrics')
+                settings=metrics['performance']['settings']
+                if settings.get('batch')!=1536 or settings.get('ubatch')!=1536:
+                    raise RuntimeError('Actual chunk settings missing from UI metrics')
+                record['long_document_check']=dict(passed=True,response=response,metrics=metrics)
             integration=subprocess.run([str(ROOT/'.venv/bin/python'),str(ROOT/'scripts/verify_integration.py'),'--model','flash'],capture_output=True,text=True,timeout=90)
             (OUT/'integration.log').write_text(integration.stdout+integration.stderr)
             record['integration_returncode']=integration.returncode;save()
@@ -127,6 +145,8 @@ def main():
             if memory['guard'] or not memory['normal_pressure_observed'] or memory['swap_growth_bytes'] or not memory['monitor_healthy'] or not memory['child_exited']:
                 record.update(status='failed',error='Actual app continuous pressure/swap/shutdown gate failed')
             record['activation']=feature_receipts((runtime/'native.log').read_text(),['reduce'])
+            from benchmark_prompt_chunks import chunk_receipt
+            record['actual_chunks']=chunk_receipt((runtime/'native.log').read_text(), size)
         assert_no_model_server()
         closed=[]
         for port in (8095,8096):
@@ -138,7 +158,7 @@ def main():
              launcher_unchanged=sha256(LAUNCHER)==record['launcher_sha256'],source_unchanged=sha256(SOURCE)==record['source_sha256'])
         save()
     if record['status']!='passed':raise RuntimeError(record.get('error','App verification failed'))
-    print('Permanent profile: English answers, complete code edit, SSE and full API integration passed; zero swap, normal pressure; both ports closed.',flush=True)
+    print('Profile API validation: English answers, complete code edit, SSE and integration passed; zero swap, normal pressure; both ports closed.',flush=True)
 
 
 if __name__=='__main__':main()

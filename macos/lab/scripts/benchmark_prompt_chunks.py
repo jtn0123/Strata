@@ -10,6 +10,7 @@ import re
 import socket
 import statistics
 import subprocess
+import time
 
 from benchmark import stream_completion, wait_ready
 from benchmark_editing import (FIXTURES, clean_memory, drafting_receipts, fixtures, power,
@@ -20,6 +21,7 @@ from benchmark_metrics import METRICS
 from capture_lookup_long import workloads as documents
 from check_memory import assert_no_model_server
 from engines import sha256, verify_engine
+from hardware_telemetry import Sampler, tool_pin
 from lab import ROOT, request, server_command
 from metal_environment import configure
 from model_provenance import assert_unchanged, verify_models
@@ -123,18 +125,23 @@ def check_frozen(frozen):
     if closure() != frozen['closure']:
         raise RuntimeError('Frozen source or engine changed; start a new campaign')
     assert_unchanged(frozen['models'])
+    if frozen.get('hardware_tool') and tool_pin() != frozen['hardware_tool']:
+        raise RuntimeError('Hardware sampler tool changed')
 
 
 def launch(folder, role, profile, frozen, draft_profile='balanced'):
     folder.mkdir()
     result = dict(status='running', role=role, profile=profile, draft_profile=draft_profile,
                   cases=[], models_loaded=False)
-    child = monitor = None
+    child = monitor = hardware = None
     try:
         assert_no_model_server(); check_frozen(frozen)
         result['settle'] = wait_for_headroom()
         result['preflight'] = preflight(False)
         result['power'] = power()
+        if frozen.get('hardware_tool'):
+            hardware = Sampler(folder)
+            hardware.start(frozen['hardware_tool'])
         with socket.socket() as sock:
             sock.bind(('127.0.0.1', 0)); port = sock.getsockname()[1]
         batch, ubatch = PROFILES[profile]
@@ -148,6 +155,7 @@ def launch(folder, role, profile, frozen, draft_profile='balanced'):
         write(folder / 'result.json', result)
         with (folder / 'native.log').open('w') as log:
             child = subprocess.Popen(command, env=env, stdout=log, stderr=log)
+            if hardware: hardware.model_pid = child.pid
             result['models_loaded'] = True
             write(folder / 'result.json', result)
             monitor = app_monitor(child, folder / 'memory.jsonl', result['memory_policy'])
@@ -163,15 +171,31 @@ def launch(folder, role, profile, frozen, draft_profile='balanced'):
                 if case['name'].startswith('long-') and not 2048 <= len(tokens) <= 3000:
                     raise ValueError('Long prompt is outside the predeclared scope')
                 for repeat in range(REPEATS):
+                    begin = time.monotonic()
+                    stream_events = []
+                    def observe(item, elapsed):
+                        stream_events.append(dict(elapsed_s=elapsed, token_count=len(item.get('tokens',[])),
+                                                  final=bool(item.get('stop'))))
+                    kwargs = dict(observer=observe) if hardware else {}
                     response = stream_completion(base, dict(prompt=tokens, n_predict=MAX_OUTPUT,
-                        temperature=0, seed=1234, cache_prompt=False, ignore_eos=False, return_tokens=True, stream=True))
+                        temperature=0, seed=1234, cache_prompt=False, ignore_eos=False, return_tokens=True, stream=True), **kwargs)
+                    end = time.monotonic()
                     row = validate_response(response)
                     timings = response['final']['timings']
                     if timings['prompt_n'] != len(tokens) or row['output_tokens'] != len(response['generated_token_ids']):
                         raise ValueError('Complete fresh prompt and exact output token counts required')
                     row.update(name=case['name'], repeat=repeat, prompt_tokens=len(tokens),
+                        begin_monotonic_s=begin, end_monotonic_s=end,
                         prompt_sha256=hashlib.sha256(json.dumps(tokens).encode()).hexdigest(),
                         quality_passed=quality(case, response['text']))
+                    if hardware:
+                        row['stream_events'] = stream_events
+                        events = [e for e in stream_events if e['token_count']>0]
+                        gaps = [b['elapsed_s']-a['elapsed_s'] for a,b in zip(events,events[1:])]
+                        row['observed_output_gaps'] = dict(samples=len(gaps),
+                            median_s=statistics.median(gaps) if gaps else None,
+                            maximum_s=max(gaps) if gaps else None,
+                            note='Client SSE inter-output gaps after first token; grouped tokens, transport/scheduling included. No GPU-kernel timing claim.')
                     result['cases'].append(row); write(folder / 'result.json', result)
                     print(f"{role}/{profile}: {case['name']} r{repeat}: prompt {row['prompt_tok_s']:.2f}, "
                           f"generation {row['generation_tok_s']:.2f} TPS, first {row['ttft_s']:.3f}s, "
@@ -185,10 +209,17 @@ def launch(folder, role, profile, frozen, draft_profile='balanced'):
             try: child.wait(timeout=5)
             except subprocess.TimeoutExpired: child.kill(); child.wait(timeout=5)
         if monitor: result['memory'] = monitor.finish()
+        if hardware:
+            result['hardware'] = hardware.stop()
+            for row in result['cases']:
+                row['hardware_window'] = hardware.window(row['begin_monotonic_s'],row['end_monotonic_s'])
         try:
             assert_no_model_server(); check_frozen(frozen)
             if result['status'] == 'completed':
                 if not clean_memory(result['memory']): raise RuntimeError('RAM/swap/cleanup gate failed')
+                if hardware and (not result['hardware']['healthy'] or
+                        not all(result['hardware']['sensor_fields_observed'].values())):
+                    raise RuntimeError('Hardware diagnostic coverage failed; original answers retained')
                 result['activation'] = feature_receipts((folder / 'native.log').read_text(), ['reduce'])
                 result['drafting'] = drafting_receipts((folder / 'native.log').read_text(), draft_profile)
                 result['actual_chunks'] = chunk_receipt((folder / 'native.log').read_text(), profile)
@@ -204,6 +235,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--candidate', choices=('1024', '1536', '256'), required=True)
     ap.add_argument('--draft-profile', choices=('balanced', 'code-edit'), default='balanced')
+    ap.add_argument('--telemetry', action='store_true', help='Owned rootless GPU/thermal/contention sampler; all arms identical')
     ap.add_argument('--output', type=Path, required=True)
     ap.add_argument('--run', action='store_true'); args = ap.parse_args()
     print(f'Plan: 512/{args.candidate}/{args.candidate}/512; {args.draft_profile}, kept engine, 4K/F16/MTP3, '
@@ -212,6 +244,7 @@ def main():
     assert_no_model_server(); require_pass()
     args.output.mkdir(parents=True, exist_ok=False)
     frozen = dict(closure=closure(), models=verify_models(['flash', 'mtp_shared_packed_q3']))
+    if args.telemetry: frozen['hardware_tool'] = tool_pin()
     result = dict(schema=1, status='running', candidate=args.candidate, draft_profile=args.draft_profile,
                   order=ORDER, arms=[], frozen=frozen,
                   prompt_cache=False, normal_eos=True, output_cap=MAX_OUTPUT, default_changed=False,
