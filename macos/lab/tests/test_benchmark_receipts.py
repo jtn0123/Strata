@@ -335,10 +335,10 @@ class BenchmarkReceiptTests(unittest.TestCase):
                 calls['count'] += 1
                 if calls['count'] == 2: raise failure
                 return original(*args, **kwargs)
+            fault = dict(request=2, decode_error=OSError('decode fixture'))
             with patch.object(benchmark_cache, 'completion_counts', validate), \
                     self.assertRaisesRegex(ValueError, 'counter fixture') as caught:
-                self.cache_campaign(root, real_engine=True, fault=dict(request=2,
-                    decode_error=OSError('decode fixture')))
+                self.cache_campaign(root, real_engine=True, fault=fault)
             self.assertIs(caught.exception, failure)
             response = self.receipt(root)['rejected_cases'][0]['followup']
             self.assertEqual(response['token_ids'], [7, 99])
@@ -375,8 +375,9 @@ class BenchmarkReceiptTests(unittest.TestCase):
                         yield 7
                         raise failure
                 tokenizer = SimpleNamespace(decode=Mock(side_effect=AssertionError('No decode after cancellation')))
+                engine = Engine()
                 with self.assertRaises(type(failure)) as caught:
-                    benchmark_cache.measure(Engine(), tokenizer, [1, 2, 3])
+                    benchmark_cache.measure(engine, tokenizer, [1, 2, 3])
                 self.assertIs(caught.exception, failure)
                 tokenizer.decode.assert_not_called()
                 self.assertEqual(caught.exception.benchmark_response['token_ids'], [7])
@@ -389,9 +390,10 @@ class BenchmarkReceiptTests(unittest.TestCase):
                 predicted_per_second=50, prompt_per_second=500)}
             def generate(self, *args): yield from [7, 8]
         tokenizer = SimpleNamespace(base='http://unused', decode=Mock(side_effect=AssertionError('Use bounded decode')))
+        engine = Engine()
         with patch.object(benchmark_cache, 'request', return_value={'content': 'partial fixture'}) as request, \
                 self.assertRaisesRegex(ValueError, 'normal-EOS') as caught:
-            benchmark_cache.measure(Engine(), tokenizer, [1, 2, 3])
+            benchmark_cache.measure(engine, tokenizer, [1, 2, 3])
         request.assert_called_once_with('http://unused', '/detokenize', {'tokens': [7, 8]}, timeout=2)
         tokenizer.decode.assert_not_called()
         self.assertEqual(caught.exception.benchmark_response['text'], 'partial fixture')

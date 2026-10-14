@@ -74,8 +74,9 @@ class MetricTests(unittest.TestCase):
                     stack.enter_context(patch.object(benchmark, name, value))
                 stack.enter_context(patch.object(benchmark.urllib.request, 'urlopen', side_effect=response))
                 stack.enter_context(patch.object(benchmark.psutil, 'swap_memory', return_value=SimpleNamespace(used=0)))
+                args = helper.args()
                 with self.assertRaisesRegex(ValueError, 'Native output count differs'):
-                    benchmark.run(helper.args())
+                    benchmark.run(args)
             record = helper.receipt(root)
             self.assertEqual(record['status'], 'failed')
             self.assertEqual(record['cases'], [])
