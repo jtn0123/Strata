@@ -147,7 +147,7 @@ trial.main()
 
 
 class LegacyBenchmarkTerminationTests(unittest.TestCase):
-    def check_termination(self, stopping, during_spawn=False):
+    def check_termination(self, stopping, during_spawn=False, during_cleanup=False):
         for name in ('benchmark', 'benchmark_cache'):
             with self.subTest(driver=name, during_spawn=during_spawn), tempfile.TemporaryDirectory(prefix='strata-legacy-stop-') as temporary:
                 root=Path(temporary)
@@ -160,7 +160,8 @@ class LegacyBenchmarkTerminationTests(unittest.TestCase):
                     (root/'scripts'/script).write_text('owned fixture')
                 marker=root/'child.json';finished=root/'monitor-finished';observed=root/'observer-ready'
                 fake=root/'owned-fixture'
-                fake.write_text('#!'+sys.executable+'\nimport json,os,time\nfrom pathlib import Path\n'
+                fake.write_text('#!'+sys.executable+'\nimport json,os,signal,time\nfrom pathlib import Path\n'
+                    + ('signal.signal(signal.SIGTERM,signal.SIG_IGN)\n' if during_cleanup else '')
                     +'Path('+repr(str(marker))+').write_text(json.dumps({"pid":os.getpid()}))\n'
                     +'while True:time.sleep(1)\n')
                 fake.chmod(0o700)
@@ -190,6 +191,38 @@ trial.Monitor=Monitor
 def wait(*a,**kw):
     while True:time.sleep(.02)
 trial.wait_ready=wait
+if '''+repr(during_cleanup)+''':
+    def ready(*a,**kw):
+        observed=Path('''+repr(str(observed))+''')
+        deadline=time.monotonic()+10
+        while not observed.exists() and time.monotonic()<deadline:time.sleep(.01)
+        if not observed.exists():raise RuntimeError('Fixture observer not ready')
+        return 0
+    trial.wait_ready=ready
+    trial.request=lambda *a,**kw:{}
+    # Complete only fixture workload callbacks so the first stop arrives in the
+    # real natural-shutdown path, rather than startup or measurement.
+    trial.measure_workloads=lambda *a:None
+    trial._CacheSession=lambda *a:None
+    trial._paired_histories=lambda *a:None
+    trial._cache_state_checks=lambda *a:None
+    spawn=trial.subprocess.Popen
+    def cleanup_spawn(*a,**kw):
+        child=spawn(*a,**kw)
+        original_wait=child.wait
+        injected=False
+        def cleanup_wait(timeout=None):
+            nonlocal injected
+            if not injected:
+                injected=True
+                os.kill(os.getpid(),'''+str(int(stopping))+''')
+                os.kill(os.getpid(),'''+str(int(stopping))+''')
+            # The production timeout remains10s. Bound only this deliberately
+            # SIGTERM-ignoring fixture so escalation is exercised quickly.
+            return original_wait(timeout=min(timeout,.1) if timeout is not None else None)
+        child.wait=cleanup_wait
+        return child
+    trial.subprocess.Popen=cleanup_spawn
 if '''+repr(during_spawn)+''':
     spawn=trial.subprocess.Popen
     def held_spawn(*a,**kw):
@@ -214,7 +247,7 @@ trial.run(args)
                     if not marker.exists():self.fail('Owned fixture did not start: '+str(process.communicate(timeout=2)))
                     owned=psutil.Process(json.loads(marker.read_text())['pid']);created=owned.create_time()
                     self.assertIn(str(fake),owned.cmdline())
-                    if during_spawn:observed.write_text('identified owned fixture')
+                    if during_spawn or during_cleanup:observed.write_text('identified owned fixture')
                     else:process.send_signal(stopping)
                     stdout,stderr=process.communicate(timeout=15)
                     self.assertNotEqual(process.returncode,0)
@@ -239,7 +272,8 @@ trial.run(args)
                         except psutil.NoSuchProcess:pass
                     if owned and BenchmarkTerminationTests.alive(owned):
                         self.assertEqual(owned.create_time(),created);self.assertIn(str(fake),owned.cmdline())
-                        owned.terminate()
+                        if during_cleanup:owned.kill()
+                        else:owned.terminate()
                         try:owned.wait(timeout=5)
                         except psutil.TimeoutExpired:owned.kill();owned.wait(timeout=5)
 
@@ -249,6 +283,12 @@ trial.run(args)
     def test_sigterm_during_legacy_spawn_publishes_ownership(self):self.check_termination(signal.SIGTERM,True)
     def test_ctrl_c_during_legacy_spawn_publishes_ownership(self):self.check_termination(signal.SIGINT,True)
     def test_sighup_during_legacy_spawn_publishes_ownership(self):self.check_termination(signal.SIGHUP,True)
+    def test_sigterm_during_cleanup_reaps_legacy_children_and_finalizes_monitor(self):
+        self.check_termination(signal.SIGTERM,during_cleanup=True)
+    def test_ctrl_c_during_cleanup_reaps_legacy_children_and_finalizes_monitor(self):
+        self.check_termination(signal.SIGINT,during_cleanup=True)
+    def test_sighup_during_cleanup_reaps_legacy_children_and_finalizes_monitor(self):
+        self.check_termination(signal.SIGHUP,during_cleanup=True)
 
 
 if __name__=='__main__':unittest.main()

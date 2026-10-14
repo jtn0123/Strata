@@ -7,6 +7,17 @@ runtime evidence; cosmetic preferences and uncertain candidates are separate.
 
 ## Confirmed findings
 
+The independent PR audit at `5d689af` subsequently identified three regressions
+and an older cancellation window. Its follow-up corrections preserve sampling
+sharing choices across Reset and delayed reads, install the frozen quality tools
+required by the ordinary offline gate, and retain rejected benchmark responses
+outside timing aggregates. Cancellation during natural benchmark cleanup now
+waits for owned-child termination/escalation/reaping and monitor finalization,
+then propagates after saving the failed receipt. New tests cover all three stop
+signals on both maintained drivers, all cache request phases, partial transports,
+nonfinite counters, short outputs and missing rate fields. Raw audit probes and
+failed receipts remain local and ignored; these fixes add no model-speed claim.
+
 All entries below are corrected in this pass. Impact describes the old behavior;
 effort describes the scope of its correction. Tests use synthetic content.
 

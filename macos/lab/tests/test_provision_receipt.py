@@ -63,3 +63,41 @@ class ProvisionTests(unittest.TestCase):
                  patch.object(provision, 'verify_engine', side_effect=FileNotFoundError('missing receipt')), patch.object(provision, 'run') as run:
                 with self.assertRaises(FileNotFoundError): provision.main(['--check-only'])
                 run.assert_not_called()
+
+    def test_bootstrap_installs_locked_quality_tools_before_native_builds(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.fixture(directory); uv = root / 'uv'; uv.touch()
+            commands = []
+            with patch.object(provision, 'ROOT', root), patch.object(provision, 'preflight', return_value={
+                    'build_flags': [], 'llama_cpp': {}, 'strata_macos': {}}), \
+                    patch.object(provision, 'source_check'), \
+                    patch.object(provision.shutil, 'which', return_value=str(uv)), \
+                    patch.object(provision, 'run', side_effect=lambda command: commands.append(list(map(str, command)))), \
+                    patch.object(provision, 'write_receipt'), patch.object(provision, 'verify_engine'):
+                provision.main([])
+            installs = [command for command in commands if command[1:3] == ['pip', 'install']]
+            quality = next((command for command in installs if 'requirements-quality.lock' in command), None)
+            self.assertIsNotNone(quality, 'The mandatory offline coverage tests need their pinned tools')
+            self.assertIn('--require-hashes', quality)
+            self.assertEqual(quality[quality.index('--only-binary') + 1], ':all:')
+            self.assertEqual(quality[quality.index('--python') + 1], '.venv/bin/python')
+            self.assertLess(commands.index(quality), next(index for index, command in enumerate(commands) if '-S' in command))
+
+    def test_failed_quality_install_stops_before_build_or_receipt_publication(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.fixture(directory); uv = root / 'uv'; uv.touch()
+            commands = []
+            def install(command):
+                commands.append(list(map(str, command)))
+                if 'requirements-quality.lock' in command:
+                    raise RuntimeError('quality wheel verification failed')
+            with patch.object(provision, 'ROOT', root), patch.object(provision, 'preflight', return_value={
+                    'build_flags': [], 'llama_cpp': {}, 'strata_macos': {}}), \
+                    patch.object(provision, 'source_check'), \
+                    patch.object(provision.shutil, 'which', return_value=str(uv)), \
+                    patch.object(provision, 'run', side_effect=install), \
+                    patch.object(provision, 'write_receipt') as receipt, patch.object(provision, 'verify_engine') as verify:
+                with self.assertRaisesRegex(RuntimeError, 'quality wheel verification failed'):
+                    provision.main([])
+            self.assertFalse(any('-S' in command or '--build' in command for command in commands))
+            receipt.assert_not_called(); verify.assert_not_called()

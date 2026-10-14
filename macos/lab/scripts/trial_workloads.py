@@ -9,6 +9,8 @@ from pathlib import Path
 from typing import Any, Protocol, cast
 import urllib.request
 
+from benchmark_metrics import attach_response_failure
+
 JSONDict = dict[str, Any]
 
 
@@ -45,6 +47,38 @@ class TrialWorkloads:
     swap_used: Callable[[], int]
 
 
+def _validate_case(context: TrialWorkloads, case: JSONDict, cached: bool = False) -> None:
+    try:
+        if cached:
+            context.case_metrics(case, cached=True)
+        else:
+            context.case_metrics(case)
+    except BaseException as error:
+        attach_response_failure(error, case)
+        raise
+
+
+def _completed_case(context: TrialWorkloads, result: JSONDict, fields: JSONDict) -> JSONDict:
+    case = {**fields, "response": result}
+    try:
+        timings = result["final"]["timings"]
+        case.update(
+            ttft_s=result["ttft_s"],
+            wall_s=result["wall_s"],
+            prompt_tok_s=timings["prompt_per_second"],
+            generation_tok_s=timings["predicted_per_second"],
+            output_tokens=timings["predicted_n"],
+        )
+        if timings["prompt_n"] != case["prompt_tokens"] or timings["predicted_n"] != context.args.predict:
+            label = "Benchmark" if case["workload"] == "synthetic" else "Real-workload"
+            raise RuntimeError(f"{label} token count mismatch: {timings}")
+        context.case_metrics(case)
+        return case
+    except BaseException as error:
+        attach_response_failure(error, case)
+        raise
+
+
 def _synthetic_case(
     context: TrialWorkloads, prompt: list[int], length: int, repetition: int, prompt_hash: str
 ) -> JSONDict:
@@ -62,26 +96,19 @@ def _synthetic_case(
     swap_before = context.swap_used()
     result = context.stream_completion(context.base, payload)
     io_after = context.disk_io_counters()
-    timings = result["final"]["timings"]
-    case = {
-        "prompt_tokens": length,
-        "repeat": repetition + 1,
-        "prompt_sha256": prompt_hash,
-        "workload": "synthetic",
-        "ttft_s": result["ttft_s"],
-        "wall_s": result["wall_s"],
-        "prompt_tok_s": timings["prompt_per_second"],
-        "generation_tok_s": timings["predicted_per_second"],
-        "output_tokens": timings["predicted_n"],
-        "response": result,
-        "system_disk_read_bytes": io_after.read_bytes - io_before.read_bytes if io_before and io_after else None,
-        "swap_before_bytes": swap_before,
-        "swap_after_bytes": context.swap_used(),
-    }
-    if timings["prompt_n"] != length or timings["predicted_n"] != context.args.predict:
-        raise RuntimeError(f"Benchmark token count mismatch: {timings}")
-    context.case_metrics(case)
-    return case
+    return _completed_case(
+        context,
+        result,
+        {
+            "prompt_tokens": length,
+            "repeat": repetition + 1,
+            "prompt_sha256": prompt_hash,
+            "workload": "synthetic",
+            "system_disk_read_bytes": io_after.read_bytes - io_before.read_bytes if io_before and io_after else None,
+            "swap_before_bytes": swap_before,
+            "swap_after_bytes": context.swap_used(),
+        },
+    )
 
 
 def _synthetic_workloads(context: TrialWorkloads) -> None:
@@ -181,22 +208,16 @@ def _real_workloads(context: TrialWorkloads) -> None:
                     "return_tokens": True,
                 },
             )
-            timings = result["final"]["timings"]
-            if timings["prompt_n"] != len(prompt) or timings["predicted_n"] != context.args.predict:
-                raise RuntimeError(f"Real-workload token count mismatch: {timings}")
-            case = {
-                "workload": name,
-                "prompt_tokens": len(prompt),
-                "repeat": repetition + 1,
-                "prompt_sha256": prompt_hash,
-                "ttft_s": result["ttft_s"],
-                "wall_s": result["wall_s"],
-                "prompt_tok_s": timings["prompt_per_second"],
-                "generation_tok_s": timings["predicted_per_second"],
-                "output_tokens": timings["predicted_n"],
-                "response": result,
-            }
-            context.case_metrics(case)
+            case = _completed_case(
+                context,
+                result,
+                {
+                    "workload": name,
+                    "prompt_tokens": len(prompt),
+                    "repeat": repetition + 1,
+                    "prompt_sha256": prompt_hash,
+                },
+            )
             record["warmups" if repetition < 0 else "cases"].append(case)
             save()
             print(
@@ -279,7 +300,7 @@ def _cached_workloads(context: TrialWorkloads) -> None:
                 "expected": workload["expected"],
                 **result,
             }
-            context.case_metrics(case, cached=True)
+            _validate_case(context, case, cached=True)
             record["cached_cases"].append(case)
             save()
             print(
@@ -307,3 +328,53 @@ def measure_workloads(context: TrialWorkloads) -> None:
         context.save()
     with urllib.request.urlopen(context.base + "/metrics") as response:
         (context.folder / "metrics.txt").write_bytes(response.read())
+
+
+class LedgerTemplate(Protocol):
+    def render(self, messages: Sequence[JSONDict], *, enable_thinking: bool = False) -> str: ...
+
+
+class LedgerTokenizer(Protocol):
+    def encode(self, text: str, parse_special: bool = False) -> list[int]: ...
+
+
+def cache_workload(template: LedgerTemplate, tokenizer: LedgerTokenizer, budget: int, variant: int) -> JSONDict:
+    system = {
+        "role": "system",
+        "content": "Use the supplied ledger. Do not guess labels. Follow the requested output format.",
+    }
+    rows: list[str] = []
+    labels: list[str] = []
+    messages: list[JSONDict] | None = None
+    for n in range(300):
+        label = f"{['cedar', 'violet', 'basil', 'amber'][n % 4]}-{10000 + variant * 317 + n * 43}"
+        row = f"R{n:03d}: label={label}; count={(n * 17 + 11) % 97}; color={['red', 'green', 'blue'][n % 3]}."
+        candidate = [
+            system,
+            {
+                "role": "user",
+                "content": "Keep this ledger for my next question. Reply only READY.\n" + "\n".join(rows + [row]),
+            },
+        ]
+        ids = tokenizer.encode(template.render(candidate, enable_thinking=False), parse_special=True)
+        if len(ids) > budget and rows:
+            break
+        rows.append(row)
+        labels.append(label)
+        messages = candidate
+    targets = [len(rows) // 4, len(rows) // 2, len(rows) - 1]
+    question = (
+        "Give only the labels for " + ", ".join(f"R{n:03d}" for n in targets) + ", in that order, separated by commas."
+    )
+    return {"messages": messages, "question": question, "expected": [labels[n] for n in targets], "records": len(rows)}
+
+
+def cache_stop_tokens(tokenizer: LedgerTokenizer) -> set[int]:
+    stops = set()
+    for text in ("<|im_end|>", "<|endoftext|>"):
+        ids = tokenizer.encode(text, parse_special=True)
+        if len(ids) == 1:
+            stops.add(ids[0])
+    if not stops:
+        raise ValueError("No supported end-of-turn token found for cache benchmark")
+    return stops

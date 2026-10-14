@@ -1,14 +1,30 @@
 """Reject invalid measurements before aggregation or percentage calculation."""
 
+import json
 import math
 import statistics
 from collections.abc import Mapping, Sequence
-from typing import Literal, TypedDict, cast
+from typing import Literal, Protocol, TypedDict, cast
 
 type MetricName = Literal["generation_tok_s", "prompt_tok_s", "ttft_s", "wall_s"]
 type Number = int | float
 type Rates = dict[MetricName, Number]
 METRICS: tuple[MetricName, ...] = ("generation_tok_s", "prompt_tok_s", "ttft_s", "wall_s")
+
+
+class RejectedEvidence(Protocol):
+    benchmark_response: dict[str, object]
+
+
+def attach_response_failure(error: BaseException, response: Mapping[str, object]) -> None:
+    """Retain JSON-native rejected evidence without changing the original error.
+
+    Native JSON may contain invalid nonfinite counters. Keep them as explicit
+    diagnostic strings, so a strict receipt can be saved without publishing TPS.
+    """
+    evidence = dict(response, status="rejected", error=f"{type(error).__name__}: {error}")
+    safe = cast(dict[str, object], json.loads(json.dumps(evidence), parse_constant=str))
+    cast(RejectedEvidence, error).benchmark_response = safe
 
 
 class TimingEvidence(TypedDict, total=False):

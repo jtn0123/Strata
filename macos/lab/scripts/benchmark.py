@@ -5,6 +5,7 @@ import argparse
 import csv
 from datetime import UTC, datetime
 import fcntl
+import hashlib
 import json
 import platform
 import socket
@@ -18,11 +19,11 @@ from typing import Any, NamedTuple
 
 import psutil
 from lab import ROOT, request, server_command
-from engines import ENGINES, verify_engine
+from engines import ENGINES, sha256, verify_engine
 from draft_vocab import experiment_environment
 from check_memory import assert_no_model_server
 from metal_environment import TUNING, configure
-from benchmark_metrics import case_metrics, completion_counts
+from benchmark_metrics import attach_response_failure, case_metrics, completion_counts
 from benchmark_signals import cleanup_on_termination, defer_termination
 from model_provenance import ModelVerification, assert_unchanged, verify_models
 from memory_monitor import Monitor as Monitor, OwnedProcess, wait_ready as wait_ready
@@ -77,36 +78,61 @@ def stream_completion(
     req = urllib.request.Request(
         base + "/completion", data=json.dumps(payload).encode(), headers={"Content-Type": "application/json"}
     )
-    with urllib.request.urlopen(req, timeout=600) as response:
-        for line in response:
-            if not line.startswith(b"data: "):
-                continue
-            item = json.loads(line[6:])
-            if observer is not None:
-                observer(item, time.monotonic() - started)
-            if first is None and (item.get("tokens") or item.get("content")):
-                first = time.monotonic()
-            text.append(item.get("content", ""))
-            ids.extend(item.get("tokens", []))
-            if item.get("stop"):
-                final = item
-    elapsed = time.monotonic() - started
-    if final is None or first is None:
-        raise RuntimeError("Streaming response has no first token or final timing record")
+    try:
+        with urllib.request.urlopen(req, timeout=600) as response:
+            for line in response:
+                if not line.startswith(b"data: "):
+                    continue
+                item = json.loads(line[6:])
+                if observer is not None:
+                    observer(item, time.monotonic() - started)
+                if first is None and (item.get("tokens") or item.get("content")):
+                    first = time.monotonic()
+                text.append(item.get("content", ""))
+                ids.extend(item.get("tokens", []))
+                if item.get("stop"):
+                    final = item
+        elapsed = time.monotonic() - started
+        if final is None or first is None:
+            raise RuntimeError("Streaming response has no first token or final timing record")
+        prompt = payload.get("prompt")
+        completion_counts(
+            final["timings"],
+            ids,
+            len(prompt) if isinstance(prompt, list) else None,
+            cached=bool(payload.get("cache_prompt")),
+            max_new=payload.get("n_predict"),
+        )
+        return {
+            "ttft_s": first - started,
+            "wall_s": elapsed,
+            "text": "".join(text),
+            "generated_token_ids": ids,
+            "final": final,
+        }
+    except BaseException as error:
+        attach_response_failure(error, _rejected_stream(started, first, text, ids, final, payload))
+        raise
+
+
+def _rejected_stream(
+    started: float,
+    first: float | None,
+    text: Sequence[Any],
+    ids: Sequence[Any],
+    final: JSONDict | None,
+    payload: JSONDict,
+) -> JSONDict:
     prompt = payload.get("prompt")
-    completion_counts(
-        final["timings"],
-        ids,
-        len(prompt) if isinstance(prompt, list) else None,
-        cached=bool(payload.get("cache_prompt")),
-        max_new=payload.get("n_predict"),
-    )
     return {
-        "ttft_s": first - started,
-        "wall_s": elapsed,
-        "text": "".join(text),
-        "generated_token_ids": ids,
+        "ttft_s": None if first is None else first - started,
+        "wall_s": time.monotonic() - started,
+        "text": "".join(part for part in text if isinstance(part, str)),
+        "content_fragments": list(text),
+        "generated_token_ids": list(ids),
         "final": final,
+        "prompt_token_ids": prompt,
+        "prompt_sha256": hashlib.sha256(json.dumps(prompt).encode()).hexdigest(),
     }
 
 
@@ -205,6 +231,7 @@ def _prepare_trial(args: argparse.Namespace, run_id: str, engine: str, receipt: 
         "method": "Single slot, full Metal offload, fixed seed 1234; sampling temperature is recorded in settings. Exact synthetic chat prompt sizes and fixed output count from settings; no prompt reuse; ignore EOS for timing only. No model downloads during a run. Warm OS file cache is uncontrolled. TTFT includes HTTP and prompt evaluation. Correctness checks use normal EOS handling.",
     }
     record = receipt.record
+    record["workload_sha256"] = sha256(Path(__file__).with_name("trial_workloads.py"))
     _source_receipts(record)
     record["binary_version"] = command_output([command[0], "--version"])
     if args.spec == "draft-mtp":
@@ -214,6 +241,11 @@ def _prepare_trial(args: argparse.Namespace, run_id: str, engine: str, receipt: 
 
 
 def _stop_trial(process: OwnedProcess | None, monitor: Monitor | None, record: JSONDict) -> None:
+    with defer_termination():
+        _finalize_owned_trial(process, monitor, record)
+
+
+def _finalize_owned_trial(process: OwnedProcess | None, monitor: Monitor | None, record: JSONDict) -> None:
     if process and process.poll() is None:
         process.terminate()
         try:
@@ -286,6 +318,8 @@ def _finish_trial(
     except BaseException as error:
         record.update(status="failed", cleanup_error=f"{type(error).__name__}: {error}")
         record.setdefault("error", record["cleanup_error"])
+        if isinstance(error, (KeyboardInterrupt, SystemExit)):
+            raise
     finally:
         receipt.save()
 
@@ -355,6 +389,9 @@ def run(args: argparse.Namespace) -> JSONDict:
             )
         except BaseException as error:
             receipt.record["status"], receipt.record["error"] = "failed", f"{type(error).__name__}: {error}"
+            response = getattr(error, "benchmark_response", None)
+            if response is not None:
+                receipt.record.setdefault("rejected_cases", []).append({"stage": "measurement", "response": response})
             raise
         finally:
             _finish_trial(engine, prepared, process, monitor, folder, receipt)

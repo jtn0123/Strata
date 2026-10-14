@@ -47,8 +47,11 @@ Sonar's automatic analysis and the coverage gate are separate checks.
 
 ## Run
 
-Use frozen runtime/quality locks in a development environment. Model runtime pins
-remain unchanged; quality tools are development dependencies. Python 3.12 and
+Use frozen runtime/quality locks in a development environment. Lab provisioning
+installs the quality lock so its mandatory offline coverage tests work in `.venv`;
+existing environments can install that lock without rebuilding native code, using
+the command in the lab README. Model runtime pins remain unchanged; quality tools
+are development dependencies. Python 3.12 and
 supported Node 22.13+ or Node 24+ are required.
 
 ```sh

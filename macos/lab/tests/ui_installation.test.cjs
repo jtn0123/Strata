@@ -190,6 +190,28 @@ test('whole installation preserves lexical sampling state and deliberate cancell
   assert.equal(page.document.getElementById('send-btn').disabled, false);
 });
 
+for (const [choice, clicks, expectedShare] of [['enabled', 1, true], ['disabled', 2, false], ['untouched', 0, true]]) {
+  test(`whole sampling Reset retains ${choice} sharing with a delayed settings read`, async () => {
+    const page = installation({stored: {sampling: {thinking: 'low', temperature: 0.4, max: '128', show: false}}});
+    scripts.forEach(page.execute);
+    page.document.getElementById('sampling-btn').click();
+    for (let click = 0; click < clicks; click++) page.document.getElementById('s-share').click();
+    page.document.getElementById('s-reset').click();
+    page.answer('/settings', Response.json({shared: true}));
+    await until(() => page.document.getElementById('shared-status').textContent === '');
+    assert.equal(page.evaluate('sharedOn'), true, 'the delayed read records the server state');
+    assert.equal(page.document.getElementById('s-share').getAttribute('aria-checked'), String(expectedShare));
+    const applying = page.document.getElementById('s-apply').onclick();
+    const post = page.requests.find((request) => request.resource === '/settings' && request.options.method === 'POST');
+    assert.ok(post, 'Apply writes the intended sharing state');
+    assert.deepEqual(JSON.parse(post.options.body), {defaults: expectedShare
+      ? {reasoning_effort: 'high', temperature: 0.6, top_p: 0.95, top_k: 20} : null});
+    post.resolve(Response.json({shared: expectedShare})); await applying;
+    assert.deepEqual(JSON.parse(page.storage.get('strata.sampling')),
+      {thinking: 'high', temperature: 0.6, top_p: 0.95, top_k: 20, max: '', seed: '', show: true, esp: true});
+  });
+}
+
 function metricsSample(rows = [], kind = 'mock') {
   return {live: {state: 'idle'}, hardware: {}, engine: {model: 'mock'}, requests: rows,
     performance: {schema: 1, measurement_kind: kind, settings: {model: 'mock', context: 4096, engine: 'mock'},

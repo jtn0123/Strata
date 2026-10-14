@@ -165,6 +165,13 @@
     const sharing = new StrataSharedSettings();
     let sharingKnown = false;
     $("s-share").addEventListener("click", () => sharing.edited());
+    const resetSampling = $("s-reset").onclick;
+    $("s-reset").onclick = () => {
+      // Sampling defaults do not include the choice to share with other apps.
+      const share = $("s-share").getAttribute("aria-checked");
+      resetSampling();
+      $("s-share").setAttribute("aria-checked", share);
+    };
     loadShared = () => {
       sharingKnown = false;
       $("shared-status").textContent = "Checking settings for other apps…";

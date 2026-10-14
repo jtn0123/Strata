@@ -23,8 +23,8 @@ responsibility boundaries and retained behavior determine whether a split helps.
 
 | Code / metric | Before | After |
 | --- | ---: | ---: |
-| Main benchmark file | 532 | 365 |
-| `benchmark.run` function | 247 | 68 |
+| Main benchmark file | 532 | 402 |
+| `benchmark.run` function | 247 | 71 |
 | `benchmark_cache.run` function | 166 | 42 |
 | `run.execute` launcher function | 159 | 37 |
 | Monitor render cyclomatic complexity | 23 | 10 |
@@ -33,7 +33,7 @@ responsibility boundaries and retained behavior determine whether a split helps.
 | Python targets with additional strict checks | 2 | 13 |
 
 Some files grow when named contracts and previously compressed code are expanded.
-The cache file is 463 lines after this pass; the main UI file is 365. Containing
+The cache file is 500 lines after this pass; the main UI file is 372. Containing
 private JS IIFEs include their nested named helpers and are not claimed below 80
 physical lines. Their complexity and individual helpers are checked separately.
 

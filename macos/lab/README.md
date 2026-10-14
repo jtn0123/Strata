@@ -62,6 +62,16 @@ For the complete optional M5 engine/helper/diagnostic chain, use [the ordered pr
 
 Prerequisites: native ARM64 macOS, Apple's Command Line Tools, Python 3 and `uv`. The build embeds Metal source for runtime compilation, so the standalone Metal compiler is not required for this initial path. This does not establish that every optional Metal 4 tensor optimization is enabled.
 
+Provisioning installs the frozen development quality tools into the lab environment
+alongside its existing runtime packages, so the mandatory offline inventory can
+run its coverage contracts. To update an already provisioned environment without
+rebuilding native code:
+
+```sh
+uv pip install --python .venv/bin/python --only-binary :all: --require-hashes -r requirements-quality.lock
+.venv/bin/python scripts/validate_offline.py
+```
+
 ```sh
 uv run --python 3.12 --no-project python scripts/provision.py --jobs 1
 .venv/bin/python scripts/download_models.py small

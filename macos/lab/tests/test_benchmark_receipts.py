@@ -120,12 +120,16 @@ class BenchmarkReceiptTests(unittest.TestCase):
             self.assertEqual(record['memory']['swap_growth_bytes'], 3*1024**3)
             self.assertEqual(record['status'], 'failed')
 
-    def cache_campaign(self, root, *, hits=True, memory=None, real_engine=False):
-        active = {'messages': []}
+    def cache_campaign(self, root, *, hits=True, memory=None, real_engine=False, fault=None):
+        active = {'messages': [], 'request': 0}
         class Tokenizer:
             def __init__(self, *a): pass
             def encode(self, messages, **kw): return [99] if isinstance(messages, str) else messages
-            def decode(self, ids): return text_for(active['messages'])
+            def decode(self, ids):
+                if fault and active['request'] == fault['request']:
+                    if fault.get('decode_error'): raise fault['decode_error']
+                    return fault.get('text', 'rejected fixture')
+                return text_for(active['messages'])
         class Template:
             def __init__(self, *a): pass
             def render(self, messages, **kw): return messages
@@ -148,12 +152,17 @@ class BenchmarkReceiptTests(unittest.TestCase):
             def __init__(self, *a, **kw): self.sock = self; self.payload = {}
             def request(self, method, path, body, **kw):
                 self.payload = json.loads(body); active['messages'] = self.payload['prompt']
+                active['request'] += 1
             def getresponse(self): return self
             def __iter__(self):
                 reused = int(self.payload['cache_prompt'])
-                for row in (dict(tokens=[7]), dict(tokens=[99]), dict(stop=True, timings=dict(
-                        predicted_n=2, predicted_per_second=50, predicted_ms=40, prompt_ms=10,
-                        prompt_per_second=500, prompt_n=len(self.payload['prompt'])-reused, cache_n=reused))):
+                defect = fault if fault and active['request'] == fault['request'] else {}
+                timings = dict(predicted_n=2, predicted_per_second=50, predicted_ms=40, prompt_ms=10,
+                    prompt_per_second=500, prompt_n=len(self.payload['prompt'])-reused, cache_n=reused)
+                timings.update(defect.get('timings', {}))
+                yield b'data: '+json.dumps(dict(tokens=defect.get('tokens', [7, 99]))).encode()+b'\n'
+                if defect.get('error'): raise defect['error']
+                for row in (dict(stop=True, timings=timings),):
                     yield b'data: '+json.dumps(row).encode()+b'\n'
             def shutdown(self, *a): pass
             def close(self): pass
@@ -238,6 +247,167 @@ class BenchmarkReceiptTests(unittest.TestCase):
             tokenizer = SimpleNamespace(decode=lambda ids: 'fixture')
             with self.subTest(timings=timings, tokens=tokens), self.assertRaises(ValueError):
                 benchmark_cache.measure(engine, tokenizer, [1, 2, 3])
+
+    def test_rejected_cache_phases_preserve_raw_response_and_prior_evidence(self):
+        for request, stage, completed, cap in ((1, 'prime', 0, 16), (2, 'followup', 0, 96),
+                                              (9, 'seed', 4, 32), (10, 'cache_on', 4, 96),
+                                              (11, 'cache_off', 4, 96)):
+            with self.subTest(stage=stage), tempfile.TemporaryDirectory() as folder:
+                root = self.root(folder)
+                tokens = [7] * cap
+                fault = dict(request=request, tokens=tokens, timings=dict(predicted_n=cap))
+                with self.assertRaisesRegex(ValueError, 'normal-EOS'):
+                    self.cache_campaign(root, real_engine=True, fault=fault)
+                record = self.receipt(root)
+                self.assertEqual(record['status'], 'failed')
+                self.assertEqual(len(record['cases']), completed)
+                rejected = record['rejected_cases'][0]
+                self.assertEqual((rejected['status'], rejected['stage']), ('rejected', stage))
+                response = rejected[stage]
+                self.assertEqual(response['status'], 'rejected')
+                self.assertEqual(response['token_ids'], tokens)
+                self.assertEqual(response['text'], 'rejected fixture')
+                self.assertEqual(response['native_timings']['predicted_n'], cap)
+                self.assertEqual(response['max_new'], cap)
+                self.assertEqual(response['prompt_sha256'], hashlib.sha256(
+                    json.dumps(response['prompt_token_ids']).encode()).hexdigest())
+                if stage == 'followup': self.assertEqual(rejected['prime']['token_ids'], [7, 99])
+                if stage in ('cache_on', 'cache_off'): self.assertEqual(rejected['seed']['token_ids'], [7, 99])
+                if stage == 'cache_off': self.assertEqual(rejected['cache_on']['token_ids'], [7, 99])
+
+    def test_rejected_cache_counter_and_semantic_failures_remain_auditable(self):
+        faults = (dict(request=1, text='WRONG', error_text='ledger instruction'),
+                  dict(request=2, timings=dict(predicted_n=999), error_text='output count'),
+                  dict(request=4, timings=dict(cache_n=0, prompt_n=3), error_text='did not reuse'))
+        for fault in faults:
+            with self.subTest(fault=fault), tempfile.TemporaryDirectory() as folder:
+                root = self.root(folder)
+                expected = AssertionError if fault['request'] in (1, 4) else ValueError
+                with self.assertRaisesRegex(expected, fault['error_text']):
+                    self.cache_campaign(root, real_engine=True, fault=fault)
+                record = self.receipt(root)
+                rejected = record['rejected_cases'][0]
+                self.assertEqual(rejected['status'], 'rejected')
+                response = rejected['prime'] if fault['request'] == 1 else rejected['followup']
+                self.assertEqual(response['text'], fault.get('text', 'rejected fixture'))
+                if fault['request'] == 2: self.assertEqual(response['native_timings']['predicted_n'], 999)
+                if fault['request'] == 4: self.assertEqual(response['native_timings']['cache_n'], 0)
+
+    def test_complete_wrong_answers_retain_legacy_pair_and_diagnostic_semantics(self):
+        for request in (6, 10):
+            with self.subTest(request=request), tempfile.TemporaryDirectory() as folder:
+                root = self.root(folder)
+                with self.assertRaises(SystemExit):
+                    self.cache_campaign(root, real_engine=True, fault=dict(request=request, text='WRONG'))
+                record = self.receipt(root)
+                self.assertEqual(record['status'], 'correctness-failure')
+                self.assertEqual(len(record['cases']), 4)
+                self.assertEqual(record.get('rejected_cases', []), [])
+                self.assertTrue(any(not check['passed'] for check in record['checks']))
+                summary = record['summary'][0]
+                self.assertEqual(summary['cache_on']['all_correct'], request != 6)
+                self.assertEqual(summary['cache_on']['repeats'], 1)
+                self.assertEqual(summary['cache_off']['repeats'], 1)
+
+    def test_rejected_cache_nonfinite_metrics_have_strict_json_receipts(self):
+        values = (('predicted_per_second', float('nan'), 'NaN'),
+                  ('predicted_n', float('inf'), 'Infinity'),
+                  ('predicted_n', float('-inf'), '-Infinity'),
+                  ('predicted_n', [2], [2]), ('predicted_n', True, True))
+        for key, invalid, preserved in values:
+            with self.subTest(key=key, invalid=invalid), tempfile.TemporaryDirectory() as folder:
+                root = self.root(folder)
+                with self.assertRaises(ValueError):
+                    self.cache_campaign(root, real_engine=True, fault=dict(request=2,
+                        timings={key: invalid}))
+                record = self.receipt(root)
+                response = record['rejected_cases'][0]['followup']
+                self.assertEqual(response['native_timings'][key], preserved)
+                json.dumps(record, allow_nan=False)
+
+    def test_cache_counter_failure_is_not_replaced_by_decode_failure(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = self.root(folder)
+            failure = ValueError('counter fixture')
+            original = benchmark_cache.completion_counts
+            calls = {'count': 0}
+            def validate(*args, **kwargs):
+                calls['count'] += 1
+                if calls['count'] == 2: raise failure
+                return original(*args, **kwargs)
+            with patch.object(benchmark_cache, 'completion_counts', validate), \
+                    self.assertRaisesRegex(ValueError, 'counter fixture') as caught:
+                self.cache_campaign(root, real_engine=True, fault=dict(request=2,
+                    decode_error=OSError('decode fixture')))
+            self.assertIs(caught.exception, failure)
+            response = self.receipt(root)['rejected_cases'][0]['followup']
+            self.assertEqual(response['token_ids'], [7, 99])
+            self.assertIn('decode fixture', response['text_error'])
+
+    def test_partial_cache_transport_and_cancellation_preserve_original_failure(self):
+        from native_backend import engine_failure
+        for error, decode_error in ((OSError('transport fixture'), None),
+                                    (OSError('transport fixture'), OSError('decode fixture')),
+                                    (KeyboardInterrupt('cancel fixture'), None)):
+            with self.subTest(error=error, decode_error=decode_error), tempfile.TemporaryDirectory() as folder:
+                root = self.root(folder)
+                expected = KeyboardInterrupt if isinstance(error, KeyboardInterrupt) else type(engine_failure('fixture'))
+                with self.assertRaisesRegex(expected, 'cancel fixture|transport fixture') as caught:
+                    self.cache_campaign(root, real_engine=True, fault=dict(request=2,
+                        tokens=[7], error=error, decode_error=decode_error))
+                if isinstance(error, KeyboardInterrupt): self.assertIs(caught.exception, error)
+                record = self.receipt(root)
+                rejected = record['rejected_cases'][0]
+                response = rejected['followup']
+                self.assertEqual(response['token_ids'], [7])
+                self.assertIsNone(response['native_timings'])
+                self.assertEqual(rejected['prime']['token_ids'], [7, 99])
+                self.assertEqual(record.get('summary', []), [])
+                if decode_error: self.assertIn('decode fixture', response['text_error'])
+
+    def test_cache_cancellation_does_not_start_diagnostic_decode(self):
+        for failure in (KeyboardInterrupt('cancel fixture'), SystemExit('stop fixture')):
+            with self.subTest(failure=failure):
+                class Engine:
+                    prompt_cache = False
+                    last = {}
+                    def generate(self, *args):
+                        yield 7
+                        raise failure
+                tokenizer = SimpleNamespace(decode=Mock(side_effect=AssertionError('No decode after cancellation')))
+                with self.assertRaises(type(failure)) as caught:
+                    benchmark_cache.measure(Engine(), tokenizer, [1, 2, 3])
+                self.assertIs(caught.exception, failure)
+                tokenizer.decode.assert_not_called()
+                self.assertEqual(caught.exception.benchmark_response['token_ids'], [7])
+
+    def test_failed_cache_native_diagnostic_decode_is_bounded(self):
+        class Engine:
+            prompt_cache = False
+            stop_ids = {99}
+            last = {'native_timings': dict(predicted_n=2, prompt_n=3, cache_n=0,
+                predicted_per_second=50, prompt_per_second=500)}
+            def generate(self, *args): yield from [7, 8]
+        tokenizer = SimpleNamespace(base='http://unused', decode=Mock(side_effect=AssertionError('Use bounded decode')))
+        with patch.object(benchmark_cache, 'request', return_value={'content': 'partial fixture'}) as request, \
+                self.assertRaisesRegex(ValueError, 'normal-EOS') as caught:
+            benchmark_cache.measure(Engine(), tokenizer, [1, 2, 3])
+        request.assert_called_once_with('http://unused', '/detokenize', {'tokens': [7, 8]}, timeout=2)
+        tokenizer.decode.assert_not_called()
+        self.assertEqual(caught.exception.benchmark_response['text'], 'partial fixture')
+
+    def test_rejected_cache_rows_cannot_enter_timing_aggregates(self):
+        cases = [dict(history_budget=512, cache=flag, warmup=False, status='accepted',
+            ttft_s=.1, wall_s=.3, native_timings=dict(predicted_per_second=50, cache_n=int(flag)),
+            prompt_tokens=3, rss_after_bytes=10, correct=True) for flag in (False, True)]
+        cases.append(dict(cases[1], status='rejected', wall_s=.0001, ttft_s=.0001,
+                          native_timings=dict(predicted_per_second=100000, cache_n=2)))
+        record = {'cases': cases}
+        benchmark_cache._summarize_cache(self.args(), record)
+        summary = record['summary'][0]
+        self.assertEqual(summary['cache_on']['repeats'], 1)
+        self.assertEqual(summary['cache_on']['median_generation_tok_s'], 50)
+        self.assertEqual(summary['generation_increase_percent'], 0)
 
 
 if __name__ == '__main__': unittest.main()
