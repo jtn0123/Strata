@@ -78,9 +78,7 @@ def lookup_command(command: list[str], args: object) -> list[str]:
         "draft_threads": 8,
         "draft_p_min": 0.0,
     }
-    if getattr(args, "batch", 512) != 512 or any(
-        getattr(args, key, None) != value for key, value in required.items()
-    ):
+    if getattr(args, "batch", 512) != 512 or any(getattr(args, key, None) != value for key, value in required.items()):
         raise ValueError("Code-edit lookup requires the qualified code-edit profile")
     result = list(command)
     index = result.index("--spec-type") + 1
@@ -106,10 +104,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     parser.add_argument("--native-port", type=int, default=8096)
     args = parser.parse_args(argv)
     print(f"Strata {args.profile}: {PROFILES[args.profile]['description']}", flush=True)
-    run.main(
-        PROFILES[args.profile]["arguments"]
-        + ["--port", str(args.port), "--native-port", str(args.native_port)]
-    )
+    run.main(PROFILES[args.profile]["arguments"] + ["--port", str(args.port), "--native-port", str(args.native_port)])
 
 
 if __name__ == "__main__":

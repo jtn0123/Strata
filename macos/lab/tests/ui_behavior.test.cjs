@@ -93,6 +93,7 @@ test('late shared settings update the server state without replacing a user edit
     server = value;
     if (untouched) control = value;
   });
+  assert.equal(control, false, 'the drawer starts with sharing disabled');
   control = true;
   state.edited();
   resolve(false);
@@ -121,16 +122,18 @@ const fragment = (source, start, end) => {
   assert.ok(source.includes(start) && source.includes(end), 'pinned compatibility markers changed');
   return source.slice(source.indexOf(start), source.indexOf(end, source.indexOf(start)));
 };
+const install = (name, next, context, args = '') => vm.runInContext(
+  fragment(maintained, `function ${name}(`, `function ${next}(`) + `${name}(${args});`, context);
 
 test('the actual New-chat compatibility hook prevents the reproduced message loss', () => {
   const run = (patched) => {
-    const nodes = {}, get = (id) => nodes[id] ||= {};
+    const nodes = {}, get = (id) => { nodes[id] ||= {}; return nodes[id]; };
     let action;
     const context = vm.createContext({$: get, messages: [{role: 'user', text: 'Earlier'}], busy: null,
       saveChat() {}, renderChat() {}, toast(kind, title, text, ms, undo) { if (undo) action = undo; },
       StrataChatUndo: ui.ChatUndo});
     vm.runInContext(fragment(pinned, '$("new-btn").onclick', '$("export-btn").onclick'), context);
-    if (patched) vm.runInContext(fragment(maintained, 'const originalToast = toast;', 'const originalUpdate = updateAssistant;'), context);
+    if (patched) install('installUndo', 'installAssistantRendering', context);
     get('new-btn').onclick();
     context.messages.push({role: 'user', text: 'Newer'});
     action.run();
@@ -143,7 +146,7 @@ test('the actual New-chat compatibility hook prevents the reproduced message los
 test('the actual export hook preserves file content that the pinned export drops', async () => {
   const run = async (patched) => {
     let exported;
-    const nodes = {}, get = (id) => nodes[id] ||= {};
+    const nodes = {}, get = (id) => { nodes[id] ||= {}; return nodes[id]; };
     const context = vm.createContext({$: get, messages: [{role: 'user', text: 'Review', files: [{name: 'code.py', text: 'file_secret_example'}]}],
       health: {model: 'mock'}, toast() {}, Blob, Date, setTimeout() {},
       document: {createElement: () => ({click() {}})},
@@ -163,7 +166,7 @@ test('the actual renderer keeps partial answer text beside its error', () => {
   const element = {querySelector: () => bubble};
   const context = vm.createContext({updateAssistant(el, message) { bubble.text = message.error || message.text; },
     document: {createElement: () => ({})}});
-  vm.runInContext(fragment(maintained, 'const originalUpdate = updateAssistant;', '$("export-btn").onclick'), context);
+  install('installAssistantRendering', 'installChatActions', context);
   context.updateAssistant(element, {text: 'Partial answer', error: 'Connection interrupted'}, false);
   assert.equal(bubble.text, 'Partial answer');
   assert.equal(warnings[0].textContent, 'Connection interrupted');
@@ -178,7 +181,7 @@ test('the actual Apply hook rejects invalid values and honors sharing before GET
   let saved = false, shared;
   const context = vm.createContext({$: (id) => nodes[id], strataIntegerError: ui.integerError,
     thinking: [{dataset: {v: 'high'}, getAttribute: () => 'true'}], settings: {},
-    store: {set() { saved = true; }}, sharingKnown: false, sharedOn: false,
+    store: {set() { saved = true; }}, isSharingKnown: () => false, sharedOn: false,
     openDrawer() {}, saveShared: async (value) => { shared = value; }, toast() {}});
   vm.runInContext(fragment(maintained, '$("s-apply").onclick = async', 'for (const id of ["s-max", "s-seed"])'), context);
   await nodes['s-apply'].onclick();
@@ -253,7 +256,7 @@ test('installing the maintained UI during a shortcut request keeps its reply vis
   vm.runInContext(fragment(pinned, 'async function send()', '$("composer").onsubmit'), context);
   const sending = context.send(), captured = chat.lastElementChild;
   assert.ok(context.busy);
-  vm.runInContext(fragment(maintained, 'const originalRenderChat = renderChat;', '// Keep the closed drawer'), context);
+  vm.runInContext(fragment(maintained, 'function decorateUnavailableAttachments(', 'function installSharedSettings(') + 'installChatRestore(resizeInput);', context);
   completeFetch(sse([chunk({choices: [{delta: {content: 'Actual reply'}}]}), 'data: [DONE]\n\n']));
   await sending;
   assert.equal(context.messages[1].text, 'Actual reply');
@@ -272,14 +275,14 @@ test('sharing and Apply retain the pinned global lexical state across classic sc
   const context = vm.createContext({$: (id) => nodes[id], window: {},
     store: {get: (key, fallback) => fallback, set() {}}, headers: () => ({}),
     fetch: async () => ({ok: true, json: async () => ({shared: true})}),
-    sharing: new ui.SharedSettings(), sharingKnown: false,
+    sharing: new ui.SharedSettings(), sharingKnown: false, isSharingKnown: () => context.sharingKnown,
     thinking: [{dataset: {v: 'low'}, getAttribute: () => 'true'}],
     strataIntegerError: ui.integerError, openDrawer() {}, toast() {},
     saveShared: async (on, settings) => { posted = {on, settings}; }});
   // Use the actual shell declarations: global `let` state is not window state.
   vm.runInContext(fragment(pinned, 'const DEFAULTS =', 'function saveChat()'), context);
   vm.runInContext(fragment(pinned, 'let sharedOn = false;', 'function sharedDefaults(s)'), context);
-  vm.runInContext(fragment(maintained, 'loadShared = () =>', 'const thinking ='), context);
+  vm.runInContext(fragment(maintained, 'loadShared = () =>', 'return {known:'), context);
   await context.loadShared();
   assert.equal(vm.runInContext('sharedOn', context), true);
   assert.equal(context.sharedOn, undefined);

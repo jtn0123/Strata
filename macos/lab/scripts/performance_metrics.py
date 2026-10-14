@@ -53,9 +53,7 @@ def measured_history(
         server_first_token_ms=1000 * (first - start)
         if start is not None and first is not None and first >= start
         else None,
-        server_duration_ms=number(1000 * (time.time() - start))
-        if start is not None
-        else None,
+        server_duration_ms=number(1000 * (time.time() - start)) if start is not None else None,
         generation_tps=number(native.get("predicted_per_second")),
         prompt_tps=number(native.get("prompt_per_second")),
         draft_acceptance_percent=100 * (accepted / proposed)
@@ -64,9 +62,7 @@ def measured_history(
     )
     if row["generation_tps"] is None:
         row["generation_tps"] = number(record.get("decode_tok_s"))
-        row["generation_source"] = (
-            "server-derived" if row["generation_tps"] else "unreported"
-        )
+        row["generation_source"] = "server-derived" if row["generation_tps"] else "unreported"
     else:
         row["generation_source"] = "native" if row["generation_tps"] else "unreported"
     return row
@@ -114,15 +110,11 @@ def resources(config: Mapping[str, Any]) -> JSONDict:
         "swap_used_bytes": swap.used,
         "new_swap_bytes": max(0, swap.used - initial) if initial is not None else None,
         "model_rss_bytes": number(sample.get("rss_bytes")),
-        "pressure_level": sample.get("pressure_level")
-        if sample.get("pressure_level") in (1, 2, 4)
-        else None,
+        "pressure_level": sample.get("pressure_level") if sample.get("pressure_level") in (1, 2, 4) else None,
     }
 
 
-def tracked_service(
-    original: type[Any], mock_type: type[Any], config: Mapping[str, Any] | None = None
-) -> type[Any]:
+def tracked_service(original: type[Any], mock_type: type[Any], config: Mapping[str, Any] | None = None) -> type[Any]:
     performance_config = dict(config or {})
     allowed = (
         "model",
@@ -154,9 +146,7 @@ def tracked_service(
                     # The pinned shell calls append while holding status_lock, immediately
                     # after copying engine.last. Preserve its deque and lifecycle semantics.
                     last = dict(getattr(service.engine, "last", {}) or {})
-                    super().append(
-                        measured_history(row, service.status, last, service.kind())
-                    )
+                    super().append(measured_history(row, service.status, last, service.kind()))
 
             self.history = History(self.history, maxlen=self.history.maxlen)
 
@@ -177,11 +167,7 @@ def tracked_service(
             result["performance"] = {
                 "schema": 1,
                 "measurement_kind": self.kind(),
-                "settings": {
-                    key: performance_config[key]
-                    for key in allowed
-                    if key in performance_config
-                },
+                "settings": {key: performance_config[key] for key in allowed if key in performance_config},
                 "resources": memory,
                 "scope": "Server timings start after queue admission; browser and engine timings have different scopes.",
             }

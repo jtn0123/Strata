@@ -41,7 +41,10 @@ jobs:
           tar -xzf "$RUNNER_TEMP/llama.tar.gz" --strip-components=1 -C vendor/llama.cpp
       - name: Run load-free inventory
         working-directory: macos/lab
-        run: python scripts/validate_offline.py
+        run: |
+          export MAC_QUALITY_COVERAGE_SCOPE="$(python scripts/check_coverage.py --scope)"
+          export MAC_QUALITY_COVERAGE_CONTEXT="$(python scripts/check_coverage.py --context)"
+          python -m coverage run --rcfile=config/coverage.ini scripts/validate_offline.py
       - name: Check measured campaign protocol
         working-directory: macos/lab
         run: python -m unittest discover -s bench/results/20261010-small-gains-stack -p test_sequence.py -v
@@ -60,14 +63,12 @@ jobs:
           node --check macos/lab/web/ui-state.js
           node --check macos/lab/web/performance.js
           node --test macos/lab/tests/*.test.cjs
-      - name: Check Python syntax and undefined names throughout the lab
+      - name: Check maintained Mac lint, formatting, types and size
         working-directory: macos/lab
-        run: ruff check --config config/ruff.toml --select E9,F63,F7,F82 scripts tests
-      - name: Lint and type-check maintained runtime modules
+        run: python scripts/check_quality.py
+      - name: Check focused Mac line and branch coverage
         working-directory: macos/lab
-        run: |
-          ruff check --config config/ruff.toml scripts/native_backend.py scripts/run.py scripts/stop.py scripts/runtime_profiles.py scripts/performance_metrics.py scripts/model_provenance.py scripts/benchmark_signals.py scripts/metal_environment.py
-          mypy --config-file config/mypy.ini
+        run: python scripts/check_coverage.py
       - name: Install pinned browser lint tools
         working-directory: macos/lab
         run: npm ci --ignore-scripts --no-audit --no-fund
@@ -82,4 +83,7 @@ jobs:
           path: |
             macos/lab/bench/features/offline-validation.json
             macos/lab/bench/features/offline-validation.log
+            macos/lab/bench/features/code-quality/latest-sizes.json
+            macos/lab/bench/features/coverage/coverage.json
+            macos/lab/bench/features/coverage/gate.json
           if-no-files-found: error

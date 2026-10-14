@@ -200,6 +200,22 @@ class BenchmarkReceiptTests(unittest.TestCase):
             self.assertIn('small', record['model_provenance']['models'])
             self.assertEqual(record['selected_engine']['engine'], 'baseline')
 
+    def test_cache_pairs_keep_excluded_warmup_and_alternating_order(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = self.root(folder)
+            args = self.args(); args.repeats = 2
+            with patch.object(self, 'args', return_value=args):
+                self.cache_campaign(root)
+            cases = self.receipt(root)['cases']
+            self.assertEqual([(case['repeat'], case['cache'], case['warmup']) for case in cases],
+                             [(0, False, True), (0, True, True), (1, True, False),
+                              (1, False, False), (2, False, False), (2, True, False)])
+            for left, right in zip(cases[::2], cases[1::2], strict=True):
+                self.assertEqual(left['prompt_sha256'], right['prompt_sha256'])
+                self.assertEqual(left['order'], [left['cache'], right['cache']])
+                self.assertEqual(left['prime']['native_timings']['cache_n'], 0)
+                self.assertEqual(right['prime']['native_timings']['cache_n'], 0)
+
     def test_real_engine_construction_and_measurement_recognize_the_tokenizers_eos(self):
         with tempfile.TemporaryDirectory() as folder:
             root = self.root(folder); self.cache_campaign(root, real_engine=True)

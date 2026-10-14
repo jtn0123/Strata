@@ -111,6 +111,33 @@ class SourceTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             engines.verify_engine("baseline", self.root)
 
+    def test_receipt_writer_preserves_fields_commands_and_filtered_build_settings(self):
+        (self.path / ".git/info/exclude").write_text("/build/\n")
+        binary = self.path / "build/bin/llama-server"
+        binary.parent.mkdir(parents=True)
+        binary.write_bytes(b"offline binary fixture")
+        library = binary.parent / "libggml-metal.dylib"
+        library.write_bytes(b"offline library fixture")
+        cache = binary.parent.parent / "CMakeCache.txt"
+        cache.write_text("GGML_METAL:BOOL=ON\nCMAKE_BUILD_TYPE:STRING=Release\nUNRELATED:STRING=ignored\n")
+        source = engines.source_info("baseline", self.root)
+        with patch.object(engines, "ROOT", self.root), \
+                patch.object(engines, "source_info", return_value=dict(source)), \
+                patch.object(engines, "engine_binary", return_value=binary), \
+                patch.object(engines.subprocess, "check_output", side_effect=["native fixture\n", "clang fixture\n"]) as versions:
+            receipt = engines.write_receipt("baseline")
+        self.assertEqual({key: receipt[key] for key in source}, source)
+        self.assertEqual(receipt["artifacts"], {
+            "llama-server": hashlib.sha256(b"offline binary fixture").hexdigest(),
+            "libggml-metal.dylib": hashlib.sha256(b"offline library fixture").hexdigest()})
+        self.assertEqual(receipt["binary_version"], "native fixture")
+        self.assertEqual(receipt["compiler"], "clang fixture")
+        self.assertEqual(receipt["build_settings"], {"GGML_METAL": "ON", "CMAKE_BUILD_TYPE": "Release"})
+        self.assertEqual(versions.call_args_list[0].args[0], [str(binary), "--version"])
+        self.assertEqual(versions.call_args_list[1].args[0], ["clang", "--version"])
+        saved = binary.parent.parent / "lab-receipt.json"
+        self.assertEqual(saved.read_text(), json.dumps(receipt, indent=2) + "\n")
+
 
 if __name__ == "__main__":
     unittest.main()

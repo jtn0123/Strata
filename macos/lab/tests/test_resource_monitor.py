@@ -1,5 +1,6 @@
 """Exercise launch/exit pressure and failed telemetry without loading a model."""
 from pathlib import Path
+import importlib.util
 import sys
 import tempfile
 from types import SimpleNamespace
@@ -8,9 +9,31 @@ from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from benchmark import Monitor
+from memory_monitor import wait_ready
 
 
 class MonitorTests(unittest.TestCase):
+    def test_runtime_monitor_import_does_not_require_either_benchmark_driver(self):
+        path = Path(__file__).resolve().parents[1] / 'scripts/memory_monitor.py'
+        spec = importlib.util.spec_from_file_location('standalone_memory_monitor', path)
+        module = importlib.util.module_from_spec(spec)
+        with patch.dict(sys.modules, {'benchmark': None, 'benchmark_cache': None}):
+            spec.loader.exec_module(module)
+        self.assertEqual(module.Monitor.__module__, 'standalone_memory_monitor')
+        self.assertEqual(Monitor.__module__, 'memory_monitor')
+
+    def test_ready_retry_keeps_bounded_health_probes_and_elapsed_scope(self):
+        child = Mock()
+        child.poll.return_value = None
+        with patch('memory_monitor.request', side_effect=[OSError('fixture loading'), {'status': 'ok'}]) as health, \
+                patch('memory_monitor.time.monotonic', side_effect=[0, 0, 1, 2]), \
+                patch('memory_monitor.time.sleep') as pause:
+            self.assertEqual(wait_ready(child, 'http://127.0.0.1:1', timeout=3), 2)
+        self.assertEqual(health.call_count, 2)
+        self.assertTrue(all(call.args == ('http://127.0.0.1:1', '/health') and call.kwargs == {'timeout': 2}
+                            for call in health.call_args_list))
+        pause.assert_called_once_with(.25)
+
     def monitor(self, folder):
         child = Mock(pid=123)
         child.poll.return_value = 0

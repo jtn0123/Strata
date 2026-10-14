@@ -10,9 +10,7 @@ SignalHandler = Callable[[int, FrameType | None], object] | int
 
 
 def termination_signals() -> list[signal.Signals]:
-    return [signal.SIGINT, signal.SIGTERM] + (
-        [signal.SIGHUP] if hasattr(signal, "SIGHUP") else []
-    )
+    return [signal.SIGINT, signal.SIGTERM] + ([signal.SIGHUP] if hasattr(signal, "SIGHUP") else [])
 
 
 def signal_handlers(numbers: Sequence[int]) -> dict[int, SignalHandler]:
@@ -20,9 +18,7 @@ def signal_handlers(numbers: Sequence[int]) -> dict[int, SignalHandler]:
     for number in numbers:
         handler = signal.getsignal(number)
         if handler is None:
-            raise RuntimeError(
-                f"Cannot safely restore unknown handler for signal {number}"
-            )
+            raise RuntimeError(f"Cannot safely restore unknown handler for signal {number}")
         previous[number] = handler
     return previous
 
@@ -37,9 +33,7 @@ def cleanup_on_termination() -> Iterator[None]:
         # driver's finally blocks, and let bounded cleanup survive repeated stops.
         for stopping in signals:
             signal.signal(stopping, signal.SIG_IGN)
-        raise KeyboardInterrupt(
-            f"Termination requested ({signal.Signals(number).name})"
-        )
+        raise KeyboardInterrupt(f"Termination requested ({signal.Signals(number).name})")
 
     try:
         for stopping in signals:
@@ -78,6 +72,4 @@ def defer_termination() -> Iterator[None]:
             if callable(handler):
                 handler(number, frame)
             elif handler != signal.SIG_IGN:
-                raise KeyboardInterrupt(
-                    f"Termination requested ({signal.Signals(number).name})"
-                )
+                raise KeyboardInterrupt(f"Termination requested ({signal.Signals(number).name})")

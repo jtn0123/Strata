@@ -15,24 +15,39 @@ const browserGlobals = Object.fromEntries([
   return [name, "readonly"];
 }));
 
+const correctnessRules = {
+  ...js.configs.recommended.rules,
+  "no-undef": ["error", {typeof: true}],
+  "eqeqeq": ["error", "always", {null: "ignore"}],
+  "no-eval": "error",
+  "no-implied-eval": "error",
+  "no-new-func": "error",
+  "no-return-assign": "error",
+  "no-sequences": "error",
+  "no-shadow-restricted-names": "error",
+  "no-throw-literal": "error",
+  "no-unmodified-loop-condition": "error",
+  "prefer-const": "error",
+  "no-unused-expressions": "error",
+  "no-promise-executor-return": "error",
+  "no-shadow": ["error", {builtinGlobals: true}],
+};
+
 export default [
   {
     files: ["web/mac.js", "web/ui-state.js", "web/performance.js"],
     languageOptions: {ecmaVersion: 2024, sourceType: "script", globals: browserGlobals},
     linterOptions: {reportUnusedDisableDirectives: "error"},
     rules: {
-      ...js.configs.recommended.rules,
-      "no-undef": ["error", {typeof: true}],
-      "eqeqeq": ["error", "always", {null: "ignore"}],
-      "no-eval": "error",
-      "no-implied-eval": "error",
-      "no-new-func": "error",
-      "no-return-assign": "error",
-      "no-sequences": "error",
-      "no-shadow-restricted-names": "error",
-      "no-throw-literal": "error",
-      "no-unmodified-loop-condition": "error",
+      ...correctnessRules,
+      "complexity": ["error", 15],
     },
+  },
+  {
+    files: ["tests/*.test.cjs"],
+    languageOptions: {ecmaVersion: 2024, sourceType: "commonjs", globals: globals.node},
+    linterOptions: {reportUnusedDisableDirectives: "error"},
+    rules: correctnessRules,
   },
   {
     files: ["web/mac.js"],

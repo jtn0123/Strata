@@ -1,55 +1,73 @@
 # Maintained Mac code checks
 
-Sonar's PR analysis, tests, lint and type checks answer different questions. A
-green Sonar gate alone is not proof of clean code or complete test coverage.
-The PR's initial 21 Sonar findings were corrected and a fresh scan of
-`77b9ad6` reported zero open findings and zero security hotspots. Subsequent
-changes are checked again at their exact PR head.
+The user maintenance scope is the Mac app, runtime helpers, benchmark harness and
+browser UI. Inherited PC CUDA/HIP/SYCL code, PC server and installer remain intact
+and outside this quality pass. Sonar sources are scoped to `macos/lab`; existing
+third-party/evidence/test classification stays intact.
 
-## Scope
+## Enforced checks
 
-Ruff checks Python syntax and undefined names across all lab scripts/tests.
-Its fuller error/style/bug checks cover eight maintained modules: native adapter,
-app runner/stopper, profiles, telemetry, model provenance, cancellation helpers
-and Metal environment isolation. Those modules use named types for model/cache
-receipts, profiles, streaming events and service telemetry instead of relying
-on conflicting inferred dictionary types.
+`config/quality_modules.json` defines 20 maintained Python targets. The checker
+requires that scope to match mypy, validates that paths stay in Mac scripts, and
+rejects missing modules and escaping symlinks. Critical syntax/undefined-name
+checks still cover all lab scripts and tests, including older experiment drivers.
 
-Mypy checks those same eight modules and requires complete function signatures.
-Cancellation and Metal environment helpers also enable the additional strict
-checks. Local dependencies supply inferred types; older experiment/build helpers
-are not claimed as fully type-checked. Revision-pinned `serve` and `gguf` imports
-are explicit external boundaries. Dynamic JSON and vendor service factories still
-use documented `Any` types; there is no blanket `ignore-errors` setting.
+The fuller Ruff gate uses `E4,E7,E9,F,B,UP,C4,ISC,PIE,RET,PLW,C90`, with cyclomatic
+complexity at most 10. The pinned formatter uses Python 3.12 and 120-column
+wrapping. Mypy requires complete function signatures across all 20 targets;
+13 enable the additional strict checks listed in `config/mypy.ini`. Named types
+cover model/build receipts, launch configuration, memory policy/process snapshots,
+metric evidence and workload callbacks. Dynamic JSON/vendor interfaces retain
+explicit boundaries; revision-pinned `serve`/`gguf` traversal stays external.
+There are no blanket ignore-errors settings or lint suppressions.
 
-ESLint checks all three maintained browser scripts with recommended correctness
-rules and additional guards against unsafe evaluation, undefined writes and
-readonly-state mutation. Each script has an explicit browser/shell contract.
-The global lexical settings supplied by the pinned API shell remain intact.
+ESLint checks three production scripts and every Node test suite. Recommended
+correctness rules are supplemented by undefined-write, readonly-state, unsafe
+evaluation, shadowing, immutable-binding and promise guards. Production functions
+have a cyclomatic complexity limit of 15. Classic-script settings and writable
+hooks remain explicit; the pinned shell owns its lexical `settings`/`sharedOn`.
+Whole-installation fixtures run the real pinned and maintained scripts in order.
 
-These checks do not cover the inherited CUDA/HIP/SYCL engines or installer, do not
-establish physical mobile/VoiceOver behavior, and do not measure inference speed.
-Model bytes, runtime settings and memory limits keep their separate qualification.
+Python file/function size is reported after the gate, with warnings above 500
+physical lines per file or 80 per function. Source hashes and counts are saved in
+ignored `bench/features/code-quality/latest-sizes.json` and retained by CI.
+JavaScript's private containing IIFEs include nested helpers; their physical span
+is not claimed as an 80-line pass. Named UI helpers and complexity are measured
+separately.
+
+Focused Python branch coverage has its own measured baseline and freshness gate:
+86.10% of lines and 72.69% of branches, with aggregate floors of 86%/72% and
+per-file floors derived from the same measured counts.
+It uses the maintained manifest, the native/network-denying offline inventory and
+source/config fingerprints. Line/branch floors describe this measured scope;
+they are not a whole-repository coverage claim. Node's experimental coverage
+currently reports `ui-state.js` only (94.51% lines, 87.78% branches), so it cannot
+be reported as coverage of the complete UI despite the full-installation tests.
+Sonar's automatic analysis and the coverage gate are separate checks.
 
 ## Run
 
-Use a separate development environment for quality tools; the model runtime's
-dependency pins are unchanged. Python 3.12 and supported Node 22.13+ or Node 24+
-are required. The CI installs hash-locked Python tools and lockfile-pinned Node
-tools, then runs the same checks.
+Use frozen runtime/quality locks in a development environment. Model runtime pins
+remain unchanged; quality tools are development dependencies. Python 3.12 and
+supported Node 22.13+ or Node 24+ are required.
 
 ```sh
-python -m pip install --only-binary :all: --require-hashes -r requirements-quality.lock
-ruff check --config config/ruff.toml --select E9,F63,F7,F82 scripts tests
-ruff check --config config/ruff.toml scripts/native_backend.py scripts/run.py scripts/stop.py scripts/runtime_profiles.py scripts/performance_metrics.py scripts/model_provenance.py scripts/benchmark_signals.py scripts/metal_environment.py
-mypy --config-file config/mypy.ini
+python -m pip install --only-binary :all: --require-hashes -r requirements-ci.lock -r requirements-quality.lock
+python scripts/check_quality.py
 npm ci --ignore-scripts --no-audit --no-fund
 npm run lint
+node --test tests/*.test.cjs
 ```
 
-Detailed local receipts, fault-injection checks, dependency caches and source
-snapshots stay in ignored benchmark feature directories. Tests and exact-head
-hosted checks remain separate evidence from lint/type success.
+Run the offline inventory under the configured coverage context, then check the
+coverage receipt, using the exact commands in `.github/workflows/mac-lab-offline.yml`.
+Tiny-process termination, socket ownership and campaign-protocol checks remain
+separate from the network/native-denying inventory. Test methods, parity probes,
+coverage percentages and lint/type results are separate measurements.
 
-[QUALITY-PLAN.md](QUALITY-PLAN.md) lists the measured follow-on work, including
-stricter checks, staged typing and benchmark-function separation.
+Raw logs, machine-specific paths, screenshots, coverage data, model bytes and local
+configuration stay ignored. Verify a clean export and exact-head hosted CI/Sonar
+before reporting completion. These checks do not establish real-model TPS, GPU
+correctness or physical VoiceOver/mobile-keyboard behavior.
+
+[QUALITY-PLAN.md](QUALITY-PLAN.md) records the completed work and remaining targets.
