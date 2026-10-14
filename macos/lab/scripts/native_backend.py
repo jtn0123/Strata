@@ -15,6 +15,9 @@ from urllib.parse import urlparse
 from lab import ROOT, request
 
 JSONDict = dict[str, Any]
+DETOKENIZE_ENDPOINT = "/detokenize"
+PIECE_CACHE_BYTES = 1024 * 1024
+PIECE_CACHE_ENTRIES = 4096
 
 
 def engine_failure(message: str) -> RuntimeError:
@@ -42,9 +45,7 @@ def validate_native_properties(response: Mapping[str, Any]) -> None:
     if (
         type(context) is not int
         or context <= 0
-        or not all(
-            isinstance(response.get(key), str) for key in ("build_info", "model_path")
-        )
+        or not all(isinstance(response.get(key), str) for key in ("build_info", "model_path"))
     ):
         raise ValueError("Expected context, build_info and model_path properties")
 
@@ -56,12 +57,10 @@ def validate_native_response(endpoint: str, response: object) -> JSONDict:
         raise ValueError(f"Native error response: {response['error']}")
     if endpoint == "/tokenize":
         tokens = response.get("tokens")
-        if not isinstance(tokens, list) or any(
-            type(token) is not int or token < 0 for token in tokens
-        ):
+        if not isinstance(tokens, list) or any(type(token) is not int or token < 0 for token in tokens):
             raise ValueError("Expected a list of nonnegative token IDs")
-    elif endpoint in ("/detokenize", "/apply-template"):
-        key = "content" if endpoint == "/detokenize" else "prompt"
+    elif endpoint in (DETOKENIZE_ENDPOINT, "/apply-template"):
+        key = "content" if endpoint == DETOKENIZE_ENDPOINT else "prompt"
         if not isinstance(response.get(key), str):
             raise ValueError(f"Expected a text {key} field")
     elif endpoint == "/props":
@@ -69,9 +68,7 @@ def validate_native_response(endpoint: str, response: object) -> JSONDict:
     return response
 
 
-def native_request(
-    base: str, endpoint: str, payload: JSONDict | None = None
-) -> JSONDict:
+def native_request(base: str, endpoint: str, payload: JSONDict | None = None) -> JSONDict:
     try:
         return validate_native_response(endpoint, request(base, endpoint, payload))
     except (OSError, RuntimeError, ValueError) as error:
@@ -86,9 +83,12 @@ class NativeTokenizer:
         self.piece_bytes = 0
         self.prefix: tuple[int, ...] = ()
         self.prefix_text = ""
-        self.decode_stats = dict(
-            requests=0, input_tokens=0, piece_hits=0, prefix_fallbacks=0
-        )
+        self.decode_stats = {
+            "requests": 0,
+            "input_tokens": 0,
+            "piece_hits": 0,
+            "prefix_fallbacks": 0,
+        }
 
     def encode(self, text: str, parse_special: bool = False) -> list[int]:
         response = native_request(
@@ -99,47 +99,60 @@ class NativeTokenizer:
         return cast(list[int], response["tokens"])
 
     def decode(self, ids: Iterable[int], errors: str = "replace") -> str:
+        """Keep errors for the shell's tokenizer API; native HTTP owns UTF-8 decoding.
+
+        The endpoint already returns text, so errors cannot change its decoding
+        policy. Both cached and uncached paths retain that native policy.
+        """
         ids = tuple(ids)
         if not self.piece_cache:
             return self._decode_native(ids)
         if not ids:
             self.prefix, self.prefix_text = (), ""
             return ""
-        append = len(ids) == len(self.prefix) + 1 and ids[:-1] == self.prefix
-        if append and not self.prefix_text.endswith("\ufffd"):
-            token = ids[-1]
-            if token in self.pieces:
-                piece = self.pieces.pop(token)
-                self.pieces[token] = piece
-                self.decode_stats["piece_hits"] += 1
-            else:
-                piece = self._decode_native((token,))
-                if "\ufffd" not in piece:
-                    cost = len(piece.encode("utf-8")) + 64
-                    if cost <= 1024 * 1024:
-                        while self.pieces and (
-                            len(self.pieces) >= 4096
-                            or self.piece_bytes + cost > 1024 * 1024
-                        ):
-                            _, old = self.pieces.popitem(last=False)
-                            self.piece_bytes -= len(old.encode("utf-8")) + 64
-                        self.pieces[token] = piece
-                        self.piece_bytes += cost
-            if "\ufffd" not in piece:
-                text = self.prefix_text + piece
-            else:
-                self.decode_stats["prefix_fallbacks"] += 1
-                text = piece if len(ids) == 1 else self._decode_native(ids)
+        if self._can_append(ids):
+            text = self._append_piece(ids)
         else:
             self.decode_stats["prefix_fallbacks"] += 1
             text = self._decode_native(ids)
         self.prefix, self.prefix_text = ids, text
         return text
 
+    def _can_append(self, ids: tuple[int, ...]) -> bool:
+        return len(ids) == len(self.prefix) + 1 and ids[:-1] == self.prefix and not self.prefix_text.endswith("\ufffd")
+
+    def _append_piece(self, ids: tuple[int, ...]) -> str:
+        piece = self._piece(ids[-1])
+        if "\ufffd" not in piece:
+            return self.prefix_text + piece
+        self.decode_stats["prefix_fallbacks"] += 1
+        return piece if len(ids) == 1 else self._decode_native(ids)
+
+    def _piece(self, token: int) -> str:
+        if token in self.pieces:
+            piece = self.pieces.pop(token)
+            self.pieces[token] = piece
+            self.decode_stats["piece_hits"] += 1
+            return piece
+        piece = self._decode_native((token,))
+        if "\ufffd" not in piece:
+            self._cache_piece(token, piece)
+        return piece
+
+    def _cache_piece(self, token: int, piece: str) -> None:
+        cost = len(piece.encode("utf-8")) + 64
+        if cost > PIECE_CACHE_BYTES:
+            return
+        while self.pieces and (len(self.pieces) >= PIECE_CACHE_ENTRIES or self.piece_bytes + cost > PIECE_CACHE_BYTES):
+            _, old = self.pieces.popitem(last=False)
+            self.piece_bytes -= len(old.encode("utf-8")) + 64
+        self.pieces[token] = piece
+        self.piece_bytes += cost
+
     def _decode_native(self, ids: Sequence[int]) -> str:
         self.decode_stats["requests"] += 1
         self.decode_stats["input_tokens"] += len(ids)
-        response = native_request(self.base, "/detokenize", {"tokens": ids})
+        response = native_request(self.base, DETOKENIZE_ENDPOINT, {"tokens": ids})
         return cast(str, response["content"])
 
 
@@ -151,9 +164,7 @@ class NativeTemplate:
     def starts_in_reasoning(prompt: str) -> bool:
         return prompt.rfind("<think>") > prompt.rfind("</think>")
 
-    def render(
-        self, messages: Sequence[JSONDict], tools: object = None, **kwargs: Any
-    ) -> str:
+    def render(self, messages: Sequence[JSONDict], tools: object = None, **kwargs: Any) -> str:
         if tools:
             raise ValueError("Tool calls are not supported by this Mac profile")
         if any(isinstance(m.get("content"), list) for m in messages):
@@ -164,6 +175,146 @@ class NativeTemplate:
             {"messages": messages, "chat_template_kwargs": kwargs},
         )
         return cast(str, response["prompt"])
+
+
+class _NativeStream:
+    """One completion's reader, cancellation state, counters, and owned transport."""
+
+    def __init__(
+        self,
+        connection: http.client.HTTPConnection,
+        prompt_ids: Sequence[int],
+        cancel: threading.Event,
+    ) -> None:
+        self.connection = connection
+        self.prompt_ids = prompt_ids
+        self.cancel = cancel
+        self.events: queue.Queue[JSONDict | BaseException | None] = queue.Queue()
+        self.stopped = threading.Event()
+        self.final_ready = threading.Event()
+        self.final_record: JSONDict | None = None
+        self.final_consumed = False
+        self.last_token: int | None = None
+        self.failed = False
+        self.transport: socket.socket | None = None
+        self.reader: threading.Thread | None = None
+        self.started = time.monotonic()
+        self.first: float | None = None
+        self.count = 0
+
+    def start(self, payload: JSONDict) -> None:
+        self.connection.request(
+            "POST",
+            "/completion",
+            body=json.dumps(payload),
+            headers={"Content-Type": "application/json"},
+        )
+        self.transport = self.connection.sock
+        self.reader = threading.Thread(target=self._pump, daemon=True)
+        self.reader.start()
+
+    def _pump(self) -> None:
+        try:
+            response = self.connection.getresponse()
+            if response.status != 200:
+                raise RuntimeError(f"Native inference HTTP {response.status}: {response.read().decode()}")
+            for line in response:
+                if self.stopped.is_set():
+                    break
+                if line.startswith(b"data: "):
+                    self._publish_packet(json.loads(line[6:]))
+        except BaseException as error:
+            self.events.put(error)
+        finally:
+            # EOF/error must not make finalization wait for its deadline.
+            self.final_ready.set()
+            self.events.put(None)
+
+    def _publish_packet(self, item: JSONDict) -> None:
+        if item.get("error"):
+            raise RuntimeError(f"Native inference error: {item['error']}")
+        if item.get("stop"):
+            self.final_record = item
+            self.final_ready.set()
+        self.events.put(item)
+
+    def _next_event(self) -> JSONDict | None:
+        try:
+            item = self.events.get(timeout=0.1)
+        except queue.Empty:
+            if time.monotonic() - self.started > 600:
+                raise TimeoutError("Native inference exceeded 600 seconds") from None
+            return None  # Heartbeat while native inference is quiet.
+        if item is None:
+            raise RuntimeError("Native inference stream ended before its final record")
+        if isinstance(item, BaseException):
+            raise item
+        return item
+
+    def tokens(self) -> Generator[int | None, None, None]:
+        while not self.cancel.is_set():
+            item = self._next_event()
+            if item is None:
+                yield None
+                continue
+            for token in item.get("tokens", []):
+                if self.cancel.is_set():
+                    return
+                self.first = self.first or time.monotonic()
+                self.count += 1
+                self.last_token = token
+                yield token
+            if item.get("stop"):
+                self.final_consumed = True
+                break
+
+    def wait_for_final(self, normal_stop: bool) -> None:
+        # The shell closes at EOS, before the following native timing packet.
+        # Drain only normal completion, bounded to 0.5s and cancellable.
+        if not normal_stop or self.cancel.is_set():
+            return
+        deadline = time.monotonic() + 0.5
+        while not self.final_ready.is_set() and not self.cancel.is_set() and time.monotonic() < deadline:
+            self.final_ready.wait(min(0.05, max(0, deadline - time.monotonic())))
+
+    def native_metrics(self, normal_stop: bool) -> JSONDict:
+        if self.failed or self.cancel.is_set() or not (self.final_consumed or normal_stop) or not self.final_record:
+            return {}
+        timing = self.final_record.get("timings")
+        if not isinstance(timing, dict) or not timing:
+            return {}
+        return {
+            "generated": self.count,
+            "prompt_tokens": len(self.prompt_ids),
+            "prompt_ms": timing.get("prompt_ms"),
+            "decode_ms": timing.get("predicted_ms"),
+            "native_timings": dict(timing),
+            "reused": timing.get("cache_n"),
+        }
+
+    def fallback_metrics(self) -> JSONDict:
+        metrics: JSONDict = {
+            "generated": self.count,
+            "prompt_tokens": len(self.prompt_ids),
+        }
+        if not self.failed:
+            ended = time.monotonic()
+            metrics.update(
+                prompt_ms=((self.first or ended) - self.started) * 1000,
+                decode_ms=(ended - (self.first or ended)) * 1000,
+            )
+        return metrics
+
+    def close(self) -> None:
+        self.stopped.set()
+        if self.transport:
+            try:
+                self.transport.shutdown(socket.SHUT_RDWR)
+            except OSError:
+                pass
+        if self.reader is not None and self.reader.ident is not None:
+            self.reader.join(timeout=2)
+        self.connection.close()
 
 
 class NativeEngine:
@@ -191,21 +342,7 @@ class NativeEngine:
             "prompt_cache": prompt_cache,
         }
 
-    def generate(
-        self,
-        ids: Sequence[int],
-        max_new: int,
-        sampling: Mapping[str, Any],
-        cancel: threading.Event,
-    ) -> Generator[int | None, None, None]:
-        self.last = {}
-        if cancel.is_set():
-            return
-        url = urlparse(self.base)
-        hostname = url.hostname
-        if hostname is None:
-            raise engine_failure("Native inference URL has no hostname")
-        connection = http.client.HTTPConnection(hostname, url.port, timeout=600)
+    def _completion_payload(self, ids: Sequence[int], max_new: int, sampling: Mapping[str, Any]) -> JSONDict:
         payload = {
             "prompt": ids,
             "n_predict": max_new,
@@ -225,144 +362,55 @@ class NativeEngine:
         ):
             if sampling.get(key) is not None:
                 payload[key] = sampling[key]
-        events: queue.Queue[JSONDict | BaseException | None] = queue.Queue()
-        stopped = threading.Event()
-        final_ready = threading.Event()
-        final_record: JSONDict | None = None
-        final_consumed = False
-        last_token: int | None = None
-        failed = False
-        transport: socket.socket | None = None
-        reader: threading.Thread | None = None
-        started, first, count = time.monotonic(), None, 0
+        return payload
 
-        def pump() -> None:
-            nonlocal final_record
-            try:
-                response = connection.getresponse()
-                if response.status != 200:
-                    raise RuntimeError(
-                        f"Native inference HTTP {response.status}: {response.read().decode()}"
-                    )
-                for line in response:
-                    if stopped.is_set():
-                        break
-                    if line.startswith(b"data: "):
-                        item = json.loads(line[6:])
-                        if item.get("error"):
-                            raise RuntimeError(
-                                f"Native inference error: {item['error']}"
-                            )
-                        if item.get("stop"):
-                            final_record = item
-                            final_ready.set()
-                        events.put(item)
-            except BaseException as error:
-                events.put(error)
-            finally:
-                final_ready.set()  # EOF/error must not make finalization wait for its deadline.
-                events.put(None)
-
+    def generate(
+        self,
+        ids: Sequence[int],
+        max_new: int,
+        sampling: Mapping[str, Any],
+        cancel: threading.Event,
+    ) -> Generator[int | None, None, None]:
+        self.last = {}
+        if cancel.is_set():
+            return
+        url = urlparse(self.base)
+        hostname = url.hostname
+        if hostname is None:
+            raise engine_failure("Native inference URL has no hostname")
+        connection = http.client.HTTPConnection(hostname, url.port, timeout=600)
+        payload = self._completion_payload(ids, max_new, sampling)
+        stream = _NativeStream(connection, ids, cancel)
         try:
-            connection.request(
-                "POST",
-                "/completion",
-                body=json.dumps(payload),
-                headers={"Content-Type": "application/json"},
-            )
-            transport = connection.sock
-            reader = threading.Thread(target=pump, daemon=True)
-            reader.start()
-            while not cancel.is_set():
-                try:
-                    item = events.get(timeout=0.1)
-                except queue.Empty:
-                    if time.monotonic() - started > 600:
-                        raise TimeoutError(
-                            "Native inference exceeded 600 seconds"
-                        ) from None
-                    yield None
-                    continue
-                if item is None:
-                    raise RuntimeError(
-                        "Native inference stream ended before its final record"
-                    )
-                if isinstance(item, BaseException):
-                    raise item
-                for token in item.get("tokens", []):
-                    if cancel.is_set():
-                        return
-                    first = first or time.monotonic()
-                    count += 1
-                    last_token = token
-                    yield token
-                if item.get("stop"):
-                    final_consumed = True
-                    break
+            stream.start(payload)
+            yield from stream.tokens()
         except GeneratorExit as error:
             # The shell can fail while detokenizing a yielded token, then close
             # this generator in its finally block. That active consumer failure
             # is carried as GeneratorExit's context; its timings are incomplete.
             if (
-                last_token not in self.stop_ids
+                stream.last_token not in self.stop_ids
                 and isinstance(error.__context__, Exception)
                 and not cancel.is_set()
             ):
-                failed = True
+                stream.failed = True
             raise
         except Exception as error:
             if cancel.is_set():
                 return
-            failed = True
+            stream.failed = True
             raise engine_failure(f"Native inference failed: {error}") from error
         finally:
-            # The pinned shell closes this generator as soon as it sees EOS. Native
-            # timing follows in another SSE packet. Drain only that normal completion,
-            # bounded to 0.5s and responsive to cancellation; never wait on a user stop.
-            normal_stop = last_token in self.stop_ids
-            if normal_stop and not cancel.is_set():
-                deadline = time.monotonic() + 0.5
-                while (
-                    not final_ready.is_set()
-                    and not cancel.is_set()
-                    and time.monotonic() < deadline
-                ):
-                    final_ready.wait(min(0.05, max(0, deadline - time.monotonic())))
-            if (
-                not failed
-                and not cancel.is_set()
-                and (final_consumed or normal_stop)
-                and final_record
-            ):
-                timing = final_record.get("timings")
-                if isinstance(timing, dict) and timing:
-                    self.last = {
-                        "generated": count,
-                        "prompt_tokens": len(ids),
-                        "prompt_ms": timing.get("prompt_ms"),
-                        "decode_ms": timing.get("predicted_ms"),
-                        "native_timings": dict(timing),
-                        "reused": timing.get("cache_n"),
-                    }
-            stopped.set()
-            if transport:
-                try:
-                    transport.shutdown(socket.SHUT_RDWR)
-                except OSError:
-                    pass
-            if reader is not None and reader.ident is not None:
-                reader.join(timeout=2)
-            connection.close()
+            normal_stop = stream.last_token in self.stop_ids
+            stream.wait_for_final(normal_stop)
+            self.last = stream.native_metrics(normal_stop)
+            stream.close()
             if not self.last:
-                self.last = {"generated": count, "prompt_tokens": len(ids)}
-                if not failed:
-                    ended = time.monotonic()
-                    self.last.update(
-                        prompt_ms=((first or ended) - started) * 1000,
-                        decode_ms=(ended - (first or ended)) * 1000,
-                    )
+                self.last = stream.fallback_metrics()
 
     def close(self) -> None:
+        # Each generate call owns and closes its HTTP connection and reader;
+        # the engine has no persistent transport to close between requests.
         pass
 
 

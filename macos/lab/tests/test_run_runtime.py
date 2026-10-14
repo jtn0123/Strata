@@ -29,6 +29,36 @@ class RunRuntimeTests(unittest.TestCase):
         stack.enter_context(patch.object(run.subprocess, 'Popen', side_effect=spawn))
         stack.enter_context(patch.object(run, 'app_monitor', return_value=monitor))
 
+    def test_invalid_ports_are_rejected_before_resource_checks_or_spawn(self):
+        for field in ('port', 'native_port'):
+            for value in (0, -1, 65536, True, 8095.0, '8095', '--api-key=unexpected'):
+                with self.subTest(field=field, value=value):
+                    args = self.args()
+                    setattr(args, field, value)
+                    with patch.object(run, 'experiment_environment', return_value=({}, {})), \
+                            patch.object(run, 'assert_no_model_server', side_effect=AssertionError('Resource check reached')) as resources, \
+                            patch.object(run.subprocess, 'Popen') as spawn:
+                        with self.assertRaisesRegex(ValueError, 'Ports must be integers from 1 to 65535'):
+                            run.execute(args)
+                        resources.assert_not_called()
+                        spawn.assert_not_called()
+
+    def test_duplicate_ports_are_rejected_before_resource_checks_or_spawn(self):
+        args = self.args()
+        args.native_port = args.port
+        with patch.object(run, 'experiment_environment', return_value=({}, {})), \
+                patch.object(run, 'assert_no_model_server', side_effect=AssertionError('Resource check reached')) as resources, \
+                patch.object(run.subprocess, 'Popen') as spawn:
+            with self.assertRaisesRegex(ValueError, 'API and native ports must differ'):
+                run.execute(args)
+            resources.assert_not_called()
+            spawn.assert_not_called()
+
+    def test_port_boundaries_keep_numeric_values(self):
+        args = self.args()
+        args.port, args.native_port = 1, 65535
+        self.assertEqual(run.validated_ports(args), (1, 65535))
+
     def test_stop_during_native_or_api_creation_finalizes_both_owned_children(self):
         for stage in (0, 1):
             with self.subTest(stage=stage), tempfile.TemporaryDirectory() as folder, ExitStack() as stack:

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Start Strata's Mac web app over the pinned native Metal engine. Ctrl-C stops both."""
 
+from __future__ import annotations
+
 import argparse
 from datetime import datetime, timezone
 import fcntl
@@ -56,6 +58,28 @@ def assert_ports_available(ports: Sequence[int]) -> None:
             sock.bind(("127.0.0.1", port))
 
 
+def validated_ports(args: RunArguments) -> tuple[int, int]:
+    """Keep CLI values numeric before resource checks or child argument assembly."""
+    for value in (args.port, args.native_port):
+        if type(value) is not int or not 1 <= value <= 65535:
+            raise ValueError("Ports must be integers from 1 to 65535")
+    if args.port == args.native_port:
+        raise ValueError("API and native ports must differ")
+    return int(args.port), int(args.native_port)
+
+
+def stop_owned_processes(processes: Sequence[subprocess.Popen[bytes] | None]) -> None:
+    for process in processes:
+        if process is None or process.poll() is not None:
+            continue
+        process.terminate()
+        try:
+            process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.wait()
+
+
 def main(argv: Sequence[str] | None = None) -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("model", choices=["small", "flash"], nargs="?", default="flash")
@@ -100,6 +124,7 @@ def execute(args: RunArguments) -> None:
         )
     # Reject unsupported lookup settings before any native process can launch.
     lookup_command(["--spec-type", args.spec], args)
+    app_port, native_port = validated_ports(args)
     native_env, vocab_info = experiment_environment(args.engine, args.draft_vocab)
     native_env, metal_info = configure(
         native_env, args.engine, args.tensor_api, args.m5_tuning
@@ -108,7 +133,7 @@ def execute(args: RunArguments) -> None:
     engine_info = verify_engine(args.engine)
     model_ids = [args.model] + ([args.draft_model] if args.spec == "draft-mtp" else [])
     model_info = verify_models(model_ids)
-    assert_ports_available((args.port, args.native_port))
+    assert_ports_available((app_port, native_port))
     folder = (
         ROOT / "bench/runtime" / datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     )
@@ -121,8 +146,8 @@ def execute(args: RunArguments) -> None:
                 "create_time": psutil.Process().create_time(),
                 "model": args.model,
                 "engine": args.engine,
-                "port": args.port,
-                "native_port": args.native_port,
+                "port": app_port,
+                "native_port": native_port,
                 "log_directory": str(folder),
             },
             indent=2,
@@ -130,7 +155,7 @@ def execute(args: RunArguments) -> None:
         + "\n"
     )
     config: dict[str, Any] = {
-        "native_url": f"http://127.0.0.1:{args.native_port}",
+        "native_url": f"http://127.0.0.1:{native_port}",
         "model_name": args.model,
         "host": "127.0.0.1",
         "fit_max_tokens": True,
@@ -145,7 +170,7 @@ def execute(args: RunArguments) -> None:
         try:
             command = server_command(
                 args.model,
-                args.native_port,
+                native_port,
                 args.context,
                 batch=batch,
                 ubatch=args.ubatch,
@@ -221,11 +246,11 @@ def execute(args: RunArguments) -> None:
                         "--host",
                         "127.0.0.1",
                         "--port",
-                        str(args.port),
+                        str(app_port),
                     ]
                 )
             print(
-                f"Strata: http://127.0.0.1:{args.port} | native API: {config['native_url']}/v1",
+                f"Strata: http://127.0.0.1:{app_port} | native API: {config['native_url']}/v1",
                 flush=True,
             )
             print(f"Logs: {folder} | Ctrl-C stops both processes", flush=True)
@@ -240,14 +265,7 @@ def execute(args: RunArguments) -> None:
         except KeyboardInterrupt:
             pass
         finally:
-            for process in (app, native):
-                if process and process.poll() is None:
-                    process.terminate()
-                    try:
-                        process.wait(timeout=10)
-                    except subprocess.TimeoutExpired:
-                        process.kill()
-                        process.wait()
+            stop_owned_processes((app, native))
             if monitor:
                 (folder / "memory-summary.json").write_text(
                     json.dumps(monitor.finish(), indent=2) + "\n"

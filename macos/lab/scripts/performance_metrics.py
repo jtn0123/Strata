@@ -108,16 +108,16 @@ def resources(config: Mapping[str, Any]) -> JSONDict:
     vm, swap = psutil.virtual_memory(), psutil.swap_memory()
     sample = guard_sample(config.get("monitor_file")) or {}
     initial = number(config.get("initial_swap_bytes"))
-    return dict(
-        available_bytes=vm.available,
-        total_bytes=vm.total,
-        swap_used_bytes=swap.used,
-        new_swap_bytes=max(0, swap.used - initial) if initial is not None else None,
-        model_rss_bytes=number(sample.get("rss_bytes")),
-        pressure_level=sample.get("pressure_level")
+    return {
+        "available_bytes": vm.available,
+        "total_bytes": vm.total,
+        "swap_used_bytes": swap.used,
+        "new_swap_bytes": max(0, swap.used - initial) if initial is not None else None,
+        "model_rss_bytes": number(sample.get("rss_bytes")),
+        "pressure_level": sample.get("pressure_level")
         if sample.get("pressure_level") in (1, 2, 4)
         else None,
-    )
+    }
 
 
 def tracked_service(
@@ -161,14 +161,12 @@ def tracked_service(
             self.history = History(self.history, maxlen=self.history.maxlen)
 
         def kind(self) -> str:
-            return (
-                "mock"
-                if isinstance(self.engine, mock_type)
-                else "model"
-                if (getattr(self.engine, "info", {}) or {}).get("backend")
-                == "metal-native-http"
-                else "unverified"
-            )
+            if isinstance(self.engine, mock_type):
+                return "mock"
+            backend = (getattr(self.engine, "info", {}) or {}).get("backend")
+            if backend == "metal-native-http":
+                return "model"
+            return "unverified"
 
         def metrics(self) -> JSONDict:
             result: JSONDict = super().metrics()
@@ -176,17 +174,17 @@ def tracked_service(
                 memory = resources(performance_config)
             except (OSError, ValueError, psutil.Error):
                 memory = {}
-            result["performance"] = dict(
-                schema=1,
-                measurement_kind=self.kind(),
-                settings={
+            result["performance"] = {
+                "schema": 1,
+                "measurement_kind": self.kind(),
+                "settings": {
                     key: performance_config[key]
                     for key in allowed
                     if key in performance_config
                 },
-                resources=memory,
-                scope="Server timings start after queue admission; browser and engine timings have different scopes.",
-            )
+                "resources": memory,
+                "scope": "Server timings start after queue admission; browser and engine timings have different scopes.",
+            }
             return result
 
     return TrackedService

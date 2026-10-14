@@ -40,6 +40,35 @@ class ProvenanceTests(unittest.TestCase):
             with patch.object(proof,"file_digest",side_effect=mutate),self.assertRaisesRegex(RuntimeError,"during verification"):
                 proof.verify_models(["small"],root)
 
+    def test_geometry_mutation_refuses_to_publish_a_new_cache(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); path = self.fixture(root)
+            proof.verify_models(["small"], root)
+            cache = root / "bench/runtime/model-verification.json"
+            previous = cache.read_bytes()
+            def mutate_geometry(model_id, source):
+                self.assertEqual((model_id, source), ("small", path))
+                source.write_bytes(b"changed")
+                return None
+            with patch.object(proof, "geometry", side_effect=mutate_geometry), \
+                    patch.object(proof.os, "replace") as publish:
+                with self.assertRaisesRegex(RuntimeError, "Model changed while reading geometry: small"):
+                    proof.verify_models(["small"], root)
+            publish.assert_not_called()
+            self.assertEqual(cache.read_bytes(), previous)
+
+    def test_failed_atomic_publication_keeps_old_cache_and_removes_temporary(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); self.fixture(root)
+            proof.verify_models(["small"], root)
+            cache = root / "bench/runtime/model-verification.json"
+            previous = cache.read_bytes()
+            with patch.object(proof.os, "replace", side_effect=OSError("fixture rename failed")):
+                with self.assertRaisesRegex(OSError, "fixture rename failed"):
+                    proof.verify_models(["small"], root)
+            self.assertEqual(cache.read_bytes(), previous)
+            self.assertEqual(list(cache.parent.glob("*.tmp")), [])
+
     def test_concurrent_verification_uses_independent_atomic_publication(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); self.fixture(root)

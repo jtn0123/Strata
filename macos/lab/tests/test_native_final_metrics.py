@@ -55,6 +55,55 @@ class NativeFinalMetricsTests(unittest.TestCase):
         self.assertEqual(engine.last.get('reused'), 4)
         self.assertEqual(len(connection.calls), 1)
 
+    def test_grouped_final_tokens_preserve_sampling_payload_and_native_metrics(self):
+        class GroupedConnection(Connection):
+            def __iter__(self):
+                yield b': keepalive\n'
+                yield b'data: ' + json.dumps(dict(tokens=[1, 2], stop=True, timings=dict(
+                    prompt_ms=12, predicted_ms=25, cache_n=4))).encode() + b'\n'
+        connection = GroupedConnection()
+        engine = self.engine()
+        engine.prompt_cache = False
+        sampling = dict(temperature=0, repetition_penalty=1.2, top_p=0, top_k=0,
+                        min_p=0, frequency_penalty=0, presence_penalty=0, seed=0,
+                        unsupported='fixture')
+        with patch('native_backend.http.client.HTTPConnection', return_value=connection):
+            self.assertEqual(list(engine.generate([10, 11], 32, sampling, threading.Event())), [1, 2])
+        args, kwargs = connection.calls[0]
+        self.assertEqual(args, ('POST', '/completion'))
+        self.assertEqual(json.loads(kwargs['body']), dict(prompt=[10, 11], n_predict=32,
+            stream=True, return_tokens=True, cache_prompt=False, temperature=0, repeat_penalty=1.2,
+            top_p=0, top_k=0, min_p=0, frequency_penalty=0, presence_penalty=0, seed=0))
+        self.assertEqual(engine.last, dict(generated=2, prompt_tokens=2, prompt_ms=12,
+            decode_ms=25, reused=4, native_timings=dict(prompt_ms=12, predicted_ms=25, cache_n=4)))
+        self.assertTrue(connection.closed)
+
+    def test_quiet_transport_heartbeat_and_deadline_keep_owned_cleanup(self):
+        class QuietConnection(Connection):
+            def __iter__(self):
+                self.release.wait(5)
+                return iter(())
+        for expired in (False, True):
+            with self.subTest(expired=expired):
+                engine = self.engine()
+                connection = QuietConnection()
+                cancel = threading.Event()
+                clock = iter((1.0, 602.0 if expired else 2.0, 3.0))
+                with patch('native_backend.http.client.HTTPConnection', return_value=connection), \
+                        patch('native_backend.time.monotonic', side_effect=lambda: next(clock)):
+                    stream = engine.generate([10], 32, {}, cancel)
+                    if expired:
+                        with self.assertRaisesRegex(RuntimeError, 'exceeded 600 seconds'):
+                            next(stream)
+                        self.assertNotIn('decode_ms', engine.last)
+                    else:
+                        self.assertIsNone(next(stream))
+                        cancel.set()
+                        stream.close()
+                    self.assertEqual(engine.last['generated'], 0)
+                    self.assertNotIn('native_timings', engine.last)
+                    self.assertTrue(connection.closed)
+
     def test_cancel_skips_final_drain_and_does_not_reuse_old_metrics(self):
         engine = self.engine(); engine.last = dict(native_timings=dict(predicted_per_second=999))
         connection = Connection(final=False, delay=5); cancel = threading.Event()

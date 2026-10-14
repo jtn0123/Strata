@@ -40,43 +40,44 @@ BASE: list[str] = [
     "0.0",
 ]
 PROFILES: dict[str, RuntimeProfile] = {
-    "balanced": dict(
-        arguments=BASE, description="Normal English chat and code generation."
-    ),
-    "code-edit": dict(
-        arguments=BASE + ["--lookup-profile", "code-edit"],
-        description="Edits to supplied files. Faster complete replies confirmed on two Python, two JavaScript and two JSON fixtures.",
-    ),
+    "balanced": {
+        "arguments": BASE,
+        "description": "Normal English chat and code generation.",
+    },
+    "code-edit": {
+        "arguments": BASE + ["--lookup-profile", "code-edit"],
+        "description": "Edits to supplied files. Faster complete replies confirmed on two Python, two JavaScript and two JSON fixtures.",
+    },
 }
 LONG_DOCUMENTS = list(BASE)
 for flag in ("--batch", "--ubatch"):
     LONG_DOCUMENTS[LONG_DOCUMENTS.index(flag) + 1] = "1536"
-PROFILES["long-documents"] = dict(
-    arguments=LONG_DOCUMENTS,
-    description="Optional long-document mode. Reads long inputs faster in matched trials; "
+PROFILES["long-documents"] = {
+    "arguments": LONG_DOCUMENTS,
+    "description": "Optional long-document mode. Reads long inputs faster in matched trials; "
     "uses a little more memory. Sustained editing validation is still mixed.",
-)
+}
 
 
 def lookup_command(command: list[str], args: object) -> list[str]:
     """Bound lookup to the exact configuration tested with real MTP fallback."""
     if getattr(args, "lookup_profile", "off") == "off":
         return command
-    required = dict(
-        model="flash",
-        engine="m5-small-stack",
-        m5_tuning="small-reduce",
-        tensor_api="on",
-        context=4096,
-        ubatch=512,
-        cache_type="f16",
-        spec="draft-mtp",
-        draft_model="mtp_shared_packed_q3",
-        draft=3,
-        draft_placement="mixed",
-        draft_threads=8,
-        draft_p_min=0.0,
-    )
+    required = {
+        "model": "flash",
+        "engine": "m5-small-stack",
+        "m5_tuning": "small-reduce",
+        "tensor_api": "on",
+        "context": 4096,
+        "ubatch": 512,
+        "cache_type": "f16",
+        "spec": "draft-mtp",
+        "draft_model": "mtp_shared_packed_q3",
+        "draft": 3,
+        "draft_placement": "mixed",
+        "draft_threads": 8,
+        "draft_p_min": 0.0,
+    }
     if getattr(args, "batch", 512) != 512 or any(
         getattr(args, key, None) != value for key, value in required.items()
     ):

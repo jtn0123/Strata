@@ -50,3 +50,6 @@ npm run lint
 Detailed local receipts, fault-injection checks, dependency caches and source
 snapshots stay in ignored benchmark feature directories. Tests and exact-head
 hosted checks remain separate evidence from lint/type success.
+
+[QUALITY-PLAN.md](QUALITY-PLAN.md) lists the measured follow-on work, including
+stricter checks, staged typing and benchmark-function separation.

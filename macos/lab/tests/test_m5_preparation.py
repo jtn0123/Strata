@@ -108,6 +108,22 @@ class M5Tests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 configure({}, "mtp-mma", **kwargs)
 
+    def test_setting_errors_precede_engine_errors_and_environment_reads(self):
+        class UnreadableEnvironment(dict):
+            def items(self): raise AssertionError("Invalid settings must not read the environment")
+        inherited = UnreadableEnvironment()
+        cases = (
+            ("baseline", "unknown", "head4", "Unknown Metal experiment setting"),
+            ("baseline", "auto", "unknown", "Unknown Metal experiment setting"),
+            ("baseline", "auto", "head4", "GPU tuning and timing diagnostics require an isolated M5 engine"),
+            ("m5-lab", "auto", "copy-v4", "Copy kernels require the isolated m5-copy engine"),
+            ("m5-copy", "auto", "head4", "Vocabulary head tiling requires the isolated m5-head engine"),
+        )
+        for engine, api, tuning, message in cases:
+            with self.subTest(engine=engine, api=api, tuning=tuning):
+                with self.assertRaisesRegex(ValueError, message):
+                    configure(inherited, engine, api, tuning)
+
     def test_copy_modes_require_the_copy_engine_and_strip_inherited_trace(self):
         for mode, width in (("copy-scalar", "1"), ("copy-v4", "4"), ("copy-v8", "8")):
             for engine in ("baseline", "mtp-mma", "m5-lab", "m5-trace", "m5-correctness"):

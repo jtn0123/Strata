@@ -2,7 +2,7 @@
 
 import math
 from collections.abc import Mapping
-from typing import TypedDict
+from typing import NamedTuple, TypedDict
 
 
 class MetalReceipt(TypedDict):
@@ -10,6 +10,13 @@ class MetalReceipt(TypedDict):
     tuning: str
     profile: bool
     variables: dict[str, str]
+
+
+class TuningRule(NamedTuple):
+    setting: str
+    prefix: bool
+    engines: tuple[str, ...]
+    message: str
 
 
 TUNING: dict[str, dict[str, str]] = {
@@ -109,13 +116,43 @@ TUNING: dict[str, dict[str, str]] = {
 }
 
 
-def configure(
-    environment: Mapping[str, str],
+TUNING_RULES = (
+    TuningRule("small-", True, ("m5-small-stack",), "Small-gain combination requires isolated m5-small-stack engine"),
+    TuningRule("route-map", False, ("m5-route-map",), "Route-map reuse requires isolated m5-route-map engine"),
+    TuningRule("compact-tiles", False, ("m5-compact",), "Compact tile dispatch requires isolated m5-compact engine"),
+    TuningRule(
+        "compact-cols",
+        False,
+        ("m5-compact-cols",),
+        "Column-first compact dispatch requires isolated m5-compact-cols engine",
+    ),
+    TuningRule("qsa-all-pools", False, ("m5-qsa",), "QSA ranking requires isolated m5-qsa engine"),
+    TuningRule("top10", False, ("m5-top10",), "Parallel top10 requires isolated m5-top10 engine"),
+    TuningRule("draftcap", True, ("m5-draftcap",), "Draft caps require the isolated m5-draftcap engine"),
+    TuningRule("reduce10", False, ("m5-reduce",), "Ten-expert fusion requires the isolated m5-reduce engine"),
+    TuningRule("sampling-view", False, ("m5-sampling",), "Sampling view requires the isolated m5-sampling engine"),
+    TuningRule("hc-", True, ("m5-hc",), "HC kernels require the isolated m5-hc engine"),
+    TuningRule("expert-group", False, ("m5-group",), "Expert grouping requires the isolated m5-group engine"),
+    TuningRule("gate-up", True, ("m5-gate", "m5-gate-lanes"), "Gate fusion requires the isolated m5-gate engine"),
+    TuningRule("head", True, ("m5-head",), "Vocabulary head tiling requires the isolated m5-head engine"),
+    TuningRule("encoders", True, ("m5-encoders",), "Encoding threads require the isolated m5-encoders engine"),
+    TuningRule("gdn-row", True, ("m5-gdn",), "GDN row grouping requires the isolated m5-gdn engine"),
+)
+
+
+def _validate_tuning_engine(engine: str, tuning: str) -> None:
+    for rule in TUNING_RULES:
+        matches = tuning.startswith(rule.setting) if rule.prefix else tuning == rule.setting
+        if matches and engine not in rule.engines:
+            raise ValueError(rule.message)
+
+
+def _validate_metal_settings(
     engine: str,
-    tensor_api: str = "auto",
-    tuning: str = "stock",
-    profile: bool = False,
-) -> tuple[dict[str, str], MetalReceipt]:
+    tensor_api: str,
+    tuning: str,
+    profile: bool,
+) -> None:
     if tensor_api not in ("auto", "on", "off") or tuning not in TUNING:
         raise ValueError("Unknown Metal experiment setting")
     if (tuning != "stock" or profile) and engine not in (
@@ -142,9 +179,7 @@ def configure(
         "m5-compact-cols",
         "m5-small-stack",
     ):
-        raise ValueError(
-            "GPU tuning and timing diagnostics require an isolated M5 engine"
-        )
+        raise ValueError("GPU tuning and timing diagnostics require an isolated M5 engine")
     if (tuning.startswith("copy-") or tuning == "conv-direct") and engine not in (
         "m5-copy",
         "m5-reduce",
@@ -167,45 +202,21 @@ def configure(
         "m5-small-stack",
     ):
         raise ValueError("Copy kernels require the isolated m5-copy engine")
-    if tuning.startswith("small-") and engine != "m5-small-stack":
-        raise ValueError(
-            "Small-gain combination requires isolated m5-small-stack engine"
-        )
-    if tuning == "route-map" and engine != "m5-route-map":
-        raise ValueError("Route-map reuse requires isolated m5-route-map engine")
-    if tuning == "compact-tiles" and engine != "m5-compact":
-        raise ValueError("Compact tile dispatch requires isolated m5-compact engine")
-    if tuning == "compact-cols" and engine != "m5-compact-cols":
-        raise ValueError(
-            "Column-first compact dispatch requires isolated m5-compact-cols engine"
-        )
-    if tuning == "qsa-all-pools" and engine != "m5-qsa":
-        raise ValueError("QSA ranking requires isolated m5-qsa engine")
-    if tuning == "top10" and engine != "m5-top10":
-        raise ValueError("Parallel top10 requires isolated m5-top10 engine")
-    if tuning.startswith("draftcap") and engine != "m5-draftcap":
-        raise ValueError("Draft caps require the isolated m5-draftcap engine")
-    if tuning == "reduce10" and engine != "m5-reduce":
-        raise ValueError("Ten-expert fusion requires the isolated m5-reduce engine")
-    if tuning == "sampling-view" and engine != "m5-sampling":
-        raise ValueError("Sampling view requires the isolated m5-sampling engine")
-    if tuning.startswith("hc-") and engine != "m5-hc":
-        raise ValueError("HC kernels require the isolated m5-hc engine")
-    if tuning == "expert-group" and engine != "m5-group":
-        raise ValueError("Expert grouping requires the isolated m5-group engine")
-    if tuning.startswith("gate-up") and engine not in ("m5-gate", "m5-gate-lanes"):
-        raise ValueError("Gate fusion requires the isolated m5-gate engine")
-    if tuning.startswith("head") and engine != "m5-head":
-        raise ValueError("Vocabulary head tiling requires the isolated m5-head engine")
-    if tuning.startswith("encoders") and engine != "m5-encoders":
-        raise ValueError("Encoding threads require the isolated m5-encoders engine")
-    if tuning.startswith("gdn-row") and engine != "m5-gdn":
-        raise ValueError("GDN row grouping requires the isolated m5-gdn engine")
+    _validate_tuning_engine(engine, tuning)
+
+
+def configure(
+    environment: Mapping[str, str],
+    engine: str,
+    tensor_api: str = "auto",
+    tuning: str = "stock",
+    profile: bool = False,
+) -> tuple[dict[str, str], MetalReceipt]:
+    _validate_metal_settings(engine, tensor_api, tuning, profile)
     env = {
         k: v
         for k, v in environment.items()
-        if not k.startswith(("GGML_METAL_", "GGML_M5_LAB_", "GGML_SCHED_DEBUG"))
-        and k != "METAL_CAPTURE_ENABLED"
+        if not k.startswith(("GGML_METAL_", "GGML_M5_LAB_", "GGML_SCHED_DEBUG")) and k != "METAL_CAPTURE_ENABLED"
     }
     flags = dict(TUNING[tuning])
     if tensor_api == "on":
