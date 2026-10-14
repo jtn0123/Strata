@@ -17,6 +17,10 @@ from performance_metrics import tracked_service
 from serve.server import EngineDied, Service, make_handler
 
 
+# A complete final record for prompt [10] and the two emitted tokens [1, 99].
+COUNTS = dict(prompt_n=1, cache_n=0, predicted_n=2)
+
+
 class Tokenizer:
     def encode(self, *args, **kwargs): return [99]
     def decode(self, ids, **kwargs): return 'hello'
@@ -110,7 +114,7 @@ class NativeErrorTests(unittest.TestCase):
     def test_downstream_detokenize_failure_has_no_native_or_synthetic_rate(self):
         packet = lambda row: b'data: ' + json.dumps(row).encode() + b'\n'
         connection = Connection(lines=[packet(dict(tokens=[1])), packet(dict(tokens=[99])),
-            packet(dict(stop=True, timings=dict(prompt_ms=12, predicted_ms=25, predicted_per_second=80)))])
+            packet(dict(stop=True, timings=dict(prompt_ms=12, predicted_ms=25, predicted_per_second=80, **COUNTS)))])
         engine = self.engine()
         service = tracked_service(Service, type(None))(engine, Tokenizer(), None)
         service.tok = NativeTokenizer('fixture')
@@ -131,7 +135,7 @@ class NativeErrorTests(unittest.TestCase):
     def test_normal_eos_in_an_unrelated_exception_handler_retains_native_timings(self):
         packet = lambda row: b'data: ' + json.dumps(row).encode() + b'\n'
         connection = Connection(lines=[packet(dict(tokens=[1])), packet(dict(tokens=[99])),
-            packet(dict(stop=True, timings=dict(prompt_ms=12, predicted_ms=25, predicted_per_second=80)))])
+            packet(dict(stop=True, timings=dict(prompt_ms=12, predicted_ms=25, predicted_per_second=80, **COUNTS)))])
         engine = self.engine(); service = Service(engine, Tokenizer(), None)
         try:
             raise ValueError('previous unrelated operation')
@@ -140,6 +144,23 @@ class NativeErrorTests(unittest.TestCase):
                 list(service.run([10], False, [], 10, {}, threading.Event()))
         self.assertEqual(service.history[-1]['finish'], 'stop')
         self.assertEqual(engine.last['native_timings']['predicted_per_second'], 80)
+
+    def test_impossible_final_counters_leave_monitor_without_native_rate(self):
+        packet = lambda row: b'data: ' + json.dumps(row).encode() + b'\n'
+        connection = Connection(lines=[packet(dict(tokens=[1])), packet(dict(tokens=[99])),
+            packet(dict(stop=True, timings=dict(prompt_ms=-5, predicted_ms=25, predicted_per_second=400000,
+                                                prompt_n=20, cache_n=100, predicted_n=800)))])
+        engine = self.engine()
+        service = tracked_service(Service, type(None))(engine, Tokenizer(), None)
+        with patch('native_backend.http.client.HTTPConnection', return_value=connection):
+            list(service.run([10], False, [], 10, {}, threading.Event()))
+        row = service.history[-1]
+        self.assertEqual((row['finish'], row['output_tokens']), ('stop', 2))
+        self.assertIsNone(row['reused'])
+        self.assertNotEqual(row['generation_source'], 'native')
+        self.assertNotEqual(row['generation_tps'], 400000)
+        self.assertNotIn('native_timings', engine.last)
+        self.assertIn('Native output count differs', engine.last['native_timing_error'])
 
     def test_native_error_and_malformed_schemas_reach_supported_error_boundary(self):
         tokenizer = NativeTokenizer('fixture')
@@ -182,7 +203,7 @@ class NativeErrorTests(unittest.TestCase):
         packet = lambda row: b'data: ' + json.dumps(row).encode() + b'\n'
         failed = Connection(lines=[packet(dict(tokens=[1])), packet(dict(error='fixture failed'))])
         completed = Connection(lines=[packet(dict(tokens=[1])), packet(dict(tokens=[99])),
-            packet(dict(stop=True, timings=dict(predicted_per_second=80, prompt_ms=12, predicted_ms=25)))])
+            packet(dict(stop=True, timings=dict(predicted_per_second=80, prompt_ms=12, predicted_ms=25, **COUNTS)))])
         engine = self.engine(); service = Service(engine, Tokenizer(), None)
         with patch('native_backend.http.client.HTTPConnection', side_effect=[failed, completed]):
             response = service.run([10], False, [], 10, {}, threading.Event())

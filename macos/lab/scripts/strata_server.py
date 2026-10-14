@@ -5,7 +5,7 @@ import argparse
 import json
 import sys
 from collections.abc import Callable, Sequence
-from http.server import BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import NamedTuple, Protocol, TypedDict, cast
 
@@ -18,6 +18,7 @@ type HandlerInstaller = Callable[[HandlerFactory], HandlerFactory]
 class PinnedServer(Protocol):
     Service: type[object]
     MockEngine: type[object]
+    Server: type[ThreadingHTTPServer]
     make_handler: HandlerFactory
 
     def main(self) -> int: ...
@@ -79,7 +80,7 @@ def setup_server(argv: Sequence[str] | None = None) -> ServerBootstrap:
 
     register_backend("metal-native", create_backend)
     from serve import server as pinned_server
-    from web_ui import mac_handler_factory
+    from web_ui import bounded_server, mac_handler_factory
     from performance_metrics import tracked_service
 
     # The downloaded shell is an explicit revision-pinned module boundary.
@@ -89,6 +90,7 @@ def setup_server(argv: Sequence[str] | None = None) -> ServerBootstrap:
     # The web adapter wraps the retained factory and returns its handler subclass.
     install_handler = cast(HandlerInstaller, mac_handler_factory)
     server.make_handler = install_handler(server.make_handler)
+    server.Server = bounded_server(server.Server)
     return ServerBootstrap(server, config)
 
 

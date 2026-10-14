@@ -12,6 +12,7 @@ from collections.abc import Generator, Iterable, Mapping, Sequence
 from typing import Any, cast
 from urllib.parse import urlparse
 
+from benchmark_metrics import validate_final_record
 from lab import ROOT, request
 
 JSONDict = dict[str, Any]
@@ -185,10 +186,17 @@ class _NativeStream:
         connection: http.client.HTTPConnection,
         prompt_ids: Sequence[int],
         cancel: threading.Event,
+        *,
+        max_new: int,
+        cached: bool,
     ) -> None:
         self.connection = connection
         self.prompt_ids = prompt_ids
         self.cancel = cancel
+        self.max_new = max_new
+        self.cached = cached
+        self.timing_error: str | None = None
+        self.rejected_timings: JSONDict | None = None
         self.events: queue.Queue[JSONDict | BaseException | None] = queue.Queue()
         self.stopped = threading.Event()
         self.final_ready = threading.Event()
@@ -283,6 +291,14 @@ class _NativeStream:
         timing = self.final_record.get("timings")
         if not isinstance(timing, dict) or not timing:
             return {}
+        try:
+            limit = self.max_new if self.max_new > 0 else None
+            validate_final_record(timing, self.count, len(self.prompt_ids), cached=self.cached, max_new=limit)
+        except (KeyError, ValueError) as error:
+            # Impossible counters never become native rates; server-derived timing remains.
+            self.timing_error = f"{type(error).__name__}: {error}"
+            self.rejected_timings = dict(timing)
+            return {}
         return {
             "generated": self.count,
             "prompt_tokens": len(self.prompt_ids),
@@ -297,6 +313,9 @@ class _NativeStream:
             "generated": self.count,
             "prompt_tokens": len(self.prompt_ids),
         }
+        if self.timing_error:
+            # Kept apart from native_timings so a benchmark receipt can show what was rejected.
+            metrics.update(native_timing_error=self.timing_error, rejected_native_timings=self.rejected_timings)
         if not self.failed:
             ended = time.monotonic()
             metrics.update(
@@ -380,7 +399,7 @@ class NativeEngine:
             raise engine_failure("Native inference URL has no hostname")
         connection = http.client.HTTPConnection(hostname, url.port, timeout=600)
         payload = self._completion_payload(ids, max_new, sampling)
-        stream = _NativeStream(connection, ids, cancel)
+        stream = _NativeStream(connection, ids, cancel, max_new=max_new, cached=self.prompt_cache)
         try:
             stream.start(payload)
             yield from stream.tokens()

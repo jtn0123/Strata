@@ -12,7 +12,7 @@ class StreamObserverTests(unittest.TestCase):
     def response(self):
         return io.BytesIO(b''.join(b'data: '+json.dumps(r).encode()+b'\n' for r in [
             dict(content='hello',tokens=[1,2]),dict(content=' world',tokens=[3]),
-            dict(content='',tokens=[],stop=True,timings=dict(predicted_n=3))]))
+            dict(content='',tokens=[],stop=True,timings=dict(predicted_n=3,prompt_ms=4,predicted_ms=30))]))
 
     def test_observer_preserves_text_tokens_and_native_final_packet(self):
         seen=[]

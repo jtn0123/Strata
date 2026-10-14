@@ -85,6 +85,12 @@ def counter(value: object, label: str) -> int:
     return value
 
 
+def elapsed(value: object, label: str) -> Number:
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+        raise ValueError(f"{label}: expected a finite nonnegative measurement, got {value!r}")
+    return value
+
+
 def completion_counts(
     timings: Mapping[str, object],
     ids: Sequence[object],
@@ -96,14 +102,36 @@ def completion_counts(
     """Match native counters to the actual request and emitted token IDs."""
     if not ids or any(type(token) is not int or token < 0 for token in ids):
         raise ValueError("Actual nonempty output token IDs required")
+    return validate_final_record(timings, len(ids), prompt_tokens, cached=cached, max_new=max_new)
+
+
+def validate_final_record(
+    timings: Mapping[str, object],
+    emitted: int,
+    prompt_tokens: int | None = None,
+    *,
+    cached: bool = False,
+    max_new: int | None = None,
+) -> int:
+    """A final record must describe this request: each emitted token, the whole prompt, real times.
+
+    predicted_n counts every streamed token, the end-of-turn token included (llama.cpp n_gen).
+    """
     generated = counter(timings["predicted_n"], "predicted_n")
-    if generated != len(ids) or max_new is not None and generated > max_new:
+    if generated != emitted or max_new is not None and generated > max_new:
         raise ValueError("Native output count differs from emitted tokens or requested cap")
     if prompt_tokens is not None:
         read = counter(timings["prompt_n"], "prompt_n")
         reused = counter(timings.get("cache_n", 0), "cache_n")
         if read + reused != prompt_tokens or not cached and reused:
             raise ValueError("Native prompt count differs from the complete requested input")
+    for key in ("prompt_ms", "predicted_ms"):
+        elapsed(timings.get(key), key)
+    for key in ("prompt_per_second", "predicted_per_second"):
+        if key in timings:
+            elapsed(timings.get(key), key)
+    if counter(timings.get("draft_n_accepted", 0), "draft_n_accepted") > counter(timings.get("draft_n", 0), "draft_n"):
+        raise ValueError("Native accepted draft count exceeds proposals")
     return generated
 
 

@@ -100,7 +100,7 @@ class BenchmarkReceiptTests(unittest.TestCase):
                     return {'choices': [{'message': {'content': answer}}]}
                 return {}
             response = dict(ttft_s=.1, wall_s=.3, text='fixture', generated_token_ids=[7, 9],
-                final=dict(stop=True, timings=dict(prompt_n=64, predicted_n=2,
+                final=dict(stop=True, timings=dict(prompt_n=64, predicted_n=2, prompt_ms=128, predicted_ms=20,
                                                   predicted_per_second=50, prompt_per_second=500)))
             with self.patches(benchmark, root) as stack:
                 for name, value in {'Monitor': FinalSwapMonitor, 'request': request,
@@ -234,7 +234,7 @@ class BenchmarkReceiptTests(unittest.TestCase):
             self.assertTrue(all(c['native_timings']['cache_n'] > 0 for c in record['cases'] if c['cache']))
 
     def test_cache_measure_rejects_wrong_counts_capped_output_and_invalid_metrics(self):
-        good = dict(predicted_n=2, prompt_n=3, cache_n=0,
+        good = dict(predicted_n=2, prompt_n=3, cache_n=0, prompt_ms=6, predicted_ms=20,
                     predicted_per_second=50, prompt_per_second=500)
         class Engine:
             prompt_cache = False
@@ -278,7 +278,10 @@ class BenchmarkReceiptTests(unittest.TestCase):
     def test_rejected_cache_counter_and_semantic_failures_remain_auditable(self):
         faults = (dict(request=1, text='WRONG', error_text='ledger instruction'),
                   dict(request=2, timings=dict(predicted_n=999), error_text='output count'),
-                  dict(request=4, timings=dict(cache_n=0, prompt_n=3), error_text='did not reuse'))
+                  dict(request=4, timings=dict(cache_n=0, prompt_n=3), error_text='did not reuse'),
+                  # Only the engine's final-record check catches these; the receipt still shows them.
+                  dict(request=2, timings=dict(predicted_ms=-5), error_text='predicted_ms'),
+                  dict(request=2, timings=dict(draft_n=1, draft_n_accepted=2), error_text='accepted draft'))
         for fault in faults:
             with self.subTest(fault=fault), tempfile.TemporaryDirectory() as folder:
                 root = self.root(folder)
@@ -290,7 +293,8 @@ class BenchmarkReceiptTests(unittest.TestCase):
                 self.assertEqual(rejected['status'], 'rejected')
                 response = rejected['prime'] if fault['request'] == 1 else rejected['followup']
                 self.assertEqual(response['text'], fault.get('text', 'rejected fixture'))
-                if fault['request'] == 2: self.assertEqual(response['native_timings']['predicted_n'], 999)
+                if fault['request'] == 2:
+                    for key, value in fault['timings'].items(): self.assertEqual(response['native_timings'][key], value)
                 if fault['request'] == 4: self.assertEqual(response['native_timings']['cache_n'], 0)
 
     def test_complete_wrong_answers_retain_legacy_pair_and_diagnostic_semantics(self):
@@ -386,7 +390,7 @@ class BenchmarkReceiptTests(unittest.TestCase):
         class Engine:
             prompt_cache = False
             stop_ids = {99}
-            last = {'native_timings': dict(predicted_n=2, prompt_n=3, cache_n=0,
+            last = {'native_timings': dict(predicted_n=2, prompt_n=3, cache_n=0, prompt_ms=6, predicted_ms=20,
                 predicted_per_second=50, prompt_per_second=500)}
             def generate(self, *args): yield from [7, 8]
         tokenizer = SimpleNamespace(base='http://unused', decode=Mock(side_effect=AssertionError('Use bounded decode')))
