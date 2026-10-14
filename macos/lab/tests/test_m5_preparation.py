@@ -1,13 +1,17 @@
 """Protect paused preparation, controlled experiments and diagnostic interpretation."""
+from contextlib import ExitStack
 import copy
 import json
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 from unittest.mock import Mock
+
+import psutil
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import benchmark_m5
@@ -17,6 +21,7 @@ from metal_environment import configure
 import prepare_m5
 import profile_m5
 import verify_m5
+import verify_q2
 
 
 class M5Tests(unittest.TestCase):
@@ -221,6 +226,156 @@ class M5Tests(unittest.TestCase):
         result = prepare_m5.inventory()
         self.assertIn("Q2_0", result["formats"])
         self.assertGreater(result["formats"]["Q2_0"]["bytes"], 0)
+
+
+class TinyCheck:
+    """Owned test-backend-ops stand-in: writes its log, then exits after `live` running polls."""
+    pid = 4242
+
+    def __init__(self, live, log, text):
+        self.live, self.returncode, self.calls = live, None, []
+        log.write(text)
+
+    def poll(self):
+        if self.returncode is None and self.live <= 0:
+            self.returncode = 0
+        self.live -= 1
+        return self.returncode
+
+    def terminate(self):
+        self.calls.append("terminate")
+        self.returncode = -15
+
+    def kill(self):
+        self.calls.append("kill")
+        self.returncode = -9
+
+    def wait(self, timeout=None):
+        return self.returncode
+
+
+class SyntheticCheckResourceTests(unittest.TestCase):
+    """Shared verify_q2.check_case: live and post-exit swap/pressure evidence decide acceptance."""
+
+    def patched(self, stack, live, swaps, rss=64 * 1024**2, pressure=1, memory=None, sleep=None,
+                text="1/1 tests passed\n"):
+        children = []
+
+        def start(command, stdout, stderr, env):
+            children.append(TinyCheck(live, stdout, text))
+            return children[-1]
+
+        swap = Mock(side_effect=[SimpleNamespace(used=value) for value in swaps])
+        stack.enter_context(patch("verify_q2.subprocess.Popen", side_effect=start))
+        stack.enter_context(patch("verify_q2.psutil.swap_memory", swap))
+        proc = stack.enter_context(patch("verify_q2.psutil.Process"))
+        proc.return_value.memory_info.side_effect = memory
+        proc.return_value.memory_info.return_value = SimpleNamespace(rss=rss)
+        stack.enter_context(patch.object(verify_q2.Monitor, "read_pressure_level", side_effect=[pressure]))
+        stack.enter_context(patch("verify_q2.time.sleep", side_effect=sleep))
+        return children, swap
+
+    def run_check(self, live, swaps, **options):
+        folder = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        with ExitStack() as stack:
+            children, swap = self.patched(stack, live, swaps, **options)
+            result = verify_q2.check_case(Path("test-backend-ops"), folder, "math", "type_a=q2_0,")
+        published = json.loads((folder / "math.json").read_text())
+        self.assertEqual(published, json.loads(json.dumps(result)))
+        return result, children[0], swap
+
+    def test_normal_tiny_check_passes_with_live_and_final_samples(self):
+        result, child, swap = self.run_check(2, [0, 0, 0, 0])
+        self.assertTrue(result["passed"])
+        self.assertEqual((result["live_samples"], result["guard"], result["system_swap_growth_bytes"]), (2, None, 0))
+        self.assertEqual(result["final_observation"], {"swap_used_bytes": 0, "pressure_level": 1})
+        self.assertEqual((child.calls, swap.call_count), ([], 4))
+
+    def test_swap_growth_after_the_last_live_sample_fails(self):
+        result, _, swap = self.run_check(1, [0, 0, 1024**3])
+        self.assertFalse(result["passed"])
+        self.assertEqual(result["system_swap_growth_bytes"], 1024**3)
+        self.assertEqual(result["guard"], verify_q2.LIMIT_GUARD)
+        self.assertEqual(result["final_observation"]["swap_used_bytes"], 1024**3)
+        self.assertEqual(swap.call_count, 3)
+
+    def test_exit_before_the_first_poll_still_takes_the_final_sample(self):
+        result, child, swap = self.run_check(0, [0, 512 * 1024**2])
+        self.assertEqual((result["live_samples"], swap.call_count, child.calls), (0, 2, []))
+        self.assertEqual(result["final_observation"], {"swap_used_bytes": 512 * 1024**2, "pressure_level": 1})
+        self.assertEqual(result["system_swap_growth_bytes"], 512 * 1024**2)
+        self.assertFalse(result["passed"])
+        result, _, _ = self.run_check(0, [0, 0])
+        self.assertFalse(result["passed"])
+        self.assertIn("No live child sample", result["guard"])
+
+    def test_monitor_read_failure_rejects_with_evidence(self):
+        result, child, _ = self.run_check(5, [0, 0], memory=psutil.AccessDenied(4242))
+        self.assertFalse(result["passed"])
+        self.assertIn("Monitoring failed: AccessDenied", result["guard"])
+        self.assertEqual((child.calls, result["exit_code"]), (["terminate"], -15))
+        self.assertEqual(result["final_observation"], {"swap_used_bytes": 0, "pressure_level": 1})
+        result, _, _ = self.run_check(1, [0, 0, 0], pressure=subprocess.CalledProcessError(1, ["sysctl"]))
+        self.assertFalse(result["passed"])
+        self.assertTrue(result["monitor_error"].startswith("Final observation failed: CalledProcessError"))
+        self.assertEqual(result["final_observation"], {"swap_used_bytes": 0})
+        result, _, _ = self.run_check(1, [0, 0, 0], pressure=2)
+        self.assertFalse(result["passed"])
+        self.assertIn("pressure level 2", result["guard"])
+
+    def test_live_guard_stops_the_child_and_returns_rejected_evidence(self):
+        result, child, _ = self.run_check(5, [0, 0, 0], rss=2 * 1024**3)
+        self.assertFalse(result["passed"])
+        self.assertEqual((result["guard"], result["peak_rss_bytes"]), (verify_q2.LIMIT_GUARD, 2 * 1024**3))
+        self.assertEqual(child.calls, ["terminate"])
+
+    def test_child_exiting_during_a_sample_keeps_earlier_live_evidence(self):
+        memory = [SimpleNamespace(rss=64 * 1024**2), psutil.NoSuchProcess(4242)]
+        result, child, swap = self.run_check(2, [0, 0, 0], memory=memory)
+        self.assertTrue(result["passed"])
+        self.assertEqual((result["live_samples"], result["monitor_error"], child.calls), (1, None, []))
+        self.assertEqual(swap.call_count, 3)
+
+    def test_child_ignoring_terminate_is_killed_and_reaped(self):
+        child = Mock(returncode=None)
+        child.poll.return_value = None
+        child.wait.side_effect = [subprocess.TimeoutExpired("test-backend-ops", 10), -9, -9]
+        self.assertEqual(verify_q2.reap(child), -9)
+        self.assertEqual([call[0] for call in child.method_calls], ["poll", "terminate", "wait", "kill", "wait", "wait"])
+
+    def test_interrupted_check_publishes_evidence_and_reaps(self):
+        folder = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        with ExitStack() as stack, self.assertRaises(KeyboardInterrupt):
+            children, _ = self.patched(stack, 5, [0, 0, 0], sleep=KeyboardInterrupt)
+            verify_q2.check_case(Path("test-backend-ops"), folder, "math", "type_a=q2_0,")
+        published = json.loads((folder / "math.json").read_text())
+        self.assertEqual((published["passed"], published["exit_code"], children[0].calls), (False, -15, ["terminate"]))
+        self.assertEqual(published["final_observation"], {"swap_used_bytes": 0, "pressure_level": 1})
+
+    def m5_check(self, swaps):
+        root = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        (root / "bench/features").mkdir(parents=True)
+        error = None
+        with ExitStack() as stack:
+            self.patched(stack, 1, swaps, text="has tensor            = true\n1/1 tests passed\n")
+            stack.enter_context(patch.multiple(verify_m5, ROOT=root, sha256=Mock(return_value="tester"),
+                                               verify_engine=Mock(return_value={"directory": "engine"})))
+            try:
+                verify_m5.check("m5-lab", "on")
+            except RuntimeError as caught:
+                error = caught
+        return error, json.loads(next((root / "bench/features").glob("*/checks.json")).read_text())
+
+    def test_m5_zero_swap_gate_sees_growth_after_exit(self):
+        error, receipt = self.m5_check([0, 0, 0])
+        self.assertIsNone(error)
+        self.assertEqual(receipt["status"], "passed")
+        # 1 MiB is under the shared 256 MiB guard, but the M5 gate requires zero new swap.
+        error, receipt = self.m5_check([0, 0, 1024**2])
+        self.assertIn("memory check failed", str(error))
+        self.assertEqual(receipt["status"], "failed")
+        self.assertTrue(receipt["check"]["passed"])
+        self.assertEqual(receipt["check"]["system_swap_growth_bytes"], 1024**2)
 
 
 if __name__ == "__main__":
