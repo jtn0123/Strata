@@ -10,6 +10,7 @@ import functools
 import ipaddress
 import json
 import socket
+import socketserver
 import threading
 import time
 from collections.abc import Callable
@@ -17,7 +18,7 @@ from email.message import Message
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from io import BytesIO
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 WEB = Path(__file__).resolve().parents[1] / "web"
 ASSETS = {
@@ -305,6 +306,13 @@ class ConnectionLimit(ThreadingHTTPServer):
         self.slots = threading.BoundedSemaphore(MAX_CONNECTIONS)
         self.refusals = threading.BoundedSemaphore(MAX_CONNECTIONS)
         super().__init__(*args, **kwargs)
+
+    def server_bind(self) -> None:
+        # HTTPServer.server_bind also looks up the address's DNS name (socket.getfqdn). On the hosted macOS
+        # runner that lookup of 127.0.0.1 blocked startup for over 30 s; nothing here uses the name.
+        socketserver.TCPServer.server_bind(self)
+        host, port = cast(tuple[str, int], self.server_address)[:2]
+        self.server_name, self.server_port = host, port
 
     def process_request(self, request: Any, client_address: Any) -> None:
         if not self.slots.acquire(blocking=False):

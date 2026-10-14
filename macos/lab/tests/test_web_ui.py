@@ -542,6 +542,18 @@ class ConnectionLimitTests(unittest.TestCase):
         self.assertEqual(refused.events, [])
         self.assertEqual(self.free(server.refusals), 1)
 
+    def test_binding_does_not_wait_for_a_dns_name(self):
+        class Socket:
+            def setsockopt(self, *args): pass
+            def bind(self, address): self.address = address
+            def getsockname(self): return ('127.0.0.1', 8095)
+        server = self.server()
+        server.socket, server.server_address = Socket(), ('127.0.0.1', 0)
+        with patch('socket.getfqdn', side_effect=AssertionError('DNS lookup at startup')):
+            server.server_bind()
+        self.assertEqual((server.socket.address, server.server_name, server.server_port),
+                         (('127.0.0.1', 0), '127.0.0.1', 8095))
+
     def test_busy_answer_is_complete_http(self):
         head, _, body = BUSY.partition(b'\r\n\r\n')
         self.assertTrue(head.startswith(b'HTTP/1.0 503 '))
