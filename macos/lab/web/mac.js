@@ -1,4 +1,11 @@
 // Compatibility and accessibility over the pinned API shell; native settings stay with the server.
+// app.js owns these classic-script bindings. The writable contract describes
+// hook replacements and shared state; it creates no local or window bindings.
+// In particular, sharedOn and settings remain app.js's global lexical variables.
+/* global toast:writable, updateAssistant:writable, send:writable, spark:writable,
+          showTab:writable, renderChat:writable, loadShared:writable, sharedOn:writable,
+          loadDrawer:writable, settings:writable, openDrawer:writable, setPill:writable,
+          render:writable */
 "use strict";
 (() => {
   const input = document.getElementById("input");

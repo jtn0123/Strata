@@ -63,8 +63,9 @@ class BenchmarkReceiptTests(unittest.TestCase):
             with self.subTest(module=module.__name__), tempfile.TemporaryDirectory() as folder:
                 root = self.root(folder)
                 (root / 'models/small/tiny.gguf').write_bytes(b'changed')
+                args = self.args()
                 with self.patches(module, root), patch.object(module.subprocess, 'Popen') as spawn:
-                    with self.assertRaisesRegex(RuntimeError, 'SHA256 differs'): module.run(self.args())
+                    with self.assertRaisesRegex(RuntimeError, 'SHA256 differs'): module.run(args)
                 spawn.assert_not_called()
                 record = self.receipt(root)
                 self.assertEqual(record['status'], 'failed')
@@ -74,10 +75,11 @@ class BenchmarkReceiptTests(unittest.TestCase):
         for module in (benchmark, benchmark_cache):
             with self.subTest(module=module.__name__), tempfile.TemporaryDirectory() as folder:
                 root = self.root(folder)
+                args = self.args()
                 with patch.object(module, 'ROOT', root), \
                      patch.object(module, 'verify_engine', side_effect=RuntimeError('Replaced native library')), \
                      patch.object(module.subprocess, 'Popen') as spawn:
-                    with self.assertRaisesRegex(RuntimeError, 'Replaced native library'): module.run(self.args())
+                    with self.assertRaisesRegex(RuntimeError, 'Replaced native library'): module.run(args)
                 spawn.assert_not_called()
                 self.assertEqual(self.receipt(root)['status'], 'failed')
 
@@ -217,8 +219,9 @@ class BenchmarkReceiptTests(unittest.TestCase):
                                 (dict(good, prompt_n=2), [7, 99]),
                                 (good, [7, 8]), (dict(good, predicted_per_second=float('nan')), [7, 99])):
             engine = Engine(); engine.tokens = tokens; engine.last = {'native_timings': timings}
+            tokenizer = SimpleNamespace(decode=lambda ids: 'fixture')
             with self.subTest(timings=timings, tokens=tokens), self.assertRaises(ValueError):
-                benchmark_cache.measure(engine, SimpleNamespace(decode=lambda ids: 'fixture'), [1, 2, 3])
+                benchmark_cache.measure(engine, tokenizer, [1, 2, 3])
 
 
 if __name__ == '__main__': unittest.main()

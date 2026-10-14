@@ -106,7 +106,11 @@ function strataUnavailableFiles(messages) {
 
 function strataChatMarkdown(messages, model) {
   return messages.map((message) => {
-    if (message.role !== "user") return `## ${model}\n\n${message.reasoning ? `<details><summary>Thinking</summary>\n\n${message.reasoning}\n\n</details>\n\n` : ""}${message.text || message.error || ""}${message.text && message.error ? `\n\nRequest interrupted: ${message.error}` : ""}\n`;
+    if (message.role !== "user") {
+      const reasoning = message.reasoning ? `<details><summary>Thinking</summary>\n\n${message.reasoning}\n\n</details>\n\n` : "";
+      const interruption = message.text && message.error ? `\n\nRequest interrupted: ${message.error}` : "";
+      return `## ${model}\n\n${reasoning}${message.text || message.error || ""}${interruption}\n`;
+    }
     const files = (message.files || []).map((file) => {
       if (file.text == null) return `Attachment: ${file.name} — contents unavailable after reload; reattach to use them again.`;
       const fence = "`".repeat(Math.max(2, ...(file.text.match(/`+/g) || []).map((part) => part.length)) + 1);
@@ -122,7 +126,8 @@ function strataIntegerError(value, label) {
 }
 
 class StrataSharedSettings {
-  constructor() { this.request = 0; this.revision = 0; }
+  request = 0;
+  revision = 0;
   edited() { this.revision++; }
   invalidate() { this.request++; }
   async load(read, write, fail = () => {}) {

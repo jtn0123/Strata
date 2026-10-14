@@ -82,10 +82,11 @@ class EditingBenchmarkTests(unittest.TestCase):
         with self.assertRaises(ValueError): validate_response(response, fixtures()[0])
 
     def test_wrong_or_impossible_output_counter_is_ineligible(self):
+        case = fixtures()[0]
         for count in (-5, True, 1, 4):
             response = self.response(); response['final']['timings']['predicted_n'] = count
             with self.subTest(count=count), self.assertRaises(ValueError):
-                validate_response(response, fixtures()[0])
+                validate_response(response, case)
 
     def test_tiny_repeatable_gain_can_qualify(self):
         self.assertEqual(compare(self.arms())['eligible_languages'], ['javascript', 'json', 'python'])

@@ -31,6 +31,14 @@ def engine_failure(message):
     return EngineDied(message)
 
 
+def validate_native_properties(response):
+    settings = response.get('default_generation_settings')
+    context = settings.get('n_ctx') if isinstance(settings, dict) else None
+    if (type(context) is not int or context <= 0 or
+            not all(isinstance(response.get(key), str) for key in ('build_info', 'model_path'))):
+        raise ValueError('Expected context, build_info and model_path properties')
+
+
 def validate_native_response(endpoint, response):
     if not isinstance(response, dict):
         raise ValueError('Expected a JSON object')
@@ -45,11 +53,7 @@ def validate_native_response(endpoint, response):
         if not isinstance(response.get(key), str):
             raise ValueError(f'Expected a text {key} field')
     elif endpoint == '/props':
-        settings = response.get('default_generation_settings')
-        context = settings.get('n_ctx') if isinstance(settings, dict) else None
-        if (type(context) is not int or context <= 0 or
-                not all(isinstance(response.get(key), str) for key in ('build_info', 'model_path'))):
-            raise ValueError('Expected context, build_info and model_path properties')
+        validate_native_properties(response)
     return response
 
 

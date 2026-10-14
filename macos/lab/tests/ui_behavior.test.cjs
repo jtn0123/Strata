@@ -260,3 +260,36 @@ test('installing the maintained UI during a shortcut request keeps its reply vis
   assert.equal(chat.lastElementChild, captured, 'the active reply element must stay attached during installation');
   assert.equal(chat.lastElementChild.text, 'Actual reply');
 });
+
+test('sharing and Apply retain the pinned global lexical state across classic scripts', async () => {
+  const nodes = {'s-share': {checked: 'false', getAttribute() { return this.checked; },
+    setAttribute(name, value) { this.checked = value; }}, 'shared-status': {}, 's-apply': {}};
+  for (const [id, value] of [['s-temp', '0.4'], ['s-topp', '0.9'], ['s-topk', '12'], ['s-max', '256'], ['s-seed', '42']]) {
+    nodes[id] = {value, setCustomValidity() {}, reportValidity: () => true};
+  }
+  for (const id of ['s-show', 's-esp']) nodes[id] = {getAttribute: () => 'true'};
+  let posted;
+  const context = vm.createContext({$: (id) => nodes[id], window: {},
+    store: {get: (key, fallback) => fallback, set() {}}, headers: () => ({}),
+    fetch: async () => ({ok: true, json: async () => ({shared: true})}),
+    sharing: new ui.SharedSettings(), sharingKnown: false,
+    thinking: [{dataset: {v: 'low'}, getAttribute: () => 'true'}],
+    strataIntegerError: ui.integerError, openDrawer() {}, toast() {},
+    saveShared: async (on, settings) => { posted = {on, settings}; }});
+  // Use the actual shell declarations: global `let` state is not window state.
+  vm.runInContext(fragment(pinned, 'const DEFAULTS =', 'function saveChat()'), context);
+  vm.runInContext(fragment(pinned, 'let sharedOn = false;', 'function sharedDefaults(s)'), context);
+  vm.runInContext(fragment(maintained, 'loadShared = () =>', 'const thinking ='), context);
+  await context.loadShared();
+  assert.equal(vm.runInContext('sharedOn', context), true);
+  assert.equal(context.sharedOn, undefined);
+  assert.equal(context.window.sharedOn, undefined);
+  vm.runInContext(fragment(maintained, '$("s-apply").onclick = async', 'for (const id of ["s-max", "s-seed"])'), context);
+  await nodes['s-apply'].onclick();
+  assert.equal(vm.runInContext('settings.thinking', context), 'low');
+  assert.equal(vm.runInContext('settings.max', context), '256');
+  assert.equal(vm.runInContext('settings.seed', context), '42');
+  assert.equal(posted.settings, vm.runInContext('settings', context));
+  assert.equal(context.settings, undefined);
+  assert.equal(context.window.settings, undefined);
+});

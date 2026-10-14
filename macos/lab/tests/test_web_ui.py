@@ -72,6 +72,26 @@ class WebUITests(unittest.TestCase):
                 self.assertEqual(names.controls[control], label)
                 self.assertIn(control, names.labels)
 
+    def test_shared_settings_status_uses_a_live_semantic_output(self):
+        class Status(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.element = None
+
+            def handle_starttag(self, tag, attrs):
+                values = dict(attrs)
+                if values.get('id') == 'shared-status':
+                    self.element = (tag, values)
+
+        status = Status()
+        status.feed((WEB / 'index.html').read_text())
+        tag, attrs = status.element
+        self.assertEqual(tag, 'output')
+        self.assertEqual(attrs['aria-live'], 'polite')
+        self.assertEqual(attrs['aria-atomic'], 'true')
+        self.assertIn('shared-status', attrs['class'].split())
+        self.assertNotIn('role', attrs)
+
     def test_css_and_js_mime_and_cache_allow_refresh(self):
         for path, mime in [('/web/mac.css?v=2', 'text/css'), ('/web/mac.js', 'text/javascript'), ('/web/ui-state.js', 'text/javascript'), ('/web/performance.js', 'text/javascript')]:
             with self.subTest(path=path):

@@ -38,7 +38,12 @@
     latest = metrics.performance || null;
     if (!latest) { $("perf-mode").textContent = "Performance data unavailable"; return; }
     const rows = metrics.requests || [], last = rows[0], memory = latest.resources || {}, settings = latest.settings || {};
-    $("perf-mode").textContent = latest.measurement_kind === "mock" ? "Mock preview · test data" : latest.measurement_kind === "model" ? last ? "Live model · recent request" : "Live model · waiting for first request" : "Unverified backend";
+    let mode = "Unverified backend";
+    if (latest.measurement_kind === "mock") mode = "Mock preview · test data";
+    if (latest.measurement_kind === "model") {
+      mode = last ? "Live model · recent request" : "Live model · waiting for first request";
+    }
+    $("perf-mode").textContent = mode;
     let changed = false;
     for (const row of [...rows].reverse()) {
       if (!valid(row.time)) continue;

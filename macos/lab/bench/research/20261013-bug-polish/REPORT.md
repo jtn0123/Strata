@@ -78,3 +78,26 @@ not establish physical mobile-keyboard behavior or VoiceOver acceptance.
 
 These are preserved separately from the maintained-driver fixes. They do not
 qualify as new performance ideas or reopen earlier rejected experiments.
+
+## Sonar follow-up
+
+The initial PR 4 analysis reported 21 open findings: one response-validator
+complexity finding, eight exception-assertion findings, six cross-script writable
+binding findings, one status-element finding, two nested ternaries, two nested
+template literals and one class-field initialization finding. This cleanup
+addresses each group directly; analysis exclusions and quality rules are unchanged.
+
+The native schema refactor preserves return identity or exact exception type/message
+across 1,944 synthetic combinations. Exception tests prepare arguments/lazy
+generators before asserting the actual failing call. The UI declares its legitimate
+writable shell bindings without creating shadows or migrating lexical settings to
+window properties; an actual pinned-shell regression verifies sharing/Apply.
+Semantic output retains polite/atomic announcements and its block layout. Nine
+export scenarios and eight actual Monitor mode combinations match the previous
+commit exactly; class defaults are preserved.
+
+Local validation now passes 282 offline Python tests and 28 JavaScript tests,
+plus the same 12 benchmark-termination, one six-case launcher-termination, two
+port and five campaign-protocol tests: 330 total. Cloud closure is verified by
+the fresh analysis of the final PR head, rather than inferred from the green gate
+or local rule checks. Full-model performance measurements remain unchanged.

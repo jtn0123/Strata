@@ -54,8 +54,9 @@ class NativeErrorTests(unittest.TestCase):
             with self.subTest(connection=connection):
                 engine = self.engine(); service = Service(engine, Tokenizer(), None)
                 with patch('native_backend.http.client.HTTPConnection', return_value=connection):
+                    response = service.run([10], False, [], 10, {}, threading.Event())
                     with self.assertRaises(EngineDied):
-                        list(service.run([10], False, [], 10, {}, threading.Event()))
+                        list(response)
                 self.assertEqual(service.history[-1]['finish'], 'error')
                 self.assertNotIn('native_timings', engine.last)
                 self.assertNotIn('reused', engine.last)
@@ -106,8 +107,9 @@ class NativeErrorTests(unittest.TestCase):
         service.tok = NativeTokenizer('fixture')
         with patch('native_backend.http.client.HTTPConnection', return_value=connection), \
                 patch('native_backend.request', side_effect=ConnectionResetError('detokenize failed')):
+            response = service.run([10], False, [], 10, {}, threading.Event())
             with self.assertRaisesRegex(EngineDied, 'detokenize failed'):
-                list(service.run([10], False, [], 10, {}, threading.Event()))
+                list(response)
         row = service.history[-1]
         self.assertEqual(row['finish'], 'error')
         self.assertEqual(row['output_tokens'], 1)
@@ -159,8 +161,9 @@ class NativeErrorTests(unittest.TestCase):
                 patch('native_backend.request', side_effect=original):
             for name in list(sys.modules):
                 if name == 'serve' or name.startswith('serve.'): del sys.modules[name]
+            tokenizer = NativeTokenizer('fixture')
             with self.assertRaises(RuntimeError) as caught:
-                NativeTokenizer('fixture').encode('fixture')
+                tokenizer.encode('fixture')
             self.assertIn('standalone transport failed', str(caught.exception))
             self.assertIs(caught.exception.__cause__, original)
             exception_type = importlib.import_module('serve.server').EngineDied
@@ -173,8 +176,9 @@ class NativeErrorTests(unittest.TestCase):
             packet(dict(stop=True, timings=dict(predicted_per_second=80, prompt_ms=12, predicted_ms=25)))])
         engine = self.engine(); service = Service(engine, Tokenizer(), None)
         with patch('native_backend.http.client.HTTPConnection', side_effect=[failed, completed]):
+            response = service.run([10], False, [], 10, {}, threading.Event())
             with self.assertRaises(EngineDied):
-                list(service.run([10], False, [], 10, {}, threading.Event()))
+                list(response)
             self.assertEqual(service.history[-1]['finish'], 'error')
             self.assertEqual(service.history[-1]['output_tokens'], 1)
             self.assertIsNone(service.history[-1]['decode_tok_s'])
