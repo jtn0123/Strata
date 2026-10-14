@@ -167,8 +167,9 @@ class RequestPartTests(unittest.TestCase):
         lines = self.lines()
         split = parsed(lines)
         del split[('t', 3)]
+        graphs = graph_times(command_buffers(lines))
         with self.assertRaisesRegex(ValueError, 'no segment timing'):
-            request_parts(graph_times(command_buffers(lines)), split, (0.9, 2.0), 48, (512, 512))
+            request_parts(graphs, split, (0.9, 2.0), 48, (512, 512))
 
 
 class FitTests(unittest.TestCase):

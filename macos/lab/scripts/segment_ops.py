@@ -224,7 +224,8 @@ def _solve(matrix: list[list[float]], vector: list[float]) -> list[float]:
     n = len(vector)
     rows = [[*matrix[i], vector[i]] for i in range(n)]
     for col in range(n):
-        pivot = max(range(col, n), key=lambda r: abs(rows[r][col]))
+        sizes = [abs(row[col]) for row in rows[col:]]
+        pivot = col + sizes.index(max(sizes))
         if abs(rows[pivot][col]) < 1e-12:
             raise ValueError("Chunk sizes and positions do not separate the fit terms")
         rows[col], rows[pivot] = rows[pivot], rows[col]
