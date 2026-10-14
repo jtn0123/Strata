@@ -18,9 +18,15 @@ was treated as test evidence, not proof that every runtime failure path was corr
 ## Validation and boundaries
 
 253 load-free Python tests, six tiny-child termination tests, five campaign-protocol tests and
-seven JavaScript tests pass locally. The two subprocess checks run separately in CI; the
+seven JavaScript tests pass locally. The six subprocess checks run separately in CI; the
 offline gate continues to deny real sockets and native execution. JavaScript and launcher
 syntax checks and `git diff --check` also pass. Final hosted results are visible on the PR.
+
+The first hosted run of the audit fixes exposed a scheduling-sensitive cancellation check:
+0.2515 seconds against a 0.25-second wall-clock bound. That check now cancels during the
+actual drain wait and verifies one bounded polling wait, no further wait after cancellation,
+closed transport and absent native counters. Existing real-time deadline/early-stop checks
+remain in place; no runtime timeout or performance/resource gate was relaxed.
 
 The full new branch history is audited for model/binary artifacts, credential signatures and
 personal machine paths. Model weights, raw trials, local screenshots, process snapshots,

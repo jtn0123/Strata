@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 import threading
 import time
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -106,10 +107,28 @@ class NativeFinalMetricsTests(unittest.TestCase):
 
     def test_cancel_during_eos_drain_stops_waiting(self):
         engine = self.engine(); connection = Connection(final=False, delay=5); cancel = threading.Event()
-        with patch('native_backend.http.client.HTTPConnection', return_value=connection):
+        class FinalReady:
+            def __init__(self):
+                self.ready=threading.Event()
+                self.waits=[]
+            def is_set(self):return self.ready.is_set()
+            def set(self):self.ready.set()
+            def wait(self,timeout):
+                self.waits.append(timeout)
+                # Cancel during the actual drain wait, without depending on when
+                # a Timer thread is scheduled on a shared CI runner.
+                cancel.set()
+                return False
+        final_ready=FinalReady()
+        events=iter((threading.Event(),final_ready))
+        native_threading=SimpleNamespace(Event=lambda:next(events),Thread=threading.Thread)
+        with patch('native_backend.http.client.HTTPConnection', return_value=connection), \
+                patch('native_backend.threading',native_threading):
             stream = engine.generate([10], 32, {}, cancel)
             self.assertEqual(next(stream), 1); self.assertEqual(next(stream), 99)
-            timer = threading.Timer(0.02, cancel.set); timer.start()
-            started = time.monotonic(); stream.close(); timer.join()
-        self.assertLess(time.monotonic() - started, 0.25)
+            stream.close()
+        self.assertTrue(cancel.is_set())
+        self.assertEqual(len(final_ready.waits),1,'Cancellation must prevent further drain waits')
+        self.assertLessEqual(final_ready.waits[0],0.05,'Cancellation polling must remain bounded')
+        self.assertTrue(connection.closed)
         self.assertNotIn('native_timings', engine.last)
