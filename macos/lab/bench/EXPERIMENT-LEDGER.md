@@ -693,3 +693,23 @@ Balanced P07 remains the normal launcher; editing lookup has a maintained dedica
 - **Failed/excluded receipts:** Two 34 GiB prelaunch holds/no model; symlink-path cache helpers refuse unverified files; two bundled native UI gzip builds fail through alias paths before a physical-path/UI-off rebuild; qualification v1 rejects a harness EOS-display assertion after 12 native answers. Corrected, separately frozen v2 requires full stop-token parity and the actual shell's visible-text behavior. Every failed receipt remains retained, outside accepted comparisons; no guard lowering or cleanup inside brackets.
 - **Quality/next:** 356 offline tests,21 lint/type/format targets,14 strict,87.37% line/75.28% branch focused coverage; original 20 per-file floors preserved and new parser 100%/100%. R2 remains conditional after Default-worker observations; R3 needs actual prompt-operation attribution; R4 bounded Apple prefetch and R5 parked-tool contracts remain distinct work. No PR/push or hosted CI claim in this local experiment.
 - **Evidence:** [Baseline, both brackets, limitations, rejected attempts and revisit conditions](research/20261014-baseline-and-helper-pool/REPORT.md). Raw responses, runners, memory/build receipts and traces remain ignored under the local feature campaign.
+
+### E10 — N00 prompt-chunk operation inventory and GPU time (attribution only)
+
+- **What ran:** user-authorized model run on the kept `m5-small-stack` engine and unchanged settings.
+  - Inventory launches at 512 and 1,536 logged every encoded Metal dispatch with tensor shapes and fusion; their timings are discarded.
+  - Timing launches in the order 512/1,536/1,536/512 recorded only command-buffer GPU timestamps, three fresh one-token requests per prompt.
+  - All six launches passed the 34 GiB admission, normal-pressure, zero-new-swap and cleanup guards. One earlier attempt was held at 33.7–33.9 GiB until background apps were quit; the threshold was not lowered.
+- **Findings:**
+  - Every target chunk encodes the same 3,322 dispatches regardless of size.
+  - Target GPU time fits about 171 ms per chunk + 1.02 ms per token + 0.21 ms per token per 1,000 earlier tokens, within ±3.3% over 13 chunk measurements of 284–1,532 tokens.
+  - 1,536 chunks use 12.3–12.6% less target GPU time on long prompts.
+  - The GPU sits idle for 427–463 ms per long prompt (9.5–11.5%) while the MTP helper's experts run on the CPU.
+  - The server's 4-token checkpoint chunk costs 39.6–50.8 ms of GPU time per request.
+  - The pinned launch-wide fusion counter double-counts MoE-reduce fusions.
+- **Decision:** attribution only; no default, kernel or speed claim changes.
+- **Revisit:** rerun only after an engine, model, chunk rule or helper-placement change. Next candidates are:
+  - overlapping the helper's CPU experts, or moving them to the GPU for prompt batches;
+  - a segment-timed diagnostic build to locate the per-chunk cost before N01;
+  - a reuse check before touching the 4-token checkpoint.
+- **Evidence:** [report](research/20261014-n00-prompt-ops/REPORT.md). Native logs, per-request rows and inventories stay ignored under the local feature folder.

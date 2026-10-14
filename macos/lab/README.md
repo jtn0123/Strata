@@ -32,20 +32,20 @@ The 60 TPS code result is a fixed-length answer to a short prompt. The 87–88 T
 
 ### Latest qualification reports
 
-- October 14: [post-merge baseline and MTP helper pool (R0/R1)](bench/research/20261014-baseline-and-helper-pool/REPORT.md), and the [repo audit with ranked research cards](bench/research/20261014-repo-audit/REPORT.md) and its [grade report](.Codex/grade-report-20261014.md).
+- October 14: [N00 prompt-chunk operations and GPU time](bench/research/20261014-n00-prompt-ops/REPORT.md), [post-merge baseline and MTP helper pool (R0/R1)](bench/research/20261014-baseline-and-helper-pool/REPORT.md), and the [repo audit with ranked research cards](bench/research/20261014-repo-audit/REPORT.md) and its [grade report](.Codex/grade-report-20261014.md).
 - October 13: [prompt chunks (E05)](bench/research/20261013-prompt-chunks/REPORT.md), [Long Documents mode](bench/research/20261013-long-documents-mode/REPORT.md) and the [bug and polish pass](bench/research/20261013-bug-polish/REPORT.md).
 - October 10: [P07 validation and rollout](bench/results/20261010-small-gains-stack/REPORT.md).
 - Every decision, failure and retry condition: [experiment decision ledger](bench/EXPERIMENT-LEDGER.md).
 
 ### Next experiment queue
 
-As of October 14, model and GPU runs wait for the user's go-ahead; nothing below starts automatically.
+As of October 14, model and GPU runs are authorized by the user, one at a time in this order.
 
-1. Fix the October 14 audit findings in the [grade report's recommended order](.Codex/grade-report-20261014.md#recommended-sequence) before more heavy profile testing.
-2. N00 (R3): measure actual operation and shape costs on 512- and 1,536-token prompt chunks. This is a prerequisite with no speed estimate.
-3. N01: integrated compact expert routing from llama.cpp #30373, in an isolated clone, after N00.
-4. N02 (R4): bounded Apple advisory reads for eligible lazy-table rows, compared on first exposure and warm replies.
-5. N06: validate MTP checkpoint restores before any checkpoint-copy omission (N07).
+1. Done: the October 14 audit fixes and N00 (R3), which [attributes prompt-chunk time](bench/research/20261014-n00-prompt-ops/REPORT.md). The largest measured items are a per-chunk cost of about 171 ms of GPU time and 427–463 ms per long prompt of GPU idle time while the MTP helper's experts run on the CPU.
+2. N01: integrated compact expert routing from llama.cpp #30373, in an isolated clone. First locate the per-chunk cost with segment timing.
+3. N02 (R4): bounded Apple advisory reads for eligible lazy-table rows, compared on first exposure and warm replies.
+4. N06: validate MTP checkpoint restores before any checkpoint-copy omission (N07).
+5. New from N00: overlap the helper's CPU experts with target work, or run them on the GPU for prompt batches, while keeping decode speed and memory.
 
 R2, a helper-only QoS trial, stays conditional. Persistent helper pools are not adopted; W02 and prompt-local drafting (E02/E02-M) are parked. [All research cards](bench/research/20261014-repo-audit/REPORT.md) and [R0/R1 remaining work](bench/research/20261014-baseline-and-helper-pool/REPORT.md).
 
