@@ -229,7 +229,7 @@ def inventory(graphs: Sequence[Graph], labels: Sequence[GraphLabel]) -> list[dic
     return list(distinct.values())
 
 
-def _buffer(record: dict[str, object]) -> Buffer | None:
+def timed_buffer(record: dict[str, object]) -> Buffer | None:
     """One timed buffer; an untimed buffer is dropped only when it holds metadata operations alone."""
     counts = cast(dict[str, int], record.get("op_counts", {}))
     if record.get("valid") is not True:
@@ -257,7 +257,7 @@ def _buffer(record: dict[str, object]) -> Buffer | None:
 
 def command_buffers(lines: Iterable[str]) -> list[Buffer]:
     rows = (json.loads(line.split(PROFILE, 1)[1]) for line in lines if PROFILE in line)
-    return [buffer for row in rows if (buffer := _buffer(row)) is not None]
+    return [buffer for row in rows if (buffer := timed_buffer(row)) is not None]
 
 
 def graph_times(buffers: Iterable[Buffer]) -> list[GraphTime]:

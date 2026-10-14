@@ -28,7 +28,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--build", action="store_true")
     ap.add_argument("--jobs", type=int, default=1)
-    ap.add_argument("--engine", choices=["m5-lab", "m5-trace", "m5-correctness", "m5-copy", "m5-reduce", "m5-sampling", "m5-hc", "m5-group", "m5-gate", "m5-gdn", "m5-lookup", "m5-gate-lanes", "m5-encoders", "m5-head", "m5-embedding", "m5-draftcap", "m5-top10", "m5-qsa", "m5-route-map", "m5-compact", "m5-compact-cols", "m5-small-stack"], default="m5-lab")
+    ap.add_argument("--engine", choices=["m5-lab", "m5-trace", "m5-correctness", "m5-copy", "m5-reduce", "m5-sampling", "m5-hc", "m5-group", "m5-gate", "m5-gdn", "m5-lookup", "m5-gate-lanes", "m5-encoders", "m5-head", "m5-embedding", "m5-draftcap", "m5-top10", "m5-qsa", "m5-route-map", "m5-compact", "m5-compact-cols", "m5-small-stack", "m5-segments"], default="m5-lab")
     args = ap.parse_args(argv)
     if not 1 <= args.jobs <= 2:
         ap.error("Use one or two build workers")
@@ -52,10 +52,12 @@ def main(argv=None):
             source_info(args.engine)
             cmake = ROOT / ".venv/bin/cmake"
             flags = [f for f in baseline_build_flags(runtime["build_flags"], ROOT) if not f.startswith("-DLLAMA_BUILD_TESTS=")]
-            call([cmake, "-S", path, "-B", path / "build", *flags, "-DLLAMA_BUILD_TESTS=ON"])
+            # Configure through the real path: the web UI step resolves its assets and fails across a vendor symlink.
+            real = path.resolve()
+            call([cmake, "-S", real, "-B", real / "build", *flags, "-DLLAMA_BUILD_TESTS=ON"])
             targets = ["llama-server", "test-backend-ops"]
             if args.engine == "m5-sampling": targets.append("test-backend-sampler")
-            call([cmake, "--build", path / "build", "--target", *targets, "-j", args.jobs])
+            call([cmake, "--build", real / "build", "--target", *targets, "-j", args.jobs])
             write_receipt(args.engine)
         candidate = verify_engine(args.engine) if (path / "build/lab-receipt.json").exists() else source_info(args.engine)
         if any(verify_engine(name) != pin for name, pin in controls.items()):

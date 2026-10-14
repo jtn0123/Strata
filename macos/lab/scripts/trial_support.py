@@ -92,8 +92,11 @@ def prompt(case: EditFixture) -> str:
     )
 
 
-def kept_server(port: int, batch: int, ubatch: int) -> list[str]:
-    """Kept 4K/F16/MTP3 launch with the mixed shared helper; trial_command applies the drafting policy."""
+def kept_server(port: int, batch: int, ubatch: int, engine: str = ENGINE) -> list[str]:
+    """Kept 4K/F16/MTP3 launch with the mixed shared helper; trial_command applies the drafting policy.
+
+    A diagnostic engine built from the kept stack can replace the kept engine with every launch setting unchanged.
+    """
     return server_command(
         "flash",
         port,
@@ -106,7 +109,7 @@ def kept_server(port: int, batch: int, ubatch: int) -> list[str]:
         8,
         "mixed",
         "mtp_shared_packed_q3",
-        engine=ENGINE,
+        engine=engine,
         draft_threads=8,
         draft_p_min=0.0,
     )
