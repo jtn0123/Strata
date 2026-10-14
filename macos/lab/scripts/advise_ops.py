@@ -73,10 +73,13 @@ class Memory(TypedDict):
     swap_growth_bytes: int
 
 
-class Launch(TypedDict):
+class Measured(TypedDict):
     mode: str
-    requests: list[Request]
     memory: Memory
+
+
+class Launch(Measured):
+    requests: list[Request]
 
 
 def parse(lines: Iterable[str]) -> list[Advice]:
@@ -193,9 +196,10 @@ def warm(launches: Sequence[Launch]) -> dict[str, object]:
     }
 
 
-def memory(launches: Sequence[Launch]) -> dict[str, dict[str, int]]:
+def memory(launches: Sequence[Measured], modes: Sequence[str] = MODES) -> dict[str, dict[str, int]]:
+    """Per mode: the highest peak RSS and swap growth, and the lowest available memory, over its launches."""
     rows: dict[str, dict[str, int]] = {}
-    for mode in MODES:
+    for mode in modes:
         own = [launch["memory"] for launch in launches if launch["mode"] == mode]
         if own:
             rows[mode] = {

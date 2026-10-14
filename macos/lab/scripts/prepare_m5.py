@@ -28,7 +28,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--build", action="store_true")
     ap.add_argument("--jobs", type=int, default=1)
-    ap.add_argument("--engine", choices=["m5-lab", "m5-trace", "m5-correctness", "m5-copy", "m5-reduce", "m5-sampling", "m5-hc", "m5-group", "m5-gate", "m5-gdn", "m5-lookup", "m5-gate-lanes", "m5-encoders", "m5-head", "m5-embedding", "m5-draftcap", "m5-top10", "m5-qsa", "m5-route-map", "m5-compact", "m5-compact-cols", "m5-small-stack", "m5-segments", "m5-overlap", "m5-advise"], default="m5-lab")
+    ap.add_argument("--engine", choices=["m5-lab", "m5-trace", "m5-correctness", "m5-copy", "m5-reduce", "m5-sampling", "m5-hc", "m5-group", "m5-gate", "m5-gdn", "m5-lookup", "m5-gate-lanes", "m5-encoders", "m5-head", "m5-embedding", "m5-draftcap", "m5-top10", "m5-qsa", "m5-route-map", "m5-compact", "m5-compact-cols", "m5-small-stack", "m5-segments", "m5-overlap", "m5-advise", "m5-mtpstate"], default="m5-lab")
     args = ap.parse_args(argv)
     if not 1 <= args.jobs <= 2:
         ap.error("Use one or two build workers")
