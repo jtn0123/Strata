@@ -49,6 +49,7 @@ EXPERIMENTS = {
     "m5-small-stack": "m5_small_stack_experiment.json",
     "m5-waits": "m5_waits_experiment.json",
     "m5-segments": "m5_segments_experiment.json",
+    "m5-overlap": "m5_overlap_experiment.json",
 }
 ENGINES = ("baseline", *EXPERIMENTS)
 

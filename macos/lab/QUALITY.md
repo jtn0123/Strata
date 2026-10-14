@@ -7,18 +7,18 @@ third-party/evidence/test classification stays intact.
 
 ## Enforced checks
 
-`config/quality_modules.json` defines 30 maintained Python targets. The checker
+`config/quality_modules.json` defines 31 maintained Python targets. The checker
 requires that scope to match mypy, validates that paths stay in Mac scripts, and
 rejects missing modules and escaping symlinks. The targets include the active
 editing, prompt-chunk and N00 prompt-operation drivers, the N00 native-log parser
-`prompt_ops.py`, the N00b segment-timer parser `segment_ops.py`, the runtime-profile verifier and their shared
-`trial_support.py` launch/response helpers, and `api_requests.py`, the chat
-request contract checked before the pinned API shell. Critical syntax/undefined-name checks
+`prompt_ops.py`, the N00b segment-timer parser `segment_ops.py`, the N15 helper-overlap timeline `overlap_ops.py`,
+the runtime-profile verifier and their shared `trial_support.py` launch/response
+helpers, and `api_requests.py`, the chat request contract checked before the pinned API shell. Critical syntax/undefined-name checks
 still cover all lab scripts and tests, including older experiment drivers.
 
 The fuller Ruff gate uses `E4,E7,E9,F,B,UP,C4,ISC,PIE,RET,PLW,C90`, with cyclomatic
 complexity at most 10. The pinned formatter uses Python 3.12 and 120-column
-wrapping. Mypy requires complete function signatures across all 30 targets;
+wrapping. Mypy requires complete function signatures across all 31 targets;
 17 enable the additional strict checks listed in `config/mypy.ini`. Named types
 cover model/build receipts, launch configuration, memory policy/process snapshots,
 metric evidence and workload callbacks. Dynamic JSON/vendor interfaces retain
@@ -40,11 +40,11 @@ is not claimed as an 80-line pass. Named UI helpers and complexity are measured
 separately.
 
 Focused Python branch coverage has its own measured baseline and freshness gate:
-92.68% of lines and 85.28% of branches across the 30 targets in the N00b
-segment-timer pass, with aggregate floors of 92%/85%. That pass re-recorded every
-module's counts; some had not been refreshed since earlier changes. Floors are the
+92.92% of lines and 85.90% of branches across the 31 targets in the N15
+helper-overlap pass, with aggregate floors of 92%/85%. The N00b segment-timer pass
+re-recorded every module's counts; some had not been refreshed since earlier changes. Floors are the
 recorded percentages rounded down, so each module keeps its measured per-file
-floors; the wait-diagnostic parser, `prompt_ops.py`, `segment_ops.py`,
+floors; the wait-diagnostic parser, `prompt_ops.py`, `segment_ops.py`, `overlap_ops.py`,
 `api_requests.py` and `trial_support.py` require 100% line/branch coverage. It uses the maintained
 manifest, the native/network-denying offline inventory and source/config
 fingerprints. Line/branch floors describe this measured scope; they are not a

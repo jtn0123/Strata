@@ -120,7 +120,7 @@ TUNING_RULES = (
     TuningRule(
         "small-",
         True,
-        ("m5-small-stack", "m5-waits", "m5-segments"),
+        ("m5-small-stack", "m5-waits", "m5-segments", "m5-overlap"),
         "Small-gain combination requires isolated m5-small-stack engine",
     ),
     TuningRule("route-map", False, ("m5-route-map",), "Route-map reuse requires isolated m5-route-map engine"),
@@ -185,6 +185,7 @@ def _validate_metal_settings(
         "m5-small-stack",
         "m5-waits",
         "m5-segments",
+        "m5-overlap",
     ):
         raise ValueError("GPU tuning and timing diagnostics require an isolated M5 engine")
     if (tuning.startswith("copy-") or tuning == "conv-direct") and engine not in (
@@ -209,6 +210,7 @@ def _validate_metal_settings(
         "m5-small-stack",
         "m5-waits",
         "m5-segments",
+        "m5-overlap",
     ):
         raise ValueError("Copy kernels require the isolated m5-copy engine")
     _validate_tuning_engine(engine, tuning)
