@@ -524,15 +524,16 @@ class ConnectionLimitTests(unittest.TestCase):
         endless = self.Request(incoming=[b'x'] * 1000)
         clock = iter([0.0, 0.5, 1.0, 1.5, web_ui.DRAIN_SECONDS + 1])
         self.Thread.started.pop().run()
-        with patch.object(web_ui.time, 'monotonic', lambda: next(clock)):
+        with patch.object(web_ui.time, 'monotonic', side_effect=clock):
             self.refused(server, endless)
         self.assertTrue(endless.closed)
         self.assertEqual(endless.events.count('read'), 3)
 
     def test_failed_thread_start_or_busy_write_releases_resources(self):
         server = self.server(slots=1)
+        failing = self.Request(fail=True)
         with self.assertRaises(RuntimeError):
-            server.process_request(self.Request(fail=True), ('127.0.0.1', 1))
+            server.process_request(failing, ('127.0.0.1', 1))
         accepted = self.Request()
         server.process_request(accepted, ('127.0.0.1', 1))
         refused = self.Request(send_error=BrokenPipeError('client left'))
@@ -561,7 +562,7 @@ class ConnectionLimitTests(unittest.TestCase):
         self.assertEqual(json.loads(body)['error']['type'], 'server_error')
 
     def test_construction_creates_the_configured_bound(self):
-        with patch.object(self.Original, '__init__', lambda self, *args, **kwargs: None):
+        with patch.object(self.Original, '__init__', return_value=None):
             server = bounded_server(self.Original)(('127.0.0.1', 0), BaseHTTPRequestHandler)
         self.assertEqual((self.free(server.slots), self.free(server.refusals)),
                          (web_ui.MAX_CONNECTIONS, web_ui.MAX_CONNECTIONS))

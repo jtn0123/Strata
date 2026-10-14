@@ -153,8 +153,9 @@ class MetricTests(unittest.TestCase):
                          {"draft_n_accepted": 1}, {"draft_n": 2.0}):
             with self.subTest(mutation=mutation), self.assertRaises(ValueError):
                 completion_counts(dict(good, **mutation), [7, 9], 5, cached=True)
+        untimed = {key: value for key, value in good.items() if key != 'predicted_ms'}
         with self.assertRaisesRegex(ValueError, 'predicted_ms'):
-            completion_counts({key: value for key, value in good.items() if key != 'predicted_ms'}, [7, 9], 5, cached=True)
+            completion_counts(untimed, [7, 9], 5, cached=True)
         with self.assertRaises(ValueError): completion_counts(good, [7, 9], 5, cached=False)
         with self.assertRaises(ValueError): completion_counts(good, [7, 9], max_new=1)
         with self.assertRaises(ValueError): completion_counts(good, [7, True])

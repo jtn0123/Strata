@@ -10,23 +10,23 @@ import functools
 import ipaddress
 import json
 import socket
-import socketserver
 import threading
 import time
 from collections.abc import Callable
 from email.message import Message
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
 from io import BytesIO
 from pathlib import Path
 from typing import Any, cast
 
 WEB = Path(__file__).resolve().parents[1] / "web"
+JAVASCRIPT = "text/javascript; charset=utf-8"
 ASSETS = {
     "": ("index.html", "text/html; charset=utf-8"),
     "/web/mac.css": ("mac.css", "text/css; charset=utf-8"),
-    "/web/mac.js": ("mac.js", "text/javascript; charset=utf-8"),
-    "/web/ui-state.js": ("ui-state.js", "text/javascript; charset=utf-8"),
-    "/web/performance.js": ("performance.js", "text/javascript; charset=utf-8"),
+    "/web/mac.js": ("mac.js", JAVASCRIPT),
+    "/web/ui-state.js": ("ui-state.js", JAVASCRIPT),
+    "/web/performance.js": ("performance.js", JAVASCRIPT),
 }
 LOOPBACK_NAMES = frozenset(("localhost", "127.0.0.1", "::1"))
 MAX_BODY_BYTES = 16 * 1024 * 1024  # Rejected before reading; the Mac profiles use a 4,096-token context.
@@ -56,7 +56,7 @@ def host_name(value: str | None) -> str:
     text = (value or "").strip().lower()
     if text.startswith("["):
         name, closed, rest = text[1:].partition("]")
-        return name if closed and (not rest or (rest[:1] == ":" and rest[1:].isdigit())) else ""
+        return name if closed and (not rest or (rest.startswith(":") and rest[1:].isdigit())) else ""
     if text.count(":") == 1:
         text, port = text.split(":")
         if not port.isdigit():
@@ -308,9 +308,9 @@ class ConnectionLimit(ThreadingHTTPServer):
         super().__init__(*args, **kwargs)
 
     def server_bind(self) -> None:
-        # HTTPServer.server_bind also looks up the address's DNS name (socket.getfqdn). On the hosted macOS
-        # runner that lookup of 127.0.0.1 blocked startup for over 30 s; nothing here uses the name.
-        socketserver.TCPServer.server_bind(self)
+        # Bind as HTTPServer's base does, without its lookup of the address's DNS name (socket.getfqdn).
+        # On the hosted macOS runner that lookup of 127.0.0.1 blocked startup for over 30 s; nothing uses the name.
+        super(HTTPServer, self).server_bind()
         host, port = cast(tuple[str, int], self.server_address)[:2]
         self.server_name, self.server_port = host, port
 
