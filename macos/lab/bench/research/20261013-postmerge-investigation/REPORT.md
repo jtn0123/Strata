@@ -1,5 +1,9 @@
 # Post-merge M5 investigation and preparation
 
+Execution update: the user later authorized R0/R1. See the
+[October 14 baseline, helper diagnostics and independent speed confirmation](../20261014-baseline-and-helper-pool/REPORT.md).
+The held status below records the original preparation stage.
+
 Researched October 13, 2026, after PR 4 merged as
 `8c66e2030fe7e09b91fa4e0369c05cceabc1267e`. The user selected research and
 preparation only. No model, GPU, storage benchmark or native build was run.

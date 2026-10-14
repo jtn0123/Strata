@@ -7,15 +7,15 @@ third-party/evidence/test classification stays intact.
 
 ## Enforced checks
 
-`config/quality_modules.json` defines 20 maintained Python targets. The checker
+`config/quality_modules.json` defines 21 maintained Python targets. The checker
 requires that scope to match mypy, validates that paths stay in Mac scripts, and
 rejects missing modules and escaping symlinks. Critical syntax/undefined-name
 checks still cover all lab scripts and tests, including older experiment drivers.
 
 The fuller Ruff gate uses `E4,E7,E9,F,B,UP,C4,ISC,PIE,RET,PLW,C90`, with cyclomatic
 complexity at most 10. The pinned formatter uses Python 3.12 and 120-column
-wrapping. Mypy requires complete function signatures across all 20 targets;
-13 enable the additional strict checks listed in `config/mypy.ini`. Named types
+wrapping. Mypy requires complete function signatures across all 21 targets;
+14 enable the additional strict checks listed in `config/mypy.ini`. Named types
 cover model/build receipts, launch configuration, memory policy/process snapshots,
 metric evidence and workload callbacks. Dynamic JSON/vendor interfaces retain
 explicit boundaries; revision-pinned `serve`/`gguf` traversal stays external.
@@ -36,8 +36,9 @@ is not claimed as an 80-line pass. Named UI helpers and complexity are measured
 separately.
 
 Focused Python branch coverage has its own measured baseline and freshness gate:
-86.10% of lines and 72.69% of branches, with aggregate floors of 86%/72% and
-per-file floors derived from the same measured counts.
+87.37% of lines and 75.28% of branches in the post-merge wait-diagnostic pass,
+with aggregate floors of 86%/74%. The original 20 modules retain their measured
+per-file floors; the new diagnostic parser requires 100% line/branch coverage.
 It uses the maintained manifest, the native/network-denying offline inventory and
 source/config fingerprints. Line/branch floors describe this measured scope;
 they are not a whole-repository coverage claim. Node's experimental coverage
