@@ -20,6 +20,7 @@ class StrataConfigTests(unittest.TestCase):
         # Run startup registration without opening sockets or changing global handlers.
         with patch.object(server,'Service',server.Service), \
                 patch.object(server,'make_handler',server.make_handler), \
+                patch.object(server,'Server',server.Server), \
                 patch.object(backends,'register_backend'), \
                 patch.object(sys,'argv',['strata_server.py',*argv]):
             return runpy.run_path(str(ROOT/'scripts/strata_server.py'))['config']
@@ -63,17 +64,34 @@ class StrataConfigTests(unittest.TestCase):
         def wrap(original):
             events.append('handler')
             return original
+        def bound(original):
+            events.append('server')
+            return original
         with patch.object(server, 'Service', server.Service), \
                 patch.object(server, 'make_handler', server.make_handler), \
+                patch.object(server, 'Server', server.Server), \
                 patch.object(backends, 'register_backend', side_effect=lambda *args: events.append('backend')), \
                 patch.object(Path, 'read_text', side_effect=read_config), \
                 patch.object(performance_metrics, 'tracked_service', side_effect=track), \
                 patch.object(web_ui, 'mac_handler_factory', side_effect=wrap), \
+                patch.object(web_ui, 'bounded_server', side_effect=bound), \
                 patch.object(sys, 'argv', ['strata_server.py', '--config=fixture.json']):
             result=runpy.run_path(str(ROOT/'scripts/strata_server.py'))
-        self.assertEqual(events, ['backend', 'config', ('service', {'batch': 512}), 'handler'])
+        self.assertEqual(events, ['backend', 'config', ('service', {'batch': 512}), 'handler', 'server'])
         self.assertEqual(result['config'], {'batch': 512})
         self.assertIs(result['main'], server.main)
+
+    def test_pinned_server_class_is_wrapped_with_the_connection_bound(self):
+        original=server.Server
+        with patch.object(server,'Service',server.Service), \
+                patch.object(server,'make_handler',server.make_handler), \
+                patch.object(server,'Server',original), \
+                patch.object(backends,'register_backend'), \
+                patch.object(sys,'argv',['strata_server.py','--engine','mock']):
+            runpy.run_path(str(ROOT/'scripts/strata_server.py'))
+            wrapped=server.Server
+        self.assertTrue(issubclass(wrapped,web_ui.ConnectionLimit) and issubclass(wrapped,original))
+        self.assertIs(server.Server,original)
 
     def test_null_performance_and_additional_settings_are_preserved(self):
         with tempfile.TemporaryDirectory() as folder:

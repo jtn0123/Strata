@@ -23,7 +23,8 @@ class EditingBenchmarkTests(unittest.TestCase):
         case = fixtures()[0]
         return dict(text=case['source'].replace(case['old'], case['new']), generated_token_ids=[1, 2, 3],
                     ttft_s=0.8, wall_s=5, final=dict(stop=True, stop_type='eos', timings=dict(
-                        predicted_per_second=60, prompt_per_second=500, predicted_n=3, draft_n=3, draft_n_accepted=2)))
+                        predicted_per_second=60, prompt_per_second=500, predicted_n=3, draft_n=3, draft_n_accepted=2,
+                        prompt_ms=6, predicted_ms=33)))
 
     def arms(self):
         memory = dict(monitor_healthy=True, child_exited=True, normal_pressure_required=True,

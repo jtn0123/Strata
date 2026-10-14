@@ -28,7 +28,7 @@ class MetricTests(unittest.TestCase):
         class Engine:
             prompt_cache = False
             stop_ids = {99}
-            last = {'native_timings': dict(predicted_n=2, prompt_n=3, cache_n=0,
+            last = {'native_timings': dict(predicted_n=2, prompt_n=3, cache_n=0, prompt_ms=6, predicted_ms=20,
                     predicted_per_second=50, prompt_per_second=500)}
             def generate(self, *args):
                 for token in (7, 99):
@@ -59,7 +59,8 @@ class MetricTests(unittest.TestCase):
     def test_invalid_stream_counts_preserve_response_in_failed_campaign(self):
         helper = receipt_fixtures.BenchmarkReceiptTests()
         events = [dict(tokens=[7, 9], content='captured reply'), dict(stop=True,
-                  timings=dict(prompt_n=64, predicted_n=999, predicted_per_second=50, prompt_per_second=500))]
+                  timings=dict(prompt_n=64, predicted_n=999, predicted_per_second=50, prompt_per_second=500,
+                                     prompt_ms=128, predicted_ms=20))]
         def response(*a, **kw):
             return io.BytesIO(b''.join(b'data: ' + json.dumps(event).encode() + b'\n' for event in events))
         def request(base, path, payload=None, **kw):
@@ -113,7 +114,8 @@ class MetricTests(unittest.TestCase):
             return {}
         for failure in ('nonfinite-rate', 'short-output', 'missing-rate'):
             with self.subTest(failure=failure), tempfile.TemporaryDirectory() as directory:
-                timings = dict(prompt_n=64, predicted_n=2, predicted_per_second=50, prompt_per_second=500)
+                timings = dict(prompt_n=64, predicted_n=2, predicted_per_second=50, prompt_per_second=500,
+                               prompt_ms=128, predicted_ms=20)
                 if failure == 'nonfinite-rate': timings['predicted_per_second'] = float('nan')
                 if failure == 'missing-rate': timings.pop('predicted_per_second')
                 raw = dict(ttft_s=.1, wall_s=.3, text='completed reply', generated_token_ids=[7, 9],
@@ -139,12 +141,21 @@ class MetricTests(unittest.TestCase):
                 json.dumps(record, allow_nan=False)
 
     def test_complete_native_counters_match_actual_tokens_and_input(self):
-        good = dict(predicted_n=2, prompt_n=3, cache_n=2)
+        good = dict(predicted_n=2, prompt_n=3, cache_n=2, prompt_ms=6, predicted_ms=20)
         self.assertEqual(completion_counts(good, [7, 9], 5, cached=True, max_new=2), 2)
+        self.assertEqual(completion_counts(dict(good, predicted_ms=0, predicted_per_second=0, draft_n=3,
+                                                draft_n_accepted=3), [7, 9], 5, cached=True), 2)
         for mutation in ({"predicted_n": -1}, {"predicted_n": 3}, {"predicted_n": True},
-                         {"prompt_n": 2}, {"cache_n": -1}, {"cache_n": 2.5}):
+                         {"prompt_n": 2}, {"cache_n": -1}, {"cache_n": 2.5},
+                         {"prompt_ms": None}, {"prompt_ms": -1}, {"predicted_ms": float('inf')},
+                         {"predicted_ms": True}, {"predicted_per_second": float('nan')},
+                         {"prompt_per_second": "fast"}, {"draft_n": 1, "draft_n_accepted": 2},
+                         {"draft_n_accepted": 1}, {"draft_n": 2.0}):
             with self.subTest(mutation=mutation), self.assertRaises(ValueError):
                 completion_counts(dict(good, **mutation), [7, 9], 5, cached=True)
+        untimed = {key: value for key, value in good.items() if key != 'predicted_ms'}
+        with self.assertRaisesRegex(ValueError, 'predicted_ms'):
+            completion_counts(untimed, [7, 9], 5, cached=True)
         with self.assertRaises(ValueError): completion_counts(good, [7, 9], 5, cached=False)
         with self.assertRaises(ValueError): completion_counts(good, [7, 9], max_new=1)
         with self.assertRaises(ValueError): completion_counts(good, [7, True])

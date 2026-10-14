@@ -16,6 +16,7 @@ from engines import sha256,verify_engine
 from lab import request
 from check_memory import assert_no_model_server,snapshot
 from benchmark_m5_small_gains import feature_receipts
+from benchmark_signals import cleanup_on_termination,defer_termination
 
 import argparse
 parser=argparse.ArgumentParser(description=__doc__)
@@ -28,24 +29,78 @@ LAUNCHERS={'balanced':'Start Strata.command','code-edit':'Start Strata - Code Ed
            'long-documents':'Start Strata - Long Documents.command'}
 LAUNCHER=ROOT/LAUNCHERS[options.profile] if options else None
 SOURCE=ROOT/'scripts/runtime_profiles.py'
+PORTS=(8095,8096)
 
 
+def stop_child(child):
+    """Terminate, then kill, and always reap the owned launcher.
+
+    A stop request that arrives during the bounded waits restarts the current
+    step instead of abandoning the child; cleanup_on_termination ignores later
+    requests, so this cannot loop on repeated signals.
+    """
+    if child is None:return
+    stop=None;killing=False
+    while child.poll() is None:
+        try:
+            if killing:child.kill();child.wait(timeout=3)
+            else:child.terminate();child.wait(timeout=20)
+        except subprocess.TimeoutExpired:
+            if killing:raise
+            killing=True
+        except KeyboardInterrupt as error:stop=error
+    if stop:raise stop
+
+
+def ports_closed(ports=PORTS):
+    closed=[]
+    for port in ports:
+        with socket.socket() as sock:
+            sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+            sock.bind(('127.0.0.1',port));closed.append(port)
+    return closed
+
+
+def postflight(record,active,size):
+    """Collect shutdown evidence; any missing or failed item raises or marks the receipt failed."""
+    if active:
+        runtime=Path(active['log_directory']);memory=json.loads((runtime/'memory-summary.json').read_text())
+        record['native_memory']=memory
+        record['memory_policy']=json.loads((runtime/'memory-policy.json').read_text())
+        if memory['guard'] or not memory['normal_pressure_observed'] or memory['swap_growth_bytes'] or not memory['monitor_healthy'] or not memory['child_exited']:
+            record.update(status='failed',error='Actual app continuous pressure/swap/shutdown gate failed')
+        record['activation']=feature_receipts((runtime/'native.log').read_text(),['reduce'])
+        from benchmark_prompt_chunks import chunk_receipt
+        record['actual_chunks']=chunk_receipt((runtime/'native.log').read_text(), size)
+    assert_no_model_server()
+    record.update(ports_closed_after_stop=ports_closed(),no_model_server_remaining=True,postflight=snapshot(),
+         default_launcher_unchanged=sha256(ROOT/'Start Strata.command')==record.get('default_launcher_before'),
+         launcher_unchanged=sha256(LAUNCHER)==record.get('launcher_sha256'),source_unchanged=sha256(SOURCE)==record.get('source_sha256'))
+    if not (record['default_launcher_unchanged'] and record['launcher_unchanged'] and record['source_unchanged']):
+        record.update(status='failed',error='Launcher or profile source changed during verification')
+
+
+@cleanup_on_termination()
 def main():
     if OUT.exists():raise RuntimeError('App verification already attempted; no retry/overwrite')
     assert_no_model_server();OUT.mkdir()
-    from validate_offline import require_pass
-    require_pass()
-    original_default=sha256(ROOT/'Start Strata.command')
-    record=dict(status='attempting',created_utc=datetime.now(timezone.utc).isoformat(),checks=[],
-       launcher_sha256=sha256(LAUNCHER),source_sha256=sha256(SOURCE),verifier_sha256=sha256(Path(__file__)),
-       engine=verify_engine('m5-small-stack'),preflight=snapshot(),default_launcher_before=original_default)
+    record=dict(status='attempting',created_utc=datetime.now(timezone.utc).isoformat(),checks=[])
     def save():(OUT/'verification.json').write_text(json.dumps(record,indent=2)+'\n')
-    save();child=None;active=None
+    child=None;active=None;checks_passed=False
+    size='1536' if options.profile=='long-documents' else '512'
     try:
+        save()
+        from validate_offline import require_pass
+        require_pass()
+        record.update(launcher_sha256=sha256(LAUNCHER),source_sha256=sha256(SOURCE),verifier_sha256=sha256(Path(__file__)),
+           engine=verify_engine('m5-small-stack'),preflight=snapshot(),default_launcher_before=sha256(ROOT/'Start Strata.command'))
+        save()
         with (OUT/'launcher.log').open('w') as log:
             launched=[str(LAUNCHER)]
             record['launched']=launched;save()
-            child=subprocess.Popen(launched,stdout=log,stderr=log,cwd=ROOT)
+            # Publish the child before a stop request can unwind to cleanup.
+            with defer_termination():
+                child=subprocess.Popen(launched,stdout=log,stderr=log,cwd=ROOT)
             started=time.monotonic()
             while True:
                 if child.poll() is not None:raise RuntimeError('Optional app launcher exited before ready')
@@ -64,7 +119,6 @@ def main():
             command=json.loads((runtime/'command.json').read_text())
             expected={'--spec-type':'draft-mtp' if ROLE=='control' else 'ngram-mod,draft-mtp','--spec-draft-n-max':'3',
                '--spec-draft-threads':'8','--spec-draft-p-min':'0.0'}
-            size='1536' if options.profile=='long-documents' else '512'
             expected.update({'-b':size,'-ub':size})
             if ROLE=='lookup':expected.update({'--spec-ngram-mod-n-match':'16','--spec-ngram-mod-n-min':'1','--spec-ngram-mod-n-max':'3'})
             if any(command[command.index(k)+1]!=v for k,v in expected.items()):raise RuntimeError('Actual app command differs from qualified lookup profile')
@@ -127,36 +181,25 @@ def main():
             record['integration_returncode']=integration.returncode;save()
             if integration.returncode:raise RuntimeError('Full API integration failed; see integration.log')
             result_path=next(line[6:] for line in integration.stdout.splitlines() if line.startswith('Saved '))
-            record['integration']=json.loads(Path(result_path).read_text());save()
-            record['status']='passed'
+            record['integration']=json.loads(Path(result_path).read_text())
+            # Provisional only: the receipt is accepted after shutdown and postflight evidence.
+            checks_passed=True;record['checks_status']='passed';save()
     except BaseException as error:
         record.update(status='failed',error=f'{type(error).__name__}: {error}');save();raise
     finally:
-        if child and child.poll() is None:
-            child.terminate()
-            try:child.wait(timeout=20)
-            except subprocess.TimeoutExpired:child.kill();child.wait(timeout=3)
-        record['exit_code']=child.returncode if child else None
+        failure=None
+        try:stop_child(child)
+        except BaseException as error:failure=error
+        record['exit_code']=child.returncode if child else None;save()
+        try:postflight(record,active,size)
+        except BaseException as error:failure=failure or error
+        if failure is not None:
+            record.update(status='failed',finalization_error=f'{type(failure).__name__}: {failure}')
+            record.setdefault('error',record['finalization_error'])
+        elif checks_passed and record['status']=='attempting':record['status']='passed'
         save()
-        if active:
-            runtime=Path(active['log_directory']);memory=json.loads((runtime/'memory-summary.json').read_text())
-            record['native_memory']=memory
-            record['memory_policy']=json.loads((runtime/'memory-policy.json').read_text())
-            if memory['guard'] or not memory['normal_pressure_observed'] or memory['swap_growth_bytes'] or not memory['monitor_healthy'] or not memory['child_exited']:
-                record.update(status='failed',error='Actual app continuous pressure/swap/shutdown gate failed')
-            record['activation']=feature_receipts((runtime/'native.log').read_text(),['reduce'])
-            from benchmark_prompt_chunks import chunk_receipt
-            record['actual_chunks']=chunk_receipt((runtime/'native.log').read_text(), size)
-        assert_no_model_server()
-        closed=[]
-        for port in (8095,8096):
-            with socket.socket() as sock:
-                sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
-                sock.bind(('127.0.0.1',port));closed.append(port)
-        record.update(ports_closed_after_stop=closed,no_model_server_remaining=True,postflight=snapshot(),
-             default_launcher_unchanged=sha256(ROOT/'Start Strata.command')==original_default,
-             launcher_unchanged=sha256(LAUNCHER)==record['launcher_sha256'],source_unchanged=sha256(SOURCE)==record['source_sha256'])
-        save()
+        # Without an earlier failure in flight, the shutdown/postflight failure is the result.
+        if failure is not None and checks_passed:raise failure
     if record['status']!='passed':raise RuntimeError(record.get('error','App verification failed'))
     print('Profile API validation: English answers, complete code edit, SSE and integration passed; zero swap, normal pressure; both ports closed.',flush=True)
 

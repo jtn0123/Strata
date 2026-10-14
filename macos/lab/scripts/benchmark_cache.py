@@ -88,7 +88,7 @@ def measure(
             result.update(
                 ttft_s=first - started if first is not None else None,
                 wall_s=time.monotonic() - started,
-                native_timings=engine.last.get("native_timings"),
+                native_timings=engine.last.get("native_timings", engine.last.get("rejected_native_timings")),
                 token_ids=tokens,
             )
         timings = result["native_timings"]

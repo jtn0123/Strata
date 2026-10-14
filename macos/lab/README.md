@@ -58,9 +58,28 @@ No login service or system-wide Python packages are installed. Native and Strata
 
 ## Recreate the environment
 
-For the complete optional M5 engine/helper/diagnostic chain, use [the ordered preparation recipe](bench/M5-PREPARATION-RECIPE.md). It distinguishes CPU builds and saved-data checks from model/GPU execution, and documents the current external-library policy and remaining fresh-directory validation.
+These commands rebuild what `Start Strata.command` needs on a fresh clone, in order. They compile native code on the CPU and download or transform model files; none of them loads a model. Starting the app afterwards is the first step that runs the model on the GPU. [The preparation recipe](bench/M5-PREPARATION-RECIPE.md) explains each step, the optional diagnostic engines and what has not yet been checked in a fresh directory.
 
-Prerequisites: native ARM64 macOS, Apple's Command Line Tools, Python 3 and `uv`. The build embeds Metal source for runtime compilation, so the standalone Metal compiler is not required for this initial path. This does not establish that every optional Metal 4 tensor optimization is enabled.
+Prerequisites: native ARM64 macOS, Apple's Command Line Tools, Git, `curl`, `uv` and Python 3.12. The build embeds Metal source for runtime compilation, so the standalone Metal compiler is not required. This does not establish that every optional Metal 4 tensor optimization is enabled.
+
+<!-- default-profile-chain -->
+```sh
+uv run --python 3.12 --no-project python scripts/provision.py --jobs 1
+.venv/bin/python scripts/download_models.py flash
+.venv/bin/python scripts/download_models.py mtp_bf16
+.venv/bin/python scripts/prepare_draft.py q3
+.venv/bin/python scripts/prepare_shared.py --jobs 1
+.venv/bin/python scripts/prepare_shared_layout.py
+.venv/bin/python scripts/prepare_mma.py --jobs 1
+.venv/bin/python scripts/prepare_m5.py --engine m5-small-stack --build --jobs 1
+.venv/bin/python scripts/validate_offline.py
+```
+
+Provisioning builds the baseline engine. The helper is quantized from BF16 to Q3, its copies of the main model's embedding and output tables are removed, and its tensors are reordered for the mixed CPU/GPU placement. The launcher's `m5-small-stack` build (`prepare_m5.py`) needs the operation build from `prepare_mma.py`, which in turn needs the shared-weight checkout from `prepare_shared.py`. `tests/test_recreate_recipe.py` checks this order against the scripts and `config/`.
+
+Sources, dependencies and model revisions are pinned in `config/` and `requirements.txt`. Downloads resume and verify exact byte count and SHA256 before a model becomes available; each download also needs 20 GiB spare beyond what is left to fetch. By registered byte count the model files in this chain total 78.5 GB: 66.4 GB for Flash, the 7.77 GB BF16 helper source and 1.80, 1.25 and 1.25 GB for the Q3, shared and packed helpers. The first launch or benchmark reads the 67.7 GB of Flash and packed-helper files in full to check their SHA256, then keeps the result in `bench/runtime/model-verification.json`. Smaller helpers are quantized from verified BF16, not re-quantized from the compressed Q4 file. `prepare_draft.py` records source/tool pins, output SHA256 and native quantization logs. The experiments also retain Q2_K and Q2_0 variants; they are not the chosen profile.
+
+`scripts/run.py small`, the small-model benchmarks and the older helper comparisons also need `download_models.py small` (2.74 GB) and the original Q4 helper, `download_models.py mtp` (2.79 GB). The default launcher uses neither.
 
 Provisioning installs the frozen development quality tools into the lab environment
 alongside its existing runtime packages, so the mandatory offline inventory can
@@ -71,17 +90,6 @@ rebuilding native code:
 uv pip install --python .venv/bin/python --only-binary :all: --require-hashes -r requirements-quality.lock
 .venv/bin/python scripts/validate_offline.py
 ```
-
-```sh
-uv run --python 3.12 --no-project python scripts/provision.py --jobs 1
-.venv/bin/python scripts/download_models.py small
-.venv/bin/python scripts/download_models.py flash
-.venv/bin/python scripts/download_models.py mtp
-.venv/bin/python scripts/download_models.py mtp_bf16
-.venv/bin/python scripts/prepare_draft.py q3
-```
-
-Sources, dependencies and model revisions are pinned in `config/` and `requirements.txt`. Downloads resume and verify exact byte count and SHA256 before a model becomes available. The original three downloads use about 72 GB. Recreating the optional Q3 helper adds a 7.77 GB BF16 source and 1.80 GB derived file; leave another 20 GiB spare. Smaller helpers are quantized from verified BF16, not re-quantized from the compressed Q4 file. `prepare_draft.py` records source/tool pins, output SHA256 and native quantization logs. The experiments also retain Q2_K and Q2_0 variants; they are not the chosen profile.
 
 Saved derived-model entries do not require the local files to exist already: the preparation tools regenerate missing outputs and check them against the registered byte count/SHA256 before accepting them. Recreated files preserve the registry and its original pins. Existing corrupted or unexpected partial files still require review; a mismatch is not silently re-pinned.
 
@@ -119,7 +127,7 @@ The selected full Flash-Next Q2_0 files contain 37.6 GB of model weights and a s
 
 This experiment preserves all 512 experts per layer in the selected compressed model. It does not use the separate Coder variant that drops experts. It also does not port the upstream CUDA expert scheduler: Metal reads resident weights through unified memory, while the existing lazy lookup path uses SSD.
 
-The full files do not include an MTP block. The original optional 2.79 GB self-contained Q4_K_M draft head is downloaded separately; the selected Q3 helper is 1.80 GB. The untouched pinned runtime requires the helper's own embeddings/output projection. A separate weight-sharing build now tests borrowing these tables from the main model; it does not change the normal engine.
+The full files do not include an MTP block. The original optional 2.79 GB self-contained Q4_K_M draft head is downloaded separately; the selected Q3 helper is 1.80 GB. The untouched pinned runtime requires the helper's own embeddings/output projection. A separate weight-sharing build borrows these tables from the main model; the normal launcher uses it, through the `m5-small-stack` engine and the packed shared helper.
 
 The original self-contained Q4 GPU draft exceeded the default GPU memory budget on this Mac. Its CPU variant produced 43-45 output tokens/s but added 1.85 GiB of swap and longer startup. The later selected Q3 split profile avoided new swap; its measured tradeoffs are in [PREDICTION.md](bench/PREDICTION.md). No system GPU memory limit was changed.
 
