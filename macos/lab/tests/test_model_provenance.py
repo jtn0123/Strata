@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import sys
 import tempfile
+import threading
 import unittest
 from unittest.mock import patch
 
@@ -38,6 +39,29 @@ class ProvenanceTests(unittest.TestCase):
                 digest=original(p);p.write_bytes(b"changed");return digest
             with patch.object(proof,"file_digest",side_effect=mutate),self.assertRaisesRegex(RuntimeError,"during verification"):
                 proof.verify_models(["small"],root)
+
+    def test_concurrent_verification_uses_independent_atomic_publication(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); self.fixture(root)
+            barrier = threading.Barrier(2)
+            original = proof.os.replace
+            temporary_paths, errors = [], []
+            def replace(source, destination):
+                temporary_paths.append(source)
+                barrier.wait(timeout=3)
+                original(source, destination)
+            def verify():
+                try: proof.verify_models(["small"], root)
+                except BaseException as error: errors.append(error)
+            with patch.object(proof.os, "replace", side_effect=replace):
+                threads = [threading.Thread(target=verify) for _ in range(2)]
+                for thread in threads: thread.start()
+                for thread in threads: thread.join(timeout=5)
+            self.assertFalse(any(thread.is_alive() for thread in threads))
+            self.assertEqual(errors, [])
+            self.assertEqual(len(set(temporary_paths)), 2)
+            self.assertEqual(list((root/"bench/runtime").glob("*.tmp")), [])
+            proof.verify_models(["small"], root)
 
 
 if __name__ == "__main__":unittest.main()

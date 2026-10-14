@@ -66,6 +66,22 @@ class MonitorTests(unittest.TestCase):
             self.assertFalse(result["monitor_healthy"])
             self.assertIn("No live", result["guard"])
 
+    def test_teardown_swap_above_budget_fails_after_healthy_live_sample(self):
+        for limit, final_swap in ((0, 1), (128*1024**2, 200*1024**2)):
+            with self.subTest(limit=limit), tempfile.TemporaryDirectory() as folder:
+                monitor, child = self.monitor(folder)
+                monitor.swap_guard_bytes = limit
+                with patch("benchmark.psutil.virtual_memory", return_value=SimpleNamespace(available=4*1024**3)), \
+                     patch("benchmark.psutil.swap_memory", return_value=SimpleNamespace(used=0)), \
+                     patch("benchmark.psutil.disk_io_counters", return_value=None):
+                    monitor.sample(SimpleNamespace(rss=1, vms=1))
+                    with patch("benchmark.psutil.swap_memory", return_value=SimpleNamespace(used=final_swap)):
+                        result = monitor.finish()
+                self.assertTrue(result["monitor_healthy"])
+                self.assertEqual(result["swap_growth_bytes"], final_swap)
+                self.assertIn("swap grew", result["guard"])
+                child.terminate.assert_not_called()
+
     def test_ignored_termination_escalates_to_kill(self):
         import subprocess
         with tempfile.TemporaryDirectory() as folder:

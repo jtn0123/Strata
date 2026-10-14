@@ -11,7 +11,7 @@ JavaScript framework or model download is needed. `mac.js` uses the pinned shell
 refresh this compatibility layer and its control-ID test when changing that dependency.
 
 The interface adds draft-only prompt shortcuts, responsive layouts, light/dark colors, keyboard tab selection,
-and a settings dialog with focus containment and focus restoration. The closed dialog is inert. Reduced-motion
+and a settings dialog with focus containment, keyboard radio selection and focus restoration. The closed dialog is inert. Reduced-motion
 preferences disable the added transitions. Unreported GPU counters are hidden and explained; system memory
 comes from the server's existing hardware sampler, not a new free-memory estimate. The chart floor adopts
 upstream's [6a7c6f82](https://github.com/Niko1221/Strata/commit/6a7c6f8275a551ae3940d7d434dd2e88a1ee59f4).
@@ -46,6 +46,22 @@ Run the pure status-state regression tests separately from the network-free Pyth
 ```sh
 node --test tests/ui_state.test.cjs
 ```
+
+The later bug/interaction pass adds `tests/ui_behavior.test.cjs`. Its focused checks reproduce the pinned
+chat's unsafe Undo, omitted attached-file export and premature-stream completion before checking the maintained
+fixes. Chat EOF now needs an explicit terminal SSE record; interrupted replies keep their partial text beside
+the error, while Stop remains cancellation. Numeric sampling fields reject invalid values before saving, and
+late shared-settings responses cannot replace a user's choice. Applying before that read completes explicitly
+writes the selected sharing state.
+
+Attached file contents remain transient: reload keeps their names, shows a reattachment notice, and warns
+on the first follow-up. Markdown export includes available file contents and identifies unavailable restored
+files. Response tables scroll locally; narrow/coarse-pointer copy, removal, close and radio targets are 44px.
+The user-message foreground follows the selected theme, and input names retain their visible labels.
+
+Run both JavaScript suites with `node --test tests/ui_state.test.cjs tests/ui_behavior.test.cjs`.
+Focused local validation is 27 JavaScript cases and 14 web/performance Python cases. Browser and full offline
+verification are separate; these tests do not establish physical VoiceOver or mobile-keyboard acceptance.
 
 Final local validation: 178 Python offline tests, five campaign-protocol tests and four JavaScript state tests
 pass. The CI workflow runs the JavaScript checks under Node 22. Review prompts, model responses, detailed grades
@@ -97,3 +113,15 @@ Final audit checks: 253 load-free Python tests, six tiny-child termination tests
 protocol tests and seven JavaScript tests. Historical counts above describe their earlier passes.
 Physical VoiceOver/mobile-keyboard validation and a new full-model performance comparison were
 not part of this audit; previously recorded model results remain the performance evidence.
+
+## Latest bug and polish validation
+
+The [follow-up report](../bench/research/20261013-bug-polish/REPORT.md) records 22 corrected
+findings and two deferred parked-tool findings. Local checks pass 281 load-free Python tests,
+27 JavaScript tests, 12 benchmark-termination tests, six app-launch signal cases, two port checks
+and five campaign-protocol checks. The six app signal cases share one test method.
+
+Real browser checks cover mock completion, retained partial failure, intentional Stop, quick-link
+startup, settings validation, reattachment notices and narrow/desktop layouts. Dark user-message
+contrast is 11.4:1; 320 px chat/table fixtures fit the viewport. Review screenshots and detailed
+receipts remain ignored, and no real model/GPU benchmark ran in this pass.

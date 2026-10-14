@@ -48,12 +48,18 @@ jobs:
       - name: Check benchmark termination with tiny owned fixtures
         working-directory: macos/lab
         run: python -m unittest discover -s tests -p test_benchmark_termination.py -v
+      - name: Check launcher termination with tiny owned fixtures
+        working-directory: macos/lab
+        run: python -m unittest discover -s tests -p test_run_termination.py -v
+      - name: Check local port restart and ownership
+        working-directory: macos/lab
+        run: python -m unittest discover -s tests -p test_runtime_ports.py -v
       - name: Check browser status transitions
         run: |
           node --check macos/lab/web/mac.js
           node --check macos/lab/web/ui-state.js
           node --check macos/lab/web/performance.js
-          node --test macos/lab/tests/ui_state.test.cjs
+          node --test macos/lab/tests/*.test.cjs
       - name: Retain offline receipt and log
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

@@ -146,4 +146,109 @@ trial.main()
         self.check_termination(signal.SIGHUP,during_spawn=True)
 
 
+class LegacyBenchmarkTerminationTests(unittest.TestCase):
+    def check_termination(self, stopping, during_spawn=False):
+        for name in ('benchmark', 'benchmark_cache'):
+            with self.subTest(driver=name, during_spawn=during_spawn), tempfile.TemporaryDirectory(prefix='strata-legacy-stop-') as temporary:
+                root=Path(temporary)
+                for relative in ('bench/results','config','scripts'):
+                    (root/relative).mkdir(parents=True)
+                (root/'config/runtime.json').write_text(json.dumps({
+                    'llama_cpp':{'revision':'fixture'},'strata_macos':{'revision':'fixture'}}))
+                (root/'config/models.json').write_text(json.dumps({'small':{}}))
+                for script in ('native_backend.py','benchmark_cache.py'):
+                    (root/'scripts'/script).write_text('owned fixture')
+                marker=root/'child.json';finished=root/'monitor-finished';observed=root/'observer-ready'
+                fake=root/'owned-fixture'
+                fake.write_text('#!'+sys.executable+'\nimport json,os,time\nfrom pathlib import Path\n'
+                    +'Path('+repr(str(marker))+').write_text(json.dumps({"pid":os.getpid()}))\n'
+                    +'while True:time.sleep(1)\n')
+                fake.chmod(0o700)
+                driver=root/'driver.py'
+                driver.write_text('''import os,sys,time
+from pathlib import Path
+from types import SimpleNamespace
+sys.path.insert(0,'''+repr(str(ROOT/'scripts'))+''')
+import '''+name+''' as trial
+trial.ROOT=Path('''+repr(str(root))+''')
+trial.verify_engine=lambda *a:{}
+trial.verify_models=lambda *a:{}
+trial.assert_unchanged=lambda *a:None
+trial.host_snapshot=lambda:{}
+trial.command_output=lambda command:'fixture' if command[-1]=='HEAD' else ''
+trial.server_command=lambda *a,**kw:['''+repr(str(fake))+''']
+trial.experiment_environment=lambda *a:(dict(os.environ),{})
+trial.configure=lambda *a:(dict(os.environ),{})
+class Monitor:
+    thread=SimpleNamespace(start=lambda:None)
+    baseline=staticmethod(lambda:{})
+    def __init__(self,*a,**kw):pass
+    def finish(self):
+        Path('''+repr(str(finished))+''').write_text('finished')
+        return {'guard':None,'monitor_healthy':True,'child_exited':True}
+trial.Monitor=Monitor
+def wait(*a,**kw):
+    while True:time.sleep(.02)
+trial.wait_ready=wait
+if '''+repr(during_spawn)+''':
+    spawn=trial.subprocess.Popen
+    def held_spawn(*a,**kw):
+        child=spawn(*a,**kw)
+        observed=Path('''+repr(str(observed))+''')
+        deadline=time.monotonic()+10
+        while not observed.exists() and time.monotonic()<deadline:time.sleep(.01)
+        if not observed.exists():raise RuntimeError('Fixture observer not ready')
+        os.kill(os.getpid(),'''+str(int(stopping))+''')
+        return child
+    trial.subprocess.Popen=held_spawn
+args=SimpleNamespace(model='small',label='owned-fixture',engine='baseline',spec='none',draft=3,
+    draft_placement='gpu',draft_model='mtp',temperature=0,repeats=1,histories=[512],context=4096,
+    batch=512,ubatch=128,cache_type='f16',threads=8,predict=2,prompts=[64],warmups=0,extended_checks=False)
+trial.run(args)
+''')
+                process=subprocess.Popen([sys.executable,str(driver)],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+                owned=None;created=None
+                try:
+                    deadline=time.monotonic()+10
+                    while not marker.exists() and process.poll() is None and time.monotonic()<deadline:time.sleep(.01)
+                    if not marker.exists():self.fail('Owned fixture did not start: '+str(process.communicate(timeout=2)))
+                    owned=psutil.Process(json.loads(marker.read_text())['pid']);created=owned.create_time()
+                    self.assertIn(str(fake),owned.cmdline())
+                    if during_spawn:observed.write_text('identified owned fixture')
+                    else:process.send_signal(stopping)
+                    stdout,stderr=process.communicate(timeout=15)
+                    self.assertNotEqual(process.returncode,0)
+                    # Python preserves SIGINT's exit status for an uncaught
+                    # KeyboardInterrupt; the receipt/guard/child prove cleanup.
+                    if stopping!=signal.SIGINT:self.assertNotEqual(process.returncode,-stopping)
+                    self.assertTrue(finished.exists(),stdout+stderr)
+                    self.assertFalse(BenchmarkTerminationTests.alive(owned))
+                    receipt='result.json' if name=='benchmark' else 'comparison.json'
+                    record=json.loads(next((root/'bench/results').glob('*/'+receipt)).read_text())
+                    self.assertEqual(record['status'],'failed')
+                    self.assertIn(signal.Signals(stopping).name,record['error'])
+                finally:
+                    if process.poll() is None:
+                        process.terminate()
+                        try:process.communicate(timeout=5)
+                        except subprocess.TimeoutExpired:process.kill();process.communicate(timeout=5)
+                    if owned is None and marker.exists():
+                        try:
+                            candidate=psutil.Process(json.loads(marker.read_text())['pid'])
+                            if str(fake) in candidate.cmdline():owned=candidate;created=candidate.create_time()
+                        except psutil.NoSuchProcess:pass
+                    if owned and BenchmarkTerminationTests.alive(owned):
+                        self.assertEqual(owned.create_time(),created);self.assertIn(str(fake),owned.cmdline())
+                        owned.terminate()
+                        try:owned.wait(timeout=5)
+                        except psutil.TimeoutExpired:owned.kill();owned.wait(timeout=5)
+
+    def test_sigterm_reaps_legacy_children(self):self.check_termination(signal.SIGTERM)
+    def test_ctrl_c_reaps_legacy_children(self):self.check_termination(signal.SIGINT)
+    def test_sighup_reaps_legacy_children(self):self.check_termination(signal.SIGHUP)
+    def test_sigterm_during_legacy_spawn_publishes_ownership(self):self.check_termination(signal.SIGTERM,True)
+    def test_ctrl_c_during_legacy_spawn_publishes_ownership(self):self.check_termination(signal.SIGINT,True)
+    def test_sighup_during_legacy_spawn_publishes_ownership(self):self.check_termination(signal.SIGHUP,True)
+
+
 if __name__=='__main__':unittest.main()

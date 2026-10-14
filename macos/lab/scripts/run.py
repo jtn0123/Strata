@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 import fcntl
 import json
 import os
-import signal
 import socket
 import subprocess
 import sys
@@ -21,6 +20,7 @@ from metal_environment import TUNING, configure
 from runtime_profiles import lookup_command
 from runtime_memory import admit_model, app_monitor
 from model_provenance import verify_models
+from benchmark_signals import cleanup_on_termination, defer_termination
 
 
 def assert_ports_available(ports):
@@ -60,6 +60,7 @@ def main(argv=None):
         execute(args)
 
 
+@cleanup_on_termination()
 def execute(args):
     batch = getattr(args, 'batch', 512)
     if not 0 < args.ubatch <= batch <= args.context:
@@ -72,10 +73,6 @@ def execute(args):
     engine_info = verify_engine(args.engine)
     model_ids = [args.model] + ([args.draft_model] if args.spec == 'draft-mtp' else [])
     model_info = verify_models(model_ids)
-    def interrupted(signum, frame):
-        raise KeyboardInterrupt
-    signal.signal(signal.SIGTERM, interrupted)
-    signal.signal(signal.SIGHUP, interrupted)
     assert_ports_available((args.port, args.native_port))
     folder = ROOT / "bench/runtime" / datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     folder.mkdir(parents=True)
@@ -110,13 +107,15 @@ def execute(args):
                                          batch=batch,
                                          initial_swap_bytes=policy['baseline']['swap_used_bytes'])
             config_path.write_text(json.dumps(config, indent=2) + "\n")
-            native = subprocess.Popen(command, stdout=log, stderr=log, env=native_env)
-            monitor = app_monitor(native, folder / "memory.jsonl", policy)
-            monitor.thread.start()
+            with defer_termination():
+                native = subprocess.Popen(command, stdout=log, stderr=log, env=native_env)
+                monitor = app_monitor(native, folder / "memory.jsonl", policy)
+                monitor.thread.start()
             wait_ready(native, config["native_url"])
-            app = subprocess.Popen([sys.executable, str(ROOT / "scripts/strata_server.py"),
-                                    "--engine", "metal-native", "--config", str(config_path),
-                                    "--host", "127.0.0.1", "--port", str(args.port)])
+            with defer_termination():
+                app = subprocess.Popen([sys.executable, str(ROOT / "scripts/strata_server.py"),
+                                        "--engine", "metal-native", "--config", str(config_path),
+                                        "--host", "127.0.0.1", "--port", str(args.port)])
             print(f"Strata: http://127.0.0.1:{args.port} | native API: {config['native_url']}/v1", flush=True)
             print(f"Logs: {folder} | Ctrl-C stops both processes", flush=True)
             while native.poll() is None and app.poll() is None:

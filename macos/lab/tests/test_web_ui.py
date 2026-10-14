@@ -43,10 +43,34 @@ class WebUITests(unittest.TestCase):
         self.assertIn('id="stop-btn"', body)
         self.assertIn('id="api-key"', body)
         self.assertIn('/web/mac.js', body)
+        self.assertLess(body.index('/web/ui-state.js'), body.index('/web/app.js'))
         self.assertLess(body.index('/web/ui-state.js'), body.index('/web/mac.js'))
         self.assertIn('/web/performance.js', body)
         self.assertNotIn('https://cdn', body)
         self.assertEqual(int(h.headers['Content-Length']), len(h.wfile.getvalue()))
+
+    def test_form_controls_keep_visible_and_explicit_accessible_names(self):
+        class Names(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.controls = {}
+                self.labels = set()
+
+            def handle_starttag(self, tag, attrs):
+                values = dict(attrs)
+                if tag in ('input', 'textarea'):
+                    self.controls[values.get('id')] = values.get('aria-label')
+                if tag == 'label':
+                    self.labels.add(values.get('for'))
+
+        names = Names()
+        names.feed((WEB / 'index.html').read_text())
+        for control, label in [('input', 'Your message'), ('s-temp', 'Temperature'),
+                               ('s-topp', 'Top-p'), ('s-topk', 'Top-k'),
+                               ('s-max', 'Max tokens'), ('s-seed', 'Seed')]:
+            with self.subTest(control=control):
+                self.assertEqual(names.controls[control], label)
+                self.assertIn(control, names.labels)
 
     def test_css_and_js_mime_and_cache_allow_refresh(self):
         for path, mime in [('/web/mac.css?v=2', 'text/css'), ('/web/mac.js', 'text/javascript'), ('/web/ui-state.js', 'text/javascript'), ('/web/performance.js', 'text/javascript')]:

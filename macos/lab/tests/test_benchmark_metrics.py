@@ -5,10 +5,21 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from benchmark_metrics import METRICS, change, metrics
+from benchmark_metrics import METRICS, change, completion_counts, metrics
 
 
 class MetricTests(unittest.TestCase):
+    def test_complete_native_counters_match_actual_tokens_and_input(self):
+        good = dict(predicted_n=2, prompt_n=3, cache_n=2)
+        self.assertEqual(completion_counts(good, [7, 9], 5, cached=True, max_new=2), 2)
+        for mutation in ({"predicted_n": -1}, {"predicted_n": 3}, {"predicted_n": True},
+                         {"prompt_n": 2}, {"cache_n": -1}, {"cache_n": 2.5}):
+            with self.subTest(mutation=mutation), self.assertRaises(ValueError):
+                completion_counts(dict(good, **mutation), [7, 9], 5, cached=True)
+        with self.assertRaises(ValueError): completion_counts(good, [7, 9], 5, cached=False)
+        with self.assertRaises(ValueError): completion_counts(good, [7, 9], max_new=1)
+        with self.assertRaises(ValueError): completion_counts(good, [7, True])
+
     def case(self):
         return {"workload": "code", "prompt_tokens": 48, "repeat": 2,
                 "generation_tok_s": 50, "prompt_tok_s": 500, "ttft_s": 0.2, "wall_s": 2.76,

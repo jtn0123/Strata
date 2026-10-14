@@ -10,7 +10,8 @@ GIB = 1024**3
 def assert_no_model_server():
     servers = []
     for process in psutil.process_iter(["name"]):
-        if (process.info["name"] or "").startswith("llama-server"):
+        name = process.info["name"] or ""
+        if name.startswith("llama-server") or name == "strata":
             servers.append(process.pid)
     if servers:
         raise RuntimeError(f"Stop the running native model servers before a benchmark: PIDs {servers}")

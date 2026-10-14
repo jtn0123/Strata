@@ -20,7 +20,9 @@ from engines import ENGINES, verify_engine
 from draft_vocab import experiment_environment
 from check_memory import assert_no_model_server
 from metal_environment import TUNING, configure
-from benchmark_metrics import case_metrics
+from benchmark_metrics import case_metrics, completion_counts
+from benchmark_signals import cleanup_on_termination, defer_termination
+from model_provenance import assert_unchanged, verify_models
 
 
 def command_output(command):
@@ -116,6 +118,13 @@ class Monitor:
             return True
         return False
 
+    def swap_guard(self, sample):
+        if sample["swap_used_bytes"] - self.initial_swap > self.swap_guard_bytes:
+            self.guard = self.guard or f"Stopped: swap grew by over {self.swap_guard_bytes/1024**2:.0f} MiB"
+            self.stop_owned_child()
+            return True
+        return False
+
     def run(self):
         low_since = None
         try:
@@ -131,13 +140,14 @@ class Monitor:
                     stream.flush()
                     if self.pressure_guard(sample):
                         return
+                    if self.swap_guard(sample):
+                        return
                     if sample["available_bytes"] < self.minimum_available_bytes:
                         low_since = low_since or time.monotonic()
                     else:
                         low_since = None
-                    if sample["swap_used_bytes"] - self.initial_swap > self.swap_guard_bytes or (low_since and time.monotonic() - low_since > 4):
-                        self.guard = (f"Stopped: swap grew by over {self.swap_guard_bytes/1024**2:.0f} MiB "
-                                      f"or available memory stayed below {self.minimum_available_bytes/1024**2:.0f} MiB for 4 seconds")
+                    if low_since and time.monotonic() - low_since > 4:
+                        self.guard = f"Stopped: available memory stayed below {self.minimum_available_bytes/1024**2:.0f} MiB for 4 seconds"
                         self.stop_owned_child()
                         return
                     if mem is None or self.process.poll() is not None:
@@ -158,6 +168,7 @@ class Monitor:
             try:
                 sample = self.sample()
                 self.pressure_guard(sample)
+                self.swap_guard(sample)
                 with self.path.open("a") as stream:
                     stream.write(json.dumps({**sample, "after_child_exit": self.process.poll() is not None}) + "\n")
             except Exception as error:
@@ -224,6 +235,9 @@ def stream_completion(base, payload, observer=None):
     elapsed = time.monotonic() - started
     if final is None or first is None:
         raise RuntimeError("Streaming response has no first token or final timing record")
+    prompt = payload.get("prompt")
+    completion_counts(final["timings"], ids, len(prompt) if isinstance(prompt, list) else None,
+                      cached=bool(payload.get("cache_prompt")), max_new=payload.get("n_predict"))
     return {"ttft_s": first - started, "wall_s": elapsed, "text": "".join(text),
             "generated_token_ids": ids, "final": final}
 
@@ -264,18 +278,12 @@ def main():
             raise SystemExit(1)
 
 
+@cleanup_on_termination()
 def run(args):
     engine = getattr(args, "engine", "baseline")
     warmups = getattr(args, "warmups", 0)
     if args.repeats < 1 or warmups < 0:
         raise ValueError("Use at least one measured repeat and nonnegative warmups")
-    engine_info = verify_engine(engine)
-    vocab_mode = getattr(args, "draft_vocab", "off")
-    if vocab_mode != "off" and args.spec != "draft-mtp":
-        raise ValueError("A draft vocabulary can only be used with prediction enabled")
-    env, vocab_info = experiment_environment(engine, vocab_mode)
-    env, metal_info = configure(env, engine, getattr(args, "tensor_api", "auto"),
-                                getattr(args, "m5_tuning", "stock"))
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + args.label
     folder = ROOT / "bench/results" / run_id
     folder.mkdir()
@@ -285,6 +293,15 @@ def run(args):
         result_path.write_text(json.dumps(record, indent=2) + "\n")
     save()
     try:
+        engine_info = verify_engine(engine)
+        vocab_mode = getattr(args, "draft_vocab", "off")
+        if vocab_mode != "off" and args.spec != "draft-mtp":
+            raise ValueError("A draft vocabulary can only be used with prediction enabled")
+        env, vocab_info = experiment_environment(engine, vocab_mode)
+        env, metal_info = configure(env, engine, getattr(args, "tensor_api", "auto"),
+                                    getattr(args, "m5_tuning", "stock"))
+        model_ids = [args.model] + ([args.draft_model] if args.spec == "draft-mtp" else [])
+        model_proof = verify_models(model_ids, ROOT)
         with socket.socket() as sock:
             sock.bind(("127.0.0.1", 0))
             port = sock.getsockname()[1]
@@ -299,6 +316,7 @@ def run(args):
                   "model": json.loads((ROOT / "config/models.json").read_text())[args.model],
                   "host_before": host_snapshot(), "cases": [], "warmups": [], "checks": [],
                   "selected_engine": engine_info,
+                  "model_provenance": model_proof,
                   "draft_vocabulary": vocab_info,
                   "metal_environment": metal_info,
                   "method": "Single slot, full Metal offload, fixed seed 1234; sampling temperature is recorded in settings. Exact synthetic chat prompt sizes and fixed output count from settings; no prompt reuse; ignore EOS for timing only. No model downloads during a run. Warm OS file cache is uncontrolled. TTFT includes HTTP and prompt evaluation. Correctness checks use normal EOS handling."}
@@ -327,11 +345,12 @@ def run(args):
                 record["launch_preflight"] = preflight(small=args.model != "flash")
                 save()
             launch_baseline = Monitor.baseline()
-            process = subprocess.Popen(command, stdout=log, stderr=log, env=env)
-            monitor = Monitor(process, folder / "memory.jsonl",
-                              getattr(args, "swap_guard_bytes", 2 * 1024**3),
-                              getattr(args, "minimum_available_bytes", 384 * 1024**2), baseline=launch_baseline)
-            monitor.thread.start()
+            with defer_termination():
+                process = subprocess.Popen(command, stdout=log, stderr=log, env=env)
+                monitor = Monitor(process, folder / "memory.jsonl",
+                                  getattr(args, "swap_guard_bytes", 2 * 1024**3),
+                                  getattr(args, "minimum_available_bytes", 384 * 1024**2), baseline=launch_baseline)
+                monitor.thread.start()
             record["ready_s"] = wait_ready(process, base)
             record["props"] = request(base, "/props")
             print(f"{run_id}: ready in {record['ready_s']:.2f}s", flush=True)
@@ -425,10 +444,10 @@ def run(args):
                     multilingual=False))
                 save()
             if getattr(args, "cached_workloads", False):
-                from benchmark_cache import build_workload, clean, correct, measure
+                from benchmark_cache import build_workload, clean, correct, measure, stop_tokens
                 from native_backend import NativeEngine, NativeTemplate, NativeTokenizer
                 tokenizer, template = NativeTokenizer(base), NativeTemplate(base)
-                native = NativeEngine(base, record["props"], args.model, True)
+                native = NativeEngine(base, record["props"], args.model, True, stop_ids=stop_tokens(tokenizer))
                 record["cached_cases"] = []
                 def encode(messages):
                     return tokenizer.encode(template.render(messages, enable_thinking=False), parse_special=True)
@@ -484,6 +503,9 @@ def run(args):
                     if record["memory"]["guard"] or not record["memory"]["monitor_healthy"]:
                         record["status"] = "failed"
                         record.setdefault("error", record["memory"]["guard"] or "Memory monitoring was incomplete")
+                assert_unchanged(model_proof, ROOT)
+                if verify_engine(engine) != engine_info:
+                    raise RuntimeError("Native engine changed during benchmark")
                 record["host_after"] = host_snapshot()
                 if record["cases"]:
                     record["summary"] = [{"workload": name, "prompt_tokens": n,

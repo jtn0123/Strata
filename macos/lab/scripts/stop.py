@@ -21,7 +21,9 @@ def main():
     if abs(process.create_time() - saved["create_time"]) > 0.01:
         raise RuntimeError("Recorded process was replaced; refusing to signal an unrelated process")
     command = process.cmdline()
-    if not any(arg in ("scripts/run.py", str(ROOT / "scripts/run.py")) for arg in command):
+    supervisors = {form for name in ("run.py", "runtime_profiles.py")
+                   for form in ("scripts/" + name, str(ROOT / "scripts" / name))}
+    if not any(arg in supervisors for arg in command):
         raise RuntimeError("Recorded process is not this lab's supervisor")
     if process.cwd() != str(ROOT):
         raise RuntimeError("Recorded process belongs to another workspace")

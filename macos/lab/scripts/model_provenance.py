@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import tempfile
 
 from lab import ROOT
 
@@ -64,8 +65,16 @@ def verify_models(model_ids, root=ROOT):
             raise RuntimeError(f"Model changed while reading geometry: {name}")
         result[name] = {"registry":model,"files":files,"routing_geometry":observed_geometry}
     cache_path.parent.mkdir(parents=True,exist_ok=True)
-    temporary = cache_path.with_suffix(".tmp")
-    temporary.write_text(json.dumps(cache,indent=2)+"\n"); os.replace(temporary,cache_path)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", dir=cache_path.parent,
+                                         prefix=cache_path.name+".", suffix=".tmp", delete=False) as stream:
+            temporary = Path(stream.name)
+            stream.write(json.dumps(cache,indent=2)+"\n")
+        os.replace(temporary,cache_path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
     return {"models":result,"hash_io_policy":"Initial or changed files: bounded reads with macOS F_NOCACHE outside measurements. Cached verification uses identity/size/mtime/ctime; not protection against adversarial modification. Headers are read; cache state remains uncontrolled."}
 
 

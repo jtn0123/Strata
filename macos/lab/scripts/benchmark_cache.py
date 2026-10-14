@@ -15,8 +15,23 @@ import time
 
 import psutil
 from benchmark import Monitor, command_output, host_snapshot, wait_ready
+from benchmark_metrics import case_metrics, completion_counts
+from benchmark_signals import cleanup_on_termination, defer_termination
+from engines import verify_engine
 from lab import ROOT, request, server_command
+from model_provenance import assert_unchanged, verify_models
 from native_backend import NativeEngine, NativeTemplate, NativeTokenizer
+
+
+def stop_tokens(tokenizer):
+    stops = set()
+    for text in ("<|im_end|>", "<|endoftext|>"):
+        ids = tokenizer.encode(text, parse_special=True)
+        if len(ids) == 1:
+            stops.add(ids[0])
+    if not stops:
+        raise ValueError("No supported end-of-turn token found for cache benchmark")
+    return stops
 
 
 def measure(engine, tokenizer, ids, max_new=96, temperature=0):
@@ -29,12 +44,15 @@ def measure(engine, tokenizer, ids, max_new=96, temperature=0):
     timings = engine.last.get("native_timings")
     if first is None or not timings:
         raise RuntimeError("Missing first token or native final timings")
-    if timings["prompt_n"] + timings["cache_n"] != len(ids):
-        raise RuntimeError(f"Prompt accounting mismatch: {timings}")
-    return {"ttft_s": first - started, "wall_s": elapsed,
-            "native_timings": timings, "token_ids": tokens,
-            "text": tokenizer.decode(tokens), "prompt_tokens": len(ids),
-            "prompt_sha256": hashlib.sha256(json.dumps(ids).encode()).hexdigest()}
+    completion_counts(timings, tokens, len(ids), cached=engine.prompt_cache, max_new=max_new)
+    if tokens[-1] not in engine.stop_ids:
+        raise ValueError("Complete normal-EOS cached answer required")
+    result = {"ttft_s": first - started, "wall_s": elapsed,
+              "native_timings": timings, "token_ids": tokens,
+              "text": tokenizer.decode(tokens), "prompt_tokens": len(ids),
+              "prompt_sha256": hashlib.sha256(json.dumps(ids).encode()).hexdigest()}
+    case_metrics(result, cached=True)
+    return result
 
 
 def build_workload(template, tokenizer, budget, variant):
@@ -84,50 +102,62 @@ def main():
         run(args)
 
 
+@cleanup_on_termination()
 def run(args):
     run_id = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + args.model + "-" + args.label
     folder = ROOT / "bench/results" / run_id
     folder.mkdir()
-    with socket.socket() as sock:
-        sock.bind(("127.0.0.1", 0))
-        port = sock.getsockname()[1]
-    base = f"http://127.0.0.1:{port}"
-    command = server_command(args.model, port, 4096, ubatch=512, spec=args.spec, draft=args.draft,
-                             draft_placement=args.draft_placement, draft_model=args.draft_model)
     record = {"schema": 1, "kind": "conversation-cache" if args.spec == "none" else "prediction-cache", "run_id": run_id,
-              "settings": vars(args), "command": command, "status": "running",
-              "runtime": json.loads((ROOT / "config/runtime.json").read_text()),
-              "model": json.loads((ROOT / "config/models.json").read_text())[args.model],
-              "binary_version": command_output([command[0], "--version"]),
-              "host_before": host_snapshot(), "cases": [], "checks": [],
+              "settings": vars(args), "status": "running", "cases": [], "checks": [],
               "method": "Paired real adapter runs. Each variant is primed with the same uncached first turn. Follow-up uses identical tokens with cache off/on; order alternates AB/BA. Seed 1234 and temperature from settings, normal EOS, max 96 answer tokens. Each history has an excluded warm-up pair. Compare TTFT and wall time on matched follow-ups, not the earlier synthetic cold-prompt benchmark. OS cache and background activity are uncontrolled. No extra multi-conversation RAM cache. Speculative settings and draft identity are recorded."}
-    record["adapter_sha256"] = hashlib.sha256((ROOT / "scripts/native_backend.py").read_bytes()).hexdigest()
-    record["benchmark_sha256"] = hashlib.sha256((ROOT / "scripts/benchmark_cache.py").read_bytes()).hexdigest()
-    if args.spec == "draft-mtp":
-        record["draft_model"] = json.loads((ROOT / "config/models.json").read_text())[args.draft_model]
-    record["actual_sources"] = {}
-    for name, directory in [("llama_cpp", "llama.cpp"), ("strata_macos", "Strata-macOS")]:
-        path = ROOT / "vendor" / directory
-        revision = command_output(["git", "-C", str(path), "rev-parse", "HEAD"])
-        dirty = command_output(["git", "-C", str(path), "status", "--porcelain"])
-        record["actual_sources"][name] = {"revision": revision, "dirty": dirty}
-        if revision != record["runtime"][name]["revision"] or dirty:
-            raise RuntimeError(f"Unpinned or modified source checkout: {directory}")
     path = folder / "comparison.json"
     def save():
         path.write_text(json.dumps(record, indent=2) + "\n")
     save()
+    try:
+        engine_info = verify_engine("baseline")
+        model_ids = [args.model] + ([args.draft_model] if args.spec == "draft-mtp" else [])
+        model_proof = verify_models(model_ids, ROOT)
+        record.update(selected_engine=engine_info, model_provenance=model_proof)
+        with socket.socket() as sock:
+            sock.bind(("127.0.0.1", 0))
+            port = sock.getsockname()[1]
+        base = f"http://127.0.0.1:{port}"
+        command = server_command(args.model, port, 4096, ubatch=512, spec=args.spec, draft=args.draft,
+                                 draft_placement=args.draft_placement, draft_model=args.draft_model)
+        record.update(command=command, runtime=json.loads((ROOT / "config/runtime.json").read_text()),
+                      model=json.loads((ROOT / "config/models.json").read_text())[args.model],
+                      binary_version=command_output([command[0], "--version"]), host_before=host_snapshot())
+        record["adapter_sha256"] = hashlib.sha256((ROOT / "scripts/native_backend.py").read_bytes()).hexdigest()
+        record["benchmark_sha256"] = hashlib.sha256((ROOT / "scripts/benchmark_cache.py").read_bytes()).hexdigest()
+        if args.spec == "draft-mtp":
+            record["draft_model"] = json.loads((ROOT / "config/models.json").read_text())[args.draft_model]
+        record["actual_sources"] = {}
+        for name, directory in [("llama_cpp", "llama.cpp"), ("strata_macos", "Strata-macOS")]:
+            source = ROOT / "vendor" / directory
+            revision = command_output(["git", "-C", str(source), "rev-parse", "HEAD"])
+            dirty = command_output(["git", "-C", str(source), "status", "--porcelain"])
+            record["actual_sources"][name] = {"revision": revision, "dirty": dirty}
+            if revision != record["runtime"][name]["revision"] or dirty:
+                raise RuntimeError(f"Unpinned or modified source checkout: {directory}")
+        save()
+    except BaseException as error:
+        record.update(status="failed", preparation_failed=True, error=f"{type(error).__name__}: {error}")
+        save()
+        raise
     process, monitor = None, None
     with (folder / "server.log").open("w") as log:
         try:
             launch_baseline = Monitor.baseline()
-            process = subprocess.Popen(command, stdout=log, stderr=log)
-            monitor = Monitor(process, folder / "memory.jsonl", baseline=launch_baseline)
-            monitor.thread.start()
+            with defer_termination():
+                process = subprocess.Popen(command, stdout=log, stderr=log)
+                monitor = Monitor(process, folder / "memory.jsonl", baseline=launch_baseline)
+                monitor.thread.start()
             record["ready_s"] = wait_ready(process, base)
             props = request(base, "/props")
             tokenizer, template = NativeTokenizer(base), NativeTemplate(base)
-            engines = {flag: NativeEngine(base, props, args.model, flag) for flag in (False, True)}
+            stops = stop_tokens(tokenizer)
+            engines = {flag: NativeEngine(base, props, args.model, flag, stop_ids=stops) for flag in (False, True)}
             proc = psutil.Process(process.pid)
             def evaluate(engine, ids, max_new=96):
                 return measure(engine, tokenizer, ids, max_new, args.temperature)
@@ -156,6 +186,8 @@ def run(args):
                         case["correct"] = correct(case["text"], workload["expected"])
                         if not flag and case["native_timings"]["cache_n"]:
                             raise AssertionError("Baseline unexpectedly reused prompt tokens")
+                        if flag and not case["native_timings"]["cache_n"]:
+                            raise AssertionError("Cached follow-up did not reuse its primed history")
                         record["cases"].append(case)
                         paired[flag] = case
                         save()
@@ -198,6 +230,15 @@ def run(args):
                     process.wait()
             if monitor:
                 record["memory"] = monitor.finish()
+                if (record["memory"]["guard"] or not record["memory"]["monitor_healthy"]
+                        or not record["memory"]["child_exited"]):
+                    record.update(status="failed", error=record["memory"]["guard"] or "Memory monitoring or child cleanup was incomplete")
+            try:
+                assert_unchanged(model_proof, ROOT)
+                if verify_engine("baseline") != engine_info:
+                    raise RuntimeError("Native engine changed during cache comparison")
+            except BaseException as error:
+                record.update(status="failed", error=f"{type(error).__name__}: {error}")
             record["host_after"] = host_snapshot()
             record["summary"] = []
             for budget in args.histories:

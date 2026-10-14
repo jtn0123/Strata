@@ -1,4 +1,4 @@
-// A small UI layer over the pinned API shell. No generation parameters or requests are changed.
+// Compatibility and accessibility over the pinned API shell; native settings stay with the server.
 "use strict";
 (() => {
   const input = document.getElementById("input");
@@ -7,6 +7,58 @@
   const keepWelcomeCopy = () => { if (subtitle.textContent !== welcomeText) subtitle.textContent = welcomeText; };
   new MutationObserver(keepWelcomeCopy).observe(subtitle, {childList: true, characterData: true, subtree: true});
   keepWelcomeCopy();
+  const originalToast = toast;
+  toast = (kind, title, text, ms, action) => {
+    if (title === "New chat" && action?.label === "Undo") {
+      const undo = new StrataChatUndo(messages), restore = action.run;
+      action = {...action, run: () => {
+        if (!undo.restore(messages, busy, restore)) originalToast("info", "Your new chat is kept", "The earlier chat can no longer replace this conversation.");
+      }};
+    }
+    return originalToast(kind, title, text, ms, action);
+  };
+
+  const originalUpdate = updateAssistant;
+  updateAssistant = (element, message, streaming) => {
+    // The older renderer replaces partial text with an error. Keep both visible.
+    originalUpdate(element, message.error && message.text ? {...message, error: ""} : message, streaming);
+    const bubble = element.querySelector(".st-bubble");
+    if (message.error && message.text) {
+      const warning = document.createElement("div");
+      warning.className = "msg-error partial-response-error";
+      warning.textContent = message.error;
+      bubble.appendChild(warning);
+    }
+    bubble.querySelectorAll("table").forEach((table) => {
+      const scroll = document.createElement("div");
+      scroll.className = "response-table";
+      scroll.tabIndex = 0;
+      scroll.setAttribute("role", "region");
+      scroll.setAttribute("aria-label", "Response table; scroll to see all columns");
+      table.replaceWith(scroll);
+      scroll.appendChild(table);
+    });
+  };
+
+  $("export-btn").onclick = () => {
+    if (!messages.length) { toast("info", "Nothing to save yet"); return; }
+    const url = URL.createObjectURL(new Blob([strataChatMarkdown(messages, health.model)], {type: "text/markdown"}));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `strata-chat-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-")}.md`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  };
+
+  let attachmentWarningChat = null;
+  const originalSend = send;
+  send = async () => {
+    if (!busy && (input.value.trim() || attachments.length) && strataUnavailableFiles(messages).length && attachmentWarningChat !== messages) {
+      toast("warn", "Earlier files need reattaching", "File contents are not kept after a reload. Reattach them if this question depends on them.", 6000);
+      attachmentWarningChat = messages;
+    }
+    return originalSend();
+  };
   document.querySelectorAll("[data-prompt]").forEach((button) => {
     button.addEventListener("click", () => {
       if (busy) return;
@@ -54,15 +106,104 @@
   const originalRenderChat = renderChat;
   renderChat = () => {
     originalRenderChat();
+    document.querySelectorAll(".st-msg--user").forEach((element) => {
+      const message = messages[+element.dataset.i];
+      if (!strataUnavailableFiles([message]).length) return;
+      const files = element.querySelector(".msg-images");
+      [...files.children].forEach((chip, index) => {
+        if (message.files[index].text != null) return;
+        chip.classList.add("chip--unavailable");
+        chip.title = "Contents unavailable after reload. Reattach this file to use it again.";
+      });
+      const note = document.createElement("div");
+      note.className = "attachment-warning";
+      const copy = document.createElement("span");
+      copy.textContent = "File contents were not saved. Reattach to use them again.";
+      const reattach = document.createElement("button");
+      reattach.type = "button";
+      reattach.className = "st-btn st-btn--secondary";
+      reattach.textContent = "Reattach";
+      reattach.onclick = () => $("file").click();
+      note.append(copy, reattach);
+      files.after(note);
+    });
     resizeInput();
     if (!messages.length) document.getElementById("chat-scroll").scrollTop = 0;
   };
-  if (!messages.length) document.getElementById("chat-scroll").scrollTop = 0;
+  // ?q= may already be streaming before this script loads. send() owns that
+  // assistant element until completion; rebuilding rows would detach it.
+  if (!busy) renderChat();
 
   // Keep the closed drawer out of keyboard navigation; restore focus when dismissed.
   const drawer = document.getElementById("drawer");
+  const sharing = new StrataSharedSettings();
+  let sharingKnown = false;
+  $("s-share").addEventListener("click", () => sharing.edited());
+  loadShared = () => {
+    sharingKnown = false;
+    $("shared-status").textContent = "Checking settings for other apps…";
+    return sharing.load(async () => {
+      const response = await fetch("/settings", {headers: headers()});
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return !!(await response.json()).shared;
+    }, (value, untouched) => {
+      sharedOn = value;
+      sharingKnown = true;
+      if (untouched) $("s-share").setAttribute("aria-checked", String(value));
+      $("shared-status").textContent = "";
+    }, () => { $("shared-status").textContent = "Could not check other apps. Your choice will be applied when you save."; });
+  };
+
+  const thinking = [...$("s-thinking").children];
+  const thinkingTabStops = () => thinking.forEach((button) => { button.tabIndex = button.getAttribute("aria-checked") === "true" ? 0 : -1; });
+  const originalLoadDrawer = loadDrawer;
+  loadDrawer = (...args) => { originalLoadDrawer(...args); thinkingTabStops(); };
+  thinking.forEach((button, index) => {
+    button.addEventListener("click", thinkingTabStops);
+    button.addEventListener("keydown", (event) => {
+      let next;
+      if (["ArrowRight", "ArrowDown"].includes(event.key)) next = (index + 1) % thinking.length;
+      if (["ArrowLeft", "ArrowUp"].includes(event.key)) next = (index + thinking.length - 1) % thinking.length;
+      if (event.key === "Home") next = 0;
+      if (event.key === "End") next = thinking.length - 1;
+      if (next == null) return;
+      event.preventDefault();
+      thinking[next].click();
+      thinking[next].focus();
+    });
+  });
+
+  // Keep the pinned sampling values; validate before saving. If GET is still
+  // pending, explicitly write the chosen sharing state instead of guessing it.
+  $("s-apply").onclick = async () => {
+    for (const [id, label] of [["s-max", "Max tokens"], ["s-seed", "Seed"]]) {
+      const control = $(id);
+      control.setCustomValidity(strataIntegerError(control.value, label));
+      if (!control.reportValidity()) return;
+    }
+    const selected = thinking.find((button) => button.getAttribute("aria-checked") === "true");
+    settings = {thinking: selected ? selected.dataset.v : "high", temperature: +$("s-temp").value,
+      top_p: +$("s-topp").value, top_k: +$("s-topk").value,
+      max: $("s-max").value.trim(), seed: $("s-seed").value.trim(),
+      show: $("s-show").getAttribute("aria-checked") === "true",
+      esp: $("s-esp").getAttribute("aria-checked") === "true"};
+    store.set("sampling", settings);
+    const share = $("s-share").getAttribute("aria-checked") === "true";
+    const saveForApps = share || sharedOn || !sharingKnown;
+    openDrawer(false);
+    if (saveForApps) {
+      try {
+        await saveShared(share, settings);
+        toast("success", "Sampling saved", share ? "Other apps use these settings from their next request." : "Other apps use their own settings again.");
+      } catch (error) { toast("error", "Saved here, but not for other apps", error.message, 6000); }
+    } else {
+      toast("success", "Sampling saved", settings.temperature === 0 ? "Greedy: the same question gives the same answer." : "");
+    }
+  };
+  for (const id of ["s-max", "s-seed"]) $(id).addEventListener("input", () => $(id).setCustomValidity(""));
   const originalOpenDrawer = openDrawer;
   openDrawer = (open) => {
+    sharing.invalidate();
     originalOpenDrawer(open);
     drawer.inert = !open;
     document.getElementById("sampling-btn").setAttribute("aria-expanded", String(open));
@@ -103,9 +244,11 @@
     document.getElementById("connection-message").textContent = status.label === "Key needed"
       ? "Add your API key in About → Settings to connect."
       : "Can’t reach the local server. Reconnecting… Monitor shows the last readings.";
+    $("connection-settings").hidden = status.label !== "Key needed";
     document.querySelector(".monitor").dataset.stale = String(status.state === "error");
     if (status.state === "error") document.getElementById("monitor-summary").textContent = status.announcement + " · readings are stale";
   };
+  $("connection-settings").onclick = () => { showTab("about"); $("api-key").focus(); };
 
   const originalRender = render;
   render = (metrics) => {

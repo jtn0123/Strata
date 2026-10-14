@@ -17,6 +17,21 @@ def counter(value, label):
     return value
 
 
+def completion_counts(timings, ids, prompt_tokens=None, *, cached=False, max_new=None):
+    """Match native counters to the actual request and emitted token IDs."""
+    if not ids or any(type(token) is not int or token < 0 for token in ids):
+        raise ValueError("Actual nonempty output token IDs required")
+    generated = counter(timings["predicted_n"], "predicted_n")
+    if generated != len(ids) or max_new is not None and generated > max_new:
+        raise ValueError("Native output count differs from emitted tokens or requested cap")
+    if prompt_tokens is not None:
+        read = counter(timings["prompt_n"], "prompt_n")
+        reused = counter(timings.get("cache_n", 0), "cache_n")
+        if read + reused != prompt_tokens or not cached and reused:
+            raise ValueError("Native prompt count differs from the complete requested input")
+    return generated
+
+
 def case_metrics(case, cached=False):
     label = f"{case.get('workload', 'cached' if cached else 'case')}/{case.get('prompt_tokens', case.get('history_budget', '?'))}/repeat={case.get('repeat', '?')}"
     values = {"generation_tok_s": case["native_timings"]["predicted_per_second"],
