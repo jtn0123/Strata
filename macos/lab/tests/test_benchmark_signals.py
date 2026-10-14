@@ -12,6 +12,14 @@ from benchmark_signals import cleanup_on_termination, defer_termination
 
 
 class BenchmarkSignalTests(unittest.TestCase):
+    def test_unknown_native_handler_is_refused_before_changing_any_signal(self):
+        scope = cleanup_on_termination()
+        with patch('benchmark_signals.signal.getsignal', return_value=None), \
+                patch('benchmark_signals.signal.signal') as setter:
+            with self.assertRaisesRegex(RuntimeError, 'unknown handler'):
+                scope.__enter__()
+        setter.assert_not_called()
+
     def test_resource_references_are_published_before_pending_stop_unwinds(self):
         for number in (signal.SIGINT,signal.SIGTERM,signal.SIGHUP):
             owned=[]

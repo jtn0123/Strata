@@ -6,6 +6,8 @@ The maintained [Mac web interface](web/README.md) adds prompt shortcuts, respons
 
 The [latest bug and polish pass](bench/research/20261013-bug-polish/REPORT.md) corrects launcher shutdown, failed-request telemetry, benchmark acceptance and chat/settings behavior. It preserves partial interrupted replies, identifies files that need reattaching after reload and keeps wide replies within narrow screens. This pass adds no new model-speed claim.
 
+[Code quality checks](QUALITY.md) document the maintained scope and commands for Ruff, mypy and ESLint. CI enforces these alongside the offline, termination, socket and browser regression checks; inherited engine code and measured model performance have separate validation.
+
 ## Maintained profiles
 
 `Start Strata.command` runs the balanced P07 profile. `Start Strata - Code Editing.command` uses confirmed lookup plus MTP for edits to supplied files. Both verify provenance and use the strict app memory policy. [Adoption decisions and validation](bench/PERMANENT-PROFILES.md).

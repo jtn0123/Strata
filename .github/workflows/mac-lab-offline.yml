@@ -27,7 +27,7 @@ jobs:
           node-version: '22'
       - name: Install pinned Python dependencies
         run: |
-          python -m pip install --only-binary :all: --require-hashes -r macos/lab/requirements-ci.lock
+          python -m pip install --only-binary :all: --require-hashes -r macos/lab/requirements-ci.lock -r macos/lab/requirements-quality.lock
       - name: Restore pinned source dependencies only
         working-directory: macos/lab
         env:
@@ -60,6 +60,20 @@ jobs:
           node --check macos/lab/web/ui-state.js
           node --check macos/lab/web/performance.js
           node --test macos/lab/tests/*.test.cjs
+      - name: Check Python syntax and undefined names throughout the lab
+        working-directory: macos/lab
+        run: ruff check --config config/ruff.toml --select E9,F63,F7,F82 scripts tests
+      - name: Lint and type-check maintained runtime modules
+        working-directory: macos/lab
+        run: |
+          ruff check --config config/ruff.toml scripts/native_backend.py scripts/run.py scripts/stop.py scripts/runtime_profiles.py scripts/performance_metrics.py scripts/model_provenance.py scripts/benchmark_signals.py scripts/metal_environment.py
+          mypy --config-file config/mypy.ini
+      - name: Install pinned browser lint tools
+        working-directory: macos/lab
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Lint maintained browser scripts
+        working-directory: macos/lab
+        run: npm run lint
       - name: Retain offline receipt and log
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

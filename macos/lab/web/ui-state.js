@@ -64,7 +64,7 @@ class StrataSSECompletion {
     try {
       const packet = JSON.parse(data);
       if (packet.error || packet.choices?.some((choice) => typeof choice.finish_reason === "string" && choice.finish_reason)) this.terminal = true;
-    } catch (_) { /* the original parser owns malformed records */ }
+    } catch { /* the original parser owns malformed records */ }
   }
   end() {
     this.pending += this.decoder.decode();

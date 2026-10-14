@@ -1,15 +1,43 @@
 """Keep Metal experiments explicit and independent of inherited debug flags."""
-import math
 
-TUNING = {
+import math
+from collections.abc import Mapping
+from typing import TypedDict
+
+
+class MetalReceipt(TypedDict):
+    tensor_api: str
+    tuning: str
+    profile: bool
+    variables: dict[str, str]
+
+
+TUNING: dict[str, dict[str, str]] = {
     "stock": {},
-    'small-reduce': {'GGML_M5_LAB_CONV_DIRECT': '1', 'GGML_M5_LAB_REDUCE10': '1'},
-    'small-top10': {'GGML_M5_LAB_CONV_DIRECT': '1', 'GGML_M5_LAB_TOP10': '1'},
-    'small-reduce-top10': {'GGML_M5_LAB_CONV_DIRECT': '1', 'GGML_M5_LAB_REDUCE10': '1', 'GGML_M5_LAB_TOP10': '1'},
-    'small-compact': {'GGML_M5_LAB_CONV_DIRECT': '1', 'GGML_M5_LAB_COMPACT_TILES': '1'},
-    'small-reduce-compact': {'GGML_M5_LAB_CONV_DIRECT': '1', 'GGML_M5_LAB_REDUCE10': '1', 'GGML_M5_LAB_COMPACT_TILES': '1'},
-    'small-top10-compact': {'GGML_M5_LAB_CONV_DIRECT': '1', 'GGML_M5_LAB_TOP10': '1', 'GGML_M5_LAB_COMPACT_TILES': '1'},
-    'small-reduce-top10-compact': {'GGML_M5_LAB_CONV_DIRECT': '1', 'GGML_M5_LAB_REDUCE10': '1', 'GGML_M5_LAB_TOP10': '1', 'GGML_M5_LAB_COMPACT_TILES': '1'},
+    "small-reduce": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_REDUCE10": "1"},
+    "small-top10": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_TOP10": "1"},
+    "small-reduce-top10": {
+        "GGML_M5_LAB_CONV_DIRECT": "1",
+        "GGML_M5_LAB_REDUCE10": "1",
+        "GGML_M5_LAB_TOP10": "1",
+    },
+    "small-compact": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_COMPACT_TILES": "1"},
+    "small-reduce-compact": {
+        "GGML_M5_LAB_CONV_DIRECT": "1",
+        "GGML_M5_LAB_REDUCE10": "1",
+        "GGML_M5_LAB_COMPACT_TILES": "1",
+    },
+    "small-top10-compact": {
+        "GGML_M5_LAB_CONV_DIRECT": "1",
+        "GGML_M5_LAB_TOP10": "1",
+        "GGML_M5_LAB_COMPACT_TILES": "1",
+    },
+    "small-reduce-top10-compact": {
+        "GGML_M5_LAB_CONV_DIRECT": "1",
+        "GGML_M5_LAB_REDUCE10": "1",
+        "GGML_M5_LAB_TOP10": "1",
+        "GGML_M5_LAB_COMPACT_TILES": "1",
+    },
     "bf16-row3": {"GGML_M5_LAB_BF16_MIN_ROWS": "3"},
     "q2-row2": {"GGML_M5_LAB_Q2_MIN_ROWS": "2"},
     "nt1": {"GGML_M5_LAB_NT_MAX": "1"},
@@ -20,9 +48,20 @@ TUNING = {
     "copy-v4": {"GGML_M5_LAB_COPY_WIDTH": "4"},
     "copy-v8": {"GGML_M5_LAB_COPY_WIDTH": "8"},
     "conv-direct": {"GGML_M5_LAB_CONV_DIRECT": "1"},
-    "draftcap-tail": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_DRAFT_EARLY_STOP": "1"},
-    "draftcap2": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_DRAFT_EARLY_STOP": "1", "GGML_M5_LAB_DRAFT_CAP": "2"},
-    "draftcap3": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_DRAFT_EARLY_STOP": "1", "GGML_M5_LAB_DRAFT_CAP": "3"},
+    "draftcap-tail": {
+        "GGML_M5_LAB_CONV_DIRECT": "1",
+        "GGML_M5_LAB_DRAFT_EARLY_STOP": "1",
+    },
+    "draftcap2": {
+        "GGML_M5_LAB_CONV_DIRECT": "1",
+        "GGML_M5_LAB_DRAFT_EARLY_STOP": "1",
+        "GGML_M5_LAB_DRAFT_CAP": "2",
+    },
+    "draftcap3": {
+        "GGML_M5_LAB_CONV_DIRECT": "1",
+        "GGML_M5_LAB_DRAFT_EARLY_STOP": "1",
+        "GGML_M5_LAB_DRAFT_CAP": "3",
+    },
     "route-map": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_ROUTE_MAP": "1"},
     "compact-tiles": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_COMPACT_TILES": "1"},
     "compact-cols": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_COMPACT_TILES": "1"},
@@ -41,30 +80,105 @@ TUNING = {
     "reduce10": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_REDUCE10": "1"},
     "sampling-view": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_SAMPLING_VIEW": "1"},
     "hc-special": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_HC_SPECIAL": "1"},
-    "hc-down-ks1": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_HC_TENSOR": "1", "GGML_M5_LAB_HC_DOWN_SPLIT": "1"},
-    "hc-down-ks2": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_HC_TENSOR": "1", "GGML_M5_LAB_HC_DOWN_SPLIT": "2"},
-    "hc-down-ks4": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_HC_TENSOR": "1", "GGML_M5_LAB_HC_DOWN_SPLIT": "4"},
-    "hc-down-ks8": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_HC_TENSOR": "1", "GGML_M5_LAB_HC_DOWN_SPLIT": "8"},
-    "hc-down-ks16": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_HC_TENSOR": "1", "GGML_M5_LAB_HC_DOWN_SPLIT": "16"},
+    "hc-down-ks1": {
+        "GGML_M5_LAB_CONV_DIRECT": "1",
+        "GGML_M5_LAB_HC_TENSOR": "1",
+        "GGML_M5_LAB_HC_DOWN_SPLIT": "1",
+    },
+    "hc-down-ks2": {
+        "GGML_M5_LAB_CONV_DIRECT": "1",
+        "GGML_M5_LAB_HC_TENSOR": "1",
+        "GGML_M5_LAB_HC_DOWN_SPLIT": "2",
+    },
+    "hc-down-ks4": {
+        "GGML_M5_LAB_CONV_DIRECT": "1",
+        "GGML_M5_LAB_HC_TENSOR": "1",
+        "GGML_M5_LAB_HC_DOWN_SPLIT": "4",
+    },
+    "hc-down-ks8": {
+        "GGML_M5_LAB_CONV_DIRECT": "1",
+        "GGML_M5_LAB_HC_TENSOR": "1",
+        "GGML_M5_LAB_HC_DOWN_SPLIT": "8",
+    },
+    "hc-down-ks16": {
+        "GGML_M5_LAB_CONV_DIRECT": "1",
+        "GGML_M5_LAB_HC_TENSOR": "1",
+        "GGML_M5_LAB_HC_DOWN_SPLIT": "16",
+    },
     "hc-up": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_HC_TENSOR": "2"},
 }
 
 
-def configure(environment, engine, tensor_api="auto", tuning="stock", profile=False):
+def configure(
+    environment: Mapping[str, str],
+    engine: str,
+    tensor_api: str = "auto",
+    tuning: str = "stock",
+    profile: bool = False,
+) -> tuple[dict[str, str], MetalReceipt]:
     if tensor_api not in ("auto", "on", "off") or tuning not in TUNING:
         raise ValueError("Unknown Metal experiment setting")
-    if (tuning != "stock" or profile) and engine not in ("m5-lab", "m5-trace", "m5-correctness", "m5-copy", "m5-reduce", "m5-sampling", "m5-hc", "m5-group", "m5-gate", "m5-gdn", "m5-lookup", "m5-gate-lanes", "m5-encoders", "m5-head", "m5-embedding", "m5-draftcap", "m5-top10", "m5-qsa", "m5-route-map", "m5-compact", "m5-compact-cols", "m5-small-stack"):
-        raise ValueError("GPU tuning and timing diagnostics require an isolated M5 engine")
-    if (tuning.startswith("copy-") or tuning == "conv-direct") and engine not in ("m5-copy", "m5-reduce", "m5-sampling", "m5-hc", "m5-group", "m5-gate", "m5-gdn", "m5-lookup", "m5-gate-lanes", "m5-encoders", "m5-head", "m5-embedding", "m5-draftcap", "m5-top10", "m5-qsa", "m5-route-map", "m5-compact", "m5-compact-cols", "m5-small-stack"):
+    if (tuning != "stock" or profile) and engine not in (
+        "m5-lab",
+        "m5-trace",
+        "m5-correctness",
+        "m5-copy",
+        "m5-reduce",
+        "m5-sampling",
+        "m5-hc",
+        "m5-group",
+        "m5-gate",
+        "m5-gdn",
+        "m5-lookup",
+        "m5-gate-lanes",
+        "m5-encoders",
+        "m5-head",
+        "m5-embedding",
+        "m5-draftcap",
+        "m5-top10",
+        "m5-qsa",
+        "m5-route-map",
+        "m5-compact",
+        "m5-compact-cols",
+        "m5-small-stack",
+    ):
+        raise ValueError(
+            "GPU tuning and timing diagnostics require an isolated M5 engine"
+        )
+    if (tuning.startswith("copy-") or tuning == "conv-direct") and engine not in (
+        "m5-copy",
+        "m5-reduce",
+        "m5-sampling",
+        "m5-hc",
+        "m5-group",
+        "m5-gate",
+        "m5-gdn",
+        "m5-lookup",
+        "m5-gate-lanes",
+        "m5-encoders",
+        "m5-head",
+        "m5-embedding",
+        "m5-draftcap",
+        "m5-top10",
+        "m5-qsa",
+        "m5-route-map",
+        "m5-compact",
+        "m5-compact-cols",
+        "m5-small-stack",
+    ):
         raise ValueError("Copy kernels require the isolated m5-copy engine")
     if tuning.startswith("small-") and engine != "m5-small-stack":
-        raise ValueError("Small-gain combination requires isolated m5-small-stack engine")
+        raise ValueError(
+            "Small-gain combination requires isolated m5-small-stack engine"
+        )
     if tuning == "route-map" and engine != "m5-route-map":
         raise ValueError("Route-map reuse requires isolated m5-route-map engine")
     if tuning == "compact-tiles" and engine != "m5-compact":
         raise ValueError("Compact tile dispatch requires isolated m5-compact engine")
     if tuning == "compact-cols" and engine != "m5-compact-cols":
-        raise ValueError("Column-first compact dispatch requires isolated m5-compact-cols engine")
+        raise ValueError(
+            "Column-first compact dispatch requires isolated m5-compact-cols engine"
+        )
     if tuning == "qsa-all-pools" and engine != "m5-qsa":
         raise ValueError("QSA ranking requires isolated m5-qsa engine")
     if tuning == "top10" and engine != "m5-top10":
@@ -87,8 +201,12 @@ def configure(environment, engine, tensor_api="auto", tuning="stock", profile=Fa
         raise ValueError("Encoding threads require the isolated m5-encoders engine")
     if tuning.startswith("gdn-row") and engine != "m5-gdn":
         raise ValueError("GDN row grouping requires the isolated m5-gdn engine")
-    env = {k: v for k, v in environment.items()
-           if not k.startswith(("GGML_METAL_", "GGML_M5_LAB_", "GGML_SCHED_DEBUG")) and k != "METAL_CAPTURE_ENABLED"}
+    env = {
+        k: v
+        for k, v in environment.items()
+        if not k.startswith(("GGML_METAL_", "GGML_M5_LAB_", "GGML_SCHED_DEBUG"))
+        and k != "METAL_CAPTURE_ENABLED"
+    }
     flags = dict(TUNING[tuning])
     if tensor_api == "on":
         flags["GGML_METAL_TENSOR_ENABLE"] = "1"
@@ -97,9 +215,14 @@ def configure(environment, engine, tensor_api="auto", tuning="stock", profile=Fa
     if profile:
         flags["GGML_M5_LAB_PROFILE"] = "1"
     env.update(flags)
-    return env, {"tensor_api": tensor_api, "tuning": tuning, "profile": profile, "variables": flags}
+    return env, {
+        "tensor_api": tensor_api,
+        "tuning": tuning,
+        "profile": profile,
+        "variables": flags,
+    }
 
 
-def validate_confidence(value):
+def validate_confidence(value: float | None) -> None:
     if value is not None and (not math.isfinite(value) or not 0 <= value <= 1):
         raise ValueError("Draft confidence must be a finite probability from 0 to 1")

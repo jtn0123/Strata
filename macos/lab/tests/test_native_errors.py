@@ -45,6 +45,15 @@ class NativeErrorTests(unittest.TestCase):
         engine.last = dict(native_timings=dict(predicted_per_second=999), reused=999)
         return engine
 
+    def test_missing_native_hostname_fails_before_creating_transport(self):
+        engine = self.engine()
+        engine.base = 'not-a-native-url'
+        response = engine.generate([10], 10, {}, threading.Event())
+        with patch('native_backend.http.client.HTTPConnection') as connection:
+            with self.assertRaisesRegex(EngineDied, 'no hostname'):
+                list(response)
+        connection.assert_not_called()
+
     def test_native_faults_mark_history_error_without_old_or_native_counters(self):
         faults = [Connection(status=503), Connection(), Connection(lines=[b'data: invalid-json\n']),
                   Connection(request_error=ConnectionRefusedError('fixture refused')),

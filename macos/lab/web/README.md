@@ -60,7 +60,23 @@ files. Response tables scroll locally; narrow/coarse-pointer copy, removal, clos
 The user-message foreground follows the selected theme, and input names retain their visible labels.
 
 Run both JavaScript suites with `node --test tests/ui_state.test.cjs tests/ui_behavior.test.cjs`.
-Focused local validation is 27 JavaScript cases and 14 web/performance Python cases. Browser and full offline
+
+The maintained JavaScript also has a scoped ESLint gate. From `macos/lab`, use Node 22.13+ on the
+Node 22 line, or Node 24+:
+
+```sh
+npm ci --ignore-scripts
+npm run lint
+```
+
+The lockfile pins the lint dependencies. Only `web/mac.js`, `web/ui-state.js` and `web/performance.js`
+are checked; downloaded vendor sources keep their pins. The gate catches undefined names and writes,
+redeclarations, unreachable code, unused bindings and unsafe evaluation. Its explicit per-file contracts
+distinguish readonly shell data from writable hooks/state. `loadShared` is an exported classic-script hook
+called by the pinned drawer; `sharedOn` and `settings` remain the shell's global lexical bindings.
+Python type and lint checks are separate from this JavaScript gate.
+
+Focused local validation is 28 JavaScript cases and 15 web/performance Python cases. Browser and full offline
 verification are separate; these tests do not establish physical VoiceOver or mobile-keyboard acceptance.
 
 Final local validation: 178 Python offline tests, five campaign-protocol tests and four JavaScript state tests

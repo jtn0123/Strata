@@ -6,6 +6,7 @@
           showTab:writable, renderChat:writable, loadShared:writable, sharedOn:writable,
           loadDrawer:writable, settings:writable, openDrawer:writable, setPill:writable,
           render:writable */
+/* exported loadShared */
 "use strict";
 (() => {
   const input = document.getElementById("input");
