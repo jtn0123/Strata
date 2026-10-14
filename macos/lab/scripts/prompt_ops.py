@@ -16,7 +16,7 @@ import re
 import statistics
 from typing import TypedDict, cast
 
-NODE = re.compile(r"ggml_metal_op_encode_impl: node\[\s*(\d+)\] - (\S+)\s+(.*)$")
+NODE = re.compile(r"ggml_metal_op_encode_impl: node\[ *(\d+)\] - (\S+) +(\S.*)?$")
 TENSOR = re.compile(r"ggml_metal_op_encode_impl: (src\d|node) - \s*(\S+) \[([^\]]*)\] \[[^\]]*\], [01], ")
 FUSE = re.compile(r"ggml_metal_op_encode_impl:\s+fuse (\d+) ops$")
 FUSION = re.compile(r"ggml_metal_free: - (\S+): (\d+)$")
@@ -143,7 +143,7 @@ def dispatch_graphs(lines: Iterable[str]) -> list[Graph]:
     reader = _Reader()
     for line in lines:
         if node := NODE.search(line):
-            reader.node(int(node[1]), node[2], node[3].rstrip())
+            reader.node(int(node[1]), node[2], (node[3] or "").rstrip())
         elif tensor := TENSOR.search(line):
             reader.tensor(tensor[1], tensor[2], tensor[3])
         elif fuse := FUSE.search(line):

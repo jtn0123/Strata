@@ -108,12 +108,14 @@ class DispatchInventoryTests(unittest.TestCase):
                 label_graphs(subset, schedule)
 
     def test_orphan_lines_and_graphs_without_shapes(self):
-        with self.assertRaisesRegex(ValueError, 'Tensor line without an encoded dispatch'):
-            dispatch_graphs([NOOP, tensor('src0', 'f32', [1, 1, 1, 1])])
-        with self.assertRaisesRegex(ValueError, 'Fusion line without an encoded dispatch'):
-            dispatch_graphs([NOOP, fuse(2)])
-        with self.assertRaisesRegex(ValueError, 'Fused nodes exceed the node-index gap'):
-            dispatch_graphs([node(0, 'ADD', 'x'), fuse(3), node(2, 'ADD', 'y')])
+        cases = [([NOOP, tensor('src0', 'f32', [1, 1, 1, 1])], 'Tensor line without an encoded dispatch'),
+                 ([NOOP, fuse(2)], 'Fusion line without an encoded dispatch'),
+                 ([node(0, 'ADD', 'x'), fuse(3), node(2, 'ADD', 'y')], 'Fused nodes exceed the node-index gap')]
+        for lines, message in cases:
+            with self.subTest(message=message), self.assertRaisesRegex(ValueError, message):
+                dispatch_graphs(lines)
+        unnamed = dispatch_graphs([node(0, 'ADD', '')])[0]['dispatches'][0]
+        self.assertEqual((unnamed['op'], unnamed['name'], unnamed['concurrent']), ('ADD', '', False))
         lone = dispatch_graphs([node(0, 'ADD', 'x'), tensor('node', 'f32', [1, 1, 1, 1])])
         self.assertEqual(summarize(lone[0])['by_shape'], {'ADD  -> f32[1, 1, 1, 1]': 1})
         bare = dispatch_graphs([node(0, 'ADD', 'x')])
