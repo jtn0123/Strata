@@ -39,6 +39,7 @@ def main(argv=None):
     ap.add_argument("--port", type=int, default=8095)
     ap.add_argument("--native-port", type=int, default=8096)
     ap.add_argument("--context", type=int, default=4096)
+    ap.add_argument("--batch", type=int, default=512)
     ap.add_argument("--ubatch", type=int, default=512)
     ap.add_argument("--cache-type", default="f16", choices=["f16", "q8_0", "q4_0"])
     ap.add_argument("--spec", default="none", choices=["none", "draft-mtp"])
@@ -60,6 +61,9 @@ def main(argv=None):
 
 
 def execute(args):
+    batch = getattr(args, 'batch', 512)
+    if not 0 < args.ubatch <= batch <= args.context:
+        raise ValueError('Prompt chunks must satisfy 0 < ubatch <= batch <= context; refusing silent clamping')
     # Reject unsupported lookup settings before any native process can launch.
     lookup_command(['--spec-type', args.spec], args)
     native_env, vocab_info = experiment_environment(args.engine, args.draft_vocab)
@@ -86,7 +90,7 @@ def execute(args):
     native, app, monitor = None, None, None
     with (folder / "native.log").open("w") as log:
         try:
-            command = server_command(args.model, args.native_port, args.context, ubatch=args.ubatch,
+            command = server_command(args.model, args.native_port, args.context, batch=batch, ubatch=args.ubatch,
                                      cache_type=args.cache_type, spec=args.spec, draft=args.draft,
                                      draft_placement=args.draft_placement, draft_model=args.draft_model,
                                      engine=args.engine, draft_threads=args.draft_threads,
@@ -100,6 +104,12 @@ def execute(args):
             (folder / "settings.json").write_text(json.dumps(vars(args), indent=2) + "\n")
             policy = admit_model(args.model)
             (folder / "memory-policy.json").write_text(json.dumps(policy, indent=2) + "\n")
+            config['performance'] = {key: getattr(args, key) for key in
+                ('model', 'engine', 'context', 'cache_type', 'spec', 'draft', 'draft_model', 'lookup_profile', 'tensor_api', 'm5_tuning', 'ubatch', 'draft_threads', 'draft_placement', 'draft_p_min')}
+            config['performance'].update(monitor_file=str(folder / 'memory.jsonl'),
+                                         batch=batch,
+                                         initial_swap_bytes=policy['baseline']['swap_used_bytes'])
+            config_path.write_text(json.dumps(config, indent=2) + "\n")
             native = subprocess.Popen(command, stdout=log, stderr=log, env=native_env)
             monitor = app_monitor(native, folder / "memory.jsonl", policy)
             monitor.thread.start()

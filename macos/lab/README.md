@@ -1,8 +1,14 @@
 # Strata Mac Lab
 
+## Mac workspace
+
+The maintained [Mac web interface](web/README.md) adds prompt shortcuts, responsive light/dark layouts and keyboard-accessible settings over the pinned API shell. It hides unavailable GPU readings instead of implying they are zero. Preview it without loading a model using `.venv/bin/python scripts/strata_server.py --engine mock --port 8116` from this directory. Mock response speeds are not benchmarks.
+
 ## Maintained profiles
 
 `Start Strata.command` runs the balanced P07 profile. `Start Strata - Code Editing.command` uses confirmed lookup plus MTP for edits to supplied files. Both verify provenance and use the strict app memory policy. [Adoption decisions and validation](bench/PERMANENT-PROFILES.md).
+
+`Start Strata - Long Documents.command` selects an optional 1,536-token prompt-chunk mode for reading long pasted text. It uses the same model and 4K total context budget. Stop the current server before selecting another launcher; choose Code Editing for changes to supplied files. Matched long-document trials finished replies about 8.5–10% sooner, with roughly 0.6 GiB more reported process memory. Sustained editing validation is mixed, so the ordinary chat/editing launchers keep 512-token chunks. The Monitor and metrics export include the actual batch and chunk settings. [Measurements and limitations](bench/research/20261013-prompt-chunks/REPORT.md). [Real app checks and hardware investigation](bench/research/20261013-long-documents-mode/REPORT.md).
 
 Local, measured experiments for an Apple M5 Pro with 48 GiB unified memory. This workspace keeps Strata's existing Mac interface and uses a revision-pinned native llama.cpp Metal server behind it. All inference stays on the Mac.
 

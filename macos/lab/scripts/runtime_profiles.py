@@ -1,16 +1,22 @@
-"""Permanent profiles qualified by the recorded M5 comparisons."""
+"""Maintained profiles and an optional measured long-document candidate."""
 import argparse
 
 BASE = ['flash', '--engine', 'm5-small-stack', '--m5-tuning', 'small-reduce',
-        '--tensor-api', 'on', '--context', '4096', '--ubatch', '512',
+        '--tensor-api', 'on', '--context', '4096', '--batch', '512', '--ubatch', '512',
         '--cache-type', 'f16', '--spec', 'draft-mtp',
         '--draft-model', 'mtp_shared_packed_q3', '--draft', '3',
         '--draft-placement', 'mixed', '--draft-threads', '8', '--draft-p-min', '0.0']
 PROFILES = {
     'balanced': dict(arguments=BASE, description='Normal English chat and code generation.'),
     'code-edit': dict(arguments=BASE + ['--lookup-profile', 'code-edit'],
-                     description='Edits to supplied code. Confirmed on one Python file; broader speed coverage is pending.'),
+                     description='Edits to supplied files. Faster complete replies confirmed on two Python, two JavaScript and two JSON fixtures.'),
 }
+LONG_DOCUMENTS = list(BASE)
+for flag in ('--batch', '--ubatch'):
+    LONG_DOCUMENTS[LONG_DOCUMENTS.index(flag) + 1] = '1536'
+PROFILES['long-documents'] = dict(arguments=LONG_DOCUMENTS,
+    description='Optional long-document mode. Reads long inputs faster in matched trials; '
+                'uses a little more memory. Sustained editing validation is still mixed.')
 
 
 def lookup_command(command, args):
@@ -21,7 +27,8 @@ def lookup_command(command, args):
                     tensor_api='on', context=4096, ubatch=512, cache_type='f16',
                     spec='draft-mtp', draft_model='mtp_shared_packed_q3', draft=3,
                     draft_placement='mixed', draft_threads=8, draft_p_min=0.0)
-    if any(getattr(args, key, None) != value for key, value in required.items()):
+    if (getattr(args, 'batch', 512) != 512
+            or any(getattr(args, key, None) != value for key, value in required.items())):
         raise ValueError('Code-edit lookup requires the qualified code-edit profile')
     result = list(command)
     index = result.index('--spec-type') + 1
