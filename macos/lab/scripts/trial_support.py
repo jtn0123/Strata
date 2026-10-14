@@ -175,29 +175,32 @@ def clean_memory(memory: MemorySummary) -> bool:
     )
 
 
+def drafting_receipt(text: str, profile: str, kind: str) -> DraftCounters | None:
+    """One matcher's last cumulative statistics, or None when the profile does not enable it."""
+    enabled = profile != "balanced" if kind == "ngram-mod" else profile == MATCHERS[kind]
+    if (f"adding speculative implementation '{kind}'" in text) != enabled:
+        raise ValueError(f"Unexpected or missing {kind} initialization")
+    counters = [tuple(map(int, values)) for values in re.findall(COUNTERS.format(kind=re.escape(kind)), text)]
+    if not enabled:
+        if counters:
+            raise ValueError(f"Unexpected {kind} statistics")
+        return None
+    required_active = kind != "ngram-mod" or profile == "code-edit"
+    if not counters or required_active and not any(all(value > 0 for value in row) for row in counters):
+        raise ValueError(f"{kind} produced no accepted drafts")
+    if any(a > g or at > t or t > 3 * g for g, a, t, at in counters):
+        raise ValueError(f"Invalid or unbounded {kind} draft counters")
+    g, a, t, at = counters[-1]
+    return {"generated_drafts": g, "accepted_drafts": a, "proposed_tokens": t, "accepted_tokens": at}
+
+
 def drafting_receipts(text: str, profile: str) -> dict[str, DraftCounters]:
     """Normal trace verbosity emits cumulative statistics, not per-draft debug lines."""
     receipts: dict[str, DraftCounters] = {}
     for kind in ("ngram-mod", "ngram-simple", "ngram-map-k"):
-        enabled = profile != "balanced" if kind == "ngram-mod" else profile == MATCHERS[kind]
-        if (f"adding speculative implementation '{kind}'" in text) != enabled:
-            raise ValueError(f"Unexpected or missing {kind} initialization")
-        counters = [tuple(map(int, values)) for values in re.findall(COUNTERS.format(kind=re.escape(kind)), text)]
-        if not enabled:
-            if counters:
-                raise ValueError(f"Unexpected {kind} statistics")
-            continue
-        required_active = kind != "ngram-mod" or profile == "code-edit"
-        if (
-            not counters
-            or required_active
-            and not any(g > 0 and a > 0 and t > 0 and at > 0 for g, a, t, at in counters)
-        ):
-            raise ValueError(f"{kind} produced no accepted drafts")
-        if any(a > g or at > t or t > 3 * g for g, a, t, at in counters):
-            raise ValueError(f"Invalid or unbounded {kind} draft counters")
-        g, a, t, at = counters[-1]
-        receipts[kind] = {"generated_drafts": g, "accepted_drafts": a, "proposed_tokens": t, "accepted_tokens": at}
+        receipt = drafting_receipt(text, profile, kind)
+        if receipt is not None:
+            receipts[kind] = receipt
     return receipts
 
 

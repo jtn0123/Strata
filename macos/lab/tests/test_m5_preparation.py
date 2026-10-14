@@ -345,9 +345,10 @@ class SyntheticCheckResourceTests(unittest.TestCase):
 
     def test_interrupted_check_publishes_evidence_and_reaps(self):
         folder = Path(self.enterContext(tempfile.TemporaryDirectory()))
-        with ExitStack() as stack, self.assertRaises(KeyboardInterrupt):
+        with ExitStack() as stack:
             children, _ = self.patched(stack, 5, [0, 0, 0], sleep=KeyboardInterrupt)
-            verify_q2.check_case(Path("test-backend-ops"), folder, "math", "type_a=q2_0,")
+            with self.assertRaises(KeyboardInterrupt):
+                verify_q2.check_case(Path("test-backend-ops"), folder, "math", "type_a=q2_0,")
         published = json.loads((folder / "math.json").read_text())
         self.assertEqual((published["passed"], published["exit_code"], children[0].calls), (False, -15, ["terminate"]))
         self.assertEqual(published["final_observation"], {"swap_used_bytes": 0, "pressure_level": 1})

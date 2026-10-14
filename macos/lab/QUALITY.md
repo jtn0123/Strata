@@ -39,7 +39,7 @@ is not claimed as an 80-line pass. Named UI helpers and complexity are measured
 separately.
 
 Focused Python branch coverage has its own measured baseline and freshness gate:
-91.65% of lines and 83.48% of branches across the 27 targets in the
+91.67% of lines and 83.45% of branches across the 27 targets in the
 boundary/monitor pass, with aggregate floors of 91%/81%. Each module keeps its
 measured per-file floors; the wait-diagnostic parser, `api_requests.py` and
 `trial_support.py` require 100% line/branch coverage. It uses the maintained

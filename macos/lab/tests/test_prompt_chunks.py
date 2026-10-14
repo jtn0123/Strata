@@ -261,7 +261,7 @@ class PromptChunkLaunchTests(unittest.TestCase):
         self.assertFalse(quality(cases()[0],'not json'))
         self.assertTrue(quality(cases()[-1],'Warmup matters.'))
         self.assertFalse(quality(cases()[-1],'<think>plan</think>'))
-        self.assertEqual(chunks.output_gaps([])['median_s'],None)
+        self.assertIsNone(chunks.output_gaps([])['median_s'])
 
     def test_frozen_closure_rejects_source_model_or_sampler_changes(self):
         replaced=dict(require_pass=lambda:None,fingerprint=lambda:{'scripts/a.py':'1'},sha256=lambda path:path.name,

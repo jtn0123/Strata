@@ -243,6 +243,16 @@ def _refuse_duplicate_libraries(libraries: list[ExternalLibrary]) -> None:
         raise RuntimeError(f"Different external files provide the same native library: {', '.join(duplicated)}")
 
 
+def _note_library(found: dict[Path, ExternalLibrary], target: Path, name: str, build: Path) -> None:
+    """Record one install name of a library outside the build directory, hashing each file once."""
+    if target.parent == build:
+        return
+    if target not in found:
+        found[target] = {"path": str(target), "install_names": [], "sha256": sha256(target), "versions": {}}
+    if name not in found[target]["install_names"]:
+        found[target]["install_names"].append(name)
+
+
 def external_libraries(binary: Path) -> list[ExternalLibrary]:
     """The non-system dylib closure the server loads from outside its build directory.
 
@@ -264,10 +274,7 @@ def external_libraries(binary: Path) -> list[ExternalLibrary]:
             if name.startswith(SYSTEM_LIBRARY_PREFIXES):
                 continue
             target = _resolve_load(name, loader, executable, rpaths)
-            if target.parent != executable.parent and target not in found:
-                found[target] = {"path": str(target), "install_names": [], "sha256": sha256(target), "versions": {}}
-            if target in found and name not in found[target]["install_names"]:
-                found[target]["install_names"].append(name)
+            _note_library(found, target, name, executable.parent)
             if target not in seen:
                 seen.add(target)
                 pending.append((target, rpaths))

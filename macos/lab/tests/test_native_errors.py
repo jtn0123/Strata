@@ -184,8 +184,9 @@ class NativeErrorTests(unittest.TestCase):
                 connection = Connection(lines=[packet(row), packet(dict(tokens=[1, 99])), final])
                 engine = self.engine(); service = Service(engine, Tokenizer(), None)
                 with patch('native_backend.http.client.HTTPConnection', return_value=connection):
+                    response = service.run([10], False, [], 10, {}, threading.Event())
                     with self.assertRaisesRegex(EngineDied, 'completion'):
-                        list(service.run([10], False, [], 10, {}, threading.Event()))
+                        list(response)
                 self.assertEqual(service.history[-1]['finish'], 'error')
                 self.assertIsNone(service.history[-1]['decode_tok_s'])
                 self.assertNotIn('native_timings', engine.last)
@@ -203,8 +204,9 @@ class NativeErrorTests(unittest.TestCase):
         connection.request = lambda *args, **kwargs: sent.append(kwargs)
         engine = self.engine(); service = Service(engine, Tokenizer(), None)
         with patch('native_backend.http.client.HTTPConnection', return_value=connection):
+            response = service.run([10], False, [], 10, dict(temperature=float('nan')), threading.Event())
             with self.assertRaisesRegex(EngineDied, 'JSON compliant'):
-                list(service.run([10], False, [], 10, dict(temperature=float('nan')), threading.Event()))
+                list(response)
         self.assertEqual(sent, [])
 
     def test_valid_empty_text_and_token_responses_are_preserved(self):
