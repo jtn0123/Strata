@@ -14,7 +14,7 @@ import threading
 import time
 from collections.abc import Callable
 from email.message import Message
-from http.server import BaseHTTPRequestHandler, HTTPServer, ThreadingHTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from io import BytesIO
 from pathlib import Path
 from typing import Any, cast
@@ -308,9 +308,16 @@ class ConnectionLimit(ThreadingHTTPServer):
         super().__init__(*args, **kwargs)
 
     def server_bind(self) -> None:
-        # Bind as HTTPServer's base does, without its lookup of the address's DNS name (socket.getfqdn).
-        # On the hosted macOS runner that lookup of 127.0.0.1 blocked startup for over 30 s; nothing uses the name.
-        super(HTTPServer, self).server_bind()
+        """Bind and record the bound address, as HTTPServer does, without looking up its DNS name.
+
+        HTTPServer.server_bind calls socket.getfqdn; on the hosted macOS runner that lookup of 127.0.0.1
+        blocked startup for over 30 s, and nothing uses the name. The pinned server only sets
+        allow_reuse_address among TCPServer's binding options.
+        """
+        if self.allow_reuse_address:
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.socket.bind(self.server_address)
+        self.server_address = self.socket.getsockname()
         host, port = cast(tuple[str, int], self.server_address)[:2]
         self.server_name, self.server_port = host, port
 

@@ -4,6 +4,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from io import BytesIO
 import json
 from pathlib import Path
+import socket
 import sys
 import threading
 from types import SimpleNamespace
@@ -545,15 +546,19 @@ class ConnectionLimitTests(unittest.TestCase):
 
     def test_binding_does_not_wait_for_a_dns_name(self):
         class Socket:
-            def setsockopt(self, *args): pass
+            def __init__(self): self.options = []
+            def setsockopt(self, *option): self.options.append(option)
             def bind(self, address): self.address = address
             def getsockname(self): return ('127.0.0.1', 8095)
-        server = self.server()
-        server.socket, server.server_address = Socket(), ('127.0.0.1', 0)
-        with patch('socket.getfqdn', side_effect=AssertionError('DNS lookup at startup')):
-            server.server_bind()
-        self.assertEqual((server.socket.address, server.server_name, server.server_port),
-                         (('127.0.0.1', 0), '127.0.0.1', 8095))
+        for reuse in (True, False):
+            with self.subTest(reuse=reuse):
+                server = self.server()
+                server.socket, server.server_address, server.allow_reuse_address = Socket(), ('127.0.0.1', 0), reuse
+                with patch('socket.getfqdn', side_effect=AssertionError('DNS lookup at startup')):
+                    server.server_bind()
+                self.assertEqual((server.socket.address, server.server_address, server.server_name, server.server_port),
+                                 (('127.0.0.1', 0), ('127.0.0.1', 8095), '127.0.0.1', 8095))
+                self.assertEqual(server.socket.options, [(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)] if reuse else [])
 
     def test_busy_answer_is_complete_http(self):
         head, _, body = BUSY.partition(b'\r\n\r\n')
