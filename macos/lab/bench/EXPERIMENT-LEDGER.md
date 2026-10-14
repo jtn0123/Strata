@@ -764,3 +764,27 @@ Balanced P07 remains the normal launcher; editing lookup has a maintained dedica
 - **Decision:** a measured prompt-reading gain in a diagnostic engine; no default changes. Concurrent slots, cancellation mid-prompt and checkpoint restores with a waiting helper chunk were not exercised.
 - **Revisit:** qualify a candidate at 512 with the standard app suite (256-token replies, editing and Long Documents profiles), plus cancel and checkpoint-restore checks after or with N06. Chunk order at 1,536 is a separate experiment.
 - **Evidence:** [report](research/20261014-n15-helper-overlap/REPORT.md). Native logs, per-request rows, memory samples and smoke tests stay ignored under the local feature folders.
+
+### E13 — N02 Apple advisory reads for lazy lookup rows (diagnostic engine)
+
+- **What ran:** user-authorized model run on `m5-advise`, an isolated diagnostic clone of the kept `m5-small-stack` engine. It adds one switch, off unless set, in `src/llama-mmap.cpp`:
+  - `GGML_M5_LAB_ADVISE=madvise` passes the pages of a chunk's lazy lookup-table rows to `madvise(MADV_WILLNEED)` before the gather, as llama.cpp PR 30405 does on Apple;
+  - `GGML_M5_LAB_ADVISE=rdadvise` passes the same spans to `fcntl(F_RDADVISE)`;
+  - a trace prints the pages asked for, those not in memory beforehand (`mincore`) and the advice time.
+
+  Settings were unchanged from E12 at 512.
+  - Six launches: no advice, madvise, F_RDADVISE, F_RDADVISE, madvise, no advice.
+  - Each launch read five unseen 2,088-token documentation excerpts twice (first exposure, then replay, 32-token replies), then the four standard prompts twice with up to 128 tokens.
+  - All six passed the 34 GiB admission, normal-pressure, zero-new-swap and cleanup guards.
+  - A check run before them confirmed that both calls return with every advised page in memory.
+  - A first full run was stopped by the zero-new-swap guard (512 KiB, 2.64 GiB available) in its third launch. It is held; the rerun used only excerpts that run had not been given.
+- **Findings:**
+  - First-exposure penalty (first read minus replay, median of 10 documents per mode): 333 ms with no advice, 189 ms with madvise (−43%), 168 ms with F_RDADVISE (−50%). The whole first read was 2.7% and 3.0% faster.
+  - Per 1,000 pages not in memory: 17.5–18.1 ms without advice, 10.5–11.1 ms with madvise, 8.5–9.1 ms with F_RDADVISE, per launch.
+  - Warm replays were 0.9% (madvise) and 1.3% (F_RDADVISE) slower: advice on resident pages costs 5.5–14.4 ms per 2,088-token request.
+  - Reply speed was within −0.1% to +1.0%, and reply text was identical in every request.
+  - Memory: peak RSS 38.84–39.14 GiB in every mode, at least 2.84 GiB available, zero swap growth.
+  - Both calls are synchronous on this Mac: they read about 3.7–6.0 µs per missing page before returning.
+- **Decision:** a measured first-exposure gain with a small warm cost, in a diagnostic engine; no default changes.
+- **Revisit:** skip advice for pages already advised since load, or advise one chunk ahead from a helper thread; measure first exposure and warm cost again.
+- **Evidence:** [report](research/20261014-n02-advise/REPORT.md). Native logs, per-request rows, memory samples, the check run and the stopped run stay ignored under the local feature folders.
