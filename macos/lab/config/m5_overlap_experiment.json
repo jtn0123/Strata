@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "id": "m5-overlap",
+  "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+  "directory": "vendor/llama-m5-overlap",
+  "patch": "patches/mtp-m5-overlap.patch",
+  "patch_sha256": "5f8c54e32efd92be2baacafc1b1e97228273990045420336eebeda6491f0c71a",
+  "source_diff_sha256": "5f8c54e32efd92be2baacafc1b1e97228273990045420336eebeda6491f0c71a",
+  "modified_files": [
+    "common/speculative.cpp",
+    "common/speculative.h",
+    "ggml/src/ggml-metal/ggml-metal-common.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.h",
+    "ggml/src/ggml-metal/ggml-metal-context.m",
+    "ggml/src/ggml-metal/ggml-metal-device.cpp",
+    "ggml/src/ggml-metal/ggml-metal-device.h",
+    "ggml/src/ggml-metal/ggml-metal-fusion.cpp",
+    "ggml/src/ggml-metal/ggml-metal-fusion.h",
+    "ggml/src/ggml-metal/ggml-metal-impl.h",
+    "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+    "ggml/src/ggml-metal/ggml-metal-ops.h",
+    "ggml/src/ggml-metal/ggml-metal.cpp",
+    "ggml/src/ggml-metal/kernels/argsort.metal",
+    "ggml/src/ggml-metal/kernels/mul_mm.metal",
+    "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+    "ggml/src/ggml-metal/kernels/quantize.metal",
+    "src/llama-context.cpp",
+    "src/llama-cparams.h",
+    "src/models/qwen4exp.cpp",
+    "tests/test-backend-ops.cpp",
+    "tools/server/server-context.cpp"
+  ],
+  "features": [
+    "mtp-shared",
+    "m5-tuning",
+    "m5-profile",
+    "m5-copy",
+    "m5-reduce",
+    "m5-top10",
+    "m5-compact",
+    "m5-small-stack",
+    "m5-overlap"
+  ],
+  "components": [
+    {
+      "patch": "patches/mtp-m5-copy.patch",
+      "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+    },
+    {
+      "patch": "patches/mtp-m5-reduce.patch",
+      "sha256": "c1c5d4a73736d41840ae2297534664f3c8205562ec6bcad5a4c7bb9f34255336"
+    },
+    {
+      "patch": "patches/mtp-m5-top10.patch",
+      "sha256": "d849c8cf38772b907b162d873973c08c86729e5583d3e4c0c9726012df5a6888"
+    },
+    {
+      "patch": "patches/mtp-m5-compact.patch",
+      "sha256": "f00bde8d2ec960aa5c89db32b1e87c4fea6423d80974acbacc9fefc1f0dd9164"
+    },
+    {
+      "patch": "patches/mtp-m5-small-stack.patch",
+      "sha256": "5249164949d0757c16bdc9fa92f61a9f20859fb5fabc3254650e95024458dac0"
+    }
+  ],
+  "scope": "Separate kept-stack clone with two opt-in switches for overlapping the helper with the target during prompt reading. GGML_M5_LAB_CONTEXT_QUEUE gives each Metal context its own command queue, so the helper's GPU work does not wait behind the target's queued prompt chunk. GGML_M5_LAB_HELPER_OVERLAP makes the MTP helper prepare a prompt chunk that samples no token (copying its input rows) and run that chunk's decode after the server has queued the target's next chunk, on the same thread; every other helper call, and every server step that reads or changes the helper's memory, runs the waiting chunk first, and a context checkpoint made in between saves its helper part after that chunk has run. GGML_M5_LAB_OVERLAP_TRACE prints a host timestamp when each helper or target prompt step is deferred, queued or run, for diagnosis. With all three unset the engine is the kept engine. Kernels, fusion rules, weights, arithmetic, allocator and context policy unchanged; diagnostic only, never a default.",
+  "upstream": {
+    "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+    "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+    "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+    "license_file": "patches/LLAMA-LICENSE.txt"
+  }
+}

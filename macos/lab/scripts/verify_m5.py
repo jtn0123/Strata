@@ -30,7 +30,7 @@ def check(engine, tensor_api, tuning="stock"):
         expected = f"has tensor            = {'true' if tensor_api == 'on' else 'false'}"
         if not result["passed"] or expected not in text or result["system_swap_growth_bytes"]:
             raise RuntimeError("GPU math, explicit Tensor API selection or memory check failed")
-        if engine in ("m5-correctness", "m5-copy", "m5-reduce", "m5-sampling", "m5-hc", "m5-group", "m5-gate", "m5-gdn", "m5-lookup", "m5-gate-lanes", "m5-encoders", "m5-head", "m5-embedding", "m5-draftcap", "m5-top10", "m5-qsa", "m5-route-map", "m5-compact", "m5-compact-cols", "m5-small-stack", "m5-segments"):
+        if engine in ("m5-correctness", "m5-copy", "m5-reduce", "m5-sampling", "m5-hc", "m5-group", "m5-gate", "m5-gdn", "m5-lookup", "m5-gate-lanes", "m5-encoders", "m5-head", "m5-embedding", "m5-draftcap", "m5-top10", "m5-qsa", "m5-route-map", "m5-compact", "m5-compact-cols", "m5-small-stack", "m5-segments", "m5-overlap"):
             residual = check_case(binary, folder, "fused-residual", r"n=(1|2|3|4|5|8|32),.*mode=mm2\+mm", env=env, operations="MUL_MAT_ADD")
             record["residual_check"] = residual
             if not residual["passed"] or residual["system_swap_growth_bytes"]:
@@ -48,7 +48,7 @@ def check(engine, tensor_api, tuning="stock"):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--engine", choices=["mtp-mma", "m5-lab", "m5-trace", "m5-correctness", "m5-copy", "m5-reduce", "m5-sampling", "m5-hc", "m5-group", "m5-gate", "m5-gdn", "m5-lookup", "m5-gate-lanes", "m5-encoders", "m5-head", "m5-embedding", "m5-draftcap", "m5-top10", "m5-qsa", "m5-route-map", "m5-compact", "m5-compact-cols", "m5-small-stack", "m5-segments"], default="m5-lab")
+    ap.add_argument("--engine", choices=["mtp-mma", "m5-lab", "m5-trace", "m5-correctness", "m5-copy", "m5-reduce", "m5-sampling", "m5-hc", "m5-group", "m5-gate", "m5-gdn", "m5-lookup", "m5-gate-lanes", "m5-encoders", "m5-head", "m5-embedding", "m5-draftcap", "m5-top10", "m5-qsa", "m5-route-map", "m5-compact", "m5-compact-cols", "m5-small-stack", "m5-segments", "m5-overlap"], default="m5-lab")
     ap.add_argument("--tensor-api", choices=["on", "off"], nargs="+", default=["on", "off"])
     ap.add_argument("--tuning", choices=TUNING, nargs="+", default=["stock"])
     ap.add_argument("--run", action="store_true")
