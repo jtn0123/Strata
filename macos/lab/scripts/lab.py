@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import NamedTuple, NotRequired, TypedDict, cast
+from typing import NamedTuple, NotRequired, TypedDict, Unpack, cast
 import urllib.error
 import urllib.request
 
@@ -31,6 +31,19 @@ class DraftSettings(NamedTuple):
     engine: str
     threads: int | None
     minimum_probability: float | None
+
+
+class DraftTuning(TypedDict, total=False):
+    draft_threads: int | None
+    draft_p_min: float | None
+
+
+def _draft_tuning(options: DraftTuning) -> tuple[int | None, float | None]:
+    """Bind the two optional helper settings while rejecting unsupported names."""
+    for name in options:
+        if name not in ("draft_threads", "draft_p_min"):
+            raise TypeError(f"server_command() got an unexpected keyword argument {name!r}")
+    return options.get("draft_threads"), options.get("draft_p_min")
 
 
 def model_settings(model_id: str) -> ModelSettings:
@@ -91,9 +104,9 @@ def server_command(
     draft_placement: str = "gpu",
     draft_model: str = "mtp",
     engine: str = "baseline",
-    draft_threads: int | None = None,
-    draft_p_min: float | None = None,
+    **draft_tuning: Unpack[DraftTuning],
 ) -> list[str]:
+    draft_threads, draft_p_min = _draft_tuning(draft_tuning)
     from engines import engine_binary
     from metal_environment import validate_confidence
 

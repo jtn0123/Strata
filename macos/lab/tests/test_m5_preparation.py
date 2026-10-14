@@ -148,6 +148,21 @@ class M5Tests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 server_command("flash", draft_p_min=0.2)
 
+    def test_helper_keyword_defaults_and_unknown_keys_preserve_binding(self):
+        positional = ("small", 8123, 4096, 512, 128, "none", 3, "f16", 8, "gpu", "mtp", "baseline")
+        with patch("lab.model_path", return_value=Path("unused.gguf")) as model, \
+                patch("engines.engine_binary", return_value=Path("unused-engine")) as engine:
+            implicit = server_command(*positional)
+            explicit = server_command(*positional, draft_threads=None, draft_p_min=None)
+            self.assertEqual(implicit, explicit)
+            self.assertEqual(implicit[implicit.index("--port") + 1], "8123")
+            engine.reset_mock(); model.reset_mock()
+            unsupported = {"unsupported_helper": 1, "draft_p_min": -1}
+            call = lambda: server_command(*positional, **unsupported)
+            with self.assertRaisesRegex(TypeError, "unexpected keyword argument 'unsupported_helper'"):
+                call()
+            engine.assert_not_called(); model.assert_not_called()
+
     def test_draft_caps_require_the_isolated_engine_and_do_not_leak(self):
         inherited = {"GGML_M5_LAB_DRAFT_CAP": "1", "GGML_M5_LAB_DRAFT_TRACE": "1",
                      "GGML_M5_LAB_DRAFT_SCHEDULE": "1", "GGML_M5_LAB_DRAFT_EARLY_STOP": "1"}

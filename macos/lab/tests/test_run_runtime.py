@@ -1,6 +1,7 @@
 """Cancellation at either app launch boundary retains owned-process cleanup."""
 from argparse import Namespace
 from contextlib import ExitStack
+import json
 from pathlib import Path
 import signal
 import sys
@@ -58,6 +59,36 @@ class RunRuntimeTests(unittest.TestCase):
         args = self.args()
         args.port, args.native_port = 1, 65535
         self.assertEqual(run.validated_ports(args), (1, 65535))
+
+    def test_json_writer_rejects_outside_and_escaping_runtime_paths(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            runtime = root / 'bench/runtime'
+            runtime.mkdir(parents=True)
+            outside = root / 'outside.json'
+            outside.write_text('original')
+            escape = runtime / 'escaped.json'
+            escape.symlink_to(outside)
+            with patch.object(run, 'ROOT', root):
+                for target in (outside, escape):
+                    with self.subTest(target=target):
+                        with self.assertRaisesRegex(ValueError, 'owned runtime directory'):
+                            run.write_json(target, {'value': 'replacement'})
+                        self.assertEqual(outside.read_text(), 'original')
+
+    def test_json_writer_keeps_user_content_and_preserves_file_on_serialization_error(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            target = root / 'bench/runtime/config.json'
+            target.parent.mkdir(parents=True)
+            with patch.object(run, 'ROOT', root):
+                payload = {'model': '../../kept-as-data', 'value': '--kept-as-data'}
+                run.write_json(target, payload)
+                original = target.read_text()
+                self.assertEqual(original, json.dumps(payload, indent=2) + '\n')
+                with self.assertRaises(TypeError):
+                    run.write_json(target, {'value': object()})
+                self.assertEqual(target.read_text(), original)
 
     def test_stop_during_native_or_api_creation_finalizes_both_owned_children(self):
         for stage in (0, 1):

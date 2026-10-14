@@ -13,6 +13,7 @@ import sys
 from typing import TypedDict, cast
 
 ROOT = Path(__file__).resolve().parents[1]
+RUFF_CONFIG = "config/ruff.toml"
 
 
 class QualityScope(TypedDict):
@@ -112,9 +113,9 @@ def main() -> None:
     check_mypy_scope(settings)
     modules = settings["python_modules"]
     checks = (
-        ["ruff", "check", "--config", "config/ruff.toml", "--select", "E9,F63,F7,F82", "scripts", "tests"],
-        ["ruff", "check", "--config", "config/ruff.toml", "--", *modules],
-        ["ruff", "format", "--check", "--config", "config/ruff.toml", "--", *modules],
+        ["ruff", "check", "--config", RUFF_CONFIG, "--select", "E9,F63,F7,F82", "scripts", "tests"],
+        ["ruff", "check", "--config", RUFF_CONFIG, "--", *modules],
+        ["ruff", "format", "--check", "--config", RUFF_CONFIG, "--", *modules],
         ["mypy", "--config-file", "config/mypy.ini"],
     )
     for arguments in checks:

@@ -171,6 +171,19 @@ class Monitor:
             return True
         return False
 
+    def _headroom_guard(self, sample: MemorySample, low_since: float | None) -> tuple[float | None, bool]:
+        if sample["available_bytes"] < self.minimum_available_bytes:
+            low_since = low_since or time.monotonic()
+        else:
+            low_since = None
+        if low_since and time.monotonic() - low_since > 4:
+            self.guard = (
+                f"Stopped: available memory stayed below {self.minimum_available_bytes / 1024**2:.0f} MiB for 4 seconds"
+            )
+            self.stop_owned_child()
+            return low_since, True
+        return low_since, False
+
     def run(self) -> None:
         low_since = None
         try:
@@ -188,13 +201,8 @@ class Monitor:
                         return
                     if self.swap_guard(sample):
                         return
-                    if sample["available_bytes"] < self.minimum_available_bytes:
-                        low_since = low_since or time.monotonic()
-                    else:
-                        low_since = None
-                    if low_since and time.monotonic() - low_since > 4:
-                        self.guard = f"Stopped: available memory stayed below {self.minimum_available_bytes / 1024**2:.0f} MiB for 4 seconds"
-                        self.stop_owned_child()
+                    low_since, stopped = self._headroom_guard(sample, low_since)
+                    if stopped:
                         return
                     if mem is None or self.process.poll() is not None:
                         return

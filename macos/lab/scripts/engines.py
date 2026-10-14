@@ -107,6 +107,23 @@ def git(path: Path, *args: str) -> bytes:
     return subprocess.check_output(["git", "-C", str(path), *args]).strip()
 
 
+def _verified_source_diff(path: Path, directory: str, revision: str, manifest: ExperimentManifest | None) -> bytes:
+    """Validate the pinned checkout before its diff can become receipt evidence."""
+    if git(path, "rev-parse", "HEAD").decode() != revision:
+        raise RuntimeError(f"Unpinned native checkout: {directory}")
+    status = git(path, "status", "--porcelain", "--untracked-files=all").decode()
+    diff = subprocess.check_output(["git", "-C", str(path), "diff", "HEAD", "--binary"])
+    if manifest:
+        expected_status = "\n".join(f" M {name}" for name in manifest["modified_files"])
+        if status.strip() != expected_status.strip() or git(path, "diff", "--cached"):
+            raise RuntimeError("Candidate contains changes beyond the experiment patch")
+        if hashlib.sha256(diff).hexdigest() != manifest["source_diff_sha256"]:
+            raise RuntimeError("Candidate source diff differs from the experiment patch")
+    elif status or diff:
+        raise RuntimeError("Baseline native checkout must remain unmodified")
+    return diff
+
+
 def source_info(engine: str, root: Path = ROOT) -> EngineSource:
     runtime = cast(RuntimeSettings, json.loads((root / "config/runtime.json").read_text()))
     revision = runtime["llama_cpp"]["revision"]
@@ -122,19 +139,7 @@ def source_info(engine: str, root: Path = ROOT) -> EngineSource:
             raise RuntimeError(f"{engine} patch hash differs from the experiment manifest")
     else:
         raise ValueError(f"Unknown engine: {engine}")
-    path = root / directory
-    if git(path, "rev-parse", "HEAD").decode() != revision:
-        raise RuntimeError(f"Unpinned native checkout: {directory}")
-    status = git(path, "status", "--porcelain", "--untracked-files=all").decode()
-    diff = subprocess.check_output(["git", "-C", str(path), "diff", "HEAD", "--binary"])
-    if manifest:
-        expected_status = "\n".join(f" M {name}" for name in manifest["modified_files"])
-        if status.strip() != expected_status.strip() or git(path, "diff", "--cached"):
-            raise RuntimeError("Candidate contains changes beyond the experiment patch")
-        if hashlib.sha256(diff).hexdigest() != manifest["source_diff_sha256"]:
-            raise RuntimeError("Candidate source diff differs from the experiment patch")
-    elif status or diff:
-        raise RuntimeError("Baseline native checkout must remain unmodified")
+    diff = _verified_source_diff(root / directory, directory, revision, manifest)
     return {
         "engine": engine,
         "directory": directory,

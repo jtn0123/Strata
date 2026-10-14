@@ -75,7 +75,13 @@ class LaunchContext:
 
 
 def write_json(path: Path, value: object) -> None:
-    path.write_text(json.dumps(value, indent=2) + "\n")
+    target = path.resolve()
+    runtime = (ROOT / "bench/runtime").resolve()
+    if not target.is_relative_to(runtime):
+        raise ValueError("JSON receipts must stay within the owned runtime directory")
+    rendered = json.dumps(value, indent=2) + "\n"
+    with target.open("w") as output:
+        output.write(rendered)
 
 
 def assert_ports_available(ports: Sequence[int]) -> None:

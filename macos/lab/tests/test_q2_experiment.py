@@ -96,6 +96,36 @@ class SourceTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             engines.source_info("q2-masked", self.root)
 
+    def test_source_validation_keeps_git_order_and_manifest_metadata(self):
+        diff = b"fixture diff"
+        manifest = {"base_revision": self.revision, "directory": "vendor/llama.cpp",
+                    "patch": "patches/test.patch", "patch_sha256": "fixture patch hash",
+                    "source_diff_sha256": hashlib.sha256(diff).hexdigest(),
+                    "modified_files": ["kernel.metal"], "additional_metadata": {"keep": True}}
+        queries = []
+        def git_query(path, *args):
+            self.assertEqual(path, self.path)
+            queries.append(args)
+            if args == ("rev-parse", "HEAD"):
+                return self.revision.encode()
+            if args[0] == "status":
+                return b" M kernel.metal"
+            return b""
+        def read_diff(command):
+            queries.append(tuple(command[3:]))
+            self.assertEqual(command, ["git", "-C", str(self.path), "diff", "HEAD", "--binary"])
+            return diff
+        with patch.object(engines, "experiment_manifest", return_value=manifest), \
+                patch.object(engines, "sha256", return_value="fixture patch hash"), \
+                patch.object(engines, "git", side_effect=git_query), \
+                patch.object(engines.subprocess, "check_output", side_effect=read_diff):
+            receipt = engines.source_info("q2-masked", self.root)
+        self.assertEqual(queries, [("rev-parse", "HEAD"), ("status", "--porcelain", "--untracked-files=all"),
+                                   ("diff", "HEAD", "--binary"), ("diff", "--cached")])
+        self.assertIs(receipt["patch"], manifest)
+        self.assertEqual(receipt["patch"]["additional_metadata"], {"keep": True})
+        self.assertEqual(receipt["source_diff_sha256"], hashlib.sha256(diff).hexdigest())
+
     def test_receipt_rejects_replaced_native_library(self):
         (self.path / ".git/info/exclude").write_text("/build/\n")
         binary = self.path / "build/bin/llama-server"
