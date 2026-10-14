@@ -740,3 +740,27 @@ Balanced P07 remains the normal launcher; editing lookup has a maintained dedica
   - a finer split of the router segment;
   - a weight-reading check on the experts' fixed term before N01.
 - **Evidence:** [report](research/20261014-n00b-segments/REPORT.md). Native logs, per-request rows, memory samples and held attempts stay ignored under the local feature folders.
+
+### E12 — N15 helper overlap during prompt reading (diagnostic engine)
+
+- **What ran:** user-authorized model run on `m5-overlap`, an isolated diagnostic clone of the kept `m5-small-stack` engine with two switches, both off unless set:
+  - `GGML_M5_LAB_CONTEXT_QUEUE` gives each Metal context its own command queue;
+  - `GGML_M5_LAB_HELPER_OVERLAP` holds the MTP helper's decode of a prompt chunk that samples no token until the target's next chunk is queued. Any other helper call or helper-state step runs the waiting chunk first.
+
+  Settings and prompts were unchanged from E10.
+  - Eight launches: at 512, overlap/serial/serial/overlap; at 1,536, serial/overlap/overlap/serial.
+  - Each launch made three fresh one-token reads per prompt (top-8 probabilities), then three replies of up to 128 tokens.
+  - All eight passed the 34 GiB admission, normal-pressure, zero-new-swap and cleanup guards.
+  - A first smoke test found a fault, fixed before the accepted run: the server's per-pass status task ran the waiting helper chunk early, so nothing overlapped.
+- **Findings:**
+  - At the default 512-token chunks:
+    - long prompts were read 10.6–10.8% faster (4,057–4,076 instead of 4,535–4,567 ms), short prompts 4.5–6.7% faster;
+    - GPU idle per long prompt fell from 517–536 to 110–119 ms;
+    - whole long-prompt replies finished 9.5–10.4% sooner.
+  - Outputs (token, top-8 probabilities, reply text, length and draft counts) matched in all 96 reads and 96 replies.
+  - Memory was unchanged: peak RSS 37.43–38.10 GiB against 37.77–38.15 GiB, and zero swap growth.
+  - Decode steps cost the same in both modes. The first draft after a long prompt took 2.5–3.5 ms longer. At 512 this lowers the reported tok/s of the 11- and 31-token replies after long prompts by 0.9–1.4%.
+  - At 1,536 the gain was 0.0–4.6% for long prompts. Higher disk reads in all four 1,536 launches made reply speed there undecided.
+- **Decision:** a measured prompt-reading gain in a diagnostic engine; no default changes. Concurrent slots, cancellation mid-prompt and checkpoint restores with a waiting helper chunk were not exercised.
+- **Revisit:** qualify a candidate at 512 with the standard app suite (256-token replies, editing and Long Documents profiles), plus cancel and checkpoint-restore checks after or with N06. Chunk order at 1,536 is a separate experiment.
+- **Evidence:** [report](research/20261014-n15-helper-overlap/REPORT.md). Native logs, per-request rows, memory samples and smoke tests stay ignored under the local feature folders.
