@@ -291,14 +291,29 @@
         ? "Add your API key in About → Settings to connect."
         : "Can’t reach the local server. Reconnecting… Monitor shows the last readings.";
       $("connection-settings").hidden = status.label !== "Key needed";
-      document.querySelector(".monitor").dataset.stale = String(status.state === "error");
-      if (status.state === "error") document.getElementById("monitor-summary").textContent = status.announcement + " · readings are stale";
+      const stale = status.state === "error" || status.state === "stale";
+      document.querySelector(".monitor").dataset.stale = String(stale);
+      if (stale) document.getElementById("monitor-summary").textContent = status.announcement + " · readings are stale";
     };
     $("connection-settings").onclick = () => { showTab("about"); $("api-key").focus(); };
   }
 
+  function installFreshnessCheck(connection) {
+    // The pinned poll renders nothing after a failed or abandoned request, so
+    // check the last sample's age separately, as often as the shell polls.
+    let shownStale = false;
+    const checkFreshness = () => {
+      const stale = !!connection.staleReason();
+      if (stale && !shownStale && lastMetrics) render(lastMetrics);
+      shownStale = stale;
+      setTimeout(checkFreshness, 1000);
+    };
+    setTimeout(checkFreshness, 1000);
+  }
+
   function renderMemorySummary(hw, connection) {
-    if (connection.problem) return connection.problem + " · readings are stale";
+    const stale = connection.staleReason();
+    if (stale) return stale + " · readings are stale";
     if (hw.ram_total && hw.ram_used != null) return `${gb(hw.ram_used)} / ${gb(hw.ram_total, 0)} GiB system memory in use`;
     return "System memory is not reported by this backend";
   }
@@ -346,7 +361,7 @@
       originalRender(metrics);
       const hw = metrics.hardware || {}, engine = metrics.engine || {};
       const model = engine.model || health.model || "Local model";
-      document.getElementById("workspace-model").textContent = model + (connection.problem ? " · last seen" : "");
+      document.getElementById("workspace-model").textContent = model + (connection.staleReason() ? " · last seen" : "");
       document.getElementById("monitor-summary").textContent = renderMemorySummary(hw, connection);
       renderHardwareCards(hw);
       renderMemoryRows(hw, engine);
@@ -369,4 +384,5 @@
   const connection = new StrataUIState();
   installConnectionStatus(connection);
   installTelemetry(connection);
+  installFreshnessCheck(connection);
 })();

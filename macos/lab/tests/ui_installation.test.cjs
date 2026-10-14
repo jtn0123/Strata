@@ -128,19 +128,28 @@ function installation({question = '', stored = {}} = {}) {
     history: {replaceState() {}}, performance: {now: () => 100},
     MutationObserver: class { observe() {} }, Event: class { constructor(type) { this.type = type; } },
     matchMedia: () => ({matches: false, addEventListener() {}}), addEventListener() {},
-    requestAnimationFrame: () => 1, cancelAnimationFrame() {}, setTimeout: (callback, ms) => { timers.push({callback, ms}); },
+    requestAnimationFrame: () => 1, cancelAnimationFrame() {},
+    setTimeout: (callback, ms) => timers.push({callback, ms}), clearTimeout: (id) => { if (timers[id - 1]) timers[id - 1].cleared = true; },
     URL: {createObjectURL(blob) { downloads.push(blob); return 'blob:test'; }, revokeObjectURL() {}},
     fetch(resource, options) { const pending = deferred(); requests.push({resource, options, ...pending}); return pending.promise; },
   });
   context.window = context;
   const execute = (name) => vm.runInContext(source(name), context, {filename: name});
   const evaluate = (expression) => vm.runInContext(expression, context);
-  const answer = (resource, response) => {
-    const request = requests.find((entry) => entry.resource === resource && !entry.answered);
+  const reply = (request, resource, response) => {
     assert.ok(request, `expected ${resource} request`); request.answered = true; request.resolve(response);
     return request;
   };
-  return {context, document, execute, evaluate, answer, requests, downloads, storage, timers};
+  const answer = (resource, response) => reply(requests.find((entry) => entry.resource === resource && !entry.answered), resource, response);
+  // A poll after an abandoned one answers the newest request, not the stalled one.
+  const answerLatest = (resource, response) => reply(requests.findLast((entry) => entry.resource === resource && !entry.answered), resource, response);
+  // Run each pending timer that matches, as a browser would once it is due.
+  const fire = (match) => {
+    const due = timers.filter((timer) => !timer.cleared && !timer.ran && match(timer));
+    for (const timer of due) { timer.ran = true; timer.callback(); }
+    return due.length;
+  };
+  return {context, document, execute, evaluate, answer, answerLatest, fire, requests, downloads, storage, timers};
 }
 
 test('actual classic-script order covers a shortcut already streaming during installation', async () => {
@@ -290,4 +299,197 @@ test('whole metrics installation keeps unmeasured values empty and history bound
   assert.equal(page.document.getElementById('req-body').children.length, 30);
   page.document.getElementById('perf-export').click();
   assert.equal(JSON.parse(await page.downloads.at(-1).text()).recorded_requests.length, 200);
+});
+
+const isPoll = (timer) => timer.callback.name === 'poll';
+const isFreshnessCheck = (timer) => timer.callback.name === 'checkFreshness';
+const text = (page, id) => page.document.getElementById(id).textContent;
+const metricsRequests = (page) => page.requests.filter((request) => request.resource === '/metrics');
+
+test('whole telemetry installation abandons stalled metrics replies and keeps polling', async () => {
+  const page = installation();
+  scripts.forEach(page.execute);
+  const timeout = page.evaluate('STRATA_METRICS_TIMEOUT_MS');
+  const deadlines = () => page.timers.filter((timer) => timer.ms === timeout);
+  page.answer('/metrics', Response.json(metricsSample()));
+  await until(() => text(page, 'pill-text') === 'Ready');
+  assert.ok(deadlines().every((timer) => timer.cleared), 'a completed reply releases its deadline');
+
+  page.fire(isPoll);
+  const stalled = metricsRequests(page)[1];
+  assert.ok(stalled.options.headers, 'the shell request headers are kept');
+  assert.equal(stalled.options.signal.aborted, false);
+  assert.equal(page.fire((timer) => timer.ms === timeout), 1, 'only the stalled request has a live deadline');
+  assert.equal(stalled.options.signal.reason.name, 'TimeoutError', 'the stalled request itself is cancelled');
+  await until(() => page.timers.some((timer) => isPoll(timer) && !timer.ran));
+
+  // Headers arrive, but the body never finishes.
+  page.fire(isPoll);
+  assert.equal(metricsRequests(page).length, 3, 'polling continues after the abandoned reply');
+  page.answerLatest('/metrics', new Response(new ReadableStream({start() {}}), {headers: {'Content-Type': 'application/json'}}));
+  await until(() => metricsRequests(page)[2].answered);
+  for (let turn = 0; turn < 10; turn++) await Promise.resolve();
+  assert.equal(page.timers.some((timer) => isPoll(timer) && !timer.ran), false, 'a stalled body holds the poll until its deadline');
+  assert.equal(page.fire((timer) => timer.ms === timeout), 1);
+  await until(() => page.timers.some((timer) => isPoll(timer) && !timer.ran));
+  page.fire(isPoll);
+  assert.equal(metricsRequests(page).length, 4);
+  assert.equal(text(page, 'pill-text'), 'Ready', 'two failures inside the freshness window are not yet reported');
+});
+
+test('whole telemetry installation shows an expired sample as stale and recovers on the next sample', async () => {
+  const page = installation();
+  page.context.clock = 1_000_000;
+  page.evaluate('Date.now = () => clock');
+  scripts.forEach(page.execute);
+  page.evaluate("showTab('monitor')");
+  const fresh = page.evaluate('STRATA_TELEMETRY_FRESH_MS');
+  const sample = metricsSample();
+  sample.hardware = {ram_used: 8 * 2 ** 30, ram_total: 16 * 2 ** 30};
+  page.answer('/metrics', Response.json(sample));
+  await until(() => text(page, 'pill-text') === 'Ready');
+  const pill = page.document.getElementById('pill'), monitor = page.document.querySelector('.monitor');
+  assert.match(text(page, 'monitor-summary'), /8\.0 \/ 16 GiB system memory in use/);
+
+  page.context.clock += fresh;
+  page.fire(isFreshnessCheck);
+  assert.equal(text(page, 'pill-text'), 'Ready', 'a sample exactly at the window is still current');
+  page.context.clock += 1;
+  page.fire(isFreshnessCheck);
+  assert.equal(text(page, 'pill-text'), 'Not updating');
+  assert.equal(pill.dataset.state, 'stale');
+  assert.equal(monitor.dataset.stale, 'true');
+  assert.equal(text(page, 'monitor-summary'), `No new readings for over ${fresh / 1000} seconds · readings are stale`);
+  assert.match(text(page, 'workspace-model'), / · last seen$/);
+  assert.equal(page.document.getElementById('connection-banner').hidden, true, 'an old sample alone is not reported offline');
+  await Promise.resolve();
+  assert.equal(text(page, 'pill-live'), `No new readings for over ${fresh / 1000} seconds`);
+  page.evaluate("showTab('about'); showTab('monitor')");
+  assert.equal(text(page, 'pill-text'), 'Not updating', 'a cached tab render keeps the expired state');
+
+  page.fire(isPoll);
+  page.answerLatest('/metrics', Response.json(metricsSample()));
+  await until(() => text(page, 'pill-text') === 'Ready');
+  assert.equal(pill.dataset.state, 'idle');
+  assert.equal(monitor.dataset.stale, 'false');
+  assert.doesNotMatch(text(page, 'monitor-summary'), /stale/);
+  assert.doesNotMatch(text(page, 'workspace-model'), /last seen/);
+});
+
+test('whole telemetry installation keeps caller cancellation for metrics requests', async () => {
+  const page = installation();
+  scripts.forEach(page.execute);
+  const timeout = page.evaluate('STRATA_METRICS_TIMEOUT_MS');
+  const caller = new AbortController(), reason = new Error('caller stopped');
+  page.context.callerSignal = caller.signal;
+  const pending = page.evaluate("fetch('/metrics', {signal: callerSignal})");
+  const request = page.requests.at(-1), deadline = page.timers.at(-1);
+  assert.equal(deadline.ms, timeout);
+  caller.abort(reason);
+  await assert.rejects(pending, (error) => error === reason);
+  assert.equal(request.options.signal.reason, reason, 'the underlying request is cancelled with the caller reason');
+  assert.equal(deadline.cleared, true);
+
+  page.context.abortedSignal = AbortSignal.abort();
+  await assert.rejects(page.evaluate("fetch('/metrics', {signal: abortedSignal})"), {name: 'AbortError'});
+  assert.equal(page.requests.at(-1).options.signal.aborted, true);
+  assert.equal(page.timers.at(-1).cleared, true);
+});
+
+test('whole installation gives completion streams no metrics deadline', async () => {
+  const page = installation();
+  scripts.forEach(page.execute);
+  const timeout = page.evaluate('STRATA_METRICS_TIMEOUT_MS');
+  const deadlines = () => page.timers.filter((timer) => timer.ms === timeout).length;
+  const before = deadlines();
+  page.document.getElementById('input').value = 'Read this long prompt';
+  const sending = page.evaluate('send()');
+  const chat = page.requests.find((request) => request.resource === '/v1/chat/completions');
+  assert.equal(chat.options.signal, page.evaluate('busy.controller.signal'), 'only the Stop signal reaches the completion');
+  page.context.messagesOptions = {method: 'POST', body: '{}'};
+  page.evaluate("fetch('/v1/messages', messagesOptions)");
+  assert.equal(page.requests.at(-1).options, page.context.messagesOptions, 'Anthropic messages pass through unchanged');
+  assert.equal(deadlines(), before, 'no completion request received a deadline');
+  page.fire((timer) => timer.ms === timeout);
+  assert.equal(chat.options.signal.aborted, false);
+  assert.ok(page.evaluate('busy'), 'the completion keeps waiting after every metrics deadline');
+  page.answer('/v1/chat/completions', sseResponse('Long reply'));
+  await sending;
+  assert.equal(page.evaluate('messages[1].text'), 'Long reply');
+  assert.equal(page.evaluate('messages[1].error'), undefined);
+});
+
+const perfCards = ['perf-generation', 'perf-first', 'perf-total', 'perf-prompt', 'perf-draft', 'perf-reuse'];
+const withoutPerformance = (rows = []) => {
+  const sample = metricsSample(rows);
+  delete sample.performance;
+  return sample;
+};
+const resourceValues = (page) => page.document.getElementById('perf-resources').querySelectorAll('strong').map((value) => value.textContent);
+
+test('whole metrics installation clears model readings when a sample has no performance block, then restores them', async () => {
+  const page = installation();
+  scripts.forEach(page.execute);
+  const row = {time: 100, finish: 'stop', prompt_tokens: 64, output_tokens: 32, reused: 16, generation_tps: 88,
+    generation_source: 'native', prompt_tps: 900, server_first_token_ms: 25, server_duration_ms: 400, draft_acceptance_percent: 70};
+  const button = page.document.getElementById('perf-export');
+  page.answer('/metrics', Response.json(metricsSample([row], 'model')));
+  await until(() => text(page, 'perf-generation') === '88.0 tok/s');
+  assert.equal(text(page, 'perf-first'), '25 ms');
+  assert.match(text(page, 'perf-settings'), /4K context/);
+  assert.match(resourceValues(page)[0], /GiB/);
+
+  page.fire(isPoll);
+  page.answerLatest('/metrics', Response.json(withoutPerformance([{...row, time: 101}])));
+  await until(() => text(page, 'perf-mode') === 'Performance data unavailable');
+  for (const id of perfCards) assert.equal(text(page, id), '–', id);
+  assert.equal(text(page, 'perf-generation-detail'), 'Not reported by this backend');
+  assert.deepEqual(resourceValues(page), Array(5).fill('Not reported'));
+  assert.doesNotMatch(text(page, 'perf-settings'), /4K context|mock/);
+  const cells = page.document.getElementById('req-body').querySelectorAll('td').map((cell) => cell.textContent);
+  assert.deepEqual(cells.slice(1), ['Done', '64', '32', '–', '–', '–', '16'], 'current rows keep counts but no timings');
+  assert.match(text(page, 'perf-history'), /^1 recorded request .*no current snapshot/);
+  assert.deepEqual(JSON.parse(page.storage.get('strata.performance.history')).map((saved) => saved.time), [100]);
+  assert.equal(button.textContent, 'Export history');
+  assert.equal(button.disabled, false);
+  button.click();
+  const history = JSON.parse(await page.downloads.at(-1).text());
+  assert.equal(history.performance, null);
+  assert.deepEqual(history.requests, []);
+  assert.deepEqual(history.recorded_requests.map((saved) => [saved.time, saved.generation_tps]), [[100, 88]]);
+
+  page.fire(isPoll);
+  page.answerLatest('/metrics', Response.json(metricsSample([{...row, time: 102, generation_tps: 90}], 'model')));
+  await until(() => text(page, 'perf-generation') === '90.0 tok/s');
+  assert.match(text(page, 'perf-mode'), /^Live model/);
+  assert.equal(text(page, 'perf-generation-detail'), 'Engine timing · last request');
+  assert.match(resourceValues(page)[0], /GiB/);
+  assert.match(text(page, 'perf-settings'), /4K context/);
+  assert.equal(button.textContent, 'Export metrics');
+  button.click();
+  const current = JSON.parse(await page.downloads.at(-1).text());
+  assert.equal(current.performance.measurement_kind, 'model');
+  assert.deepEqual(current.requests.map((saved) => saved.time), [102]);
+  assert.deepEqual(current.recorded_requests.map((saved) => saved.time), [100, 102]);
+});
+
+test('whole metrics installation disables export when a backend reports neither a snapshot nor history', async () => {
+  const page = installation();
+  scripts.forEach(page.execute);
+  const button = page.document.getElementById('perf-export');
+  page.answer('/metrics', Response.json(withoutPerformance()));
+  await until(() => text(page, 'perf-mode') === 'Performance data unavailable');
+  assert.equal(button.textContent, 'Export history');
+  assert.equal(button.disabled, true);
+  assert.match(text(page, 'req-body'), /first completed request/);
+  assert.equal(page.storage.has('strata.performance.history'), false);
+
+  page.fire(isPoll);
+  page.answerLatest('/metrics', Response.json(metricsSample([], 'model')));
+  await until(() => text(page, 'perf-mode').startsWith('Live model'));
+  assert.equal(button.textContent, 'Export metrics');
+  assert.equal(button.disabled, false);
+  assert.equal(text(page, 'perf-generation-detail'), 'No generation measurement yet');
+  button.click();
+  assert.equal(JSON.parse(await page.downloads.at(-1).text()).performance.measurement_kind, 'model');
 });

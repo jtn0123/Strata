@@ -195,14 +195,34 @@ test('the actual Apply hook rejects invalid values and honors sharing before GET
   assert.equal(shared, false, 'explicitly disables sharing even while GET is pending');
 });
 
+const stateSource = fs.readFileSync(path.join(__dirname, '../web/ui-state.js'), 'utf8');
+
 test('the installed fetch guard is restricted to chat completion POST streams', async () => {
-  const stateSource = fs.readFileSync(path.join(__dirname, '../web/ui-state.js'), 'utf8');
   const context = vm.createContext({TextDecoder, DOMException, ReadableStream, Response,
-    window: {fetch: async () => sse([chunk({choices: [{delta: {content: 'Partial'}}]})])}});
+    window: {fetch: async () => sse([chunk({choices: [{delta: {content: 'Partial'}}]})]), AbortController, setTimeout, clearTimeout}});
   vm.runInContext(stateSource, context);
   assert.match(await (await context.window.fetch('/metrics')).text(), /Partial/);
   assert.match(await (await context.window.fetch('/v1/chat/completions', {method: 'GET'})).text(), /Partial/);
   await assert.rejects((await context.window.fetch('/v1/chat/completions', {method: 'POST'})).text(), /before the answer finished/i);
+});
+
+test('the metrics deadline returns the shell status, headers and whole body, then clears itself', async () => {
+  const timers = [], seen = [];
+  const context = vm.createContext({DOMException, Response, window: {AbortController,
+    fetch: async (resource, options) => {
+      seen.push(options);
+      return new Response('{"error":{"message":"API key needed"}}', {status: 401, headers: {'X-Shell': 'pinned'}});
+    },
+    setTimeout: (callback, ms) => timers.push({callback, ms}),
+    clearTimeout: (id) => { timers[id - 1].cleared = true; }}});
+  vm.runInContext(stateSource, context);
+  const response = await context.window.fetch('/metrics', {headers: {Authorization: 'Bearer synthetic'}});
+  assert.equal(response.status, 401);
+  assert.equal(response.headers.get('X-Shell'), 'pinned');
+  assert.match(await response.text(), /API key needed/);
+  assert.deepEqual(seen[0].headers, {Authorization: 'Bearer synthetic'});
+  assert.equal(seen[0].signal.aborted, false);
+  assert.deepEqual(timers.map(({ms, cleared}) => ({ms, cleared})), [{ms: ui.METRICS_TIMEOUT_MS, cleared: true}]);
 });
 
 test('the pinned send path marks a truncated reply failed only after the compatibility fix', async () => {

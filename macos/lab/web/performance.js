@@ -71,7 +71,18 @@
       recorded = recorded.slice(-200);
       store.set("performance.history", recorded);
     }
-    $("perf-history").textContent = `${recorded.length} recorded ${recorded.length === 1 ? "request" : "requests"} in this browser (up to 200). Export includes numeric timing/settings history; resources are the current snapshot.`;
+  }
+
+  const hasHistory = () => recorded.length > 0 || messages.some((message) => message.performanceTiming);
+
+  function renderHistory(current) {
+    const count = `${recorded.length} recorded ${recorded.length === 1 ? "request" : "requests"} in this browser (up to 200).`;
+    $("perf-history").textContent = current
+      ? `${count} Export includes numeric timing/settings history; resources are the current snapshot.`
+      : `${count} Export includes only this earlier history; this backend reports no current snapshot.`;
+    const button = $("perf-export");
+    button.textContent = current ? "Export metrics" : "Export history";
+    button.disabled = !current && !hasHistory();
   }
 
   function generationSource(source) {
@@ -80,9 +91,9 @@
     return "No generation measurement yet";
   }
 
-  function renderPerformanceCards(last = {}) {
+  function renderPerformanceCards(last = {}, detail = generationSource(last.generation_source)) {
     $("perf-generation").textContent = rate(last.generation_tps);
-    $("perf-generation-detail").textContent = generationSource(last.generation_source);
+    $("perf-generation-detail").textContent = detail;
     $("perf-first").textContent = duration(last.server_first_token_ms);
     $("perf-total").textContent = duration(last.server_duration_ms);
     $("perf-prompt").textContent = rate(last.prompt_tps);
@@ -90,12 +101,12 @@
     $("perf-reuse").textContent = valid(last.reused) && last.prompt_tokens > 0 ? `${fmt(100 * last.reused / last.prompt_tokens)}%` : "–";
   }
 
-  function renderResources(memory) {
+  function renderResources(memory, missing = "–") {
     const pressure = {1: "Normal", 2: "Warning", 4: "Critical"}[memory.pressure_level] || "Not reported";
     const bits = [
-      ["Available RAM", valid(memory.available_bytes) ? `${gb(memory.available_bytes)} GiB` : "–"],
+      ["Available RAM", valid(memory.available_bytes) ? `${gb(memory.available_bytes)} GiB` : missing],
       ["Model RSS", valid(memory.model_rss_bytes) ? `${gb(memory.model_rss_bytes)} GiB` : "Not reported"],
-      ["System swap", valid(memory.swap_used_bytes) ? `${gb(memory.swap_used_bytes, 2)} GiB` : "–"],
+      ["System swap", valid(memory.swap_used_bytes) ? `${gb(memory.swap_used_bytes, 2)} GiB` : missing],
       ["New swap this run", valid(memory.new_swap_bytes) ? `${gb(memory.new_swap_bytes, 2)} GiB` : "Not reported"],
       ["Memory pressure", pressure],
     ];
@@ -120,12 +131,24 @@
     $("req-body").innerHTML = rows.length ? rows.slice(0, 30).map(requestRow).join("") : '<tr><td colspan="8" class="muted">Your first completed request will appear here.</td></tr>';
   }
 
+  // An older or degraded backend omits the performance block. Replace every
+  // earlier value, so another backend's measurements never appear current.
+  function renderUnavailable(rows) {
+    $("perf-mode").textContent = "Performance data unavailable";
+    renderPerformanceCards({}, "Not reported by this backend");
+    renderResources({}, "Not reported");
+    $("perf-settings").textContent = "This backend reports no performance settings or server timings. Earlier recorded requests stay in this browser's history.";
+    // Keep the current rows' identity and token counts; timing columns are unknown.
+    renderRequests(rows.map(({time, finish, prompt_tokens, output_tokens, reused}) => ({time, finish, prompt_tokens, output_tokens, reused})));
+    renderHistory(false);
+  }
+
   function installPerformanceRender() {
     const originalRender = render;
     render = (metrics) => {
       originalRender(metrics);
       latest = metrics.performance || null;
-      if (!latest) { $("perf-mode").textContent = "Performance data unavailable"; return; }
+      if (!latest) { renderUnavailable(metrics.requests || []); return; }
       const rows = metrics.requests || [], last = rows[0], settings = latest.settings || {};
       $("perf-mode").textContent = performanceMode(latest.measurement_kind, last);
       recordRequests(rows, metrics.engine?.model || "unknown", settings);
@@ -133,15 +156,16 @@
       renderResources(latest.resources || {});
       renderPerformanceSettings(metrics, settings);
       renderRequests(rows);
+      renderHistory(true);
     };
   }
 
-  function metricsExport() {
-    const current = lastMetrics.performance;
+  // Without a current block, export only the explicitly historical records.
+  function metricsExport(current) {
     return {
       schema: 1, exported_at: new Date().toISOString(),
-      performance: {schema: 1, measurement_kind: current.measurement_kind, settings: onlySettings(current.settings), resources: current.resources, scope: current.scope},
-      requests: (lastMetrics.requests || []).map(onlyRequest),
+      performance: current ? {schema: 1, measurement_kind: current.measurement_kind, settings: onlySettings(current.settings), resources: current.resources, scope: current.scope} : null,
+      requests: current ? (lastMetrics.requests || []).map(onlyRequest) : [],
       recorded_requests: recorded.map((row) => ({...onlyRequest(row), model: row.model, settings: onlySettings(row.settings)})),
       browser_timings: messages.filter((message) => message.performanceTiming).map((message) => onlyTiming(message.performanceTiming)),
     };
@@ -149,8 +173,9 @@
 
   function installMetricsExport() {
     $("perf-export").onclick = () => {
-      if (!lastMetrics?.performance) { toast("info", "No metrics yet"); return; }
-      const url = URL.createObjectURL(new Blob([JSON.stringify(metricsExport(), null, 2)], {type: "application/json"}));
+      const current = lastMetrics?.performance;
+      if (!lastMetrics || (!current && !hasHistory())) { toast("info", "No metrics yet"); return; }
+      const url = URL.createObjectURL(new Blob([JSON.stringify(metricsExport(current), null, 2)], {type: "application/json"}));
       const link = document.createElement("a");
       link.href = url; link.download = `strata-metrics-${Date.now()}.json`; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);

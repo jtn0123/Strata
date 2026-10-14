@@ -16,9 +16,35 @@ test("a successful new telemetry response recovers connection state", () => {
   state.receive({}, 100);
   state.status("error", "Server not reachable");
   state.receive({}, 200);
-  assert.equal(state.status("idle", "Idle").label, "Ready");
+  assert.equal(state.status("idle", "Idle", 300).label, "Ready");
   assert.equal(state.problem, "");
   assert.equal(state.updatedAt, 200);
+});
+
+test("a sample older than the freshness window is stale until a new sample arrives", () => {
+  const state = new StrataUIState(), sample = {}, fresh = StrataUIState.TELEMETRY_FRESH_MS;
+  assert.equal(state.staleReason(10 * fresh), "", "nothing expires before the first sample");
+  state.receive(sample, 1000);
+  assert.equal(state.status("idle", "Idle", 1000 + fresh).label, "Ready", "the window boundary is still current");
+  assert.deepEqual(state.status("generating", "Generating · 12 tok/s", 1001 + fresh),
+    {state: "stale", label: "Not updating", announcement: `No new readings for over ${fresh / 1000} seconds`});
+  state.receive(sample, 2000 + fresh);
+  assert.equal(state.status("idle", "Idle", 2000 + fresh).state, "stale", "a cached render is not a new sample");
+  state.receive({}, 2000 + fresh);
+  assert.equal(state.status("idle", "Idle", 2000 + fresh).label, "Ready");
+  assert.equal(state.staleReason(2000 + fresh), "");
+});
+
+test("a reported connection error outranks an expired sample", () => {
+  const state = new StrataUIState(), fresh = StrataUIState.TELEMETRY_FRESH_MS;
+  state.receive({}, 1000);
+  assert.equal(state.status("error", "Server not reachable", 2000 + fresh).label, "Offline");
+  assert.equal(state.staleReason(2000 + fresh), "Server not reachable");
+});
+
+test("the metrics deadline ends before an on-time slow reply could expire a sample", () => {
+  // One pinned poll wait (1 s) plus a full deadline must stay inside the window.
+  assert.ok(1000 + StrataUIState.METRICS_TIMEOUT_MS < StrataUIState.TELEMETRY_FRESH_MS);
 });
 
 test("API key failures are retained separately from offline errors", () => {

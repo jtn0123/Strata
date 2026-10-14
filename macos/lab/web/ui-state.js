@@ -1,5 +1,12 @@
 "use strict";
 
+// The pinned Monitor polls /metrics once a second and schedules the next poll
+// only after a reply settles. A reply still pending after this is abandoned.
+const STRATA_METRICS_TIMEOUT_MS = 5000;
+// Older samples are shown as stale. This exceeds one poll wait plus one full
+// deadline (6 s), so only a failed or abandoned poll can expire a sample.
+const STRATA_TELEMETRY_FRESH_MS = 10000;
+
 // A cached tab render must not make failed telemetry look like a fresh sample.
 class StrataUIState {
   constructor() { this.metrics = null; this.problem = ""; this.updatedAt = 0; }
@@ -10,11 +17,20 @@ class StrataUIState {
       this.updatedAt = now;
     }
   }
-  status(state, text) {
+  // Why the shown readings are not current, or "" while they are. Before the
+  // first sample there is nothing to expire.
+  staleReason(now = Date.now()) {
+    if (this.problem) return this.problem;
+    const expired = this.updatedAt > 0 && now - this.updatedAt > STRATA_TELEMETRY_FRESH_MS;
+    return expired ? `No new readings for over ${STRATA_TELEMETRY_FRESH_MS / 1000} seconds` : "";
+  }
+  status(state, text, now = Date.now()) {
     if (state === "error") this.problem = text;
     if (this.problem) {
       return {state: "error", label: /API key/i.test(this.problem) ? "Key needed" : "Offline", announcement: this.problem};
     }
+    const stale = this.staleReason(now);
+    if (stale) return {state: "stale", label: "Not updating", announcement: stale};
     const announcement = {idle: "Ready", reading: "Reading prompt", generating: "Generating answer", queued: "Requests queued"}[state] || text;
     return {state, label: state === "idle" ? "Ready" : text, announcement};
   }
@@ -141,10 +157,34 @@ class StrataSharedSettings {
   }
 }
 
-// Install before app.js so its optional ?q= shortcut is covered too.
+// Bound one /metrics reply, including its body, so a stalled response cannot stop
+// the pinned poll loop. A caller's own signal still cancels it with its reason.
+async function strataMetricsResponse(fetcher, resource, options = {}) {
+  const deadline = new window.AbortController(), caller = options.signal;
+  const stopped = new Promise((resolve, reject) => {
+    deadline.signal.addEventListener("abort", () => reject(deadline.signal.reason), {once: true});
+  });
+  const cancel = () => deadline.abort(caller.reason);
+  if (caller?.aborted) cancel(); else caller?.addEventListener("abort", cancel, {once: true});
+  const timer = window.setTimeout(() => deadline.abort(new DOMException(
+    `Telemetry did not answer within ${STRATA_METRICS_TIMEOUT_MS / 1000} seconds.`, "TimeoutError")), STRATA_METRICS_TIMEOUT_MS);
+  try {
+    // Racing also settles if a fetch implementation ignores the signal.
+    const response = await Promise.race([fetcher(resource, {...options, signal: deadline.signal}), stopped]);
+    const body = response.body ? await Promise.race([response.arrayBuffer(), stopped]) : null;
+    return new Response(body, {status: response.status, statusText: response.statusText, headers: response.headers});
+  } finally {
+    window.clearTimeout(timer);
+    caller?.removeEventListener("abort", cancel);
+  }
+}
+
+// Install before app.js so its optional ?q= shortcut is covered too. Only
+// /metrics has a deadline: completion streams may wait through long prompt reading.
 if (typeof window !== "undefined") {
   const strataFetch = window.fetch.bind(window);
   window.fetch = async (resource, options) => {
+    if (resource === "/metrics") return strataMetricsResponse(strataFetch, resource, options);
     const response = await strataFetch(resource, options);
     return resource === "/v1/chat/completions" && options?.method === "POST"
       ? strataCompletionResponse(response, options.signal) : response;
@@ -161,4 +201,6 @@ if (typeof module !== "undefined") {
   module.exports.chatMarkdown = strataChatMarkdown;
   module.exports.integerError = strataIntegerError;
   module.exports.SharedSettings = StrataSharedSettings;
+  module.exports.METRICS_TIMEOUT_MS = STRATA_METRICS_TIMEOUT_MS;
+  module.exports.TELEMETRY_FRESH_MS = STRATA_TELEMETRY_FRESH_MS;
 }
