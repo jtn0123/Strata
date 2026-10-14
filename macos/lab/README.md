@@ -4,6 +4,10 @@
 
 The maintained [Mac web interface](web/README.md) adds prompt shortcuts, responsive light/dark layouts and keyboard-accessible settings over the pinned API shell. It hides unavailable GPU readings instead of implying they are zero. Preview it without loading a model using `.venv/bin/python scripts/strata_server.py --engine mock --port 8116` from this directory. Mock response speeds are not benchmarks.
 
+The [latest bug and polish pass](bench/research/20261013-bug-polish/REPORT.md) corrects launcher shutdown, failed-request telemetry, benchmark acceptance and chat/settings behavior. It preserves partial interrupted replies, identifies files that need reattaching after reload and keeps wide replies within narrow screens. This pass adds no new model-speed claim.
+
+[Code quality checks](QUALITY.md) document the maintained scope and commands for Ruff, mypy and ESLint. CI enforces these alongside coverage, offline, termination, socket and browser regression checks. Maintenance is Mac-only; inherited PC code is retained outside this scope. Model performance has separate validation.
+
 ## Maintained profiles
 
 `Start Strata.command` runs the balanced P07 profile. `Start Strata - Code Editing.command` uses confirmed lookup plus MTP for edits to supplied files. Both verify provenance and use the strict app memory policy. [Adoption decisions and validation](bench/PERMANENT-PROFILES.md).
@@ -57,6 +61,16 @@ No login service or system-wide Python packages are installed. Native and Strata
 For the complete optional M5 engine/helper/diagnostic chain, use [the ordered preparation recipe](bench/M5-PREPARATION-RECIPE.md). It distinguishes CPU builds and saved-data checks from model/GPU execution, and documents the current external-library policy and remaining fresh-directory validation.
 
 Prerequisites: native ARM64 macOS, Apple's Command Line Tools, Python 3 and `uv`. The build embeds Metal source for runtime compilation, so the standalone Metal compiler is not required for this initial path. This does not establish that every optional Metal 4 tensor optimization is enabled.
+
+Provisioning installs the frozen development quality tools into the lab environment
+alongside its existing runtime packages, so the mandatory offline inventory can
+run its coverage contracts. To update an already provisioned environment without
+rebuilding native code:
+
+```sh
+uv pip install --python .venv/bin/python --only-binary :all: --require-hashes -r requirements-quality.lock
+.venv/bin/python scripts/validate_offline.py
+```
 
 ```sh
 uv run --python 3.12 --no-project python scripts/provision.py --jobs 1

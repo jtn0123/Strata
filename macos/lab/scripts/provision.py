@@ -10,6 +10,7 @@ import subprocess
 from engines import verify_engine, write_receipt
 
 ROOT = Path(__file__).resolve().parents[1]
+LAB_PYTHON = ".venv/bin/python"
 
 
 def run(command):
@@ -31,7 +32,7 @@ def preflight():
     for key, directory in (("llama_cpp", "llama.cpp"), ("strata_macos", "Strata-macOS")):
         path = ROOT / "vendor" / directory
         if path.exists(): source_check(path, runtime[key])
-    python = ROOT / ".venv/bin/python"
+    python = ROOT / LAB_PYTHON
     if (ROOT / ".venv").exists():
         if not python.is_file(): raise RuntimeError("Existing .venv has no Python executable; preserve it and use a fresh lab")
         version = subprocess.check_output([python, "-c", "import sys; print('%d.%d' % sys.version_info[:2])"], text=True).strip()
@@ -56,7 +57,10 @@ def main(argv=None):
         raise RuntimeError("Install uv before provisioning this lab")
     if not (ROOT / ".venv").exists():
         run([uv, "venv", "--python", "3.12", ".venv"])
-    run([uv, "pip", "install", "--python", ".venv/bin/python", "-r", "requirements.txt"])
+    run([uv, "pip", "install", "--python", LAB_PYTHON, "-r", "requirements.txt"])
+    # The maintained offline inventory includes the coverage gate contracts.
+    run([uv, "pip", "install", "--python", LAB_PYTHON, "--only-binary", ":all:",
+         "--require-hashes", "-r", "requirements-quality.lock"])
     for key, directory in [("llama_cpp", "llama.cpp"), ("strata_macos", "Strata-macOS")]:
         path = ROOT / "vendor" / directory
         source = runtime[key]

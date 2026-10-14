@@ -12,7 +12,7 @@ import subprocess
 import time
 
 from benchmark import Monitor, stream_completion, wait_ready
-from benchmark_metrics import case_metrics, metrics
+from benchmark_metrics import case_metrics, completion_counts, metrics
 from benchmark_signals import cleanup_on_termination, defer_termination
 from benchmark_m5_small_gains import feature_receipts, launch_row
 from benchmark_m5_next import wait_for_headroom
@@ -97,6 +97,7 @@ def validate_response(response, case=None):
         if response['text'].strip() != expected.strip():
             raise ValueError(f"Complete verbatim edit failed: {case['name']}")
     timings = final['timings']
+    completion_counts(timings, ids, max_new=MAX_OUTPUT)
     result = dict(ttft_s=response['ttft_s'], wall_s=response['wall_s'],
                   generation_tok_s=timings['predicted_per_second'], prompt_tok_s=timings['prompt_per_second'],
                   output_tokens=timings['predicted_n'], response=response)

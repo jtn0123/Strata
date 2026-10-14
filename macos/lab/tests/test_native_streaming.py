@@ -55,6 +55,32 @@ class PieceCacheTests(unittest.TestCase):
             for ids in ([1], [1, 2], [2, 1], [2, 1, 3], [], [1], [1, 1], [1, 1], [0, 0, 0]):
                 self.assertEqual(tok.decode(ids), self.native("local", "/detokenize", {"tokens": ids})["content"])
 
+    def test_errors_keyword_preserves_native_text_policy_for_both_cache_modes(self):
+        ids = [1, 4, 5, 6, 7, 2]
+        for cache in (False, True):
+            for errors in ("replace", "strict", "ignore", "fixture-policy", None, {}, object()):
+                with self.subTest(cache=cache, errors=errors), \
+                        patch("native_backend.request", side_effect=self.native):
+                    tokenizer = NativeTokenizer("local", piece_cache=cache)
+                    for n in range(len(ids) + 1):
+                        prefix = ids[:n]
+                        expected = self.native("local", "/detokenize", {"tokens": prefix})["content"]
+                        self.assertEqual(tokenizer.decode(iter(prefix), errors=errors), expected)
+
+    def test_cache_byte_eviction_and_oversized_piece_keep_exact_text(self):
+        self.pieces.update({20: b"a" * 600_000, 21: b"b" * 600_000,
+                            22: b"c" * (1024 * 1024)})
+        with patch("native_backend.request", side_effect=self.native):
+            tokenizer = NativeTokenizer("local", piece_cache=True)
+            self.assertEqual(tokenizer.decode([20]), "a" * 600_000)
+            self.assertEqual(tokenizer.decode([20, 21]), "a" * 600_000 + "b" * 600_000)
+            self.assertEqual(list(tokenizer.pieces), [21])
+            self.assertEqual(tokenizer.piece_bytes, 600_064)
+            self.assertEqual(tokenizer.decode([20, 21, 22]),
+                             "a" * 600_000 + "b" * 600_000 + "c" * (1024 * 1024))
+            self.assertEqual(list(tokenizer.pieces), [21])
+            self.assertEqual(tokenizer.piece_bytes, 600_064)
+
     def test_cache_bound_and_eviction_preserve_text(self):
         self.pieces.update({t: b"x" for t in range(20, 4120)})
         with patch("native_backend.request", side_effect=self.native):

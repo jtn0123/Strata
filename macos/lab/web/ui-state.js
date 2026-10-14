@@ -36,7 +36,129 @@ class StrataRequestTiming {
   end() { this.message = null; this.started = null; }
 }
 
+class StrataChatUndo {
+  constructor(cleared) { this.cleared = cleared; }
+  restore(current, busy, restore) {
+    if (busy || current !== this.cleared || current.length) return false;
+    restore();
+    return true;
+  }
+}
+
+// The pinned chat reader accepts EOF without checking its terminal SSE record.
+// Watch only that response; keep the bytes and AbortError behavior unchanged.
+class StrataSSECompletion {
+  constructor() { this.decoder = new TextDecoder(); this.pending = ""; this.terminal = false; }
+  receive(bytes) {
+    this.pending += this.decoder.decode(bytes, {stream: true});
+    let newline;
+    while ((newline = this.pending.indexOf("\n")) >= 0) {
+      this.line(this.pending.slice(0, newline));
+      this.pending = this.pending.slice(newline + 1);
+    }
+  }
+  line(line) {
+    if (!line.trim().startsWith("data:")) return;
+    const data = line.trim().slice(5).trim();
+    if (data === "[DONE]") { this.terminal = true; return; }
+    try {
+      const packet = JSON.parse(data);
+      if (packet.error || packet.choices?.some((choice) => typeof choice.finish_reason === "string" && choice.finish_reason)) this.terminal = true;
+    } catch { /* the original parser owns malformed records */ }
+  }
+  end() {
+    this.pending += this.decoder.decode();
+    this.line(this.pending);
+    if (!this.terminal) throw new Error("The connection ended before the answer finished. Any partial response is kept; retry when the server is ready.");
+  }
+}
+
+function strataCompletionResponse(response, signal) {
+  if (!response.ok || !response.body || !response.headers.get("Content-Type")?.includes("text/event-stream")) return response;
+  const reader = response.body.getReader(), completion = new StrataSSECompletion();
+  const stream = new ReadableStream({
+    async pull(controller) {
+      try {
+        const {value, done} = await reader.read();
+        if (done) {
+          if (signal?.aborted) throw new DOMException("The request was stopped.", "AbortError");
+          completion.end();
+          controller.close();
+          reader.releaseLock();
+        } else {
+          completion.receive(value);
+          controller.enqueue(value);
+        }
+      } catch (error) {
+        controller.error(error);
+        await reader.cancel().catch(() => {});
+        reader.releaseLock();
+      }
+    },
+    cancel(reason) { return reader.cancel(reason); },
+  });
+  return new Response(stream, {status: response.status, statusText: response.statusText, headers: response.headers});
+}
+
+function strataUnavailableFiles(messages) {
+  return messages.flatMap((message) => (message.files || []).filter((file) => file.text == null));
+}
+
+function strataChatMarkdown(messages, model) {
+  return messages.map((message) => {
+    if (message.role !== "user") {
+      const reasoning = message.reasoning ? `<details><summary>Thinking</summary>\n\n${message.reasoning}\n\n</details>\n\n` : "";
+      const interruption = message.text && message.error ? `\n\nRequest interrupted: ${message.error}` : "";
+      return `## ${model}\n\n${reasoning}${message.text || message.error || ""}${interruption}\n`;
+    }
+    const files = (message.files || []).map((file) => {
+      if (file.text == null) return `Attachment: ${file.name} — contents unavailable after reload; reattach to use them again.`;
+      const fence = "`".repeat(Math.max(2, ...(file.text.match(/`+/g) || []).map((part) => part.length)) + 1);
+      return `File: ${file.name}\n${fence}\n${file.text}\n${fence}`;
+    });
+    return `## You\n\n${[message.text, ...files].filter(Boolean).join("\n\n")}\n`;
+  }).join("\n");
+}
+
+function strataIntegerError(value, label) {
+  return value.trim() && (!Number.isSafeInteger(Number(value)) || Number(value) <= 0)
+    ? `${label} must be a positive whole number, or leave it empty.` : "";
+}
+
+class StrataSharedSettings {
+  request = 0;
+  revision = 0;
+  edited() { this.revision++; }
+  invalidate() { this.request++; }
+  async load(read, write, fail = () => {}) {
+    const request = ++this.request, revision = this.revision;
+    try {
+      const value = await read();
+      if (request === this.request) write(value, revision === this.revision);
+    } catch (error) {
+      if (request === this.request) fail(error);
+    }
+  }
+}
+
+// Install before app.js so its optional ?q= shortcut is covered too.
+if (typeof window !== "undefined") {
+  const strataFetch = window.fetch.bind(window);
+  window.fetch = async (resource, options) => {
+    const response = await strataFetch(resource, options);
+    return resource === "/v1/chat/completions" && options?.method === "POST"
+      ? strataCompletionResponse(response, options.signal) : response;
+  };
+}
+
 if (typeof module !== "undefined") {
   module.exports = StrataUIState;
   module.exports.RequestTiming = StrataRequestTiming;
+  module.exports.ChatUndo = StrataChatUndo;
+  module.exports.SSECompletion = StrataSSECompletion;
+  module.exports.completionResponse = strataCompletionResponse;
+  module.exports.unavailableFiles = strataUnavailableFiles;
+  module.exports.chatMarkdown = strataChatMarkdown;
+  module.exports.integerError = strataIntegerError;
+  module.exports.SharedSettings = StrataSharedSettings;
 }

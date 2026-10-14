@@ -108,6 +108,22 @@ class M5Tests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 configure({}, "mtp-mma", **kwargs)
 
+    def test_setting_errors_precede_engine_errors_and_environment_reads(self):
+        class UnreadableEnvironment(dict):
+            def items(self): raise AssertionError("Invalid settings must not read the environment")
+        inherited = UnreadableEnvironment()
+        cases = (
+            ("baseline", "unknown", "head4", "Unknown Metal experiment setting"),
+            ("baseline", "auto", "unknown", "Unknown Metal experiment setting"),
+            ("baseline", "auto", "head4", "GPU tuning and timing diagnostics require an isolated M5 engine"),
+            ("m5-lab", "auto", "copy-v4", "Copy kernels require the isolated m5-copy engine"),
+            ("m5-copy", "auto", "head4", "Vocabulary head tiling requires the isolated m5-head engine"),
+        )
+        for engine, api, tuning, message in cases:
+            with self.subTest(engine=engine, api=api, tuning=tuning):
+                with self.assertRaisesRegex(ValueError, message):
+                    configure(inherited, engine, api, tuning)
+
     def test_copy_modes_require_the_copy_engine_and_strip_inherited_trace(self):
         for mode, width in (("copy-scalar", "1"), ("copy-v4", "4"), ("copy-v8", "8")):
             for engine in ("baseline", "mtp-mma", "m5-lab", "m5-trace", "m5-correctness"):
@@ -131,6 +147,21 @@ class M5Tests(unittest.TestCase):
                     server_command("flash", spec="draft-mtp", draft_p_min=value)
             with self.assertRaises(ValueError):
                 server_command("flash", draft_p_min=0.2)
+
+    def test_helper_keyword_defaults_and_unknown_keys_preserve_binding(self):
+        positional = ("small", 8123, 4096, 512, 128, "none", 3, "f16", 8, "gpu", "mtp", "baseline")
+        with patch("lab.model_path", return_value=Path("unused.gguf")) as model, \
+                patch("engines.engine_binary", return_value=Path("unused-engine")) as engine:
+            implicit = server_command(*positional)
+            explicit = server_command(*positional, draft_threads=None, draft_p_min=None)
+            self.assertEqual(implicit, explicit)
+            self.assertEqual(implicit[implicit.index("--port") + 1], "8123")
+            engine.reset_mock(); model.reset_mock()
+            unsupported = {"unsupported_helper": 1, "draft_p_min": -1}
+            call = lambda: server_command(*positional, **unsupported)
+            with self.assertRaisesRegex(TypeError, "unexpected keyword argument 'unsupported_helper'"):
+                call()
+            engine.assert_not_called(); model.assert_not_called()
 
     def test_draft_caps_require_the_isolated_engine_and_do_not_leak(self):
         inherited = {"GGML_M5_LAB_DRAFT_CAP": "1", "GGML_M5_LAB_DRAFT_TRACE": "1",

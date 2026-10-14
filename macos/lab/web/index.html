@@ -41,6 +41,7 @@
 <div class="connection-banner" id="connection-banner" hidden>
   <svg class="st-icon st-icon--sm" aria-hidden="true"><use href="/web/sprite.svg#i-error"/></svg>
   <span id="connection-message"></span>
+  <button class="st-btn st-btn--secondary" id="connection-settings" type="button" hidden>Open settings</button>
 </div>
 
 <main>
@@ -73,7 +74,7 @@
       <form class="st-composer" id="composer">
         <div class="attachments" id="attachments" hidden></div>
         <label class="composer-label" for="input">Your message</label>
-        <textarea id="input" rows="2" placeholder="What are you working on?"></textarea>
+        <textarea id="input" rows="2" aria-label="Your message" placeholder="What are you working on?"></textarea>
         <div class="st-composer__bar">
           <button type="button" class="st-btn st-btn--icon" id="attach-btn" title="Attach a text file (or drop it here)" aria-label="Attach a file">
             <svg class="st-icon"><use href="/web/sprite.svg#i-attach"/></svg></button>
@@ -213,24 +214,24 @@
     </div>
     <div class="st-field">
       <label class="st-label" for="s-temp">Temperature <output id="o-temp"></output></label>
-      <input class="st-slider" type="range" id="s-temp" min="0" max="1.5" step="0.05">
+      <input class="st-slider" type="range" id="s-temp" aria-label="Temperature" min="0" max="1.5" step="0.05">
       <span class="muted small">0 = always the most likely word (exact, repeatable)</span>
     </div>
     <div class="st-field">
       <label class="st-label" for="s-topp">Top-p <output id="o-topp"></output></label>
-      <input class="st-slider" type="range" id="s-topp" min="0.05" max="1" step="0.05">
+      <input class="st-slider" type="range" id="s-topp" aria-label="Top-p" min="0.05" max="1" step="0.05">
     </div>
     <div class="st-field">
       <label class="st-label" for="s-topk">Top-k <output id="o-topk"></output></label>
-      <input class="st-slider" type="range" id="s-topk" min="1" max="64" step="1">
+      <input class="st-slider" type="range" id="s-topk" aria-label="Top-k" min="1" max="64" step="1">
     </div>
     <div class="st-field">
       <label class="st-label" for="s-max">Max tokens <output>empty = until done</output></label>
-      <input class="st-input" id="s-max" type="number" min="1" step="1" placeholder="Until done">
+      <input class="st-input" id="s-max" type="number" aria-label="Max tokens" min="1" step="1" placeholder="Until done">
     </div>
     <div class="st-field">
       <label class="st-label" for="s-seed">Seed <output>empty = random</output></label>
-      <input class="st-input" id="s-seed" type="number" min="1" step="1" placeholder="Random">
+      <input class="st-input" id="s-seed" type="number" aria-label="Seed" min="1" step="1" placeholder="Random">
     </div>
     <div class="toggle-row"><span>Show thinking<br><span class="muted small">expanded while it streams</span></span>
       <button class="st-toggle" id="s-show" role="switch" aria-checked="true" aria-label="Show thinking"></button></div>
@@ -240,6 +241,7 @@
     <div class="toggle-row"><span>Use for other apps too<br><span class="muted small">omp and other API clients get
       these settings for anything they don't set themselves</span></span>
       <button class="st-toggle" id="s-share" role="switch" aria-checked="false" aria-label="Use for other apps too"></button></div>
+    <output class="muted small shared-status" id="shared-status" aria-live="polite" aria-atomic="true"></output>
     <div class="drawer-actions">
       <button class="st-btn st-btn--secondary" id="s-reset" type="button">Reset</button>
       <button class="st-btn st-btn--primary" id="s-apply" type="button">Apply</button>
@@ -248,8 +250,8 @@
 </aside>
 <div class="scrim" id="scrim" hidden></div>
 <div class="st-toasts" id="toasts" aria-live="polite"></div>
-<script src="/web/app.js"></script>
 <script src="/web/ui-state.js"></script>
+<script src="/web/app.js"></script>
 <script src="/web/mac.js"></script>
 <script src="/web/performance.js"></script>
 </body>

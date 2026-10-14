@@ -2,6 +2,8 @@
 
 This fork starts from Niko1221/Strata commit `82f46a8c8f475f001ad76d92f58f4a4f8ffb0253` (v0.1.40.1). The `main` branch tracks that parent checkpoint. Mac work lives on `mac-m5-lab`, under [macos/lab](macos/lab/README.md).
 
+The October 13 UI, metrics and optional long-document work is merged through [PR 3](https://github.com/jtn0123/Strata/pull/3). The subsequent [bug and polish pass](macos/lab/bench/research/20261013-bug-polish/REPORT.md) covers shutdown ownership, truthful failure metrics, benchmark receipts and chat/settings/layout behavior. It adds no new TPS claim; the dated performance results below retain their original workload scopes.
+
 ## Current checkpoint — October 10, 2026
 
 The accumulated Mac experiment work is committed locally and imported through Git subtree. The normal no-argument launcher now selects the validated P07 exact ten-expert reduction with the shared packed Q3 helper, mixed placement, eight workers, maximum draft depth three, Tensor API on, 4K context, F16 KV and batch/ubatch 512. Previously measured short-prompt/256-output generation is **60.08 TPS English code / 40.38 TPS English prose**. Longer-prompt safety measurements are separate. [Rollout, exact output checks, memory evidence and rollback](macos/lab/bench/results/20261010-small-gains-stack/REPORT.md).

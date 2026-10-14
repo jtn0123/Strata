@@ -1,17 +1,24 @@
 #!/usr/bin/env python3
 """Stop only this lab's recorded supervisor, allowing it to release both servers."""
+
 import json
 import signal
 import psutil
+from typing import TypedDict
 from lab import ROOT
 
 
-def main():
+class ActiveSupervisor(TypedDict):
+    pid: int
+    create_time: float
+
+
+def main() -> None:
     path = ROOT / "bench/runtime/active.json"
     if not path.exists():
         print("No running Strata lab is recorded.")
         return
-    saved = json.loads(path.read_text())
+    saved: ActiveSupervisor = json.loads(path.read_text())
     try:
         process = psutil.Process(saved["pid"])
     except psutil.NoSuchProcess:
@@ -21,7 +28,10 @@ def main():
     if abs(process.create_time() - saved["create_time"]) > 0.01:
         raise RuntimeError("Recorded process was replaced; refusing to signal an unrelated process")
     command = process.cmdline()
-    if not any(arg in ("scripts/run.py", str(ROOT / "scripts/run.py")) for arg in command):
+    supervisors = {
+        form for name in ("run.py", "runtime_profiles.py") for form in ("scripts/" + name, str(ROOT / "scripts" / name))
+    }
+    if not any(arg in supervisors for arg in command):
         raise RuntimeError("Recorded process is not this lab's supervisor")
     if process.cwd() != str(ROOT):
         raise RuntimeError("Recorded process belongs to another workspace")

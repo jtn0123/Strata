@@ -1,5 +1,7 @@
 """Exercise launch/exit pressure and failed telemetry without loading a model."""
 from pathlib import Path
+import importlib.util
+import json
 import sys
 import tempfile
 from types import SimpleNamespace
@@ -8,15 +10,96 @@ from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from benchmark import Monitor
+from memory_monitor import wait_ready
 
 
 class MonitorTests(unittest.TestCase):
+    def test_runtime_monitor_import_does_not_require_either_benchmark_driver(self):
+        path = Path(__file__).resolve().parents[1] / 'scripts/memory_monitor.py'
+        spec = importlib.util.spec_from_file_location('standalone_memory_monitor', path)
+        module = importlib.util.module_from_spec(spec)
+        with patch.dict(sys.modules, {'benchmark': None, 'benchmark_cache': None}):
+            spec.loader.exec_module(module)
+        self.assertEqual(module.Monitor.__module__, 'standalone_memory_monitor')
+        self.assertEqual(Monitor.__module__, 'memory_monitor')
+
+    def test_ready_retry_keeps_bounded_health_probes_and_elapsed_scope(self):
+        child = Mock()
+        child.poll.return_value = None
+        with patch('memory_monitor.request', side_effect=[OSError('fixture loading'), {'status': 'ok'}]) as health, \
+                patch('memory_monitor.time.monotonic', side_effect=[0, 0, 1, 2]), \
+                patch('memory_monitor.time.sleep') as pause:
+            self.assertEqual(wait_ready(child, 'http://127.0.0.1:1', timeout=3), 2)
+        self.assertEqual(health.call_count, 2)
+        self.assertTrue(all(call.args == ('http://127.0.0.1:1', '/health') and call.kwargs == {'timeout': 2}
+                            for call in health.call_args_list))
+        pause.assert_called_once_with(.25)
+
     def monitor(self, folder):
         child = Mock(pid=123)
         child.poll.return_value = 0
         baseline = {"swap_used_bytes": 0, "available_bytes": 8*1024**3}
         return Monitor(child, Path(folder)/"memory.jsonl", 128*1024**2,
                        baseline=baseline), child
+
+    def run_headroom_frames(self, frames, *, normal_pressure=False, swap_budget=128*1024**2):
+        clock = {'now': 0}
+        current = {'swap': 0, 'pressure': 1}
+        samples = iter(frames)
+        def virtual_memory():
+            now, available, swap, pressure = next(samples)
+            clock['now'] = now
+            current.update(swap=swap, pressure=pressure)
+            return SimpleNamespace(available=available)
+        with tempfile.TemporaryDirectory() as folder, \
+                patch('memory_monitor.time.monotonic', side_effect=lambda: clock['now']):
+            monitor, child = self.monitor(folder)
+            child.poll.return_value = None
+            monitor.require_normal_pressure = normal_pressure
+            monitor.swap_guard_bytes = swap_budget
+            monitor.done = Mock()
+            monitor.done.is_set.side_effect = [False]*len(frames)+[True]
+            with patch('memory_monitor.psutil.Process') as proc, \
+                    patch('memory_monitor.psutil.virtual_memory', side_effect=virtual_memory), \
+                    patch('memory_monitor.psutil.swap_memory', side_effect=lambda: SimpleNamespace(used=current['swap'])), \
+                    patch('memory_monitor.psutil.disk_io_counters', return_value=None), \
+                    patch.object(Monitor, 'read_pressure_level', side_effect=lambda: current['pressure']):
+                proc.return_value.memory_info.return_value = SimpleNamespace(rss=1, vms=2)
+                monitor.run()
+            lines = [json.loads(line) for line in monitor.path.read_text().splitlines()]
+        return monitor, child, lines
+
+    def test_low_headroom_stops_only_after_more_than_four_seconds(self):
+        monitor, child, samples = self.run_headroom_frames(
+            [(1, 100, 0, 1), (5, 100, 0, 1), (5.01, 100, 0, 1)])
+        self.assertEqual([sample['elapsed_s'] for sample in samples], [1, 5, 5.01])
+        self.assertEqual((monitor.sample_count, monitor.live_samples), (3, 3))
+        self.assertEqual(monitor.done.wait.call_count, 2)
+        self.assertEqual(monitor.guard, 'Stopped: available memory stayed below 384 MiB for 4 seconds')
+        child.terminate.assert_called_once()
+        child.kill.assert_not_called()
+
+    def test_recovered_headroom_restarts_the_low_memory_timer(self):
+        monitor, child, samples = self.run_headroom_frames(
+            [(1, 100, 0, 1), (4, 4*1024**3, 0, 1), (6, 100, 0, 1),
+             (10, 100, 0, 1), (10.01, 100, 0, 1)])
+        self.assertEqual(len(samples), 5)
+        self.assertEqual(monitor.done.wait.call_count, 4)
+        self.assertEqual(monitor.live_samples, 5)
+        self.assertIn('available memory stayed below', monitor.guard)
+        child.terminate.assert_called_once()
+
+    def test_pressure_then_swap_take_precedence_over_expired_low_headroom(self):
+        for pressure, message in ((2, 'pressure level 2'), (1, 'swap grew')):
+            with self.subTest(pressure=pressure):
+                monitor, child, samples = self.run_headroom_frames(
+                    [(1, 100, 0, 1), (5.1, 100, 1, pressure)],
+                    normal_pressure=True, swap_budget=0)
+                self.assertEqual(len(samples), 2)
+                self.assertEqual(monitor.done.wait.call_count, 1)
+                self.assertIn(message, monitor.guard)
+                self.assertNotIn('available memory stayed below', monitor.guard)
+                child.terminate.assert_called_once()
 
     def test_swap_during_startup_counts_against_prelaunch_baseline(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -65,6 +148,22 @@ class MonitorTests(unittest.TestCase):
             self.assertEqual(result["swap_growth_bytes"], 60*1024**2)
             self.assertFalse(result["monitor_healthy"])
             self.assertIn("No live", result["guard"])
+
+    def test_teardown_swap_above_budget_fails_after_healthy_live_sample(self):
+        for limit, final_swap in ((0, 1), (128*1024**2, 200*1024**2)):
+            with self.subTest(limit=limit), tempfile.TemporaryDirectory() as folder:
+                monitor, child = self.monitor(folder)
+                monitor.swap_guard_bytes = limit
+                with patch("benchmark.psutil.virtual_memory", return_value=SimpleNamespace(available=4*1024**3)), \
+                     patch("benchmark.psutil.swap_memory", return_value=SimpleNamespace(used=0)), \
+                     patch("benchmark.psutil.disk_io_counters", return_value=None):
+                    monitor.sample(SimpleNamespace(rss=1, vms=1))
+                    with patch("benchmark.psutil.swap_memory", return_value=SimpleNamespace(used=final_swap)):
+                        result = monitor.finish()
+                self.assertTrue(result["monitor_healthy"])
+                self.assertEqual(result["swap_growth_bytes"], final_swap)
+                self.assertIn("swap grew", result["guard"])
+                child.terminate.assert_not_called()
 
     def test_ignored_termination_escalates_to_kill(self):
         import subprocess
