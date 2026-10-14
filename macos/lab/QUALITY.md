@@ -7,21 +7,22 @@ third-party/evidence/test classification stays intact.
 
 ## Enforced checks
 
-`config/quality_modules.json` defines 35 maintained Python targets. The checker
+`config/quality_modules.json` defines 37 maintained Python targets. The checker
 requires that scope to match mypy, validates that paths stay in Mac scripts, and
 rejects missing modules and escaping symlinks. The targets include the active
 editing, prompt-chunk and N00 prompt-operation drivers, the N00 native-log parser
 `prompt_ops.py`, the N00b segment-timer parser `segment_ops.py`, the N15 helper-overlap timeline `overlap_ops.py`,
 the N02 lookup-advice parser `advise_ops.py` and its driver `profile_advise.py`,
 the N06 MTP-state comparison `mtpstate_ops.py` and its driver `profile_mtpstate.py`,
+the N15 qualification checks `qualify_ops.py` and their driver `qualify_overlap.py`,
 the runtime-profile verifier and their shared `trial_support.py` launch/response
 helpers, and `api_requests.py`, the chat request contract checked before the pinned API shell. Critical syntax/undefined-name checks
 still cover all lab scripts and tests, including older experiment drivers.
 
 The fuller Ruff gate uses `E4,E7,E9,F,B,UP,C4,ISC,PIE,RET,PLW,C90`, with cyclomatic
 complexity at most 10. The pinned formatter uses Python 3.12 and 120-column
-wrapping. Mypy requires complete function signatures across all 35 targets;
-20 enable the additional strict checks listed in `config/mypy.ini`. Named types
+wrapping. Mypy requires complete function signatures across all 37 targets;
+21 enable the additional strict checks listed in `config/mypy.ini`. Named types
 cover model/build receipts, launch configuration, memory policy/process snapshots,
 metric evidence and workload callbacks. Dynamic JSON/vendor interfaces retain
 explicit boundaries; revision-pinned `serve`/`gguf` traversal stays external.
@@ -42,12 +43,12 @@ is not claimed as an 80-line pass. Named UI helpers and complexity are measured
 separately.
 
 Focused Python branch coverage has its own measured baseline and freshness gate:
-93.61% of lines and 87.06% of branches across the 35 targets in the N06
-MTP-state pass, with aggregate floors of 93%/87%. The N00b segment-timer pass
+93.88% of lines and 87.34% of branches across the 37 targets in the N15
+qualification pass, with aggregate floors of 93%/87%. The N00b segment-timer pass
 re-recorded every module's counts; some had not been refreshed since earlier changes. Floors are the
 recorded percentages rounded down, so each module keeps its measured per-file
 floors; the wait-diagnostic parser, `prompt_ops.py`, `segment_ops.py`, `overlap_ops.py`,
-`advise_ops.py`, `mtpstate_ops.py`, `api_requests.py` and `trial_support.py` require 100% line/branch coverage. It uses the maintained
+`advise_ops.py`, `mtpstate_ops.py`, `qualify_ops.py`, `api_requests.py` and `trial_support.py` require 100% line/branch coverage. It uses the maintained
 manifest, the native/network-denying offline inventory and source/config
 fingerprints. Line/branch floors describe this measured scope; they are not a
 whole-repository coverage claim. Node's experimental coverage currently reports

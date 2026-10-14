@@ -92,7 +92,7 @@ def wait_stop(folder: Path, offset: int, timeout_s: float = 60) -> int:
 
 
 def abort(base: str, tokens: list[int], after_s: float) -> bool:
-    """Stream a request, close the connection after after_s, and say whether any reply had arrived by then."""
+    """Stream a request, close the connection after after_s, and say whether reply data had arrived by then."""
     connection = http.client.HTTPConnection(urlsplit(base).netloc, timeout=60)
     payload = {
         "prompt": tokens,
@@ -105,11 +105,13 @@ def abort(base: str, tokens: list[int], after_s: float) -> bool:
     connection.request("POST", "/completion", json.dumps(payload), {"Content-Type": "application/json"})
     time.sleep(after_s)
     sock = connection.sock
-    # The server sends its headers with the first result, so any readable byte means a reply had started.
-    started = bool(select.select([sock], [], [], 0)[0])
+    received = b""
+    while select.select([sock], [], [], 0)[0] and (chunk := sock.recv(65536)):
+        received += chunk
     sock.shutdown(socket.SHUT_RDWR)
     connection.close()
-    return started
+    # The server sends its headers when it starts reading a streamed prompt; reply text comes as "data:" events.
+    return b"data:" in received
 
 
 def resume(base: str, case: PromptCase, tokens: list[int], fresh: str) -> Resume:
@@ -159,7 +161,7 @@ def lifecycle(folder: Path, result: JSONDict, base: str) -> None:
     started = abort(base, tokens, CANCEL_AFTER_S)
     cancelled: Cancel = {
         "after_s": CANCEL_AFTER_S,
-        "response_started": started,
+        "reply_started": started,
         "prompt_tokens": len(tokens),
         "stopped_tokens": wait_stop(folder, offset),
     }
@@ -202,11 +204,46 @@ def analyze(folder: Path) -> Bracket:
     }
 
 
+def run(output: Path) -> JSONDict:
+    assert_no_model_server()
+    require_pass()
+    output.mkdir(parents=True, exist_ok=False)
+    frozen: Frozen = {"closure": closure("m5-overlap"), "models": verify_models(["flash", "mtp_shared_packed_q3"])}
+    brackets: dict[str, Bracket] = {}
+    summary: JSONDict = {"schema": 1, "status": "running", "plan": BRACKETS, "rule": RULE, "brackets": brackets}
+    try:
+        for name, (draft_profile, chunks) in BRACKETS.items():
+            folder = output / name
+            folder.mkdir()
+            campaign(folder, CANDIDATE, draft_profile, frozen, chunks, lifecycle)
+            brackets[name] = analyze(folder)
+            write(output / "summary.json", summary)
+        summary["decision"] = decision(brackets)
+        summary["status"] = "passed"
+    except BaseException as error:
+        summary.update(status="failed", error=f"{type(error).__name__}: {error}")
+        raise
+    finally:
+        write(output / "summary.json", summary)
+    return summary
+
+
+def reanalyze(output: Path) -> JSONDict:
+    """Recompute every bracket and the decision from the saved launches; their measurements are unchanged."""
+    summary: JSONDict = json.loads((output / "summary.json").read_text())
+    summary.setdefault("recorded_decision", summary["decision"])
+    brackets = {name: analyze(output / name) for name in BRACKETS}
+    summary.update(brackets=brackets, decision=decision(brackets), recomputed=True)
+    write(output / "summary.json", summary)
+    return summary
+
+
 @cleanup_on_termination()
 def main(argv: Sequence[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--output", type=Path, required=True)
     ap.add_argument("--run", action="store_true")
+    ap.add_argument("--analyze", action="store_true", help="Recompute the summary of a finished run; no model")
     args = ap.parse_args(argv)
     for name, (draft_profile, chunks) in BRACKETS.items():
         print(
@@ -215,28 +252,12 @@ def main(argv: Sequence[str] | None = None) -> None:
             flush=True,
         )
     print("Rule:", RULE, flush=True)
-    if not args.run:
+    if args.analyze:
+        summary = reanalyze(args.output)
+    elif args.run:
+        summary = run(args.output)
+    else:
         return
-    assert_no_model_server()
-    require_pass()
-    args.output.mkdir(parents=True, exist_ok=False)
-    frozen: Frozen = {"closure": closure("m5-overlap"), "models": verify_models(["flash", "mtp_shared_packed_q3"])}
-    brackets: dict[str, Bracket] = {}
-    summary: JSONDict = {"schema": 1, "status": "running", "plan": BRACKETS, "rule": RULE, "brackets": brackets}
-    try:
-        for name, (draft_profile, chunks) in BRACKETS.items():
-            folder = args.output / name
-            folder.mkdir()
-            campaign(folder, CANDIDATE, draft_profile, frozen, chunks, lifecycle)
-            brackets[name] = analyze(folder)
-            write(args.output / "summary.json", summary)
-        summary["decision"] = decision(brackets)
-        summary["status"] = "passed"
-    except BaseException as error:
-        summary.update(status="failed", error=f"{type(error).__name__}: {error}")
-        raise
-    finally:
-        write(args.output / "summary.json", summary)
     print("N15 qualification:", json.dumps(summary["decision"], indent=2), flush=True)
 
 

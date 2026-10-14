@@ -5,7 +5,9 @@ After its timed requests, every launch of qualify_overlap.py runs these checks, 
   with the prompt cache on. A regenerate must write what its first reply wrote, the server must restore context
   checkpoints, and every launch of a bracket must write the same text and draft the same tokens;
 - cancel: a long prompt is sent with the prompt cache on, and the connection closed while the server reads it. The
-  server must stop before the end of the prompt, and before any reply arrives;
+  server must stop before the end of the prompt. It samples the first reply token only after the whole prompt, so
+  no reply existed yet. The client also records whether reply data had arrived; headers alone do not count, as the
+  server sends them when it starts reading a streamed prompt;
 - resume: the same prompt again, to completion, must pass its quality check. Every launch of a bracket must reuse
   the cancelled request's cache, or every launch must not;
 - repeat: a fresh short request must write exactly what the same request wrote earlier in that launch.
@@ -32,7 +34,7 @@ RULE = (
 
 class Cancel(TypedDict):
     after_s: float
-    response_started: bool
+    reply_started: bool
     prompt_tokens: int
     stopped_tokens: int
 
@@ -94,7 +96,7 @@ def checks(lifecycle: Lifecycle) -> dict[str, bool]:
     firsts = {t["name"]: t["content"] for t in turns if t["kind"] == "first"}
     regenerated = [t for t in turns if t["kind"] == "regenerate"]
     return {
-        "cancelled_mid_prompt": not cancel["response_started"] and cancel["stopped_tokens"] < cancel["prompt_tokens"],
+        "cancelled_mid_prompt": cancel["stopped_tokens"] < cancel["prompt_tokens"],
         "resumed": lifecycle["resume"]["quality_passed"],
         "repeat_matches": lifecycle["repeat_matches"],
         "regenerate_matches": bool(regenerated) and all(t["content"] == firsts.get(t["name"]) for t in regenerated),

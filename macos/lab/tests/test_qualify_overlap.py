@@ -23,8 +23,8 @@ def turn(name, kind, content=None, drafted=10, accepted=7):
                 drafted=drafted, accepted=accepted, content=content or f'{name} {"first" if kind == "regenerate" else kind}')
 
 
-def lifecycle(started=False, stopped=512, cache_n=512, good=True, repeat=True, restores=2, turns=None):
-    return dict(cancel=dict(after_s=0.5, response_started=started, prompt_tokens=2332, stopped_tokens=stopped),
+def lifecycle(stopped=512, cache_n=512, good=True, repeat=True, restores=2, turns=None):
+    return dict(cancel=dict(after_s=0.5, reply_started=False, prompt_tokens=2332, stopped_tokens=stopped),
                 resume=dict(prompt_n=2332 - cache_n, cache_n=cache_n, drafted=20, accepted=15, quality_passed=good,
                             matches_fresh=True),
                 repeat_matches=repeat, restores=restores,
@@ -48,7 +48,6 @@ class CheckTests(unittest.TestCase):
                                                    regenerate_matches=True, restored=True))
 
     def test_each_fault_fails_its_own_check(self):
-        self.assertFalse(checks(lifecycle(started=True))['cancelled_mid_prompt'])
         self.assertFalse(checks(lifecycle(stopped=2332))['cancelled_mid_prompt'])
         self.assertFalse(checks(lifecycle(good=False))['resumed'])
         self.assertFalse(checks(lifecycle(repeat=False))['repeat_matches'])
@@ -133,14 +132,17 @@ class DecisionTests(unittest.TestCase):
 
 
 class Connection:
-    """Records the request, the socket shutdown and the close of one abort."""
+    """Records the request, the socket shutdown and the close of one abort, and hands out what the server sent."""
 
-    def __init__(self, netloc, timeout):
-        self.netloc, self.timeout, self.events = netloc, timeout, []
+    def __init__(self, netloc, timeout, sent):
+        self.netloc, self.timeout, self.events, self.sent = netloc, timeout, [], list(sent)
         self.sock = self
 
     def request(self, method, path, body, headers):
         self.events.append((method, path, json.loads(body), headers))
+
+    def recv(self, size):
+        return self.sent.pop(0) if self.sent else b''
 
     def shutdown(self, how):
         self.events.append(('shutdown', how))
@@ -171,20 +173,23 @@ class DriverTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'did not stop'):
             driver.wait_stop(self.folder, driver.log_size(self.folder), timeout_s=0.2)
 
-    def abort(self, readable):
+    def abort(self, *sent):
         made = []
 
         def connect(netloc, timeout):
-            made.append(Connection(netloc, timeout))
+            made.append(Connection(netloc, timeout, sent))
             return made[-1]
 
+        def select(r, w, x, t):
+            return (r if made[0].sent else [], w, x)
+
         with patch.object(driver.http.client, 'HTTPConnection', side_effect=connect), \
-                patch.object(driver.select, 'select', side_effect=lambda r, w, x, t: (r if readable else [], w, x)):
+                patch.object(driver.select, 'select', side_effect=select):
             started = driver.abort('http://127.0.0.1:7/', [1, 2], 0)
         return started, made[0]
 
-    def test_abort_sends_a_cached_stream_and_reports_whether_a_reply_had_started(self):
-        started, connection = self.abort(False)
+    def test_abort_sends_a_cached_stream_and_reports_whether_reply_data_had_arrived(self):
+        started, connection = self.abort()
         self.assertFalse(started)
         self.assertEqual((connection.netloc, connection.timeout), ('127.0.0.1:7', 60))
         method, path, payload, headers = connection.events[0]
@@ -192,7 +197,9 @@ class DriverTests(unittest.TestCase):
         self.assertEqual((payload['prompt'], payload['cache_prompt'], payload['stream'], payload['n_predict']),
                          ([1, 2], True, True, driver.MAX_OUTPUT))
         self.assertEqual(connection.events[1:], [('shutdown', socket.SHUT_RDWR), 'close'])
-        self.assertTrue(self.abort(True)[0])
+        headers = b'HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\n\r\n'
+        self.assertFalse(self.abort(headers)[0])
+        self.assertTrue(self.abort(headers, b'data: {"content": "{"}\n\n')[0])
 
     def test_resume_keeps_the_cache_and_checks_quality_against_the_fresh_reply(self):
         response = dict(content='hello', timings=dict(prompt_n=1820, cache_n=512, draft_n=9, draft_n_accepted=6))
@@ -263,7 +270,7 @@ class DriverTests(unittest.TestCase):
     def test_a_launch_records_its_lifecycle_after_the_timed_requests(self):
         result, printed = self.run_lifecycle()
         checked = result['lifecycle']
-        self.assertEqual(checked['cancel'], dict(after_s=driver.CANCEL_AFTER_S, response_started=False,
+        self.assertEqual(checked['cancel'], dict(after_s=driver.CANCEL_AFTER_S, reply_started=False,
                                                  prompt_tokens=2332, stopped_tokens=512))
         self.assertEqual((checked['restores'], checked['repeat_matches'], len(checked['conversation'])), (2, True, 4))
         self.assertEqual(json.loads((self.folder / 'result.json').read_text())['lifecycle'], checked)
@@ -311,6 +318,23 @@ class DriverTests(unittest.TestCase):
         summary = json.loads((output / 'summary.json').read_text())
         self.assertEqual((summary['status'], summary['decision']['qualified']), ('passed', True))
         self.assertEqual(sorted(summary['brackets']), ['code-edit', 'default', 'long-documents'])
+
+    def test_a_finished_run_is_recomputed_from_its_saved_launches(self):
+        output = self.folder / 'out'
+        for name in driver.BRACKETS:
+            (output / name).mkdir(parents=True)
+            self.campaign_file(output / name)
+        recorded = dict(qualified=False, reasons=['default: a lifecycle check failed'])
+        (output / 'summary.json').write_text(json.dumps(dict(status='passed', decision=recorded, brackets={})))
+        for _ in range(2):
+            with redirect_stdout(io.StringIO()) as printed:
+                driver.main(['--output', str(output), '--analyze'])
+        summary = json.loads((output / 'summary.json').read_text())
+        self.assertEqual((summary['recorded_decision'], summary['recomputed'], summary['status']),
+                         (recorded, True, 'passed'))
+        self.assertTrue(summary['decision']['qualified'])
+        self.assertEqual(sorted(summary['brackets']), ['code-edit', 'default', 'long-documents'])
+        self.assertIn('"qualified": true', printed.getvalue())
 
     def test_a_failed_bracket_is_recorded_and_raised(self):
         output = self.folder / 'out'

@@ -810,3 +810,25 @@ Balanced P07 remains the normal launcher; editing lookup has a maintained dedica
 - **Decision:** the stale row is real but changed no measured draft or output; the fix is not adopted and no default changes.
 - **Revisit:** with a llama.cpp upgrade that includes PR 30141, add its checkpoint memory to that upgrade's memory check. N07 may proceed once it measures the bytes it would remove. Sampled replies, several slots, cancellation and position-0 restores were not tried.
 - **Evidence:** [report](research/20261014-n06-mtpstate/REPORT.md). Native logs, per-request rows and memory samples stay ignored under the local feature folder.
+
+### E15 — N15 qualification as an app setting (not qualified)
+
+- **What ran:** user-authorized model run of the helper overlap as an app setting, `overlap-reduce` on the `m5-overlap` engine: the kept `small-reduce` switches plus `GGML_M5_LAB_CONTEXT_QUEUE=1` and `GGML_M5_LAB_HELPER_OVERLAP=1`. It was compared against the kept engine and switches.
+  - Three A/B/B/A brackets under the E05 prompt-chunk protocol: the default app (balanced drafting, 512), the Code Editing app (code-edit drafting, 512) and the Long Documents app (balanced, 1,536).
+  - After its timed requests, every launch held chat conversations with regenerate, follow-up and edited follow-up (up to 256 tokens). It then cancelled a long streamed prompt 0.5 s after sending, resumed it with the prompt cache on, and repeated a fresh short request.
+  - The rule was fixed in `qualify_ops.py` before the run. All 12 launches passed the 34 GiB admission, normal-pressure, zero-new-swap and cleanup guards.
+- **Findings:**
+  - Long prompts at 512: first text 9.5–12.6% sooner, whole reply 8.6–11.5% sooner. At 1,536: 4.6–7.1% and 4.4–6.6%. Short prompts: first text 3.4–12.2% sooner.
+  - Every timed and chat reply and its draft counts were identical in all four launches of each app; every quality check passed.
+  - Every cancel stopped mid-prompt (1,024 of 2,332 tokens at 512, 796 at 1,536). Every resume reused those tokens and wrote the fresh answer. There were 8–12 checkpoint restores per launch, every regenerate matched its first reply, and every fresh repeat matched.
+  - Memory: peak RSS 37.86–38.72 GiB, at least 2.46 GiB available, zero swap growth.
+  - Two rows regressed in reply tok/s, each through one slow reply in an overlap launch:
+    - default long-prose replay, −4.95% against an allowed −2.06%;
+    - Long Documents python-client first exposure, −2.58% against −1%.
+
+    Slow replies (over 4% above the kept median) were as common without the overlap: 8 of 84 kept and 7 of 84 overlap replies.
+  - Replies after long prompts at 512 took a median 2.3–3.3 ms longer (N15's first-draft cost), 1.5–1.9% of an 11-token reply.
+  - The first scoring failed every launch, kept ones included, on a faulty cancel check that counted the server's early HTTP headers as a reply. The check now uses the stop point. The decision was recomputed from the saved launches and did not change.
+- **Decision:** not qualified; the app is unchanged and N15 remains a diagnostic engine.
+- **Revisit:** find and remove the first-draft cost after a long prompt, then qualify again. Before that run, fix a rule with enough replies per row that one slow reply cannot decide a row.
+- **Evidence:** [report](research/20261014-n15-qualify/REPORT.md). Native logs, per-request rows, conversation text and memory samples stay ignored under the local feature folder.
