@@ -32,7 +32,7 @@ The 60 TPS code result is a fixed-length answer to a short prompt. The 87–88 T
 
 ### Latest qualification reports
 
-- October 14: [N00 prompt-chunk operations and GPU time](bench/research/20261014-n00-prompt-ops/REPORT.md), [post-merge baseline and MTP helper pool (R0/R1)](bench/research/20261014-baseline-and-helper-pool/REPORT.md), and the [repo audit with ranked research cards](bench/research/20261014-repo-audit/REPORT.md) and its [grade report](.Codex/grade-report-20261014.md).
+- October 14: [N00b fixed per-chunk cost by part](bench/research/20261014-n00b-segments/REPORT.md), [N00 prompt-chunk operations and GPU time](bench/research/20261014-n00-prompt-ops/REPORT.md), [post-merge baseline and MTP helper pool (R0/R1)](bench/research/20261014-baseline-and-helper-pool/REPORT.md), and the [repo audit with ranked research cards](bench/research/20261014-repo-audit/REPORT.md) and its [grade report](.Codex/grade-report-20261014.md).
 - October 13: [prompt chunks (E05)](bench/research/20261013-prompt-chunks/REPORT.md), [Long Documents mode](bench/research/20261013-long-documents-mode/REPORT.md) and the [bug and polish pass](bench/research/20261013-bug-polish/REPORT.md).
 - October 10: [P07 validation and rollout](bench/results/20261010-small-gains-stack/REPORT.md).
 - Every decision, failure and retry condition: [experiment decision ledger](bench/EXPERIMENT-LEDGER.md).
@@ -41,11 +41,14 @@ The 60 TPS code result is a fixed-length answer to a short prompt. The 87–88 T
 
 As of October 14, model and GPU runs are authorized by the user, one at a time in this order.
 
-1. Done: the October 14 audit fixes and N00 (R3), which [attributes prompt-chunk time](bench/research/20261014-n00-prompt-ops/REPORT.md). The largest measured items are a per-chunk cost of about 171 ms of GPU time and 427–463 ms per long prompt of GPU idle time while the MTP helper's experts run on the CPU.
-2. N01: integrated compact expert routing from llama.cpp #30373, in an isolated clone. First locate the per-chunk cost with segment timing.
+1. Done:
+   - the October 14 audit fixes;
+   - N00 (R3), which [attributes prompt-chunk time](bench/research/20261014-n00-prompt-ops/REPORT.md). The largest measured items are a per-chunk cost of about 171 ms of GPU time and 427–463 ms per long prompt of GPU idle time while the MTP helper's experts run on the CPU;
+   - N00b, which [splits that per-chunk cost by part](bench/research/20261014-n00b-segments/REPORT.md). With the segment timer on, the routed experts take 89.4 ms of a 164.0 ms per-chunk cost, the router 42.4 ms, the recurrent mixers 27.9 ms and attention 7.5 ms.
+2. Overlap the helper's CPU experts with the next target chunk during prompt reading, keeping decode speed and memory. Running them on the GPU conflicts with the Metal working-set limit ([L03](bench/EXPERIMENT-LEDGER.md#l03--put-complete-helper-on-gpu)).
 3. N02 (R4): bounded Apple advisory reads for eligible lazy-table rows, compared on first exposure and warm replies.
 4. N06: validate MTP checkpoint restores before any checkpoint-copy omission (N07).
-5. New from N00: overlap the helper's CPU experts with target work, or run them on the GPU for prompt batches, while keeping decode speed and memory.
+5. N01: integrated compact expert routing from llama.cpp #30373, in an isolated clone. First measure whether the experts' 89.4 ms fixed cost per chunk is weight reading; if it is, a routing change cannot lower it. Also split the router's 42.4 ms further.
 
 R2, a helper-only QoS trial, stays conditional. Persistent helper pools are not adopted; W02 and prompt-local drafting (E02/E02-M) are parked. [All research cards](bench/research/20261014-repo-audit/REPORT.md) and [R0/R1 remaining work](bench/research/20261014-baseline-and-helper-pool/REPORT.md).
 

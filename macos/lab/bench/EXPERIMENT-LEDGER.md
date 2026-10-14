@@ -713,3 +713,30 @@ Balanced P07 remains the normal launcher; editing lookup has a maintained dedica
   - a segment-timed diagnostic build to locate the per-chunk cost before N01;
   - a reuse check before touching the 4-token checkpoint.
 - **Evidence:** [report](research/20261014-n00-prompt-ops/REPORT.md). Native logs, per-request rows and inventories stay ignored under the local feature folder.
+
+### E11 — N00b segment-timed prompt chunks (attribution only)
+
+- **What ran:** user-authorized model run on `m5-segments`, an isolated diagnostic clone of the kept `m5-small-stack` engine plus a segment timer. The timer is off unless `GGML_M5_LAB_SEGMENTS` is set. Settings and prompts were unchanged from E10.
+  - With the timer on, each graph is encoded into one Metal command buffer per part:
+    - each layer's mixer, router, routed experts and combine;
+    - the output head, when the chunk samples a token.
+  - Four launches alternated the timer on and off, at 512 and at 1,536.
+  - All four passed the 34 GiB admission, normal-pressure, zero-new-swap and cleanup guards.
+  - Two earlier attempts were held by the zero-swap guard until background helpers were quit; the guard was not changed.
+  - Two attempts exposed tool faults and were fixed before the accepted run (see the report).
+- **Findings:**
+  - The fixed per-chunk GPU cost, 164.0 ms with the timer on (170.7 ms off), splits into:
+    - routed experts: 89.4 ms;
+    - router: 42.4 ms;
+    - recurrent mixers: 27.9 ms;
+    - attention mixers: 7.5 ms;
+    - combine: about 0.
+  - Per token, the recurrent mixers cost most (0.470 ms).
+  - The timer's segment sums are within −1.2% to +0.4% of the timer-off chunk time for chunks of 284 tokens and more.
+  - All 48 outputs (token and top-8 probabilities) matched.
+- **Decision:** attribution only; no default, kernel or speed claim changes. The diagnostic engine is not a candidate.
+- **Revisit:** rerun only after an engine, model or chunk-rule change. Next candidates are:
+  - helper-expert overlap during prompt reading;
+  - a finer split of the router segment;
+  - a weight-reading check on the experts' fixed term before N01.
+- **Evidence:** [report](research/20261014-n00b-segments/REPORT.md). Native logs, per-request rows, memory samples and held attempts stay ignored under the local feature folders.
