@@ -20,6 +20,7 @@ from benchmark import stream_completion, wait_ready
 from benchmark_editing import clean_memory, fixtures, power, prompt as edit_prompt, trial_command
 from benchmark_m5_next import wait_for_headroom
 from benchmark_m5_small_gains import launch_row
+from benchmark_signals import cleanup_on_termination, defer_termination
 from capture_lookup_long import workloads as long_workloads
 from engines import sha256, verify_engine
 from lab import ROOT, model_path, request, server_command
@@ -181,13 +182,17 @@ class Lines:
     def __init__(self, child, path):
         self.child, self.queue = child, queue.Queue()
         def pump():
-            with path.open('w') as log:
-                for line in child.stdout:
-                    now = time.monotonic()
-                    log.write(json.dumps(dict(time=now, line=line.strip())) + '\n')
-                    log.flush()
-                    self.queue.put((now, line.strip()))
-            self.queue.put((time.monotonic(), None))
+            try:
+                with path.open('w') as log:
+                    for line in child.stdout:
+                        now = time.monotonic()
+                        log.write(json.dumps(dict(time=now, line=line.strip())) + '\n')
+                        log.flush()
+                        self.queue.put((now, line.strip()))
+            except BaseException as error:
+                self.queue.put((time.monotonic(), error))
+            finally:
+                self.queue.put((time.monotonic(), None))
         self.thread = threading.Thread(target=pump, daemon=True)
         self.thread.start()
 
@@ -199,6 +204,8 @@ class Lines:
                 stamp, line = self.queue.get(timeout=min(1, max(0.001, deadline - time.monotonic())))
             except queue.Empty:
                 continue
+            if isinstance(line, BaseException):
+                raise RuntimeError(f'Native protocol reader failed: {line}') from line
             if line is None or line.startswith(('ERR', 'FATAL')):
                 raise RuntimeError(f'Native engine stopped or refused request: {line}')
             rows.append((stamp, line))
@@ -284,13 +291,16 @@ def launch(folder, role, cases, tokenizer, frozen, hc, editing=False, smoke=Fals
         write(folder / 'result.json', result)
         with (folder / 'native.log').open('w') as log:
             start = time.monotonic()
-            child = subprocess.Popen(command, env=env, stdout=subprocess.PIPE if role == 'parent' else log,
-                stdin=subprocess.PIPE if role == 'parent' else None, stderr=log,
-                text=role == 'parent', bufsize=1)
-            result['models_loaded'] = True
-            monitor = app_monitor(child, folder / 'memory.jsonl', policy); monitor.thread.start()
+            with defer_termination():
+                child = subprocess.Popen(command, env=env, stdout=subprocess.PIPE if role == 'parent' else log,
+                    stdin=subprocess.PIPE if role == 'parent' else None, stderr=log,
+                    text=role == 'parent', bufsize=1)
+                result['models_loaded'] = True
+                monitor = app_monitor(child, folder / 'memory.jsonl', policy); monitor.thread.start()
+                if role == 'parent':
+                    lines = Lines(child, folder / 'protocol.jsonl')
             if role == 'parent':
-                lines = Lines(child, folder / 'protocol.jsonl'); lines.until('READY ')
+                lines.until('READY ')
             else:
                 base = f'http://127.0.0.1:{port}'; wait_ready(child, base)
             result['load_ready_s'] = time.monotonic() - start
@@ -363,6 +373,7 @@ def compare(arms, cases):
     return dict(rows=rows, keeper_enabled=False, whole_model_outputs_may_differ=True)
 
 
+@cleanup_on_termination()
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--output', type=Path, required=True)

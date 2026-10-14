@@ -1,7 +1,7 @@
 # Mac workspace
 
 The Mac launcher serves this page over the pinned API shell. `scripts/web_ui.py` replaces only the homepage and
-`/web/mac.css`, `/web/mac.js` and `/web/ui-state.js`; API routes, authentication, sampling, cancellation, native engine settings and
+`/web/mac.css`, `/web/mac.js`, `/web/ui-state.js` and `/web/performance.js`; API routes, authentication, sampling, cancellation, native engine settings and
 the shell's original assets stay with the pinned server. The upstream download is not modified.
 
 `index.html` derives from `jinzy0623/Strata-macOS` at `2cc4153409edb3f859187bdf10f13e34972d6ffb`, retaining its
@@ -83,3 +83,17 @@ export privacy passed with normal pressure/zero new swap. Current validation:207
 protocol checks, seven JavaScript tests and18 CPU-only native matcher cases. Browser observations and controlled
 editing benchmarks use different prompts/thinking settings and are not interchangeable speed comparisons.
 Detailed results and exclusions are in the [decision ledger](../bench/EXPERIMENT-LEDGER.md).
+
+## PR readiness audit
+
+The later PR audit corrected supported JSON/CLI config handling, premature hardware-sampler
+exit detection and parent protocol-reader error propagation. Every new benchmark entry point
+now unwinds through owned-child shutdown and guard finalization on Ctrl-C, SIGTERM or SIGHUP.
+Stops during process creation are deferred until child/guard ownership is published. A separate
+CI check exercises the real parent driver with tiny Python children; it never loads a model or
+runs GPU work. The network/native-denying offline gate remains separate.
+
+Final audit checks: 253 load-free Python tests, six tiny-child termination tests, five campaign
+protocol tests and seven JavaScript tests. Historical counts above describe their earlier passes.
+Physical VoiceOver/mobile-keyboard validation and a new full-model performance comparison were
+not part of this audit; previously recorded model results remain the performance evidence.

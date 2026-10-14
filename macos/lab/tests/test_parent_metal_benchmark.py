@@ -2,14 +2,34 @@ import copy
 from pathlib import Path
 import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from benchmark_parent_metal import MAX_OUTPUT, compare, main, parse_done, quality, verified_pack, release_owned_expert_cache
+from benchmark_parent_metal import Lines, MAX_OUTPUT, compare, main, parse_done, quality, verified_pack, release_owned_expert_cache
 
 
 class ParentMetalTests(unittest.TestCase):
+    def test_protocol_log_failure_reaches_waiter_without_full_timeout(self):
+        class RefusedLog:
+            def open(self, *args):
+                raise OSError('fixture protocol log refused')
+        reader=Lines(SimpleNamespace(stdout=iter(['READY fixture\n'])),RefusedLog())
+        reader.thread.join(timeout=1)
+        self.assertFalse(reader.thread.is_alive())
+        with self.assertRaisesRegex(RuntimeError,'fixture protocol log refused'):
+            reader.until('READY ',timeout=.05)
+
+    def test_protocol_eof_still_reports_engine_exit(self):
+        with tempfile.TemporaryDirectory() as d:
+            reader=Lines(SimpleNamespace(stdout=iter(['READY fixture\n'])),Path(d)/'protocol.jsonl')
+            self.assertEqual(reader.until('READY ',timeout=1)[0][1],'READY fixture')
+            with self.assertRaisesRegex(RuntimeError,'Native engine stopped'):
+                reader.until('DONE ',timeout=1)
+            reader.thread.join(timeout=1)
+            self.assertFalse(reader.thread.is_alive())
+
     def test_full_native_counters_are_validated(self):
         row = parse_done('DONE 2 3000 6000.0 40.0 stop 0 0 0 0 0 0 0 0.0 3000 0', [9, 248046], 3000)
         self.assertEqual(row['generation_tok_s'], 50)

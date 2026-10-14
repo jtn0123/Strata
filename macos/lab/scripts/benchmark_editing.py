@@ -13,6 +13,7 @@ import time
 
 from benchmark import Monitor, stream_completion, wait_ready
 from benchmark_metrics import case_metrics, metrics
+from benchmark_signals import cleanup_on_termination, defer_termination
 from benchmark_m5_small_gains import feature_receipts, launch_row
 from benchmark_m5_next import wait_for_headroom
 from check_memory import assert_no_model_server
@@ -265,9 +266,10 @@ def arm(folder, profile, role, cohort, frozen):
         record.update(command=command, metal_environment=metal)
         write(path, record)
         with (folder / 'server.log').open('w') as log:
-            process = subprocess.Popen(command, stdout=log, stderr=log, env=env)
-            monitor = app_monitor(process, folder / 'memory.jsonl', policy)
-            monitor.thread.start()
+            with defer_termination():
+                process = subprocess.Popen(command, stdout=log, stderr=log, env=env)
+                monitor = app_monitor(process, folder / 'memory.jsonl', policy)
+                monitor.thread.start()
             record['ready_s'] = wait_ready(process, base, timeout=180)
             tasks = [dict(c, content=prompt(c)) for c in fixtures() if c['cohort'] == cohort]
             tasks.append(dict(name='prose-control', language='prose', content=
@@ -346,6 +348,7 @@ def bracket(folder, profiles, cohort, frozen):
     return result
 
 
+@cleanup_on_termination()
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--experiment', choices=EXPERIMENTS, required=True)

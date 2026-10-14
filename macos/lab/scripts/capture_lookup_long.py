@@ -13,6 +13,7 @@ import subprocess
 from benchmark import stream_completion, wait_ready
 from benchmark_editing import clean_memory, power
 from benchmark_m5_next import wait_for_headroom
+from benchmark_signals import cleanup_on_termination, defer_termination
 from capture_m5_native import markers, monotonic_us, parse_lookup
 from check_memory import assert_no_model_server
 from engines import verify_engine
@@ -137,11 +138,12 @@ def launch(folder, role, frozen):
         record['memory_policy'] = policy
         write(folder / 'capture.json', record)
         with (folder / 'native.log').open('w') as log:
-            child = subprocess.Popen(command, env=env, stdout=log, stderr=log)
-            record['models_loaded'] = True
+            with defer_termination():
+                child = subprocess.Popen(command, env=env, stdout=log, stderr=log)
+                record['models_loaded'] = True
+                monitor = app_monitor(child, folder / 'memory.jsonl', policy)
+                monitor.thread.start()
             write(folder / 'capture.json', record)
-            monitor = app_monitor(child, folder / 'memory.jsonl', policy)
-            monitor.thread.start()
             base = f'http://127.0.0.1:{port}'
             record['ready_s'] = wait_ready(child, base)
             for case in workloads():
@@ -230,6 +232,7 @@ def campaign(folder):
     return result
 
 
+@cleanup_on_termination()
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--output', type=Path)

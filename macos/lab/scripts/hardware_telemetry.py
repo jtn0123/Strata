@@ -12,6 +12,7 @@ import threading
 import time
 
 import psutil
+from benchmark_signals import defer_termination
 
 
 def number(value, low=0, high=float('inf')):
@@ -83,16 +84,18 @@ class Sampler:
         self.model_pid = None
         self.lock = threading.Lock()
         self.ready = threading.Event()
+        self.stopping = threading.Event()
         self.stderr = None
 
     def start(self, pin):
         self.pin = pin
         self.thermal = thermal_reader()
         self.stderr = (self.folder / 'hardware.stderr.log').open('w')
-        self.child = subprocess.Popen([pin['path'], 'pipe', '-i', '1000'],
-            stdout=subprocess.PIPE, stderr=self.stderr, text=True, bufsize=1)
-        self.thread = threading.Thread(target=self.run, daemon=True)
-        self.thread.start()
+        with defer_termination():
+            self.child = subprocess.Popen([pin['path'], 'pipe', '-i', '1000'],
+                stdout=subprocess.PIPE, stderr=self.stderr, text=True, bufsize=1)
+            self.thread = threading.Thread(target=self.run, daemon=True)
+            self.thread.start()
         if not self.ready.wait(timeout=10) or self.error:
             self.stop()
             raise RuntimeError(self.error or 'Hardware sampler did not become ready')
@@ -103,6 +106,8 @@ class Sampler:
             psutil.cpu_percent(None)
             with (self.folder / 'hardware.jsonl').open('w') as log:
                 for line in self.child.stdout:
+                    if self.stopping.is_set():
+                        break
                     row = normalize(json.loads(line), time.monotonic(), self.thermal())
                     # A power-gated idle GPU legitimately reports frequency0.
                     # Preserve it as unavailable; do not fail the sampling stream.
@@ -129,6 +134,8 @@ class Sampler:
                     with self.lock: self.rows.append(row)
                     log.write(json.dumps(row, allow_nan=False)+'\n'); log.flush()
                     self.ready.set()
+            if not self.stopping.is_set():
+                raise RuntimeError('Hardware sampler stream ended before requested stop')
         except BaseException as error:
             self.error = f'{type(error).__name__}: {error}'
             self.ready.set()
@@ -141,6 +148,9 @@ class Sampler:
         return summarize(rows)
 
     def stop(self):
+        if not self.stopping.is_set() and self.child and self.child.poll() is not None:
+            self.error = self.error or 'Hardware sampler exited before requested stop'
+        self.stopping.set()
         if self.child and self.child.poll() is None:
             self.child.terminate()
             try: self.child.wait(timeout=5)

@@ -45,6 +45,43 @@ class HardwareTelemetryTests(unittest.TestCase):
         self.assertIsNone(sampler.child)
         self.assertIsNone(sampler.thread)
 
+    def test_unrequested_sampler_exit_cannot_count_as_healthy(self):
+        with tempfile.TemporaryDirectory() as folder:
+            sampler=Sampler(folder)
+            sampler.thermal=lambda:0
+            sampler.child=Mock(pid=987654,stdout=iter([
+                json.dumps(dict(gpu_freq_mhz=1600,gpu_active_ratio=.9,
+                                temp=dict(gpu_temp_avg=55)))+'\n']))
+            sampler.child.poll.return_value=1
+            with patch('hardware_telemetry.psutil.process_iter',return_value=[]), \
+                    patch('hardware_telemetry.psutil.cpu_percent',return_value=0):
+                sampler.run()
+            result=sampler.stop()
+            self.assertEqual(result['samples'],1)
+            self.assertTrue(result['child_exited'])
+            self.assertFalse(result['healthy'])
+            self.assertIn('before requested stop',result['error'])
+
+    def test_exit_before_reader_observes_eof_is_also_unhealthy(self):
+        sampler=Sampler('/unused')
+        sampler.rows=[normalize(dict(gpu_freq_mhz=1600),1)]
+        sampler.child=Mock()
+        sampler.child.poll.return_value=1
+        result=sampler.stop()
+        self.assertFalse(result['healthy'])
+        self.assertIn('before requested stop',result['error'])
+
+    def test_requested_stop_of_live_sampler_preserves_healthy_samples(self):
+        sampler=Sampler('/unused')
+        sampler.rows=[normalize(dict(gpu_freq_mhz=1600),1)]
+        sampler.child=Mock(returncode=None)
+        sampler.child.poll.side_effect=lambda:sampler.child.returncode
+        sampler.child.terminate.side_effect=lambda:setattr(sampler.child,'returncode',-15)
+        result=sampler.stop()
+        self.assertTrue(result['healthy'])
+        self.assertTrue(result['child_exited'])
+        self.assertIsNone(result['error'])
+
     def test_fault_counters_require_real_monotonic_coverage(self):
         self.assertIsNone(summarize([])['model_pageins'])
         self.assertIsNone(summarize([dict(model_pageins=10)])['model_pageins'])
@@ -57,9 +94,12 @@ class HardwareTelemetryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             sampler=Sampler(folder)
             sampler.thermal=lambda:0
-            sampler.child=Mock(pid=987654,stdout=iter([
-                json.dumps(dict(gpu_freq_mhz=0,gpu_active_ratio=0,temp=dict(gpu_temp_avg=40)))+'\n',
-                json.dumps(dict(gpu_freq_mhz=1600,gpu_active_ratio=.9,temp=dict(gpu_temp_avg=55)))+'\n']))
+            def stream():
+                yield json.dumps(dict(gpu_freq_mhz=0,gpu_active_ratio=0,temp=dict(gpu_temp_avg=40)))+'\n'
+                yield json.dumps(dict(gpu_freq_mhz=1600,gpu_active_ratio=.9,temp=dict(gpu_temp_avg=55)))+'\n'
+                # Model the requested stop that normally closes the owned pipe.
+                sampler.stopping.set()
+            sampler.child=Mock(pid=987654,stdout=stream())
             with patch('hardware_telemetry.psutil.process_iter',return_value=[]), \
                     patch('hardware_telemetry.psutil.cpu_percent',return_value=0):
                 sampler.run()

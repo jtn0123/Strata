@@ -18,6 +18,7 @@ from benchmark_editing import (FIXTURES, clean_memory, drafting_receipts, fixtur
 from benchmark_m5_next import wait_for_headroom
 from benchmark_m5_small_gains import feature_receipts, launch_row
 from benchmark_metrics import METRICS
+from benchmark_signals import cleanup_on_termination, defer_termination
 from capture_lookup_long import workloads as documents
 from check_memory import assert_no_model_server
 from engines import sha256, verify_engine
@@ -154,12 +155,13 @@ def launch(folder, role, profile, frozen, draft_profile='balanced'):
                       memory_policy=admit_model('flash'))
         write(folder / 'result.json', result)
         with (folder / 'native.log').open('w') as log:
-            child = subprocess.Popen(command, env=env, stdout=log, stderr=log)
-            if hardware: hardware.model_pid = child.pid
-            result['models_loaded'] = True
+            with defer_termination():
+                child = subprocess.Popen(command, env=env, stdout=log, stderr=log)
+                if hardware: hardware.model_pid = child.pid
+                result['models_loaded'] = True
+                monitor = app_monitor(child, folder / 'memory.jsonl', result['memory_policy'])
+                monitor.thread.start()
             write(folder / 'result.json', result)
-            monitor = app_monitor(child, folder / 'memory.jsonl', result['memory_policy'])
-            monitor.thread.start()
             base = f'http://127.0.0.1:{port}'
             result['ready_s'] = wait_ready(child, base)
             for case in cases(draft_profile):
@@ -231,6 +233,7 @@ def launch(folder, role, profile, frozen, draft_profile='balanced'):
     return result
 
 
+@cleanup_on_termination()
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--candidate', choices=('1024', '1536', '256'), required=True)

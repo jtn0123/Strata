@@ -52,8 +52,12 @@ Raw local evidence: `bench/results/20261013-prompt-chunks-1536-faults-v1/campaig
 | --- | ---: | ---: | ---: | ---: | ---: |
 | 1: 512 | 87.24 | 1602.0 | 0 (nominal) | 3.688 | 0 |
 | 2: 1536 | 94.44 | 1619.0 | 0 (nominal) | 2.854 | 0 |
-| 3: 1536 | 88.64 | 1619.0 | 1 (nominal) | 3.005 | 0 |
-| 4: 512 | 83.82 | 1599.0 | 1 (nominal) | 3.937 | 0 |
+| 3: 1536 | 88.64 | 1619.0 | 1 (fair) | 3.005 | 0 |
+| 4: 512 | 83.82 | 1599.0 | 1 (fair) | 3.937 | 0 |
+
+Thermal categories follow public `NSProcessInfoThermalState`: 0 nominal, 1 fair
+(slightly elevated), 2 serious and 3 critical. Category 1 is not nominal; these
+device-level readings alone do not establish the cause of a request slowdown.
 
 ## Findings and limits
 
