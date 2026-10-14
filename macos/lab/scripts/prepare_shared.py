@@ -9,7 +9,7 @@ import subprocess
 import sys
 
 from download_models import verify
-from engines import sha256, source_info, write_receipt
+from engines import baseline_build_flags, sha256, source_info, write_receipt
 from lab import ROOT, model_path
 
 REMOVED = {"output.weight", "token_embd.weight"}
@@ -120,7 +120,7 @@ def main():
             command(["git", "-C", path, "apply", ROOT / manifest["patch"]])
         source_info("mtp-shared")
         cmake = ROOT / ".venv/bin/cmake"
-        command([cmake, "-S", path, "-B", path / "build", *runtime["build_flags"]])
+        command([cmake, "-S", path, "-B", path / "build", *baseline_build_flags(runtime["build_flags"], ROOT)])
         command([cmake, "--build", path / "build", "--target", "llama-server", "-j", args.jobs])
         write_receipt("mtp-shared")
         derive()

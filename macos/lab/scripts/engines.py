@@ -1,12 +1,24 @@
 """Select an isolated native engine and verify its source/build provenance."""
 
+from collections import Counter
 import hashlib
 import json
 from pathlib import Path
-from typing import NotRequired, TypedDict, cast
+import re
+from typing import NamedTuple, NotRequired, TypedDict, cast
 import subprocess
 
 from lab import ROOT
+
+OTOOL = "/usr/bin/otool"
+# macOS serves these from the dyld shared cache; the OS version, not the lab, owns them.
+SYSTEM_LIBRARY_PREFIXES = ("/usr/lib/", "/System/Library/")
+DYLIB_LOADS = frozenset(
+    {"LC_LOAD_DYLIB", "LC_LOAD_WEAK_DYLIB", "LC_REEXPORT_DYLIB", "LC_LOAD_UPWARD_DYLIB", "LC_LAZY_LOAD_DYLIB"}
+)
+OFFSET_SUFFIX = re.compile(r"^(?P<value>.+) \(offset \d+\)$")
+# provision.py --local-http-only builds the baseline without OpenSSL; preparers repeat that choice.
+LOCAL_HTTP_ONLY_FLAG = "-DLLAMA_OPENSSL=OFF"
 
 EXPERIMENTS = {
     "q2-masked": "q2_experiment.json",
@@ -66,8 +78,24 @@ class EngineSource(TypedDict):
     patch: ExperimentManifest | None
 
 
+class ExternalLibrary(TypedDict):
+    """A non-system dylib the server loads from outside its build directory."""
+
+    path: str
+    install_names: list[str]
+    sha256: str
+    versions: dict[str, str]
+
+
+class MachOLinks(NamedTuple):
+    identity_versions: dict[str, str]
+    loads: list[str]
+    rpaths: list[str]
+
+
 class BuildReceipt(EngineSource):
     artifacts: dict[str, str]
+    external_libraries: list[ExternalLibrary]
     binary_version: str
     build_settings: dict[str, str]
     compiler: str
@@ -75,6 +103,8 @@ class BuildReceipt(EngineSource):
 
 class StoredBuildReceipt(EngineSource):
     artifacts: dict[str, str]
+    # Receipts written before external libraries were recorded have no such field.
+    external_libraries: NotRequired[list[ExternalLibrary]]
     binary_version: NotRequired[str]
     build_settings: NotRequired[dict[str, str]]
     compiler: NotRequired[str]
@@ -162,12 +192,126 @@ def artifact_hashes(path: Path) -> dict[str, str]:
     return {file.name: sha256(file) for file in files}
 
 
+def baseline_build_flags(flags: list[str], root: Path = ROOT) -> list[str]:
+    """Runtime build flags plus the baseline's local-HTTP-only choice, so engine preparers link the same way."""
+    cache = root / "vendor/llama.cpp/build/CMakeCache.txt"
+    disabled = cache.is_file() and "LLAMA_OPENSSL:BOOL=OFF" in cache.read_text().splitlines()
+    return [*flags, LOCAL_HTTP_ONLY_FLAG] if disabled and LOCAL_HTTP_ONLY_FLAG not in flags else list(flags)
+
+
+def mach_o_links(path: Path) -> MachOLinks:
+    """The dylib loads, own install-name versions and run paths that `otool -l` reports for one file."""
+    commands: list[dict[str, str]] = []
+    for line in subprocess.check_output([OTOOL, "-l", str(path)], text=True).splitlines():
+        if line.startswith("Load command "):
+            commands.append({})
+        elif commands:
+            key, _, value = line.strip().partition(" ")
+            match = OFFSET_SUFFIX.match(value)
+            commands[-1][key] = match["value"] if match else value.removeprefix("version ")
+    identity = next((command for command in commands if command.get("cmd") == "LC_ID_DYLIB"), {})
+    return MachOLinks(
+        {key: identity[key] for key in ("current", "compatibility") if key in identity},
+        [command["name"] for command in commands if command.get("cmd") in DYLIB_LOADS],
+        [command["path"] for command in commands if command.get("cmd") == "LC_RPATH"],
+    )
+
+
+def _expand(path: str, loader: Path, executable: Path) -> Path:
+    for token, base in (("@loader_path", loader.parent), ("@executable_path", executable.parent)):
+        if path == token or path.startswith(token + "/"):
+            return base / path[len(token) :].lstrip("/")
+    return Path(path)
+
+
+def _resolve_load(name: str, loader: Path, executable: Path, rpaths: tuple[Path, ...]) -> Path:
+    """Follow dyld's @rpath/@loader_path/@executable_path expansion to the file that would load."""
+    if name.startswith("@rpath/"):
+        candidates = [rpath / name.removeprefix("@rpath/") for rpath in rpaths]
+    else:
+        candidates = [_expand(name, loader, executable)]
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate.resolve()
+    raise RuntimeError(f"Missing native library {name}, loaded by {loader}")
+
+
+def _refuse_duplicate_libraries(libraries: list[ExternalLibrary]) -> None:
+    names = Counter(Path(library["path"]).name for library in libraries)
+    duplicated = sorted(name for name, count in names.items() if count > 1)
+    if duplicated:
+        raise RuntimeError(f"Different external files provide the same native library: {', '.join(duplicated)}")
+
+
+def external_libraries(binary: Path) -> list[ExternalLibrary]:
+    """The non-system dylib closure the server loads from outside its build directory.
+
+    Files inside the build directory are already hashed as artifacts. Install names that reach the same file
+    through a symlink are one library; system libraries are ignored.
+    """
+    executable = binary.resolve()
+    pending: list[tuple[Path, tuple[Path, ...]]] = [(executable, ())]
+    seen = {executable}
+    found: dict[Path, ExternalLibrary] = {}
+    while pending:
+        loader, inherited = pending.pop()
+        links = mach_o_links(loader)
+        if loader in found:
+            found[loader]["versions"] = links.identity_versions
+        # dyld searches the loading image's run paths, then those of the images that loaded it.
+        rpaths = (*(_expand(path, loader, executable) for path in links.rpaths), *inherited)
+        for name in links.loads:
+            if name.startswith(SYSTEM_LIBRARY_PREFIXES):
+                continue
+            target = _resolve_load(name, loader, executable, rpaths)
+            if target.parent != executable.parent and target not in found:
+                found[target] = {"path": str(target), "install_names": [], "sha256": sha256(target), "versions": {}}
+            if target in found and name not in found[target]["install_names"]:
+                found[target]["install_names"].append(name)
+            if target not in seen:
+                seen.add(target)
+                pending.append((target, rpaths))
+    libraries = [found[path] for path in sorted(found)]
+    for library in libraries:
+        library["install_names"].sort()
+    _refuse_duplicate_libraries(libraries)
+    return libraries
+
+
+def verify_external_libraries(engine: str, recorded: list[ExternalLibrary], binary: Path) -> None:
+    """Refuse an engine whose recorded external dylibs changed, disappeared or appeared."""
+    paths = [library["path"] for library in recorded]
+    if len(set(paths)) != len(paths):
+        raise RuntimeError(f"Build receipt lists an external native library more than once: {engine}")
+    try:
+        current = external_libraries(binary)
+    except (OSError, RuntimeError, subprocess.CalledProcessError) as error:
+        raise RuntimeError(f"External native libraries changed since the build receipt: {engine}: {error}") from error
+    if current != recorded:
+        before = {library["path"]: library for library in recorded}
+        after = {library["path"]: library for library in current}
+        changed = sorted(path for path in before.keys() | after.keys() if before.get(path) != after.get(path))
+        raise RuntimeError(f"External native libraries changed since the build receipt: {engine}: {', '.join(changed)}")
+
+
+def external_library_status(engine: VerifiedEngine) -> str:
+    """How verify_engine treated external dylibs; legacy receipts are accepted without that record."""
+    receipt = engine.get("build_receipt")
+    if receipt is None:
+        return "not checked: no build receipt"
+    if "external_libraries" not in receipt:
+        return "unrecorded: the build receipt predates external library records"
+    count = len(receipt["external_libraries"])
+    return f"verified: {count} external {'library' if count == 1 else 'libraries'} unchanged"
+
+
 def write_receipt(engine: str) -> BuildReceipt:
     info = source_info(engine)
     binary = engine_binary(engine)
     if not binary.is_file():
         raise RuntimeError(f"Native engine is not built: {binary}")
     artifacts = artifact_hashes(binary.parent)
+    libraries = external_libraries(binary)
     binary_version = subprocess.check_output([str(binary), "--version"], text=True, stderr=subprocess.STDOUT).strip()
     cache = binary.parent.parent / "CMakeCache.txt"
     keys = (
@@ -180,6 +324,7 @@ def write_receipt(engine: str) -> BuildReceipt:
         "GGML_BLAS",
         "GGML_NATIVE",
         "GGML_METAL_USE_BF16",
+        "LLAMA_OPENSSL",
     )
     build_settings = {
         line.split(":", 1)[0]: line.split("=", 1)[1]
@@ -190,6 +335,7 @@ def write_receipt(engine: str) -> BuildReceipt:
     receipt: BuildReceipt = {
         **info,
         "artifacts": artifacts,
+        "external_libraries": libraries,
         "binary_version": binary_version,
         "build_settings": build_settings,
         "compiler": compiler,
@@ -210,6 +356,9 @@ def verify_engine(engine: str, root: Path = ROOT, require_receipt: bool = True) 
         saved = cast(StoredBuildReceipt, json.loads(receipt.read_text()))
         if any(saved.get(key) != value for key, value in info.items()) or saved["artifacts"] != hashes:
             raise RuntimeError(f"Source or native binaries changed since the build receipt: {engine}")
+        # Older receipts have no external library record; they stay accepted and are never rewritten here.
+        if "external_libraries" in saved:
+            verify_external_libraries(engine, saved["external_libraries"], binary)
     result: VerifiedEngine = {
         "engine": info["engine"],
         "directory": info["directory"],
