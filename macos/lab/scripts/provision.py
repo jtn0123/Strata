@@ -7,10 +7,14 @@ import platform
 import shutil
 import subprocess
 
-from engines import verify_engine, write_receipt
+from engines import LOCAL_HTTP_ONLY_FLAG, external_library_status, verify_engine, write_receipt
 
 ROOT = Path(__file__).resolve().parents[1]
 LAB_PYTHON = ".venv/bin/python"
+# Runtime packages, then the quality tools the mandatory offline coverage tests need. Both locks pin exact
+# versions with wheel hashes; CI installs the same two files.
+LOCKS = ("requirements-ci.lock", "requirements-quality.lock")
+LOCKED_INSTALL = ("--only-binary", ":all:", "--require-hashes")
 
 
 def run(command):
@@ -49,18 +53,16 @@ def main(argv=None):
     if not 1 <= args.jobs <= 2: ap.error("Use one or two build workers")
     runtime = preflight()
     if args.check_only:
-        verify_engine("baseline")
-        print("Pinned clean sources, Python 3.12 and baseline receipt verify; no mutations")
+        status = external_library_status(verify_engine("baseline"))
+        print(f"Pinned clean sources, Python 3.12 and baseline receipt verify; external libraries {status}; no mutations")
         return
     uv = shutil.which("uv") or str(Path.home() / ".local/bin/uv")
     if not Path(uv).is_file():
         raise RuntimeError("Install uv before provisioning this lab")
     if not (ROOT / ".venv").exists():
         run([uv, "venv", "--python", "3.12", ".venv"])
-    run([uv, "pip", "install", "--python", LAB_PYTHON, "-r", "requirements.txt"])
-    # The maintained offline inventory includes the coverage gate contracts.
-    run([uv, "pip", "install", "--python", LAB_PYTHON, "--only-binary", ":all:",
-         "--require-hashes", "-r", "requirements-quality.lock"])
+    for lock in LOCKS:
+        run([uv, "pip", "install", "--python", LAB_PYTHON, *LOCKED_INSTALL, "-r", lock])
     for key, directory in [("llama_cpp", "llama.cpp"), ("strata_macos", "Strata-macOS")]:
         path = ROOT / "vendor" / directory
         source = runtime[key]
@@ -71,7 +73,8 @@ def main(argv=None):
             run(["git", "-C", path, "checkout", "--detach", "FETCH_HEAD"])
         source_check(path, source)
     cmake = ROOT / ".venv/bin/cmake"
-    flags = runtime["build_flags"] + (["-DLLAMA_OPENSSL=OFF"] if args.local_http_only else [])
+    # A local-HTTP-only baseline has no OpenSSL link; engine preparers read this choice from its CMake cache.
+    flags = runtime["build_flags"] + ([LOCAL_HTTP_ONLY_FLAG] if args.local_http_only else [])
     run([cmake, "-S", "vendor/llama.cpp", "-B", "vendor/llama.cpp/build", *flags])
     run([cmake, "--build", "vendor/llama.cpp/build", "--target", "llama-server", "llama-bench", "llama-quantize", "-j", args.jobs])
     write_receipt("baseline")

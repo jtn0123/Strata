@@ -154,8 +154,11 @@ class SourceTests(unittest.TestCase):
         with patch.object(engines, "ROOT", self.root), \
                 patch.object(engines, "source_info", return_value=dict(source)), \
                 patch.object(engines, "engine_binary", return_value=binary), \
+                patch.object(engines, "external_libraries", return_value=[]) as libraries, \
                 patch.object(engines.subprocess, "check_output", side_effect=["native fixture\n", "clang fixture\n"]) as versions:
             receipt = engines.write_receipt("baseline")
+        libraries.assert_called_once_with(binary)
+        self.assertEqual(receipt["external_libraries"], [])
         self.assertEqual({key: receipt[key] for key in source}, source)
         self.assertEqual(receipt["artifacts"], {
             "llama-server": hashlib.sha256(b"offline binary fixture").hexdigest(),

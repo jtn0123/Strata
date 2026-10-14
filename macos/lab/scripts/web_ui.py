@@ -1,7 +1,7 @@
 """Serve the maintained Mac page and guard the pinned shell's HTTP intake.
 
-The pinned handler stays unchanged; this subclass checks each request before it.
-Host and Origin rules follow the current upstream server (``host_allowed`` and
+The pinned handler stays unchanged; this subclass checks each request before it,
+including the shape of chat requests (``api_requests``). Host and Origin rules follow the current upstream server (``host_allowed`` and
 ``origin_allowed`` in ``serve/server.py``) without its config lists: the Mac
 launcher listens on 127.0.0.1 only.
 """
@@ -18,6 +18,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from io import BytesIO
 from pathlib import Path
 from typing import Any, cast
+
+from api_requests import RequestError, check_request
 
 WEB = Path(__file__).resolve().parents[1] / "web"
 JAVASCRIPT = "text/javascript; charset=utf-8"
@@ -258,7 +260,8 @@ class MacRequestHandler(BaseHTTPRequestHandler):
             if not self._authorized():
                 return
             body = self.read_body(length)
-        except IntakeError as error:
+            check_request(self.path.rstrip("/"), body)
+        except (IntakeError, RequestError) as error:
             self.reject(error.code, str(error))
             return
         self.rfile = BytesIO(body)

@@ -175,6 +175,40 @@ class NativeErrorTests(unittest.TestCase):
                         patch('native_backend.request', return_value=response):
                     with self.assertRaises(EngineDied): call()
 
+    def test_invalid_stream_packets_end_the_request_without_a_native_rate(self):
+        packet = lambda row: b'data: ' + json.dumps(row).encode() + b'\n'
+        final = packet(dict(stop=True, timings=dict(predicted_per_second=80, prompt_ms=12, predicted_ms=25, **COUNTS)))
+        for row in ([], 5, dict(tokens=[True, -4]), dict(tokens=[-4]), dict(tokens=[1.0]), dict(tokens='1'),
+                    dict(tokens=None), dict(tokens=[1], stop='yes')):
+            with self.subTest(row=row):
+                connection = Connection(lines=[packet(row), packet(dict(tokens=[1, 99])), final])
+                engine = self.engine(); service = Service(engine, Tokenizer(), None)
+                with patch('native_backend.http.client.HTTPConnection', return_value=connection):
+                    response = service.run([10], False, [], 10, {}, threading.Event())
+                    with self.assertRaisesRegex(EngineDied, 'completion'):
+                        list(response)
+                self.assertEqual(service.history[-1]['finish'], 'error')
+                self.assertIsNone(service.history[-1]['decode_tok_s'])
+                self.assertNotIn('native_timings', engine.last)
+                self.assertTrue(connection.closed)
+        grouped = Connection(lines=[packet(dict(tokens=[1, 99], stop=False)), final])
+        engine = self.engine(); service = Service(engine, Tokenizer(), None)
+        with patch('native_backend.http.client.HTTPConnection', return_value=grouped):
+            list(service.run([10], False, [], 10, {}, threading.Event()))
+        self.assertEqual((service.history[-1]['finish'], engine.last['generated']), ('stop', 2))
+        self.assertEqual(engine.last['native_timings']['predicted_per_second'], 80)
+
+    def test_nonfinite_sampling_never_reaches_the_native_server(self):
+        connection = Connection()
+        sent = []
+        connection.request = lambda *args, **kwargs: sent.append(kwargs)
+        engine = self.engine(); service = Service(engine, Tokenizer(), None)
+        with patch('native_backend.http.client.HTTPConnection', return_value=connection):
+            response = service.run([10], False, [], 10, dict(temperature=float('nan')), threading.Event())
+            with self.assertRaisesRegex(EngineDied, 'JSON compliant'):
+                list(response)
+        self.assertEqual(sent, [])
+
     def test_valid_empty_text_and_token_responses_are_preserved(self):
         responses = {'/tokenize': {'tokens': []}, '/detokenize': {'content': ''},
                      '/apply-template': {'prompt': ''}, '/props': dict(default_generation_settings=dict(n_ctx=4096),

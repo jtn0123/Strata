@@ -6,7 +6,7 @@ import fcntl
 import json
 import subprocess
 
-from engines import EXPERIMENTS, sha256, source_info, verify_engine, write_receipt
+from engines import EXPERIMENTS, baseline_build_flags, sha256, source_info, verify_engine, write_receipt
 from lab import ROOT
 
 
@@ -51,7 +51,7 @@ def main(argv=None):
                 call(["git", "-C", path, "apply", ROOT / manifest["patch"]])
             source_info(args.engine)
             cmake = ROOT / ".venv/bin/cmake"
-            flags = [f for f in runtime["build_flags"] if not f.startswith("-DLLAMA_BUILD_TESTS=")]
+            flags = [f for f in baseline_build_flags(runtime["build_flags"], ROOT) if not f.startswith("-DLLAMA_BUILD_TESTS=")]
             call([cmake, "-S", path, "-B", path / "build", *flags, "-DLLAMA_BUILD_TESTS=ON"])
             targets = ["llama-server", "test-backend-ops"]
             if args.engine == "m5-sampling": targets.append("test-backend-sampler")
