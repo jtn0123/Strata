@@ -65,8 +65,9 @@ class IntervalTests(unittest.TestCase):
                 self.assertAlmostEqual(figures[field], value, places=6)
         outside = request_busy(command_buffers(timeline()), 't', 0.9, 1.044)
         self.assertAlmostEqual(outside['helper_ms'], 6, places=6)
+        buffers = command_buffers(timeline())
         with self.assertRaisesRegex(ValueError, 'No target GPU work'):
-            request_busy(command_buffers(timeline()), 't', 1.031, 2.0)
+            request_busy(buffers, 't', 1.031, 2.0)
 
 
 class ComparisonTests(unittest.TestCase):
@@ -107,8 +108,9 @@ class ComparisonTests(unittest.TestCase):
         self.assertEqual((moved['identical'], moved['differing_cases']), (False, ['long']))
 
     def test_launches_of_other_modes_are_refused(self):
+        launches = [launch('segments')]
         with self.assertRaisesRegex(ValueError, 'Unknown overlap launch mode segments'):
-            compare([launch('segments')])
+            compare(launches)
 
 
 class OverlapDriverTests(unittest.TestCase):
