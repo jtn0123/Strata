@@ -37,7 +37,7 @@ from benchmark_prompt_chunks import (
 )
 from benchmark_signals import cleanup_on_termination
 from check_memory import assert_no_model_server
-from lab import request
+from lab import ROOT, request
 from model_provenance import verify_models
 from profile_mtpstate import EDIT, FOLLOW_UP, chat
 from qualify_ops import (
@@ -64,6 +64,18 @@ CANCEL_AFTER_S = 0.5
 CONVERSATION_TOKENS = 256
 STOP = "stop processing: n_tokens = "
 RESTORED = "restored context checkpoint"
+# Run folders stay under bench/features, where raw measurements are ignored.
+FEATURES = ROOT / "bench/features"
+SUMMARY = "summary.json"
+
+
+def output_folder(path: Path) -> Path:
+    """A run folder inside bench/features, resolved before anything is read or written there."""
+    folder = path.resolve()
+    features = FEATURES.resolve()
+    if folder == features or not folder.is_relative_to(features):
+        raise ValueError("The output folder must be inside bench/features")
+    return folder
 
 
 def log_size(folder: Path) -> int:
@@ -217,24 +229,24 @@ def run(output: Path) -> JSONDict:
             folder.mkdir()
             campaign(folder, CANDIDATE, draft_profile, frozen, chunks, lifecycle)
             brackets[name] = analyze(folder)
-            write(output / "summary.json", summary)
+            write(output / SUMMARY, summary)
         summary["decision"] = decision(brackets)
         summary["status"] = "passed"
     except BaseException as error:
         summary.update(status="failed", error=f"{type(error).__name__}: {error}")
         raise
     finally:
-        write(output / "summary.json", summary)
+        write(output / SUMMARY, summary)
     return summary
 
 
 def reanalyze(output: Path) -> JSONDict:
     """Recompute every bracket and the decision from the saved launches; their measurements are unchanged."""
-    summary: JSONDict = json.loads((output / "summary.json").read_text())
+    summary: JSONDict = json.loads((output / SUMMARY).read_text())
     summary.setdefault("recorded_decision", summary["decision"])
     brackets = {name: analyze(output / name) for name in BRACKETS}
     summary.update(brackets=brackets, decision=decision(brackets), recomputed=True)
-    write(output / "summary.json", summary)
+    write(output / SUMMARY, summary)
     return summary
 
 
@@ -253,9 +265,9 @@ def main(argv: Sequence[str] | None = None) -> None:
         )
     print("Rule:", RULE, flush=True)
     if args.analyze:
-        summary = reanalyze(args.output)
+        summary = reanalyze(output_folder(args.output))
     elif args.run:
-        summary = run(args.output)
+        summary = run(output_folder(args.output))
     else:
         return
     print("N15 qualification:", json.dumps(summary["decision"], indent=2), flush=True)

@@ -43,7 +43,7 @@ is not claimed as an 80-line pass. Named UI helpers and complexity are measured
 separately.
 
 Focused Python branch coverage has its own measured baseline and freshness gate:
-93.88% of lines and 87.34% of branches across the 37 targets in the N15
+93.89% of lines and 87.35% of branches across the 37 targets in the N15
 qualification pass, with aggregate floors of 93%/87%. The N00b segment-timer pass
 re-recorded every module's counts; some had not been refreshed since earlier changes. Floors are the
 recorded percentages rounded down, so each module keeps its measured per-file

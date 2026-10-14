@@ -98,8 +98,9 @@ class MemoryTests(unittest.TestCase):
         self.assertTrue(wide['clean'])
 
     def test_only_a_complete_bracket_is_scored(self):
+        incomplete = self.launches(1, 2)
         with self.assertRaisesRegex(ValueError, 'Four launches'):
-            memory(self.launches(1, 2))
+            memory(incomplete)
 
 
 class DecisionTests(unittest.TestCase):
@@ -156,6 +157,9 @@ class DriverTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.folder = Path(self.tmp.name)
         (self.folder / 'native.log').write_text('loaded\n')
+        features = patch.object(driver, 'FEATURES', self.folder)
+        features.start()
+        self.addCleanup(features.stop)
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -170,8 +174,9 @@ class DriverTests(unittest.TestCase):
         self.assertEqual(driver.log_since(self.folder, offset).splitlines()[1], 'other')
         self.assertEqual(driver.stops(driver.log_since(self.folder, offset)), [1024])
         self.assertEqual(driver.wait_stop(self.folder, offset), 1024)
+        end = driver.log_size(self.folder)
         with self.assertRaisesRegex(RuntimeError, 'did not stop'):
-            driver.wait_stop(self.folder, driver.log_size(self.folder), timeout_s=0.2)
+            driver.wait_stop(self.folder, end, timeout_s=0.2)
 
     def abort(self, *sent):
         made = []
@@ -335,6 +340,14 @@ class DriverTests(unittest.TestCase):
         self.assertTrue(summary['decision']['qualified'])
         self.assertEqual(sorted(summary['brackets']), ['code-edit', 'default', 'long-documents'])
         self.assertIn('"qualified": true', printed.getvalue())
+
+    def test_run_folders_must_sit_inside_the_features_folder(self):
+        self.assertEqual(driver.output_folder(self.folder / 'a' / '..' / 'out'), (self.folder / 'out').resolve())
+        for outside in (self.folder, self.folder / '..', self.folder / '..' / 'elsewhere'):
+            with self.assertRaisesRegex(ValueError, 'inside bench/features'):
+                driver.output_folder(outside)
+        with redirect_stdout(io.StringIO()), self.assertRaisesRegex(ValueError, 'inside bench/features'):
+            driver.main(['--output', str(self.folder.parent), '--run'])
 
     def test_a_failed_bracket_is_recorded_and_raised(self):
         output = self.folder / 'out'
