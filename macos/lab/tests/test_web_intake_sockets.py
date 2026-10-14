@@ -34,17 +34,25 @@ class Server:
         self.process = subprocess.Popen([sys.executable, str(ROOT / 'scripts/strata_server.py'), '--engine', 'mock',
                                          '--host', '127.0.0.1', '--port', str(self.port)],
                                         stdout=self.log, stderr=subprocess.STDOUT, env=env, cwd=ROOT)
-        deadline = time.monotonic() + 30
+        deadline, last = time.monotonic() + 30, None
         while time.monotonic() < deadline:
             if self.process.poll() is not None:
-                raise RuntimeError('Mock server exited: ' + self.output())
+                self.fail_start('exited')
             try:
-                if self.request('GET', '/health')[0] == 200:
+                last = self.request('GET', '/health')[0]
+                if last == 200:
                     return
-            except OSError:
-                time.sleep(.1)
-        self.stop()
-        raise RuntimeError('Mock server was not ready: ' + self.output())
+            except OSError as error:
+                last = error
+            time.sleep(.1)
+        self.fail_start(f'was not ready (last /health: {last!r})')
+
+    def fail_start(self, problem):
+        self.process.kill()
+        self.process.wait(timeout=5)
+        output = self.output()
+        self.log.close()
+        raise RuntimeError(f'Mock server {problem}: {output}')
 
     def output(self):
         self.log.seek(0)
