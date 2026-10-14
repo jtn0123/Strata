@@ -788,3 +788,25 @@ Balanced P07 remains the normal launcher; editing lookup has a maintained dedica
 - **Decision:** a measured first-exposure gain with a small warm cost, in a diagnostic engine; no default changes.
 - **Revisit:** skip advice for pages already advised since load, or advise one chunk ahead from a helper thread; measure first exposure and warm cost again.
 - **Evidence:** [report](research/20261014-n02-advise/REPORT.md). Native logs, per-request rows, memory samples, the check run and the stopped run stay ignored under the local feature folders.
+
+### E14 — N06 MTP draft state across context checkpoint restores (diagnostic engine)
+
+- **What ran:** user-authorized model run on `m5-mtpstate`, an isolated diagnostic clone of the kept `m5-small-stack` engine. It changes one file, `common/speculative.cpp`:
+  - with each context checkpoint, the MTP draft saves its pending row and last verification rows in llama.cpp PR 30141's layout;
+  - `GGML_M5_LAB_MTP_STATE=restore` applies them on a checkpoint restore, as the PR does; unset keeps the pinned behaviour, which ignores them;
+  - `GGML_M5_LAB_MTP_STATE_TRACE=1` prints each save and restore, with how far the row in use is from the saved one.
+
+  Settings were unchanged from E13.
+  - Four launches: stale, restore, restore, stale.
+  - Each launch held one chat conversation per standard prompt with the prompt cache on: a first reply, a regenerate, a follow-up and an edited follow-up, greedy, up to 128 tokens.
+  - All four passed the 34 GiB admission, normal-pressure, zero-new-swap and cleanup guards.
+- **Findings:**
+  - Restores: 16 per mode, 8 on regenerates and 8 on edits; plain follow-ups reused the whole cache. All 32 read a valid saved state; the 16 in restore mode applied it.
+  - The row in use at every restore was stale: a median relative difference of 1.12 from the saved row (0.93–1.46).
+  - Drafts, accepted counts (1,082 of 1,604, 67.5%) and reply text were identical in both modes, request for request. Both launches of each mode matched, and every regenerate drafted exactly as its first reply.
+  - Regenerate and edit prompt times were the same in both modes (49.4–55.4 and 257.7–272.2 ms, apart from one 406.6 ms edit in the first launch).
+  - The saved verification rows make a checkpoint up to 19.9 MiB larger (112.6 to 132.5 MiB after a long prompt).
+  - Memory: peak RSS 38.04–38.31 GiB, at least 3.11 GiB available, zero swap growth, at most 5 checkpoints held.
+- **Decision:** the stale row is real but changed no measured draft or output; the fix is not adopted and no default changes.
+- **Revisit:** with a llama.cpp upgrade that includes PR 30141, add its checkpoint memory to that upgrade's memory check. N07 may proceed once it measures the bytes it would remove. Sampled replies, several slots, cancellation and position-0 restores were not tried.
+- **Evidence:** [report](research/20261014-n06-mtpstate/REPORT.md). Native logs, per-request rows and memory samples stay ignored under the local feature folder.
