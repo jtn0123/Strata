@@ -1,6 +1,11 @@
 # Next M5 experiments
 
-These are researched candidates, not enabled features or measured new gains. Preserve fresh matched controls, independent confirmation, normal pressure, zero new swap and exact settings/output checks. Avoid unchanged retries of rejected candidates and adding isolated percentages.
+This is the initial research queue. E01 editing coverage has since qualified,
+E02/E02-M prompt-local drafting is parked, and E06 Long Documents is already
+implemented. Use the [post-merge investigation](../20261013-postmerge-investigation/REPORT.md)
+for the current ordered queue and stop conditions. Preserve fresh matched controls,
+independent confirmation, normal pressure, zero new swap and exact settings/output
+checks. Avoid unchanged retries of rejected candidates and adding isolated percentages.
 
 | Priority | Candidate | Main target / prerequisite |
 | --- | --- | --- |
