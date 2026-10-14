@@ -1,10 +1,59 @@
 # Strata Mac Lab
 
+Local, measured experiments for an Apple M5 Pro with 48 GiB unified memory. This workspace keeps Strata's existing Mac interface and uses a revision-pinned native llama.cpp Metal server behind it. All inference stays on the Mac.
+
+## Current status — October 14, 2026
+
+Three maintained launchers run the full Qwen3.8-Flash-Next Q2_0 model on the `m5-small-stack` engine with the packed shared Q3 helper: MTP depth three, mixed helper placement, eight helper CPU workers, Tensor API, F16 KV cache and 4K context. [Adoption decisions and validation](bench/PERMANENT-PROFILES.md).
+
+| Launcher | Profile | Status |
+| --- | --- | --- |
+| `Start Strata.command` | Balanced P07: 512-token prompt chunks, conversation caching | Default since October 10 ([rollout](bench/results/20261010-small-gains-stack/REPORT.md)) |
+| `Start Strata - Code Editing.command` | Balanced plus bounded lookup, for edits to files supplied in the prompt | Broader validation October 13 (E01 in the [ledger](bench/EXPERIMENT-LEDGER.md)) |
+| `Start Strata - Long Documents.command` | Optional 1,536-token prompt chunks for long pasted text | Optional since October 13 ([measurements](bench/research/20261013-prompt-chunks/REPORT.md)) |
+| `Start Strata - Original Baseline.command` | Original prediction-off profile | Rollback |
+
+On October 14 all three maintained profiles passed the real-model API and integration checks again. Persistent MTP helper pools showed no qualified speed gain and stay off by default.
+
+### Measurements by workload
+
+Each row is a different workload, profile or phase, so do not compare TPS across rows or add their percentages. All rows are English text or code on this 48 GiB M5 Pro on AC power; TPS is generated tokens per second.
+
+| Workload | Profile | Generation TPS | Other timing | Measured | Source |
+| --- | --- | ---: | --- | --- | --- |
+| Short prompt (48/53 tokens), fixed 256-token answer: code / prose | Balanced P07 | 60.08 / 40.38 | — | October 10, independent confirmation | [P07 confirmation](bench/results/20261010T035543Z-m5-small-gains-p07-confirmation-short/REPORT.md) |
+| Longer prompt (859/1,004 tokens), 256-token answer: code / prose | Balanced P07 | 46.19 / 47.14 | One safety bracket, not independently confirmed | October 10 | [P07 rollout](bench/results/20261010-small-gains-stack/REPORT.md) |
+| Edit a supplied file, first exposure: Python / JavaScript / JSON | Code Editing | 87.35 / 88.02 / 86.93 | First text 0.67–0.75 s; full reply 3.4–3.8 s | October 14 (R0) | [R0/R1 report](bench/research/20261014-baseline-and-helper-pool/REPORT.md) |
+| The same edits, replayed in the same process | Code Editing | 90.23 / 90.01 / 90.22 | Shares learned lookup, kernel and OS state | October 14 (R0) | [R0/R1 report](bench/research/20261014-baseline-and-helper-pool/REPORT.md) |
+| Long pasted text, first exposure: prose / retrieval answer | Code Editing, 512-token chunks | 55.67 / 62.10 | First text 4.52 / 4.65 s | October 14 (R0) | [R0/R1 report](bench/research/20261014-baseline-and-helper-pool/REPORT.md) |
+| Long pasted text, repeat replies, 1,536- vs 512-token chunks | Long Documents vs Balanced | — | Replies 8.53–10.03% sooner; about 0.6 GiB more process memory | October 13 | [Prompt chunks](bench/research/20261013-prompt-chunks/REPORT.md) |
+
+The 60 TPS code result is a fixed-length answer to a short prompt. The 87–88 TPS results are complete-file edits, where lookup can reuse text from the supplied file; they are not a general chat rate. The October 14 rows were measured through the Code Editing app's native endpoint after functional validation, so they are not cold launches. Their short-prose result (36.76 TPS) used the Code Editing drafting policy and is not a Balanced-chat benchmark.
+
+### Latest qualification reports
+
+- October 14: [post-merge baseline and MTP helper pool (R0/R1)](bench/research/20261014-baseline-and-helper-pool/REPORT.md), and the [repo audit with ranked research cards](bench/research/20261014-repo-audit/REPORT.md) and its [grade report](.Codex/grade-report-20261014.md).
+- October 13: [prompt chunks (E05)](bench/research/20261013-prompt-chunks/REPORT.md), [Long Documents mode](bench/research/20261013-long-documents-mode/REPORT.md) and the [bug and polish pass](bench/research/20261013-bug-polish/REPORT.md).
+- October 10: [P07 validation and rollout](bench/results/20261010-small-gains-stack/REPORT.md).
+- Every decision, failure and retry condition: [experiment decision ledger](bench/EXPERIMENT-LEDGER.md).
+
+### Next experiment queue
+
+As of October 14, model and GPU runs wait for the user's go-ahead; nothing below starts automatically.
+
+1. Fix the October 14 audit findings in the [grade report's recommended order](.Codex/grade-report-20261014.md#recommended-sequence) before more heavy profile testing.
+2. N00 (R3): measure actual operation and shape costs on 512- and 1,536-token prompt chunks. This is a prerequisite with no speed estimate.
+3. N01: integrated compact expert routing from llama.cpp #30373, in an isolated clone, after N00.
+4. N02 (R4): bounded Apple advisory reads for eligible lazy-table rows, compared on first exposure and warm replies.
+5. N06: validate MTP checkpoint restores before any checkpoint-copy omission (N07).
+
+R2, a helper-only QoS trial, stays conditional. Persistent helper pools are not adopted; W02 and prompt-local drafting (E02/E02-M) are parked. [All research cards](bench/research/20261014-repo-audit/REPORT.md) and [R0/R1 remaining work](bench/research/20261014-baseline-and-helper-pool/REPORT.md).
+
 ## Mac workspace
 
 The maintained [Mac web interface](web/README.md) adds prompt shortcuts, responsive light/dark layouts and keyboard-accessible settings over the pinned API shell. It hides unavailable GPU readings instead of implying they are zero. Preview it without loading a model using `.venv/bin/python scripts/strata_server.py --engine mock --port 8116` from this directory. Mock response speeds are not benchmarks.
 
-The [latest bug and polish pass](bench/research/20261013-bug-polish/REPORT.md) corrects launcher shutdown, failed-request telemetry, benchmark acceptance and chat/settings behavior. It preserves partial interrupted replies, identifies files that need reattaching after reload and keeps wide replies within narrow screens. This pass adds no new model-speed claim.
+The [October 13 bug and polish pass](bench/research/20261013-bug-polish/REPORT.md) corrects launcher shutdown, failed-request telemetry, benchmark acceptance and chat/settings behavior. It preserves partial interrupted replies, identifies files that need reattaching after reload and keeps wide replies within narrow screens. This pass adds no new model-speed claim.
 
 [Code quality checks](QUALITY.md) document the maintained scope and commands for Ruff, mypy and ESLint. CI enforces these alongside coverage, offline, termination, socket and browser regression checks. Maintenance is Mac-only; inherited PC code is retained outside this scope. Model performance has separate validation.
 
@@ -13,24 +62,6 @@ The [latest bug and polish pass](bench/research/20261013-bug-polish/REPORT.md) c
 `Start Strata.command` runs the balanced P07 profile. `Start Strata - Code Editing.command` uses confirmed lookup plus MTP for edits to supplied files. Both verify provenance and use the strict app memory policy. [Adoption decisions and validation](bench/PERMANENT-PROFILES.md).
 
 `Start Strata - Long Documents.command` selects an optional 1,536-token prompt-chunk mode for reading long pasted text. It uses the same model and 4K total context budget. Stop the current server before selecting another launcher; choose Code Editing for changes to supplied files. Matched long-document trials finished replies about 8.5–10% sooner, with roughly 0.6 GiB more reported process memory. Sustained editing validation is mixed, so the ordinary chat/editing launchers keep 512-token chunks. The Monitor and metrics export include the actual batch and chunk settings. [Measurements and limitations](bench/research/20261013-prompt-chunks/REPORT.md). [Real app checks and hardware investigation](bench/research/20261013-long-documents-mode/REPORT.md).
-
-Local, measured experiments for an Apple M5 Pro with 48 GiB unified memory. This workspace keeps Strata's existing Mac interface and uses a revision-pinned native llama.cpp Metal server behind it. All inference stays on the Mac.
-
-Latest: [P07 is validated and installed in the normal launcher](bench/results/20261010-small-gains-stack/REPORT.md). Its prior independent confirmation adds +0.61% code/+0.79% prose generation over the direct-copy profile. New longer-prompt and 32-token answer safety checks pass; 12 full-model launches, 312 answer/cache checks and 192 exact output signatures have zero new swap. The actual Strata API passes 16 English answer checks plus streaming and clean shutdown. W02 adds +0.58–0.71% TPS but exceeds the declared 10 ms startup ceiling on prose, so stacking remains untested. Double-click `Start Strata.command` for P07; `Start Strata - Original Baseline.command` restores the earlier profile. No model server is left running.
-
-Current measured short-prompt/256-output result: **60.08 TPS English code / 40.38 TPS English prose**. Longer-prompt safety results are a separate workload. [October 10 upstream and fork refresh](bench/research/20261010-upstream-refresh/REPORT.md) screens 1,811 public fork listings and records seven future investigations. The new full-model MLX engine is the strongest source lead; its 128 GB M4 measurements and F16 numerical changes are not a verified upgrade for this 48 GiB M5. [Next queue and prerequisites](bench/research/20261010-upstream-refresh/NEXT-EXPERIMENTS.json). No new model benchmark ran during that review.
-
-Earlier pass: [actual draft-cap early stopping and fixed two guesses](bench/results/20261009-draftcap/REPORT.md) are complete. The tail repair removes discarded helper work but has no useful measured gain: code59.482→59.464TPS (-0.030%), English prose39.931→40.007 (+0.191%), both below control drift. Fixed two passes short checks but changes the228th token in a longer English writing fixture and is parked; no controller added. All attempted launches have zero new swap;121 load-free checks pass,21 engine receipts validate and all20 preexisting engines/ordinary launcher defaults remain unchanged. Future benchmarks and native diagnostic prompts use English prose and code only. [Decisions and retry conditions](bench/EXPERIMENT-LEDGER.md), [remaining queue](bench/research/20261009-astra-future-queue.md).
-
-[The first M5 measurements are complete](bench/M5-RESULTS.md). Twenty full-model benchmark passes record zero swap growth. Keep Tensor API enabled and writing at depth three. Depth six raises the short cached-ledger result from 68.98 to 75.50 TPS (+9.44%) over a fresh depth-four control, with complete replies 4.88% quicker; long cached replies are essentially tied and fresh writing is slower.
-
-The subsequent [M5 GPU tuning batch](bench/M5-GPU-TUNING.md) completes another 24 passes with zero new swap: two-tile limits add only +0.39% code TPS and about +0.59% synthetic TPS; threshold and worker overrides do not help.
-
-The [helper/confidence batch](bench/M5-HELPER-RESULTS.md) completes all twelve comparisons: twelve helper workers add +0.94% code TPS and finish the long fresh-input reply 2.21% sooner; confidence 0.4 adds +1.83% on one prose prompt but regresses other tasks. Both have separate optional launchers; existing defaults remain. The [M5 plan](bench/M5-NEXT.md) records the completed tests and next diagnostics. `M5 Experiment Plan.command` displays the plan without starting inference. The [phase/shape diagnostic](bench/M5-PHASE-PROFILE.md) separates prompt and generation: main-model GPU-buffer intervals cover 68-73% of generation wall time on four diagnostic requests. All matched control/trace outputs agree, and the six prior engines remain unchanged.
-
-The [expert/output-table measurement](bench/M5-OPERATION-PROFILE.md) passes 23 full-size CPU-reference checks and measures 5520 matrix buffers. Expert math is the larger tested matrix family, but the selected operations project to only 34-42% of the recorded main GPU interval. Actual expert reuse and the remaining work need evidence before choosing a shader. One clean unchanged writing launch measures 47.6-48.9 synthetic TPS and 54.2 code TPS; the second launch is excluded for 60.3 MiB new swap during overlapping build activity. This is an incomplete baseline refresh and no new speed gain. All seven engines and launchers remain unchanged. The [Astra research plan](bench/research/20261006-astra-future-plan.md) records later candidates.
-
-[Six future experiment templates](bench/M5-FUTURE-TEMPLATES.md) are prepared: expert reuse, broader GPU timing, 8K context, bounded Mac SSD prefetch, one measured GPU kernel and larger-model paging. The [October 7 preparation update](bench/M5-AUDIT-PREPARATION.md) adds launch/monitor/provenance safeguards, 72 passing offline tests and a bounded 4B split smoke with three matching response pairs and zero new swap. Full Flash routing/split behavior remains untested; full-model testing waits while OpenTaskManager's VM and builds continue. Later templates label remaining implementation work. Empty result sheets track matched TPS/latency percentages, quality and memory. No background trigger resumes testing.
 
 ## Run
 
@@ -77,14 +108,20 @@ uv run --python 3.12 --no-project python scripts/provision.py --jobs 1
 
 Provisioning builds the baseline engine. The helper is quantized from BF16 to Q3, its copies of the main model's embedding and output tables are removed, and its tensors are reordered for the mixed CPU/GPU placement. The launcher's `m5-small-stack` build (`prepare_m5.py`) needs the operation build from `prepare_mma.py`, which in turn needs the shared-weight checkout from `prepare_shared.py`. `tests/test_recreate_recipe.py` checks this order against the scripts and `config/`.
 
-Sources, dependencies and model revisions are pinned in `config/` and `requirements.txt`. Downloads resume and verify exact byte count and SHA256 before a model becomes available; each download also needs 20 GiB spare beyond what is left to fetch. By registered byte count the model files in this chain total 78.5 GB: 66.4 GB for Flash, the 7.77 GB BF16 helper source and 1.80, 1.25 and 1.25 GB for the Q3, shared and packed helpers. The first launch or benchmark reads the 67.7 GB of Flash and packed-helper files in full to check their SHA256, then keeps the result in `bench/runtime/model-verification.json`. Smaller helpers are quantized from verified BF16, not re-quantized from the compressed Q4 file. `prepare_draft.py` records source/tool pins, output SHA256 and native quantization logs. The experiments also retain Q2_K and Q2_0 variants; they are not the chosen profile.
+New engine build receipts also record the non-system libraries `llama-server` loads from outside its `build/bin` folder: resolved path, SHA256, install names and the versions `otool` reports. Launch, benchmark and preparation checks then refuse a changed, missing, duplicated or newly linked library. On this Mac, read-only `otool` inspection on October 14 found Homebrew OpenSSL 3.6.4 `libssl` and `libcrypto` in that set for the baseline, `mtp-mma` and `m5-small-stack` builds. Receipts written before this record existed, including every engine receipt on this Mac as of October 14, have none. They stay accepted, `provision.py --check-only` reports their external libraries as unrecorded, and nothing adds a record to them; that needs a deliberate rebuild. `provision.py --local-http-only` builds the baseline without OpenSSL, and `prepare_shared.py`, `prepare_mma.py` and `prepare_m5.py` read that choice from the baseline's CMake cache and build the same way. [The preparation recipe](bench/M5-PREPARATION-RECIPE.md#source-and-baseline-provisioning--cpu-build-no-inference) gives the details.
+
+Sources, dependencies and model revisions are pinned in `config/`, `requirements.txt` and its hashed lock `requirements-ci.lock`. Downloads resume and verify exact byte count and SHA256 before a model becomes available; each download also needs 20 GiB spare beyond what is left to fetch. By registered byte count the model files in this chain total 78.5 GB: 66.4 GB for Flash, the 7.77 GB BF16 helper source and 1.80, 1.25 and 1.25 GB for the Q3, shared and packed helpers. The first launch or benchmark reads the 67.7 GB of Flash and packed-helper files in full to check their SHA256, then keeps the result in `bench/runtime/model-verification.json`. Smaller helpers are quantized from verified BF16, not re-quantized from the compressed Q4 file. `prepare_draft.py` records source/tool pins, output SHA256 and native quantization logs. The experiments also retain Q2_K and Q2_0 variants; they are not the chosen profile.
 
 `scripts/run.py small`, the small-model benchmarks and the older helper comparisons also need `download_models.py small` (2.74 GB) and the original Q4 helper, `download_models.py mtp` (2.79 GB). The default launcher uses neither.
 
-Provisioning installs the frozen development quality tools into the lab environment
-alongside its existing runtime packages, so the mandatory offline inventory can
-run its coverage contracts. To update an already provisioned environment without
-rebuilding native code:
+Provisioning installs the runtime lock `requirements-ci.lock` and the development
+quality lock `requirements-quality.lock` with one policy, `--require-hashes
+--only-binary :all:`, the same two files CI installs. The runtime lock holds the six
+versions in `requirements.txt` with wheel hashes; `tests/test_provision_receipt.py`
+checks that they agree, and a failed install stops provisioning before any checkout
+or build. The quality tools let the mandatory offline inventory run its coverage
+contracts. To add them to an already provisioned environment without rebuilding
+native code:
 
 ```sh
 uv pip install --python .venv/bin/python --only-binary :all: --require-hashes -r requirements-quality.lock
@@ -120,6 +157,8 @@ With the web app running, verify the real API and adapter:
 ```
 
 Checks cover greedy native/adapter token parity, Unicode, streaming, OpenAI and Anthropic answers, EOS, overflow rejection, cancellation and disconnect recovery. Text chat is the verified interface scope. Tool calls and vision require their own validation and are rejected by this adapter.
+
+Before the pinned shell sees a chat request, `scripts/api_requests.py` checks its shape. Malformed JSON, wrong types (for example `messages: null` or `max_tokens: true`), NaN or Infinity, and sampling values outside their ranges get a 400 error naming the field, instead of a dropped connection or a silently changed value. Stop sequences (`stop`, `stop_sequences`) are refused because no engine path applies them yet.
 
 ## Why the full model can exceed RAM on disk
 
@@ -197,9 +236,27 @@ The separate few-row dense Metal experiment combines the existing shared helper 
 
 The writing upgrade improves short synthetic generation 11.5% over this suite's freshly remeasured prior one-token profile; it changes both the kernel and prediction depth. The kernel alone improves three-token writing/code roughly 17%. The four-token cached comparison improves output speed 20.0% and complete reply time 11.1%. Twelve speed passes pass 360 answer checks with zero new swap; all 27 real app checks and 1,076 synthetic GPU math checks pass. These are focused checks, not a broad model-quality evaluation. [Full measurements and limits](bench/METAL-MMA.md).
 
-## Next steps
+## History
 
-The [October 6 parent/fork review](bench/UPSTREAM-SCAN.md) ranks specific Mac experiments and records which improvements are already in this runtime. The isolated Q2_0 Metal candidate passed 124 small GPU correctness checks and 54 full-model answer checks; six baseline/candidate benchmark passes completed. Final writing gains were +0.3% / +3.7% for short/long prompts, while input processing slowed 6-7% and full replies changed little. Background work affected earlier passes. The normal launcher keeps the original engine. [Measured results, evidence and commands](bench/Q2-METAL.md).
+Dated checkpoint summaries, newest first. Each describes the lab on its own date; the current settings and queue are in [Current status](#current-status--october-14-2026). Failed and parked results stay in the [experiment decision ledger](bench/EXPERIMENT-LEDGER.md).
+
+**October 10, 2026 — P07 adopted.** [P07 is validated and installed in the normal launcher](bench/results/20261010-small-gains-stack/REPORT.md). Its prior independent confirmation adds +0.61% code/+0.79% prose generation over the direct-copy profile. New longer-prompt and 32-token answer safety checks pass; 12 full-model launches, 312 answer/cache checks and 192 exact output signatures have zero new swap. The actual Strata API passes 16 English answer checks plus streaming and clean shutdown. W02 adds +0.58–0.71% TPS but exceeds the declared 10 ms startup ceiling on prose, so stacking remains untested. Double-click `Start Strata.command` for P07; `Start Strata - Original Baseline.command` restores the earlier profile. No model server is left running.
+
+**October 10, 2026 — upstream refresh.** The short-prompt/256-output confirmation at that date was **60.08 TPS English code / 40.38 TPS English prose**; longer-prompt safety results are a separate workload. [October 10 upstream and fork refresh](bench/research/20261010-upstream-refresh/REPORT.md) screens 1,811 public fork listings and records seven future investigations. The new full-model MLX engine is the strongest source lead; its 128 GB M4 measurements and F16 numerical changes are not a verified upgrade for this 48 GiB M5. [That date's queue and prerequisites](bench/research/20261010-upstream-refresh/NEXT-EXPERIMENTS.json). No new model benchmark ran during that review.
+
+**October 9, 2026 — draft-cap pass.** [Actual draft-cap early stopping and fixed two guesses](bench/results/20261009-draftcap/REPORT.md) are complete. The tail repair removes discarded helper work but has no useful measured gain: code59.482→59.464TPS (-0.030%), English prose39.931→40.007 (+0.191%), both below control drift. Fixed two passes short checks but changes the228th token in a longer English writing fixture and is parked; no controller added. All attempted launches have zero new swap;121 load-free checks pass,21 engine receipts validate and all20 preexisting engines/ordinary launcher defaults remain unchanged. Future benchmarks and native diagnostic prompts use English prose and code only. [Decisions and retry conditions](bench/EXPERIMENT-LEDGER.md), [queue at that date](bench/research/20261009-astra-future-queue.md).
+
+**October 7, 2026 — preparation.** [Six future experiment templates](bench/M5-FUTURE-TEMPLATES.md) are prepared: expert reuse, broader GPU timing, 8K context, bounded Mac SSD prefetch, one measured GPU kernel and larger-model paging. The [October 7 preparation update](bench/M5-AUDIT-PREPARATION.md) adds launch/monitor/provenance safeguards, 72 passing offline tests and a bounded 4B split smoke with three matching response pairs and zero new swap. On October 7, full Flash routing/split behavior was untested and full-model testing was held while OpenTaskManager's VM and builds ran. That hold ended: user-authorized testing completed cards 1–7 by October 9, as the templates' October 9 update records. Later templates label remaining implementation work. Empty result sheets track matched TPS/latency percentages, quality and memory. No background trigger resumes testing.
+
+**October 6, 2026 — first M5 measurements** (UTC artifact names fall on October 7). [The first M5 measurements are complete](bench/M5-RESULTS.md). Twenty full-model benchmark passes record zero swap growth. Keep Tensor API enabled and writing at depth three. Depth six raises the short cached-ledger result from 68.98 to 75.50 TPS (+9.44%) over a fresh depth-four control, with complete replies 4.88% quicker; long cached replies are essentially tied and fresh writing is slower.
+
+The subsequent [M5 GPU tuning batch](bench/M5-GPU-TUNING.md) completes another 24 passes with zero new swap: two-tile limits add only +0.39% code TPS and about +0.59% synthetic TPS; threshold and worker overrides do not help.
+
+The [helper/confidence batch](bench/M5-HELPER-RESULTS.md) completes all twelve comparisons: twelve helper workers add +0.94% code TPS and finish the long fresh-input reply 2.21% sooner; confidence 0.4 adds +1.83% on one prose prompt but regresses other tasks. Both have separate optional launchers; existing defaults remain. The [M5 plan](bench/M5-NEXT.md) records the completed tests and next diagnostics. `M5 Experiment Plan.command` displays the plan without starting inference. The [phase/shape diagnostic](bench/M5-PHASE-PROFILE.md) separates prompt and generation: main-model GPU-buffer intervals cover 68-73% of generation wall time on four diagnostic requests. All matched control/trace outputs agree, and the six prior engines remain unchanged.
+
+The [expert/output-table measurement](bench/M5-OPERATION-PROFILE.md) passes 23 full-size CPU-reference checks and measures 5520 matrix buffers. Expert math is the larger tested matrix family, but the selected operations project to only 34-42% of the recorded main GPU interval. Actual expert reuse and the remaining work need evidence before choosing a shader. One clean unchanged writing launch measures 47.6-48.9 synthetic TPS and 54.2 code TPS; the second launch is excluded for 60.3 MiB new swap during overlapping build activity. This is an incomplete baseline refresh and no new speed gain. All seven engines and launchers remain unchanged. The [Astra research plan](bench/research/20261006-astra-future-plan.md) records later candidates.
+
+**October 6, 2026 — first next-steps list.** The [October 6 parent/fork review](bench/UPSTREAM-SCAN.md) ranks specific Mac experiments and records which improvements are already in this runtime. The isolated Q2_0 Metal candidate passed 124 small GPU correctness checks and 54 full-model answer checks; six baseline/candidate benchmark passes completed. Final writing gains were +0.3% / +3.7% for short/long prompts, while input processing slowed 6-7% and full replies changed little. Background work affected earlier passes. The normal launcher keeps the original engine. [Measured results, evidence and commands](bench/Q2-METAL.md).
 
 1. Conversation caching is implemented, benchmarked and enabled. Its matched follow-up results are in [the scoreboard](bench/RESULTS.md) and [experiment notes](bench/NOTES.md).
 2. The smaller prediction helper is implemented and benchmarked. Keep it optional: its benefit depends on sampling and workload. [Prediction results](bench/PREDICTION.md).
@@ -207,5 +264,7 @@ The [October 6 parent/fork review](bench/UPSTREAM-SCAN.md) ranks specific Mac ex
    [Helper depth and worker tuning](bench/HELPER-TUNING.md) adds optional writing and cached-follow-up profiles.
 3. Treat larger contexts and higher-precision full models as separate capacity experiments. Porting Strata's expert scheduler to Metal is a larger engineering project.
 4. Investigate two-device execution later. The AMD desktop's memory does not automatically merge with Mac unified memory; networking and GPU support must be tested separately.
+
+## References
 
 The attached port plan predates native MTP support in the runtime pinned here. Avoid rebuilding those kernels or a custom draft loop until current upstream behavior has been tested. References: [Strata Mac fork](https://github.com/jinzy0623/Strata-macOS), [llama.cpp v0.6.0](https://github.com/ggml-org/llama.cpp/releases/tag/v0.6.0), [full model](https://huggingface.co/ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF), [draft files](https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/tree/main/MTP).
