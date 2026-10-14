@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Guarded prompt-chunk trials on the kept engine; no load without --run."""
+"""Guarded prompt-chunk trials on the kept engine; no load without --run.
+
+The same A/B/B/A protocol also compares an engine candidate (N15's helper overlap) against the kept engine at an
+unchanged chunk size; qualify_overlap.py runs those brackets with extra lifecycle checks in every launch.
+"""
 
 import argparse
 from collections.abc import Callable, Sequence
@@ -14,7 +18,7 @@ import re
 import statistics
 import subprocess
 import time
-from typing import NotRequired, TypedDict
+from typing import NamedTuple, NotRequired, TypedDict
 
 from benchmark import JSONDict, stream_completion, wait_ready
 from benchmark_m5_next import wait_for_headroom
@@ -28,6 +32,7 @@ from hardware_telemetry import Sampler, tool_pin
 from lab import ROOT
 from metal_environment import configure
 from model_provenance import ModelVerification, assert_unchanged, verify_models
+from overlap_ops import overlap_receipt
 from profile_m5_routes import preflight
 from runtime_memory import admit_model, app_monitor
 from trial_support import (
@@ -54,6 +59,9 @@ MAX_OUTPUT = 768
 REPEATS = 3
 ORDER = ("control", "candidate", "candidate", "control")
 PROFILES = {"512": (512, 512), "1024": (1024, 1024), "1536": (1536, 1536), "256": (512, 256)}
+KEPT_TUNING = "small-reduce"
+# Engine candidates keep the control's chunk size and change the engine and its switches instead.
+ENGINE_CANDIDATES = {"overlap": ("m5-overlap", "overlap-reduce")}
 RETRIEVAL = (
     "Read the fictional notes below. Return only a JSON object for Record 27, with keys owner, "
     "timeout_seconds and retry_limit. Do not explain.\n\n"
@@ -84,12 +92,25 @@ class Closure(TypedDict):
     sources: dict[str, str]
     fixture_sha256: str
     engine: VerifiedEngine
+    candidate_engine: NotRequired[VerifiedEngine]
 
 
 class Frozen(TypedDict):
     closure: Closure
     models: ModelVerification
     hardware_tool: NotRequired[JSONDict]
+
+
+# Requests a launch makes after its timed cases: (launch folder, result, server base URL).
+Lifecycle = Callable[[Path, JSONDict, str], None]
+
+
+class Arm(NamedTuple):
+    """The engine and switches of one bracket arm, and the requests it makes after its timed cases."""
+
+    engine: str = ENGINE
+    tuning: str = KEPT_TUNING
+    lifecycle: Lifecycle | None = None
 
 
 @dataclass
@@ -207,13 +228,17 @@ def compare(arms: Sequence[JSONDict], draft_profile: str = "balanced") -> JSONDi
     }
 
 
-def closure() -> Closure:
-    return {"sources": fingerprint(), "fixture_sha256": sha256(FIXTURES), "engine": verify_engine(ENGINE)}
+def closure(candidate_engine: str | None = None) -> Closure:
+    result: Closure = {"sources": fingerprint(), "fixture_sha256": sha256(FIXTURES), "engine": verify_engine(ENGINE)}
+    if candidate_engine is not None:
+        result["candidate_engine"] = verify_engine(candidate_engine)
+    return result
 
 
 def check_frozen(frozen: Frozen) -> None:
     require_pass()
-    if closure() != frozen["closure"]:
+    candidate = frozen["closure"].get("candidate_engine")
+    if closure(candidate["engine"] if candidate else None) != frozen["closure"]:
         raise RuntimeError("Frozen source or engine changed; start a new campaign")
     assert_unchanged(frozen["models"])
     if frozen.get("hardware_tool") and tool_pin() != frozen["hardware_tool"]:
@@ -288,7 +313,9 @@ def measure_case(folder: Path, result: JSONDict, owned: OwnedLaunch, base: str, 
         )
 
 
-def run_launch(folder: Path, result: JSONDict, owned: OwnedLaunch, frozen: Frozen) -> None:
+def run_launch(
+    folder: Path, result: JSONDict, owned: OwnedLaunch, frozen: Frozen, lifecycle: Lifecycle | None = None
+) -> None:
     assert_no_model_server()
     check_frozen(frozen)
     result["settle"] = wait_for_headroom()
@@ -299,8 +326,8 @@ def run_launch(folder: Path, result: JSONDict, owned: OwnedLaunch, frozen: Froze
         owned.hardware.start(frozen["hardware_tool"])
     port = free_port()
     batch, ubatch = PROFILES[result["profile"]]
-    command = trial_command(kept_server(port, batch, ubatch), result["draft_profile"])
-    env, flags = configure(os.environ, ENGINE, "on", "small-reduce")
+    command = trial_command(kept_server(port, batch, ubatch, result["engine"]), result["draft_profile"])
+    env, flags = configure(os.environ, result["engine"], "on", result["tuning"])
     policy = admit_model("flash")
     result.update(command=command, settings={"batch": batch, "ubatch": ubatch, "metal": flags}, memory_policy=policy)
     write(folder / "result.json", result)
@@ -317,6 +344,8 @@ def run_launch(folder: Path, result: JSONDict, owned: OwnedLaunch, frozen: Froze
         result["ready_s"] = wait_ready(owned.process, base)
         for case in cases(result["draft_profile"]):
             measure_case(folder, result, owned, base, case)
+        if lifecycle:
+            lifecycle(folder, result, base)
 
 
 def accept_launch(folder: Path, result: JSONDict, hardware: bool) -> None:
@@ -327,6 +356,7 @@ def accept_launch(folder: Path, result: JSONDict, hardware: bool) -> None:
         raise RuntimeError("Hardware diagnostic coverage failed; original answers retained")
     text = (folder / "native.log").read_text()
     result["activation"] = feature_receipts(text, ["reduce"])
+    result["activation"]["overlap"] = overlap_receipt(text, result["tuning"] == ENGINE_CANDIDATES["overlap"][1])
     result["drafting"] = drafting_receipts(text, result["draft_profile"])
     result["actual_chunks"] = chunk_receipt(text, result["profile"])
     result["status"] = "passed"
@@ -350,19 +380,24 @@ def finish_launch(folder: Path, result: JSONDict, owned: OwnedLaunch, frozen: Fr
     write(folder / "result.json", result)
 
 
-def launch(folder: Path, role: str, profile: str, frozen: Frozen, draft_profile: str = "balanced") -> JSONDict:
+def launch(
+    folder: Path, role: str, profile: str, frozen: Frozen, draft_profile: str = "balanced", arm: Arm | None = None
+) -> JSONDict:
+    arm = arm or Arm()
     folder.mkdir()
     result: JSONDict = {
         "status": "running",
         "role": role,
         "profile": profile,
         "draft_profile": draft_profile,
+        "engine": arm.engine,
+        "tuning": arm.tuning,
         "cases": [],
         "models_loaded": False,
     }
     owned = OwnedLaunch()
     try:
-        run_launch(folder, result, owned, frozen)
+        run_launch(folder, result, owned, frozen, arm.lifecycle)
         result["status"] = "completed"
     except BaseException as error:
         result.update(status="failed", error=f"{type(error).__name__}: {error}")
@@ -380,11 +415,32 @@ def copy_sources(output: Path, sources: dict[str, str]) -> None:
         dest.write_bytes((ROOT / relative).read_bytes())
 
 
-def campaign(output: Path, candidate: str, draft_profile: str, frozen: Frozen) -> None:
+def arms(candidate: str, chunks: str = "512", lifecycle: Lifecycle | None = None) -> list[tuple[str, Arm]]:
+    """Profile and arm per launch: a chunk candidate changes the chunk size, an engine candidate the engine."""
+    engine = ENGINE_CANDIDATES.get(candidate)
+    if engine is None and chunks != "512":
+        raise ValueError("Chunk candidates are compared with the 512-token control")
+    kept = Arm(lifecycle=lifecycle)
+    if engine is None:
+        return [("512", kept) if role == "control" else (candidate, kept) for role in ORDER]
+    return [(chunks, kept if role == "control" else Arm(*engine, lifecycle)) for role in ORDER]
+
+
+def campaign(
+    output: Path,
+    candidate: str,
+    draft_profile: str,
+    frozen: Frozen,
+    chunks: str = "512",
+    lifecycle: Lifecycle | None = None,
+) -> None:
+    plan = arms(candidate, chunks, lifecycle)
     result: JSONDict = {
         "schema": 1,
         "status": "running",
         "candidate": candidate,
+        "chunks": [profile for profile, _ in plan],
+        "engines": [arm.engine for _, arm in plan],
         "draft_profile": draft_profile,
         "order": ORDER,
         "arms": [],
@@ -400,9 +456,8 @@ def campaign(output: Path, candidate: str, draft_profile: str, frozen: Frozen) -
     try:
         with (ROOT / "bench/.lock").open("w") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            for i, role in enumerate(ORDER):
-                profile = "512" if role == "control" else candidate
-                result["arms"].append(launch(output / f"arm-{i + 1}-{role}", role, profile, frozen, draft_profile))
+            for i, (role, (profile, arm)) in enumerate(zip(ORDER, plan, strict=True)):
+                result["arms"].append(launch(output / f"arm-{i + 1}-{role}", role, profile, frozen, draft_profile, arm))
                 write(output / "campaign.json", result)
             result["comparison"] = compare(result["arms"], draft_profile)
             result["status"] = "passed"
