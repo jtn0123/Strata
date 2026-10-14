@@ -268,9 +268,9 @@ class DriverTests(unittest.TestCase):
         self.assertNotIn('check', control)
         with self.assertRaisesRegex(ValueError, 'Missing engine marker: lab: lazy-row advice madvise'):
             self.analyze('madvise', [driver.ELIGIBLE])
+        unadvised = [driver.ELIGIBLE, 'lab: lazy-row advice rdadvise, trace level 1', line(call(10, 704, mode='off'))]
         with self.assertRaisesRegex(ValueError, 'did not reach the engine'):
-            self.analyze('rdadvise', [driver.ELIGIBLE, 'lab: lazy-row advice rdadvise, trace level 1',
-                                      line(call(10, 704, mode='off'))])
+            self.analyze('rdadvise', unadvised)
 
     def test_the_guarded_launch_uses_these_steps_for_every_advice_mode(self):
         import profile_prompt_ops as guarded

@@ -106,15 +106,16 @@ class ComparisonTests(unittest.TestCase):
         self.assertEqual(result['repeatable'], {})
         self.assertEqual(result['parity']['differing_cases'], ['p edit', 'p first', 'p follow-up', 'p regenerate'])
         self.assertEqual(result['restores']['stale']['invalid'], 1)
-        self.assertEqual(result['acceptance']['stale']['regenerate']['rate'], None)
-        self.assertEqual(compare([launch('stale', {})])['restores']['stale']['pending_rel_diff_median'], None)
+        self.assertIsNone(result['acceptance']['stale']['regenerate']['rate'])
+        self.assertIsNone(compare([launch('stale', {})])['restores']['stale']['pending_rel_diff_median'])
         lone = dict(launch('stale', {}), requests=[request('p', 'first', 1)])
         self.assertEqual(compare([lone])['acceptance']['stale']['edit'],
                          dict(requests=0, drafted=0, accepted=0, rate=None, tok_s=None))
 
     def test_launches_of_other_modes_are_refused(self):
+        launches = [launch('madvise', {})]
         with self.assertRaisesRegex(ValueError, 'Unknown MTP state launch mode madvise'):
-            compare([launch('madvise', {})])
+            compare(launches)
 
 
 class DriverTests(unittest.TestCase):
@@ -211,10 +212,13 @@ class DriverTests(unittest.TestCase):
                                                 line(restore(20))])['checkpoints_max'], 0)
         with self.assertRaisesRegex(ValueError, 'Missing engine marker: lab: MTP checkpoint state restore'):
             self.analyze('restore', [])
+        marker = 'lab: MTP checkpoint state restore, trace on'
+        not_applied = [marker, line(restore(20))]
         with self.assertRaisesRegex(ValueError, 'did not reach the engine'):
-            self.analyze('restore', ['lab: MTP checkpoint state restore, trace on', line(restore(20))])
+            self.analyze('restore', not_applied)
+        saved_only = [marker, line(save(10))]
         with self.assertRaisesRegex(ValueError, 'no checkpoint was restored'):
-            self.analyze('restore', ['lab: MTP checkpoint state restore, trace on', line(save(10))])
+            self.analyze('restore', saved_only)
 
     def test_the_guarded_launch_uses_these_steps_for_both_modes(self):
         import profile_prompt_ops as guarded
