@@ -130,6 +130,23 @@ class WebIntakeSocketTests(unittest.TestCase):
         self.assertIn('mock engine', json.loads(body)['choices'][0]['message']['content'])
         self.assertEqual(self.server.completed(), before + 1)
 
+    def test_malformed_chat_requests_get_400_and_the_next_request_is_answered(self):
+        before = self.server.completed()
+        malformed = [('/v1/chat/completions', b'[]'), ('/v1/chat/completions', b'{"messages": null}'),
+                     ('/v1/messages', b'{"messages": [{"content": "hi"}]}'),
+                     ('/v1/chat/completions', json.dumps(dict(CHAT, chat_template_kwargs=5)).encode()),
+                     ('/v1/chat/completions', json.dumps(dict(CHAT, max_tokens=True)).encode()),
+                     ('/v1/chat/completions', json.dumps(dict(CHAT, temperature=float('nan'))).encode()),
+                     ('/v1/chat/completions', json.dumps(dict(CHAT, stop='STOP')).encode()),
+                     ('/v1/messages', json.dumps(dict(CHAT, stop_sequences=['STOP'])).encode())]
+        for path, body in malformed:
+            with self.subTest(path=path, body=body):
+                status, _, reply = self.server.request('POST', path, body)
+                self.assertEqual(status, 400, reply)
+                self.assertEqual(json.loads(reply)['error']['type'], 'invalid_request_error')
+        self.assertEqual(self.server.completed(), before)
+        self.assertEqual(self.server.request('POST', '/v1/chat/completions', CHAT)[0], 200)
+
     def test_streaming_answer_ends_normally(self):
         status, headers, body = self.server.request('POST', '/v1/chat/completions', dict(CHAT, stream=True),
                                                     headers={'Origin': f'http://127.0.0.1:{self.server.port}'})

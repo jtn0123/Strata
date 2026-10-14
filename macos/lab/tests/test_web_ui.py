@@ -363,9 +363,10 @@ class BodyTests(WebLayerCase):
         self.assertTrue(reads and max(reads) <= web_ui.READ_PIECE)
 
     def test_largest_allowed_body_and_missing_length_reach_the_pinned_handler(self):
-        body = b'x' * MAX_BODY_BYTES
+        start, end = CHAT[:-1] + b', "padding": "', b'"}'
+        body = start + b'x' * (MAX_BODY_BYTES - len(start) - len(end)) + end
         self.assertEqual(self.framed(body=body).calls, [('POST', '/v1/chat/completions', body)])
-        self.assertEqual(self.framed(body=b'').calls, [('POST', '/v1/chat/completions', b'')])
+        self.assertEqual(self.exchange(raw_request('POST', '/settings')).calls, [('POST', '/settings', b'')])
 
     def test_short_or_slow_bodies_end_with_an_answer(self):
         short = self.framed(('Content-Length', '200'))
@@ -408,6 +409,29 @@ class BodyTests(WebLayerCase):
                                SimpleNamespace(server_address=('127.0.0.1', 8095)))
         self.assertTrue(handler.close_connection)
         self.assertEqual(service.calls, [])
+
+
+class ChatContractTests(WebLayerCase):
+    BOTH = [b'[]', b'null', b'"hi"', b'{}', b'{"messages": null}', b'{"messages": ["hi"]}', b'{"messages": ',
+            CHAT[:-1] + b', "temperature": NaN}', CHAT[:-1] + b', "max_tokens": true}']
+    MALFORMED = {'/v1/chat/completions': [CHAT[:-1] + b', "chat_template_kwargs": 5}', CHAT[:-1] + b', "stop": "X"}'],
+                 '/v1/messages': [CHAT[:-1] + b', "system": 5}', CHAT[:-1] + b', "stop_sequences": ["X"]}']}
+
+    def test_malformed_chat_requests_get_a_named_400_before_the_pinned_handler(self):
+        for path, own in self.MALFORMED.items():
+            for body in self.BOTH + own:
+                with self.subTest(path=path, body=body):
+                    reply = self.post(path, body=body)
+                    self.assert_refused(reply, 400)
+                    self.assertEqual(reply.json()['error']['type'], 'invalid_request_error')
+                    self.assertEqual(reply.sock.reader.tell(), len(reply.sock.reader.getvalue()))
+
+    def test_checks_follow_authorization_and_leave_other_posts_alone(self):
+        self.assert_refused(self.post(body=b'[]', api_key=KEY), 401)
+        reply = self.post(body=b'[]', api_key=KEY, headers=[('x-api-key', KEY)])
+        self.assert_refused(reply, 400)
+        self.assertEqual(self.post('/settings', body=b'[]').calls, [('POST', '/settings', b'[]')])
+        self.assertEqual(self.post('/v1/messages', body=CHAT).calls, [('POST', '/v1/messages', CHAT)])
 
 
 class StatusTests(WebLayerCase):

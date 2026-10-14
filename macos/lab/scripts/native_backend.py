@@ -51,14 +51,17 @@ def validate_native_properties(response: Mapping[str, Any]) -> None:
         raise ValueError("Expected context, build_info and model_path properties")
 
 
+def token_ids(value: object) -> bool:
+    return isinstance(value, list) and all(type(token) is int and token >= 0 for token in value)
+
+
 def validate_native_response(endpoint: str, response: object) -> JSONDict:
     if not isinstance(response, dict):
         raise ValueError("Expected a JSON object")
     if "error" in response:
         raise ValueError(f"Native error response: {response['error']}")
     if endpoint == "/tokenize":
-        tokens = response.get("tokens")
-        if not isinstance(tokens, list) or any(type(token) is not int or token < 0 for token in tokens):
+        if not token_ids(response.get("tokens")):
             raise ValueError("Expected a list of nonnegative token IDs")
     elif endpoint in (DETOKENIZE_ENDPOINT, "/apply-template"):
         key = "content" if endpoint == DETOKENIZE_ENDPOINT else "prompt"
@@ -67,6 +70,19 @@ def validate_native_response(endpoint: str, response: object) -> JSONDict:
     elif endpoint == "/props":
         validate_native_properties(response)
     return response
+
+
+def validate_completion_packet(packet: object) -> JSONDict:
+    """One streamed completion record: token IDs the tokenizer can decode and a boolean stop flag."""
+    if not isinstance(packet, dict):
+        raise ValueError("Expected a JSON object completion packet")
+    if packet.get("error"):
+        raise RuntimeError(f"Native inference error: {packet['error']}")
+    if not token_ids(packet.get("tokens", [])):
+        raise ValueError("Expected a list of nonnegative token IDs in a completion packet")
+    if not isinstance(packet.get("stop", False), bool):
+        raise ValueError("Expected a boolean completion stop flag")
+    return packet
 
 
 def native_request(base: str, endpoint: str, payload: JSONDict | None = None) -> JSONDict:
@@ -214,7 +230,7 @@ class _NativeStream:
         self.connection.request(
             "POST",
             "/completion",
-            body=json.dumps(payload),
+            body=json.dumps(payload, allow_nan=False),
             headers={"Content-Type": "application/json"},
         )
         self.transport = self.connection.sock
@@ -230,7 +246,7 @@ class _NativeStream:
                 if self.stopped.is_set():
                     break
                 if line.startswith(b"data: "):
-                    self._publish_packet(json.loads(line[6:]))
+                    self._publish_packet(validate_completion_packet(json.loads(line[6:])))
         except BaseException as error:
             self.events.put(error)
         finally:
@@ -239,8 +255,6 @@ class _NativeStream:
             self.events.put(None)
 
     def _publish_packet(self, item: JSONDict) -> None:
-        if item.get("error"):
-            raise RuntimeError(f"Native inference error: {item['error']}")
         if item.get("stop"):
             self.final_record = item
             self.final_ready.set()
