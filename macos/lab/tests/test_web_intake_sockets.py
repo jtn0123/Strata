@@ -3,6 +3,7 @@ import http.client
 import json
 import os
 from pathlib import Path
+import signal
 import socket
 import subprocess
 import sys
@@ -31,7 +32,9 @@ class Server:
         self.port = free_port()
         self.log = tempfile.TemporaryFile()
         env = dict(os.environ, STRATA_API_KEY=api_key)
-        self.process = subprocess.Popen([sys.executable, str(ROOT / 'scripts/strata_server.py'), '--engine', 'mock',
+        # Unbuffered, with faulthandler: a server that does not start leaves its thread stacks in the log.
+        self.process = subprocess.Popen([sys.executable, '-u', '-X', 'faulthandler',
+                                         str(ROOT / 'scripts/strata_server.py'), '--engine', 'mock',
                                          '--host', '127.0.0.1', '--port', str(self.port)],
                                         stdout=self.log, stderr=subprocess.STDOUT, env=env, cwd=ROOT)
         deadline, last = time.monotonic() + 30, None
@@ -48,8 +51,13 @@ class Server:
         self.fail_start(f'was not ready (last /health: {last!r})')
 
     def fail_start(self, problem):
-        self.process.kill()
-        self.process.wait(timeout=5)
+        if self.process.poll() is None:
+            self.process.send_signal(signal.SIGABRT)
+            try:
+                self.process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                self.process.kill()
+                self.process.wait(timeout=5)
         output = self.output()
         self.log.close()
         raise RuntimeError(f'Mock server {problem}: {output}')
