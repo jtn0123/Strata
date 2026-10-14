@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "id": "m5-advise",
+  "base_revision": "d81235049384534c167caea52b85a694f6103d14",
+  "directory": "vendor/llama-m5-advise",
+  "patch": "patches/mtp-m5-advise.patch",
+  "patch_sha256": "0e8b234cfd00822eba6bb7bec1bb7143311fd0c84681ce739775fad2264561d3",
+  "source_diff_sha256": "0e8b234cfd00822eba6bb7bec1bb7143311fd0c84681ce739775fad2264561d3",
+  "modified_files": [
+    "ggml/src/ggml-metal/ggml-metal-common.cpp",
+    "ggml/src/ggml-metal/ggml-metal-common.h",
+    "ggml/src/ggml-metal/ggml-metal-context.m",
+    "ggml/src/ggml-metal/ggml-metal-device.cpp",
+    "ggml/src/ggml-metal/ggml-metal-device.h",
+    "ggml/src/ggml-metal/ggml-metal-fusion.cpp",
+    "ggml/src/ggml-metal/ggml-metal-fusion.h",
+    "ggml/src/ggml-metal/ggml-metal-impl.h",
+    "ggml/src/ggml-metal/ggml-metal-ops.cpp",
+    "ggml/src/ggml-metal/ggml-metal-ops.h",
+    "ggml/src/ggml-metal/ggml-metal.cpp",
+    "ggml/src/ggml-metal/kernels/argsort.metal",
+    "ggml/src/ggml-metal/kernels/mul_mm.metal",
+    "ggml/src/ggml-metal/kernels/mul_mv_mma.metal",
+    "ggml/src/ggml-metal/kernels/quantize.metal",
+    "src/llama-context.cpp",
+    "src/llama-cparams.h",
+    "src/llama-mmap.cpp",
+    "src/models/qwen4exp.cpp",
+    "tests/test-backend-ops.cpp"
+  ],
+  "features": [
+    "mtp-shared",
+    "m5-tuning",
+    "m5-profile",
+    "m5-copy",
+    "m5-reduce",
+    "m5-top10",
+    "m5-compact",
+    "m5-small-stack",
+    "m5-advise"
+  ],
+  "components": [
+    {
+      "patch": "patches/mtp-m5-copy.patch",
+      "sha256": "7e1c328d6d3f8a9c4509d47d0a1e90857e039166e76f96dd68b3651c37e55640"
+    },
+    {
+      "patch": "patches/mtp-m5-reduce.patch",
+      "sha256": "c1c5d4a73736d41840ae2297534664f3c8205562ec6bcad5a4c7bb9f34255336"
+    },
+    {
+      "patch": "patches/mtp-m5-top10.patch",
+      "sha256": "d849c8cf38772b907b162d873973c08c86729e5583d3e4c0c9726012df5a6888"
+    },
+    {
+      "patch": "patches/mtp-m5-compact.patch",
+      "sha256": "f00bde8d2ec960aa5c89db32b1e87c4fea6423d80974acbacc9fefc1f0dd9164"
+    }
+  ],
+  "scope": "Separate kept-stack clone with one opt-in switch for advisory reads of the lazy lookup-table rows a batch is about to gather. The pinned llama_prefetch does nothing on Apple. GGML_M5_LAB_ADVISE=madvise asks the VM to read the rows' pages with MADV_WILLNEED, the mechanism llama.cpp PR 30405 enables on Apple; =rdadvise asks the file system to read the same page spans with F_RDADVISE through a duplicate of the lazy file's descriptor. Spans are whole pages inside the lazy mapping, adjacent rows merged, at most 256 MiB per call. GGML_M5_LAB_ADVISE_TRACE=1 prints, for each call, the pages asked for, the pages not resident beforehand (mincore) and the advice time; =2 also counts the pages still not resident when the advice returns. With both unset the engine is the kept engine. Kernels, fusion, weights, arithmetic, loader mapping, allocator and context policy unchanged; diagnostic only, never a default.",
+  "upstream": {
+    "pull_request": "https://github.com/ggml-org/llama.cpp/pull/30100",
+    "head": "10d8475c8280490a550e973823e8604ae1b7c635",
+    "merge": "7e8324f5feba1d8be3f966e1791e84107e40cdd7",
+    "license_file": "patches/LLAMA-LICENSE.txt"
+  }
+}

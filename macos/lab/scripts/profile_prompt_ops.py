@@ -18,14 +18,14 @@ times with a 128-token reply, so reply speed, drafts and text can be compared be
 """
 
 import argparse
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 import fcntl
 import json
 import os
 from pathlib import Path
 import subprocess
 import time
-from typing import cast
+from typing import NamedTuple, cast
 
 from benchmark import JSONDict, wait_ready
 from benchmark_m5_next import wait_for_headroom
@@ -116,6 +116,28 @@ OVERLAP_LIMITATION = (
     "Overlap launches also answer each prompt three times with a 128-token reply at temperature 0; reply speed comes "
     "from those replies only and is compared between overlap and serial launches of the same profile."
 )
+
+
+class Steps(NamedTuple):
+    """The parts of a guarded launch that differ between trials: server command, environment, requests, analysis."""
+
+    command: Callable[[int, str, str], list[str]]
+    env: Callable[[str], tuple[dict[str, str], JSONDict]]
+    requests: Callable[[Path, JSONDict, str], None]
+    analyze: Callable[[Path, JSONDict], None]
+    limitation: str
+
+
+# Trials in other modules that reuse this guarded launch register their own modes here.
+OTHER_TRIALS: dict[str, Steps] = {}
+
+
+def steps(mode: str) -> Steps:
+    """A registered trial's steps, or this module's, looked up when the launch needs them."""
+    if mode in OTHER_TRIALS:
+        return OTHER_TRIALS[mode]
+    limitation = LIMITATION if mode not in OVERLAP_MODES else f"{LIMITATION} {OVERLAP_LIMITATION}"
+    return Steps(launch_command, launch_env, run_requests, analyze, limitation)
 
 
 def launch_engine(mode: str) -> str:
@@ -225,8 +247,9 @@ def run_launch(folder: Path, result: JSONDict, owned: OwnedServer, frozen: Froze
     result["preflight"] = preflight(False)
     result["power"] = power()
     port = free_port()
-    command = launch_command(port, result["profile"], result["mode"])
-    env, settings = launch_env(result["mode"])
+    trial = steps(result["mode"])
+    command = trial.command(port, result["profile"], result["mode"])
+    env, settings = trial.env(result["mode"])
     policy = admit_model("flash")
     result.update(command=command, settings=settings, memory_policy=policy)
     write(folder / "result.json", result)
@@ -239,7 +262,7 @@ def run_launch(folder: Path, result: JSONDict, owned: OwnedServer, frozen: Froze
         write(folder / "result.json", result)
         base = f"http://127.0.0.1:{port}"
         result["ready_s"] = wait_ready(owned.process, base)
-        run_requests(folder, result, base)
+        trial.requests(folder, result, base)
 
 
 def schedule(result: JSONDict) -> list[int]:
@@ -330,7 +353,7 @@ def finish_launch(folder: Path, result: JSONDict, owned: OwnedServer, frozen: Fr
         if result["status"] == "completed":
             if not clean_memory(result["memory"]):
                 raise RuntimeError("RAM/swap/cleanup gate failed")
-            analyze(folder, result)
+            steps(result["mode"]).analyze(folder, result)
             result["status"] = "passed"
     except BaseException as error:
         result.update(status="failed", error=f"{type(error).__name__}: {error}")
@@ -346,7 +369,7 @@ def launch(folder: Path, mode: str, profile: str, frozen: Frozen) -> JSONDict:
         "requests": [],
         "models_loaded": False,
     }
-    result["limitation"] = LIMITATION if mode not in OVERLAP_MODES else f"{LIMITATION} {OVERLAP_LIMITATION}"
+    result["limitation"] = steps(mode).limitation
     owned = OwnedServer()
     try:
         run_launch(folder, result, owned, frozen)

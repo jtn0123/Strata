@@ -50,6 +50,8 @@ EXPERIMENTS = {
     "m5-waits": "m5_waits_experiment.json",
     "m5-segments": "m5_segments_experiment.json",
     "m5-overlap": "m5_overlap_experiment.json",
+    "m5-advise": "m5_advise_experiment.json",
+    "m5-mtpstate": "m5_mtpstate_experiment.json",
 }
 ENGINES = ("baseline", *EXPERIMENTS)
 
