@@ -50,8 +50,9 @@ campaign comparisons preserve each receipt publication, payload/cache trace,
 warmup pairing, AB/BA order, outcome/error and CSV. Parity cases are not additional
 test-method counts or new model-speed measurements.
 
-The offline inventory denies network/sockets/native execution. Tiny-process
-termination, port ownership and campaign protocol checks are run separately.
+The offline inventory denies network/sockets/native execution and includes the
+campaign protocol check. Tiny-process termination and port ownership checks are
+run separately.
 Mock browser checks retain startup, complete responses, settings, Monitor's mock
 label/requests and narrow layout. All raw receipts, source snapshots, coverage
 artifacts, screenshots and private machine data stay ignored. Check current

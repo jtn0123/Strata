@@ -33,6 +33,11 @@
 # API key before exposing the port to a network: -e API_KEY=<secret>. Pass
 # -e REINSTALL=1 to change the model settings later.
 #
+# The server runs as the user strata (uid 10001), not root. A new volume is
+# made writable for it; a volume an older, root image made is handed over once:
+#   docker run --rm -v strata-data:/data --user root --entrypoint chown strata -R strata:strata /data
+# A host folder mounted at /data has to be writable for uid 10001.
+#
 # --gpus all on a host with two usable cards: setup takes both (the layer split is
 # its recommended default). Pin one card with -e GPU=0, or name them with
 # -e GPUS=0,2. A volume set up for one card switches to the pair on its first start
@@ -50,8 +55,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         python3 python3-pip python3-venv unzip \
     && rm -rf /var/lib/apt/lists/*
 
+# the server needs no root: a user of its own owns the app folder and /data (a
+# new volume starts with the ownership /data has here)
+RUN useradd --create-home --uid 10001 --shell /usr/sbin/nologin strata \
+    && install -d -o strata -g strata /opt/strata /data
+
 WORKDIR /opt/strata
-COPY . .
+COPY --chown=strata:strata . .
+USER strata
 
 # RTX 20 (75), RTX 30 (86), RTX 40 (89), RTX 50 (120), plus 80 for A-series. CMakeLists
 # refuses anything below 75. BUILD_VISION=0 skips the image encoder build.

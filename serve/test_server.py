@@ -2158,6 +2158,46 @@ class WebApp(unittest.TestCase):
                 self.assertEqual(code, 200)
                 self.assertIn(want, ctype)
 
+    def test_security_headers(self):
+        """No page of another site frames the app, no answer is read as another type, and the page runs only its own
+        scripts: the files it loads and its inline script, by SHA-256."""
+        import base64
+        import hashlib
+        import re
+        for path in ("/", "/web/app.js", "/health", "/fonts/missing.woff2"):
+            with self.subTest(path=path):
+                try:
+                    r = urllib.request.urlopen(self.base + path, timeout=10)
+                except urllib.error.HTTPError as e:
+                    r = e
+                with r:
+                    self.assertEqual(r.headers.get("X-Frame-Options"), "SAMEORIGIN")
+                    self.assertEqual(r.headers.get("X-Content-Type-Options"), "nosniff")
+                    policy = r.headers.get("Content-Security-Policy")
+                    body = r.read()
+                if path != "/":
+                    self.assertIsNone(policy)
+                    continue
+                self.assertIn("frame-ancestors 'self'", policy)
+                self.assertIn("object-src 'none'", policy)
+                inline = re.findall(rb"<script>(.*?)</script>", body, re.DOTALL)
+                self.assertTrue(inline)                                    # the theme before the first paint
+                for script in inline:
+                    sha = base64.b64encode(hashlib.sha256(script).digest()).decode()
+                    self.assertIn(f"'sha256-{sha}'", policy)
+                # every script the page has is a file of this server or one of those inline ones
+                self.assertEqual(len(re.findall(rb"<script\b", body)),
+                                 len(inline) + len(re.findall(rb'<script src="web/[a-z-]+\.js">', body)))
+
+    def test_the_page_policy(self):
+        from serve.server import page_policy
+        self.assertEqual(page_policy(b'<script src="web/app.js"></script>'),
+                         "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' "
+                         "data: blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'")
+        self.assertIn("script-src 'self' 'sha256-ungWv48Bz+pBQUDeXa4iI7ADYaOWF3qctBD/YfIAFa0=' "
+                      "'sha256-+8khpoqJueccJqbV5OzuWFHilflx1ZzCPYj3RcQx9J8=';",
+                      page_policy(b"<script>abc</script><p>x</p><script>\nlet t = 1;\n</script>"))
+
     def test_only_the_app_files_are_served(self):
         for path in ("/web/..%2Fserver.py", "/web/index.html", "/web/test.py", "/fonts/..%2F..%2Fsetup.py",
                      "/fonts/missing.woff2", "/fonts/x.ttf"):
@@ -3463,6 +3503,11 @@ class ImageSources(unittest.TestCase):
                 pass
 
             def do_GET(self):
+                if self.path == "/moved":
+                    self.send_response(302)
+                    self.send_header("Location", "/small")
+                    self.end_headers()
+                    return
                 body = {"/small": b"x" * 100, "/big": b"x" * 5000}.get(urllib.parse.urlsplit(self.path).path)
                 if body is None:
                     self.send_error(404)
@@ -3488,6 +3533,13 @@ class ImageSources(unittest.TestCase):
                             server.Vision.load(base + "/big" + q)
                 with self.assertRaisesRegex(ValueError, "could not be read: HTTP Error 404"):
                     server.Vision.load(base + "/missing")
+                # public only (open to the network): the URL and the redirect are both checked, the cap still holds
+                checked = []
+                with mock.patch.object(server, "public_url", checked.append):
+                    self.assertEqual(server.Vision.download(base + "/moved", True), b"x" * 100)
+                    with self.assertRaisesRegex(ValueError, "is over"):
+                        server.Vision.download(base + "/big?length", True)
+                self.assertEqual(checked, [base + "/moved", base + "/small", base + "/big?length"])
         finally:
             httpd.shutdown()
             httpd.server_close()
@@ -3501,8 +3553,9 @@ class ImageSources(unittest.TestCase):
                           vision=vision)
             held = []
 
-            def download(url):
+            def download(url, public_only=False):
                 held.append(svc.fifo.locked())
+                self.assertFalse(public_only)                       # listening on this PC only
                 return b"the picture"
 
             msgs = [{"role": "user", "content": [{"type": "image", "source": "https://example.com/x.png"},
@@ -3562,6 +3615,96 @@ class ImageSources(unittest.TestCase):
                         status, b = post("/v1/chat/completions", src, headers)
                         self.assertEqual(status, 200, b)
                 self.assertEqual(vision.got, [data, f, f, f])
+            finally:
+                httpd.shutdown()
+                httpd.server_close()
+
+    def test_open_to_the_network_means_beyond_loopback_without_a_key(self):
+        tok = ByteTokenizer()
+        svc = Service(MockEngine(tok, "ok", max_context=CTX), tok, ChatTemplate(ROOT / "serve/chat_template.jinja"))
+        for host, key, want in (("127.0.0.1", "", False), ("localhost", "", False), ("::1", "", False),
+                                ("127.0.0.2", "", False), ("0.0.0.0", "", True), ("::", "", True),
+                                ("192.168.1.5", "", True), ("strata.lan", "", True), ("0.0.0.0", "k", False)):
+            with self.subTest(host=host, key=key):
+                svc.bind_host, svc.api_key = host, key
+                self.assertIs(svc.open_to_network(), want)
+
+    @staticmethod
+    def resolving(*addresses):
+        """socket.getaddrinfo answering with these addresses, whatever the name."""
+        def getaddrinfo(host, port, *args, **kw):
+            return [(socket.AF_INET6 if ":" in a else socket.AF_INET, socket.SOCK_STREAM, 6, "", (a, port))
+                    for a in addresses]
+        return mock.patch("socket.getaddrinfo", getaddrinfo)
+
+    def test_only_public_addresses_pass(self):
+        from serve.server import public_url
+        for address in ("127.0.0.1", "10.1.2.3", "172.16.0.1", "192.168.0.10", "169.254.169.254", "100.64.0.1",
+                        "0.0.0.0", "224.0.0.1", "::1", "fe80::1%en0", "fd00::1", "::ffff:127.0.0.1",
+                        "::ffff:192.168.0.10"):
+            with self.subTest(address=address), self.resolving(address), \
+                    self.assertRaisesRegex(ValueError, "without an API key"):
+                public_url("http://pictures.example/x.png")
+        with self.resolving("93.184.215.14", "10.0.0.1"), self.assertRaisesRegex(ValueError, "without an API key"):
+            public_url("https://pictures.example/x.png")                # one local address is enough
+        for addresses in (("93.184.215.14",), ("2606:4700::6810:84e5", "93.184.215.14")):
+            with self.subTest(addresses=addresses), self.resolving(*addresses):
+                public_url("https://pictures.example:8443/x.png")
+        with mock.patch("socket.getaddrinfo", side_effect=socket.gaierror("no such name")), \
+                self.assertRaisesRegex(ValueError, "could not be read: no such name"):
+            public_url("https://nowhere.example/x.png")
+
+    def test_a_redirect_must_stay_public(self):
+        from serve.server import PublicRedirects
+        req = urllib.request.Request("https://pictures.example/x.png")
+        with self.resolving("169.254.169.254"), self.assertRaisesRegex(ValueError, "without an API key"):
+            PublicRedirects().redirect_request(req, None, 302, "Found", {}, "http://metadata.example/latest")
+        with self.resolving("93.184.215.14"):
+            moved = PublicRedirects().redirect_request(req, None, 302, "Found", {}, "https://cdn.example/x.png")
+        self.assertEqual(moved.full_url, "https://cdn.example/x.png")
+
+    def test_open_to_the_network_no_file_or_local_url_is_read(self):
+        """Listening beyond this PC without an API key, any device on the network is a client: a file of this PC or
+        a URL only it reaches is a 400 before anything is read; a data: URL works, and an API key restores both."""
+        tok = ByteTokenizer()
+        with tempfile.TemporaryDirectory() as d:
+            vision = self.Vision(d)
+            svc = Service(MockEngine(tok, "</think>\n\nok", max_context=CTX), tok,
+                          ChatTemplate(ROOT / "serve/chat_template.jinja"), vision=vision)
+            httpd = serve(svc, port=0)
+            svc.bind_host = "0.0.0.0"                                 # as if listening on every network
+            base = f"http://127.0.0.1:{httpd.server_address[1]}"
+
+            def post(src, key=None):
+                body = {"model": "m", "max_tokens": 8, "messages": [{"role": "user", "content": [
+                    {"type": "text", "text": "what is it?"}, {"type": "image_url", "image_url": {"url": src}}]}]}
+                headers = {"Content-Type": "application/json", **({"Authorization": f"Bearer {key}"} if key else {})}
+                req = urllib.request.Request(base + "/v1/chat/completions", data=json.dumps(body).encode(),
+                                             headers=headers)
+                try:
+                    with urllib.request.urlopen(req, timeout=30) as r:
+                        return r.status, json.loads(r.read())
+                except urllib.error.HTTPError as e:
+                    with e:
+                        return e.code, json.loads(e.read())
+
+            try:
+                f = Path(d) / "secret.png"
+                f.write_bytes(b"\x89PNG\r\n\x1a\n")
+                # open to the network, an image URL is fetched only through build_opener (PublicRedirects)
+                with mock.patch("urllib.request.build_opener") as opener:
+                    for src in (str(f), "file://" + str(f), "http://127.0.0.1:1/x.png", "http://10.0.0.1/x.png"):
+                        with self.subTest(src=src):
+                            status, b = post(src)
+                            self.assertEqual(status, 400, b)
+                            self.assertIn("without an API key", b["error"]["message"])
+                opener.assert_not_called()                            # refused before a request
+                self.assertEqual(vision.got, [])                      # nothing was read
+                data = "data:image/png;base64,iVBORw0KGgo="
+                self.assertEqual(post(data)[0], 200)
+                svc.api_key = "k"
+                self.assertEqual(post(str(f), key="k")[0], 200)
+                self.assertEqual(vision.got, [data, str(f)])
             finally:
                 httpd.shutdown()
                 httpd.server_close()

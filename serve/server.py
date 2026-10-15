@@ -1582,6 +1582,39 @@ class StrataEngine:
 IMAGE_URL_MAX = 32 << 20        # an image URL is read up to this (the web app attaches pictures of up to 20 MB)
 
 
+
+NO_LOCAL_IMAGES = ("this server listens beyond this computer without an API key, so it reads no image files or "
+                   "local-network URLs for a client: send the image as a data: URL or from a public address, or set "
+                   "an API key")
+
+
+def public_url(url: str) -> None:
+    """A ValueError unless every address `url`'s host has is a public one: listening beyond this PC without an API
+    key, an image URL of 127.0.0.1, the LAN or a cloud metadata address (169.254.169.254) had this server fetch what
+    only it can reach, for anyone on the network.  The name is looked up again when it is fetched, so a host whose
+    DNS answers change between the two can still get through; that needs a DNS server under the client's control."""
+    import ipaddress
+    parts = urlsplit(url)
+    try:
+        port = parts.port or (443 if parts.scheme == "https" else 80)
+        infos = socket.getaddrinfo(parts.hostname or "", port, type=socket.SOCK_STREAM)
+    except (OSError, ValueError, UnicodeError) as e:
+        raise ValueError(f"the image URL could not be read: {e}") from None
+    for info in infos:
+        ip = ipaddress.ip_address(str(info[4][0]).split("%")[0])
+        if ip.version == 6 and ip.ipv4_mapped:
+            ip = ip.ipv4_mapped
+        if not ip.is_global or ip.is_multicast:
+            raise ValueError(NO_LOCAL_IMAGES)
+
+
+class PublicRedirects(urllib.request.HTTPRedirectHandler):
+    """A redirect is followed only to a public address (public_url), as the image URL itself."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        public_url(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
 def network_path(path: str) -> bool:
     r"""A path to another computer: \\host\share or //host/share (either slash), \\?\UNC\host\..., \\.\UNC\host\...
     or the NT form \??\UNC\host\...  Windows connects to that host at the first look at the path (os.path.isfile is
@@ -1685,12 +1718,19 @@ class Vision:
         raise ValueError("an image must be a data: URL, an http(s) URL or a local file path")
 
     @staticmethod
-    def download(url: str) -> bytes:
+    def download(url: str, public_only=False) -> bytes:
         """An image URL's bytes, at most IMAGE_URL_MAX of them: the whole response was read, so a huge or endless one
-        filled the memory.  One that cannot be read is a ValueError (a 400 that says so), not a dropped connection."""
+        filled the memory.  One that cannot be read is a ValueError (a 400 that says so), not a dropped connection.
+        `public_only`: the URL and every redirect must name a public address (public_url)."""
         too_big = f"the image URL's file is over {IMAGE_URL_MAX >> 20} MiB"
+        request = urllib.request.Request(url, headers={"User-Agent": "strata"})
         try:
-            with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "strata"}), timeout=60) as r:
+            if public_only:
+                public_url(url)
+                response = urllib.request.build_opener(PublicRedirects).open(request, timeout=60)
+            else:
+                response = urllib.request.urlopen(request, timeout=60)
+            with response as r:
                 size = r.headers.get("Content-Length") or ""
                 if size.isdigit() and int(size) > IMAGE_URL_MAX:
                     raise ValueError(too_big)
@@ -2156,6 +2196,7 @@ class Service:
         self.slot_save_path = None                    # --slot-save-path: /slots/0?action=save|restore (off when None)
         self.embeddings = threading.local()           # the current request's image embeddings file (GENI)
         self.api_key = ""                              # when set, /v1/* needs it (Bearer or x-api-key)
+        self.bind_host = "127.0.0.1"                   # where serve() listens (open_to_network)
         # #458 (opt-in, the config's "effort_position": "end"): a non-default reasoning effort goes in a short system
         # turn before the answer instead of the top of the prompt, so switching it keeps the cached conversation
         self.effort_end = False
@@ -2208,6 +2249,30 @@ class Service:
 
     def loaded(self) -> bool:
         return not hasattr(self.engine, "alive") or self.engine.alive()
+
+    def open_to_network(self) -> bool:
+        """Listening beyond this PC without an API key: any device on the network is a client, so a request's image
+        is not read from this PC's files or from addresses only this PC can reach (read_image)."""
+        import ipaddress
+        if self.api_key:
+            return False
+        name = host_name(self.bind_host)
+        if name == "localhost":
+            return False
+        try:
+            return not ipaddress.ip_address(name).is_loopback
+        except ValueError:
+            return True                                # a host name: whatever it names may be on the network
+
+    def read_image(self, src: str) -> str | bytes:
+        """An image URL's bytes (downloaded here, outside the FIFO), else the source for Vision.load; open to the
+        network, only a data: URL or a public URL."""
+        public_only = self.open_to_network()
+        if src.startswith(("http://", "https://")):
+            return Vision.download(src, public_only)
+        if public_only and not src.startswith("data:"):
+            raise ValueError(NO_LOCAL_IMAGES)
+        return src
 
     def slot_action(self, slot: str, action: str, filename) -> tuple[int, dict]:
         """llama-server's POST /slots/{id}?action=save|restore {"filename": ...}: the conversation the engine holds,
@@ -2721,10 +2786,10 @@ class Service:
                     continue
                 why = "this server has no image encoder" if self.vision is None else None
                 if why is None:
-                    src = item["source"]
                     try:
-                        if src.startswith(("http://", "https://")):
-                            src = fetched[item["source"]] = Vision.download(src)   # outside the FIFO, as in prepare()
+                        src = self.read_image(item["source"])         # outside the FIFO, as in prepare()
+                        if isinstance(src, bytes):
+                            fetched[item["source"]] = src
                         with self.fifo:          # the encoder takes its turn with the requests (see below)
                             self.vision.encode(src)
                     except (ValueError, OSError) as e:
@@ -2752,8 +2817,7 @@ class Service:
             start = self.tok.encode(VISION_START, parse_special=True)[0]
             # An image URL is downloaded first, outside the FIFO: under it, a slow server held every other request
             # for as long as urlopen waited.
-            images = [fetched[src] if src in fetched else Vision.download(src) if src.startswith(("http://", "https://"))
-                      else src for src in images]
+            images = [fetched[src] if src in fetched else self.read_image(src) for src in images]
             # Encode only while the engine is idle: the engine and the image encoder (a separate process) must not
             # run on the GPU at the same time - an encode during a running request left that request stuck at
             # "reading the prompt" with CPU and GPU busy, for good (reproduced).  So encoding takes its turn in the
@@ -3670,6 +3734,10 @@ def make_handler(svc: Service):
             # before the close reaches it, and that request fails with "response ended prematurely" without the
             # server ever reading it (a .NET agent app, 2026-10-03: 25 of ~1000 requests, 1-24 ms after the previous answer).
             self.send_header("Connection", "close")
+            # no page of another site shows this one in a frame (clicks on it could be steered), and no browser reads
+            # an answer as another type than it says
+            self.send_header("X-Frame-Options", "SAMEORIGIN")
+            self.send_header("X-Content-Type-Options", "nosniff")
             super().end_headers()
 
         def _watch_client(self, cancel: threading.Event) -> None:
@@ -3824,6 +3892,7 @@ def make_handler(svc: Service):
                 body = (ROOT / "serve" / "web" / ("monitor.html" if path else "index.html")).read_bytes()
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Security-Policy", page_policy(body))
                 self.send_header("Content-Length", str(len(body)))
                 self.end_headers()
                 self.wfile.write(body)
@@ -4618,8 +4687,20 @@ def origin_allowed(origin: str, host, names, origins=()) -> bool:
     return bool(name) and (name in LOOPBACK_NAMES or name.endswith(".localhost") or _name_in(name, names))
 
 
+
+def page_policy(page: bytes) -> str:
+    """The web app's Content-Security-Policy: scripts, styles, fonts and requests of this server only, the page's own
+    inline scripts by their SHA-256, images also from data: and blob: URLs (attached pictures), and no frame on
+    another site's page.  Inline styles stay allowed: the pages set style attributes."""
+    inline = [base64.b64encode(hashlib.sha256(m).digest()).decode()
+              for m in re.findall(rb"<script>(.*?)</script>", page, re.DOTALL)]
+    return ("default-src 'self'; script-src 'self'" + "".join(f" 'sha256-{h}'" for h in inline) +
+            "; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; "
+            "form-action 'self'; frame-ancestors 'self'")
+
 def serve(svc: Service, host="127.0.0.1", port=8095) -> ThreadingHTTPServer:
     svc.host_names = host_names_for(host, svc.allowed_hosts, svc.trusted_origins)
+    svc.bind_host = host
     svc.start_telemetry()
     httpd = Server((host, port), make_handler(svc))
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
