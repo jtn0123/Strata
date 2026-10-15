@@ -49,7 +49,7 @@ Requirements (details: [INSTALL.md](INSTALL.md#what-you-need)):
 - **Driver:** NVIDIA 580 or newer. AMD on Linux: the kernel's amdgpu driver; on Windows: a current AMD Adrenalin
   driver. If the driver is missing or too old, tell the user to update it (NVIDIA App / nvidia.com/drivers, or AMD
   Software) and restart; do not install drivers yourself unless they ask.
-- **RAM:** 32 GB or more (see step 3). **Disk:** ~80 GB free, ideally on an NVMe SSD. **CPU:** x86-64 with AVX2. Without AVX2 (Xeon E5 v1/v2 and older) setup still installs, as an experimental and slow build it compiles on the PC (10-20 minutes): tell the user that before starting ([INSTALL.md](INSTALL.md#older-cpus-experimental)).
+- **RAM:** 32 GB or more (see step 3). **Disk:** ~80 GB free for IQ2_XS, 66-115 GB by model (setup checks it before it downloads), ideally on an NVMe SSD. **CPU:** x86-64 with AVX2. Without AVX2 (Xeon E5 v1/v2 and older) setup still installs, as an experimental and slow build it compiles on the PC (10-20 minutes): tell the user that before starting ([INSTALL.md](INSTALL.md#older-cpus-experimental)).
 - **OS:** Windows 10/11 or Linux (Ubuntu 22.04/24.04 are fully automatic).
 
 If the PC does not meet them, say which part is missing and stop.
@@ -127,7 +127,7 @@ Notes:
   hours). It can be stopped and continues where it left off.
 - Then it prepares the model for their PC (a few minutes) and, on AMD on Linux, compiles the engine.
 - **When the model starts, the PC can be slow or stop responding for 1-3 minutes** (longest the first time): Strata
-  loads 35-55 GB into RAM and locks part of it for the graphics card. That is normal; they should not close the window.
+  loads 30-65 GB into RAM and locks part of it for the graphics card. That is normal; they should not close the window.
 - Nothing leaves their PC: the model runs locally.
 
 ## 6. Start the server

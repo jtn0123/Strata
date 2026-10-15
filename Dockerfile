@@ -27,7 +27,7 @@
 # or "all", with LAYER_SPLIT), LOW_RAM (auto | on | off), HOST, PORT, API_KEY.
 #
 # Only the model files, the prepared pack, the MTP layer and the install config
-# live in the /data volume; the engine is part of the image. Strata loads 32-62 GB
+# live in the /data volume; the engine is part of the image. Strata loads 30-65 GB
 # into RAM, so a capped container needs -e LOW_RAM=on: setup.py reads the RAM from
 # /proc/meminfo, which here is the host's total, not the container's limit. Add an
 # API key before exposing the port to a network: -e API_KEY=<secret>. Pass

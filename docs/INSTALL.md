@@ -16,7 +16,7 @@ this for you with [AI_SETUP.md](AI_SETUP.md).
 | **GPU** | **NVIDIA** RTX 20, 30, 40 or 50 series, **12 GB VRAM or more** (8 GB runs, slowly). Measured on an RTX 5070 and an RTX 3090; RTX 20 (Turing, since 0.1.27) was tested by a contributor on an RTX 2070. **AMD** Radeon RX 7900 XT / XTX, RX 9070 / 9070 XT and Radeon AI PRO R9700 (validated), RX 7800 XT / 7700 XT and RX 9060 XT (validated by their owners), RX 6800 / 6900 series (community-reported), with 12 GB of VRAM or more. See [AMD cards](#amd-cards). |
 | **RAM** | Enough for the size you pick ([which model](MODELS.md#pick-by-ram)); **64 GB** runs every size. A big GPU makes up for less RAM - the [low-RAM mode](MODELS.md#a-big-graphics-card-and-little-ram). |
 | **CPU** | x86-64 with AVX2 (any Intel/AMD desktop CPU from the last ~8 years). AVX-512 (Ryzen 7000/9000) is a bit faster. Older CPUs without AVX2 are experimental and slow: [Older CPUs](#older-cpus-experimental). |
-| **Disk** | ~70-80 GB free for the model, ~6 GB for the MTP layer (+1 GB with images). **Q2_0 on an AVX-512 CPU** also writes a one-time ~40 GB copy of its experts for the fast CPU kernel. On Linux with an AMD card, ROCm takes ~10 GB more when setup installs it. An NVMe SSD is strongly recommended: it makes the first start much faster. |
+| **Disk** | The model's download: 66-76 GB for Q2_0, IQ2_XS and IQ3_XXS, 84 GB for IQ3_S, 94 GB for Unsloth's UD-IQ4_XS, 58 GB for the Coder; ~6 GB for the MTP layer (+1 GB with images). Setup checks the room before it downloads. **Q2_0 on an AVX-512 CPU** also writes a one-time ~40 GB copy of its experts for the fast CPU kernel. On Linux with an AMD card, ROCm takes ~10 GB more when setup installs it. An NVMe SSD is strongly recommended: it makes the first start much faster. |
 | **OS** | Windows 10/11, or Linux (Ubuntu 22.04/24.04 get everything installed automatically). |
 | **Driver** | **NVIDIA:** a current driver, version 580 or newer ([nvidia.com/drivers](https://www.nvidia.com/drivers) or the NVIDIA App). **AMD:** on Linux the kernel's amdgpu driver (no ROCm install needed); on Windows a current AMD Software: Adrenalin Edition driver ([amd.com/support](https://www.amd.com/en/support)). |
 
@@ -38,7 +38,7 @@ Then it downloads everything (the model is ~70 GB, so the first time takes a whi
 where it left off) and **starts the model**. Your browser opens the Strata app at `http://127.0.0.1:8080`.
 
 > **While the model starts, your PC can be slow or stop responding for 1-3 minutes** (longest the first time): Strata
-> loads 35-55 GB into your RAM and locks part of it for the graphics card. That's normal - wait, and don't close the
+> loads 30-65 GB into your RAM and locks part of it for the graphics card. That's normal - wait, and don't close the
 > window. The window tells you what it is doing.
 
 **Next time**, just double-click `START-HERE.bat` again: it starts right away (30-90 s to load the model), nothing is
@@ -67,7 +67,8 @@ Radeon GPUs are listed as not supported.
 
 On Linux setup uses a system ROCm 7 when there is one, or installs ROCm into `.venv` from AMD's wheels (~10 GB, no
 sudo), and compiles the engine on your PC for the card (10-20 minutes, once; it needs a C++ compiler and git:
-`sudo apt install build-essential git`). Several AMD cards share the model with `--gpus`, as on NVIDIA.
+`sudo apt install build-essential git`, Fedora `sudo dnf install gcc-c++ make git`, Arch
+`sudo pacman -S base-devel git`). Several AMD cards share the model with `--gpus`, as on NVIDIA.
 
 What differs from NVIDIA for now: pictures are read by the image encoder on the CPU (`--vision cpu`, about 3 s per
 picture at the default 300 image tokens on 8 cores), `--calibrate` is NVIDIA-only, and Unsloth's 4-bit model needs an NVIDIA card. Measurements per card, the
@@ -109,7 +110,7 @@ The same idea, in a container (NVIDIA cards).
    volume needs no setup pass: `-e MODEL=Q2_0 -e FAMILY=coder` picks that model's config. Add
    `-e REINSTALL=1` only to change settings for a model already set up (context, vision, KV, host,
    api_key, LOW_RAM), since those are recorded in its config.
-   Strata loads 32-62 GB into RAM. `--gpus all` on a host with two usable cards takes both: the
+   Strata loads 30-65 GB into RAM. `--gpus all` on a host with two usable cards takes both: the
    layer split is setup's recommended default ([MULTI_GPU.md](MULTI_GPU.md)), and a volume
    set up for one card switches to the pair on its first start there. Pin one card with `-e GPU=0`,
    or name them with `-e GPUS=0,2` and where the later card's layers start with `-e LAYER_SPLIT=18`.
