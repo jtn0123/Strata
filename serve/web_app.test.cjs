@@ -112,3 +112,43 @@ test('Markdown structure still renders', () => {
     '<table><thead><tr><th>a</th><th>b</th></tr></thead><tbody><tr><td>1</td><td>2</td></tr></tbody></table>');
   assert.equal(markdown('> quoted\n\n---'), '<blockquote>quoted</blockquote><hr>');
 });
+
+test('the tabs are one Tab stop; the arrow keys, Home and End move between them', () => {
+  let focused = null;
+  const buttons = ['chat', 'monitor', 'about'].map((name) => ({dataset: {tab: name}, attrs: {}, tabIndex: 0,
+    setAttribute(k, v) { this.attrs[k] = v; }, focus() { focused = this; }}));
+  const nodes = {};
+  const page = vm.createContext({document: {querySelectorAll: () => buttons}, $: (id) => (nodes[id] ||= {focus() {}}),
+    location: {hash: '', pathname: '/'}, history: {replaceState() {}}, window: {addEventListener() {}},
+    loadMcp() {}, loadConfig() {}, render() {}, lastMetrics: null});
+  vm.runInContext(fragment('let tab = "chat";', '// ------------------------------------------------------------------ server access'), page);
+  const press = (i, key) => { let prevented = false; buttons[i].onkeydown({key, preventDefault() { prevented = true; }}); return prevented; };
+  const state = () => buttons.map((b) => `${b.attrs['aria-selected']}/${b.tabIndex}`).join(' ');
+  page.showTab('chat');
+  assert.equal(state(), 'true/0 false/-1 false/-1');
+  for (const [from, key, to] of [[0, 'ArrowRight', 1], [1, 'ArrowRight', 2], [2, 'ArrowRight', 0], [0, 'ArrowLeft', 2],
+                                 [2, 'Home', 0], [0, 'End', 2], [2, 'ArrowLeft', 1]]) {
+    assert.equal(press(from, key), true, key);
+    assert.equal(focused, buttons[to], `${key} from ${from}`);
+    assert.equal(state(), buttons.map((b, i) => (i === to ? 'true/0' : 'false/-1')).join(' '));
+    assert.equal(nodes[`view-${buttons[to].dataset.tab}`].hidden, false);
+  }
+  focused = null;
+  assert.equal(press(1, 'a'), false);                                         // other keys are the browser's
+  assert.equal(focused, null);
+});
+
+test('a finished answer is announced once, outside the views (a hidden tab is not read)', () => {
+  const said = {textContent: 'earlier'}, timers = [];
+  const page = vm.createContext({$: () => said, setTimeout: (f) => timers.push(f)});
+  vm.runInContext(fragment('function announce(', 'function renderChat('), page);
+  page.announce('Answer: hello');
+  assert.equal(said.textContent, '');                                          // emptied: the same words are heard again
+  timers.forEach((f) => f());
+  assert.equal(said.textContent, 'Answer: hello');
+  const html = fs.readFileSync(path.join(__dirname, 'web/index.html'), 'utf8');
+  const region = html.match(/<div class="sr-only" id="chat-said"([^>]*)>/);
+  assert.ok(region && /aria-live="polite"/.test(region[1]), 'the live region');
+  assert.ok(html.indexOf('id="chat-said"') > html.indexOf('</main>'), 'outside the views');
+  assert.doesNotMatch(html.match(/<div class="chat" id="chat"[^>]*>/)[0], /aria-live|role="log"/);   // rebuilt as it streams
+});
