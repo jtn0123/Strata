@@ -3673,8 +3673,11 @@ def make_handler(svc: Service):
         answered = False                                    # whether this request's status line was sent
         watch_done = None                                   # #430 #431: stops this request's disconnect watcher
         body_read = False                                   # whether a handler took this request's body
+        body_length = 0                                     # its Content-Length, once _body_size checked it
         route = ""                                          # this request's path: no query, no trailing slash
         DRAIN_SECONDS = 5                                   # the longest an unread body is read and dropped
+        MAX_BODY = 256 << 20                                # the largest body read: the web app sends every picture
+        #                                                     of a chat (up to 20 MB each, as data: URLs) each turn
 
         def log_message(self, fmt, *args):
             pass
@@ -3689,7 +3692,26 @@ def make_handler(svc: Service):
 
         def _body(self) -> bytes:
             self.body_read = True
-            return self.rfile.read(int(self.headers.get("Content-Length", 0)))
+            return self.rfile.read(self.body_length)
+
+        def _body_size(self) -> bool:
+            """Check the Content-Length before anything reads the body.  One that is no number was a ValueError no
+            handler caught (no answer at all), a negative one read until the client closed, and any size was read
+            whole into memory: now they are a 400 and, above MAX_BODY, a 413.  No header: an empty body."""
+            text = self.headers.get("Content-Length", "0")
+            try:
+                length = int(text)
+            except ValueError:
+                length = -1
+            if length < 0:
+                self._invalid(self.route, f"invalid Content-Length {text!r:.40}")
+                return False
+            if length > self.MAX_BODY:
+                self._invalid(self.route, f"the request body is {length} bytes; this server reads at most "
+                                          f"{self.MAX_BODY >> 20} MiB", status=413)
+                return False
+            self.body_length = length
+            return True
 
         def _drain_body(self):
             """An answer sent before the body was read (a 401, a 403, /load, a method with no handler) must not close
@@ -3881,7 +3903,10 @@ def make_handler(svc: Service):
             if route is None:
                 self._json(404, {"error": {"message": "not found"}})
                 return
-            if route.body == "control" and not self._control_body():
+            if route.body == "control":
+                if not self._control_body():
+                    return
+            elif not self._body_size():
                 return
             if route.own_page and not self._own_page(route.own_page):
                 return
@@ -3936,12 +3961,12 @@ def make_handler(svc: Service):
                         record["state"] = "error" if record.get("error") else record.get("outcome", "completed")
                     svc.request_trace.record = None
 
-        def _invalid(self, path, message):
-            print(f"[strata] 400 invalid request: {message}", flush=True)
+        def _invalid(self, path, message, status=400):
+            print(f"[strata] {status} invalid request: {message}", flush=True)
             if path == "/v1/responses":
-                self._json(400, responses_error_body(message))
+                self._json(status, responses_error_body(message))
             else:
-                self._json(400, {"error": {"type": "invalid_request_error", "message": message}})
+                self._json(status, {"error": {"type": "invalid_request_error", "message": message}})
 
         # ---- GET handlers
         def _static(self, f: Path, content_type: str, cache: str):

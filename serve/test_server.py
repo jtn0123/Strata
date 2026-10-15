@@ -2197,6 +2197,49 @@ class ChecksBeforeTheModelLoads(OverHTTP, unittest.TestCase):
                 self.assertEqual(self.post(path, body)[0], 200)
         self.assertEqual(loads, [1, 1])                       # a good request still loads it
 
+class BodySize(OverHTTP, unittest.TestCase):
+    """The Content-Length is checked before the body is read: text there was a ValueError no handler caught (no
+    answer), -1 read until the client gave up, and any size was read whole into memory."""
+
+    def send(self, path, length, body=b""):
+        import http.client
+        c = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                c.putrequest("POST", path)
+                c.putheader("Content-Type", "application/json")
+                c.putheader("Content-Length", length)
+                c.endheaders(body)
+                r = c.getresponse()
+                return r.status, json.loads(r.read())
+        finally:
+            c.close()
+
+    def test_a_bad_length_is_a_400_on_every_route(self):
+        for path in ("/v1/chat/completions", "/v1/messages", "/v1/responses", "/settings", "/config"):
+            for length in ("abc", "-1"):
+                with self.subTest(path=path, length=length):
+                    status, body = self.send(path, length)
+                    self.assertEqual(status, 400)
+                    self.assertIn("Content-Length", body["error"]["message"])
+
+    def test_a_body_over_the_limit_is_a_413_unread(self):
+        Handler = self.httpd.RequestHandlerClass
+        status, body = self.send("/v1/chat/completions", str(Handler.MAX_BODY + 1))   # nothing sent: never read
+        self.assertEqual(status, 413)
+        self.assertIn("256 MiB", body["error"]["message"])
+        status, body = self.send("/v1/responses", str(Handler.MAX_BODY + 1))
+        self.assertEqual((status, body["error"]["type"]), (413, "invalid_request_error"))
+
+    def test_a_body_up_to_the_limit_is_answered(self):
+        small = json.dumps({"messages": [{"role": "user", "content": "hi"}]}).encode()
+        large = json.dumps({"messages": [{"role": "user", "content": "x" * 400}]}).encode()
+        with mock.patch.object(self.httpd.RequestHandlerClass, "MAX_BODY", 200):
+            self.assertEqual(self.send("/v1/chat/completions", str(len(large)), large)[0], 413)
+            self.assertEqual(self.send("/v1/chat/completions", str(len(small)), small)[0], 200)
+            self.assertEqual(self.post("/v1/chat/completions", {"messages": [{"role": "user", "content": "hi"}]})[0],
+                             200)
+
 class SharedSettings(unittest.TestCase):
     """The web app's "Use for other apps too": POST /settings makes its Chat settings every client's defaults."""
 
