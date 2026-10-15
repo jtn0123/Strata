@@ -12,7 +12,8 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import benchmark_prompt_chunks as chunks
-from benchmark_prompt_chunks import PROFILES, REPEATS, cases, chunk_receipt, compare, main, quality
+from benchmark_prompt_chunks import PROFILES, REPEATS, Arm, arms, cases, chunk_receipt, compare, main, quality
+from overlap_ops import OVERLAP_MARKERS
 
 
 def bracket():
@@ -169,18 +170,20 @@ class PromptChunkLaunchTests(unittest.TestCase):
                 observer(item,elapsed)
         return reply(self.answers[tuple(payload['prompt'])],len(payload['prompt']))
 
-    def patched(self,stack,profile='1536',memory=CLEAN,coverage=None,**overrides):
-        self.server=Server();self.sampler=None
+    def patched(self,stack,profile='1536',memory=CLEAN,coverage=None,markers=(),**overrides):
+        self.server=Server();self.sampler=None;self.settings=[]
         def popen(command,env,stdout,stderr):
-            stdout.write(native_log(*chunks.PROFILES[profile]));stdout.flush()
+            stdout.write(native_log(*chunks.PROFILES[profile])+''.join(m+'\n' for m in markers));stdout.flush()
             return self.server
+        def configure(environ,engine,api,tuning):
+            self.settings.append((engine,tuning));return dict(FIXTURE='1'),dict(tuning=tuning)
         def sampler(folder):
             self.sampler=Sampler(folder,coverage);return self.sampler
         replaced=dict(assert_no_model_server=lambda:None,check_frozen=lambda frozen:None,
                       wait_for_headroom=lambda:dict(settled=True),preflight=lambda strict:dict(strict=strict),
                       power=lambda:dict(on_ac=True,mode=0),free_port=lambda:9124,Sampler=sampler,
-                      kept_server=lambda port,b,u:['server','-b',str(b),'-ub',str(u),'--spec-type','draft-mtp','--spec-draft-n-max','3'],
-                      configure=lambda environ,engine,api,tuning:(dict(FIXTURE='1'),dict(tuning=tuning)),
+                      kept_server=lambda port,b,u,engine:['server',engine,'-b',str(b),'-ub',str(u),'--spec-type','draft-mtp','--spec-draft-n-max','3'],
+                      configure=configure,
                       admit_model=lambda model:dict(model=model),app_monitor=lambda process,path,policy:Monitor(memory),
                       wait_ready=lambda process,base:2.0,prompt_tokens=self.tokens,stream_completion=self.complete)
         replaced.update(overrides)
@@ -190,8 +193,10 @@ class PromptChunkLaunchTests(unittest.TestCase):
 
     def launch(self,frozen=None,**options):
         with ExitStack() as stack:
-            self.patched(stack,**options)
-            try:result=chunks.launch(self.folder/'arm',options.get('role','candidate'),options.get('profile','1536'),frozen or {});error=None
+            self.patched(stack,**{k:v for k,v in options.items() if k not in ('arm','role')})
+            try:
+                result=chunks.launch(self.folder/'arm',options.get('role','candidate'),options.get('profile','1536'),
+                                     frozen or {},arm=options.get('arm'));error=None
             except RuntimeError as caught:error=caught
         saved=json.loads((self.folder/'arm/result.json').read_text())
         if error is None:self.assertEqual(saved,result)
@@ -207,6 +212,22 @@ class PromptChunkLaunchTests(unittest.TestCase):
         self.assertTrue(all(r['quality_passed'] for r in result['cases']))
         self.assertNotIn('stream_events',result['cases'][0])
         self.assertEqual(self.server.calls,['terminate'])
+        self.assertEqual((result['engine'],result['tuning'],result['command'][1]),('m5-small-stack','small-reduce','m5-small-stack'))
+        self.assertEqual((self.settings,result['activation']['overlap']),([('m5-small-stack','small-reduce')],False))
+
+    def test_an_overlap_arm_runs_its_engine_and_switches_then_its_lifecycle_requests(self):
+        seen=[]
+        def lifecycle(folder,result,base):seen.append((folder.name,len(result['cases']),base))
+        arm=Arm('m5-overlap','overlap-reduce',lifecycle)
+        error,result=self.launch(profile='512',arm=arm,markers=OVERLAP_MARKERS)
+        self.assertIsNone(error)
+        self.assertEqual((result['engine'],result['tuning'],result['command'][1]),('m5-overlap','overlap-reduce','m5-overlap'))
+        self.assertEqual((self.settings,result['activation']['overlap']),([('m5-overlap','overlap-reduce')],True))
+        self.assertEqual(seen,[('arm',len(cases())*REPEATS,'http://127.0.0.1:9124')])
+        for markers,chosen in ((OVERLAP_MARKERS[:1],arm),(OVERLAP_MARKERS,None)):
+            shutil.rmtree(self.folder/'arm')
+            error,result=self.launch(profile='512',arm=chosen,markers=markers)
+            self.assertIn('overlap settings did not reach the engine',result['error'])
 
     def test_hardware_sampler_follows_the_owned_server_and_windows_each_request(self):
         healthy=dict(healthy=True,sensor_fields_observed=dict(gpu=True,thermal=True))
@@ -264,46 +285,72 @@ class PromptChunkLaunchTests(unittest.TestCase):
         self.assertIsNone(chunks.output_gaps([])['median_s'])
 
     def test_frozen_closure_rejects_source_model_or_sampler_changes(self):
+        builds={'m5-small-stack':'kept','m5-overlap':'overlap'}
         replaced=dict(require_pass=lambda:None,fingerprint=lambda:{'scripts/a.py':'1'},sha256=lambda path:path.name,
-                      verify_engine=lambda name:dict(name=name),assert_unchanged=lambda models:None,tool_pin=lambda:dict(pin=1))
+                      verify_engine=lambda name:dict(engine=name,build=builds[name]),assert_unchanged=lambda models:None,
+                      tool_pin=lambda:dict(pin=1))
         with patch.multiple(chunks,**replaced):
+            both=dict(closure=chunks.closure('m5-overlap'),models={})
+            self.assertEqual(both['closure']['candidate_engine'],dict(engine='m5-overlap',build='overlap'))
+            chunks.check_frozen(both)
+            builds['m5-overlap']='rebuilt'
+            with self.assertRaisesRegex(RuntimeError,'start a new campaign'):chunks.check_frozen(both)
             frozen=dict(closure=chunks.closure(),models={})
+            self.assertNotIn('candidate_engine',frozen['closure'])
             chunks.check_frozen(frozen)
             chunks.check_frozen(dict(frozen,hardware_tool=dict(pin=1)))
             with self.assertRaisesRegex(RuntimeError,'sampler tool changed'):chunks.check_frozen(dict(frozen,hardware_tool=dict(pin=2)))
             with self.assertRaisesRegex(RuntimeError,'start a new campaign'):
                 chunks.check_frozen(dict(frozen,closure=dict(frozen['closure'],fixture_sha256='old')))
 
-    def campaign(self,launch):
+    def campaign(self,launch,*options):
         (self.folder/'bench').mkdir(exist_ok=True);(self.folder/'scripts').mkdir(exist_ok=True)
         (self.folder/'scripts/a.py').write_text('source\n')
         output=self.folder/'campaign';output.mkdir()
         frozen=dict(closure=dict(sources={'scripts/a.py':'sha'}),models={})
         with patch.object(chunks,'ROOT',self.folder), patch.object(chunks,'launch',side_effect=launch) as launched:
-            try:chunks.campaign(output,'1536','balanced',frozen);error=None
+            try:chunks.campaign(output,*(options or ('1536','balanced')),frozen);error=None
             except RuntimeError as caught:error=caught
         return error,json.loads((output/'campaign.json').read_text()),launched
 
     def test_campaign_scores_a_complete_bracket_and_keeps_launch_receipts(self):
         arms=bracket()
-        def launch(folder,role,profile,frozen,draft_profile):
-            folder.mkdir();arm=arms.pop(0);(folder/'result.json').write_text(json.dumps(arm))
-            return arm
+        def launch(folder,role,profile,frozen,draft_profile,arm):
+            folder.mkdir();result=arms.pop(0);(folder/'result.json').write_text(json.dumps(result))
+            return result
         error,result,launched=self.campaign(launch)
         self.assertIsNone(error)
         self.assertEqual((result['status'],len(result['launches']),len(result['comparison']['rows'])),('passed',4,8))
         self.assertEqual([c.args[1:3] for c in launched.call_args_list],
                          [('control','512'),('candidate','1536'),('candidate','1536'),('control','512')])
+        self.assertEqual((result['chunks'],set(result['engines'])),(['512','1536','1536','512'],{'m5-small-stack'}))
         self.assertEqual((self.folder/'campaign/source/scripts/a.py').read_text(),'source\n')
 
     def test_campaign_stops_at_the_first_failed_launch(self):
-        def launch(folder,role,profile,frozen,draft_profile):
+        def launch(folder,role,profile,frozen,draft_profile,arm):
             folder.mkdir();(folder/'result.json').write_text(json.dumps(dict(status='failed',role=role)))
             raise RuntimeError('RAM/swap/cleanup gate failed')
         error,result,launched=self.campaign(launch)
         self.assertIn('RAM/swap/cleanup gate failed',str(error))
         self.assertEqual((result['status'],launched.call_count,result['launches']),('failed',1,[dict(status='failed',role='control')]))
         self.assertNotIn('comparison',result)
+
+    def test_an_engine_candidate_brackets_the_kept_engine_at_the_same_chunk_size(self):
+        def hook(folder,result,base):return None
+        self.assertEqual(arms('1536'),[('512',Arm()),('1536',Arm()),('1536',Arm()),('512',Arm())])
+        overlap=Arm('m5-overlap','overlap-reduce',hook)
+        self.assertEqual(arms('overlap','1536',hook),
+                         [('1536',Arm(lifecycle=hook)),('1536',overlap),('1536',overlap),('1536',Arm(lifecycle=hook))])
+        with self.assertRaisesRegex(ValueError,'512-token control'):arms('1024','1536')
+        results=bracket()
+        def launch(folder,role,profile,frozen,draft_profile,arm):
+            folder.mkdir();result=results.pop(0);(folder/'result.json').write_text(json.dumps(result))
+            return result
+        error,result,launched=self.campaign(launch,'overlap','balanced')
+        self.assertIsNone(error)
+        self.assertEqual(result['engines'],['m5-small-stack','m5-overlap','m5-overlap','m5-small-stack'])
+        self.assertEqual([c.args[2] for c in launched.call_args_list],['512']*4)
+        self.assertEqual(launched.call_args_list[1].args[4:],('balanced',Arm('m5-overlap','overlap-reduce')))
 
     def test_run_freezes_inputs_and_pins_the_sampler_only_when_requested(self):
         replaced=dict(assert_no_model_server=lambda:None,require_pass=lambda:None,closure=lambda:dict(sources={}),

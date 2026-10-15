@@ -42,7 +42,7 @@ from check_memory import assert_no_model_server
 from lab import ROOT, request
 from metal_environment import configure
 from model_provenance import verify_models
-from overlap_ops import Launch, request_busy
+from overlap_ops import Launch, overlap_receipt, request_busy
 from overlap_ops import compare as overlap_compare
 from profile_m5_routes import preflight
 from prompt_ops import (
@@ -93,7 +93,6 @@ SEGMENT_MARKER = "use m5 segments    = true"
 OVERLAP_MODES = ("overlap", "serial")
 OVERLAP_ENGINE = "m5-overlap"
 OVERLAP_ENV = {"GGML_M5_LAB_CONTEXT_QUEUE": "1", "GGML_M5_LAB_HELPER_OVERLAP": "1"}
-OVERLAP_MARKERS = ("using a separate command queue for this context", "lab: deferring prompt-chunk helper decodes")
 # Modes whose launches pair two variants on one engine; overlap mode runs each pair a second time in reverse.
 PAIRED = {"segments": SEGMENT_MODES, "overlap": OVERLAP_MODES}
 ROUNDS = {"segments": 1, "overlap": 2}
@@ -317,9 +316,7 @@ def check_markers(lines: list[str], mode: str) -> None:
     if mode in SEGMENT_MODES and any(SEGMENT_MARKER in line for line in lines) != (mode == "segments"):
         raise ValueError("The segment timer setting did not reach the engine")
     if mode in OVERLAP_MODES:
-        for marker in OVERLAP_MARKERS:
-            if any(marker in line for line in lines) != (mode == "overlap"):
-                raise ValueError("The helper overlap settings did not reach the engine")
+        overlap_receipt("\n".join(lines), mode == "overlap")
 
 
 def analyze(folder: Path, result: JSONDict) -> None:

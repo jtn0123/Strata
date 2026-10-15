@@ -22,6 +22,13 @@ class TuningRule(NamedTuple):
 TUNING: dict[str, dict[str, str]] = {
     "stock": {},
     "small-reduce": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_REDUCE10": "1"},
+    # The kept switches plus N15's helper overlap during prompt reading, as an app setting for m5-overlap only.
+    "overlap-reduce": {
+        "GGML_M5_LAB_CONV_DIRECT": "1",
+        "GGML_M5_LAB_REDUCE10": "1",
+        "GGML_M5_LAB_CONTEXT_QUEUE": "1",
+        "GGML_M5_LAB_HELPER_OVERLAP": "1",
+    },
     "small-top10": {"GGML_M5_LAB_CONV_DIRECT": "1", "GGML_M5_LAB_TOP10": "1"},
     "small-reduce-top10": {
         "GGML_M5_LAB_CONV_DIRECT": "1",
@@ -123,6 +130,7 @@ TUNING_RULES = (
         ("m5-small-stack", "m5-waits", "m5-segments", "m5-overlap", "m5-advise", "m5-mtpstate"),
         "Small-gain combination requires isolated m5-small-stack engine",
     ),
+    TuningRule("overlap-reduce", False, ("m5-overlap",), "Helper overlap requires the isolated m5-overlap engine"),
     TuningRule("route-map", False, ("m5-route-map",), "Route-map reuse requires isolated m5-route-map engine"),
     TuningRule("compact-tiles", False, ("m5-compact",), "Compact tile dispatch requires isolated m5-compact engine"),
     TuningRule(

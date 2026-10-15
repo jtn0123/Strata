@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from engines import EXPERIMENTS
 from metal_environment import configure
-from overlap_ops import change_pct, compare, length, request_busy, shared, union
+from overlap_ops import OVERLAP_MARKERS, change_pct, compare, length, request_busy, shared, union
 import profile_prompt_ops as driver
 from prompt_ops import command_buffers
 
@@ -186,12 +186,12 @@ class OverlapDriverTests(unittest.TestCase):
         return result
 
     def test_analysis_checks_both_switches_and_adds_request_timelines(self):
-        result = self.analyze('overlap', driver.OVERLAP_MARKERS)
+        result = self.analyze('overlap', OVERLAP_MARKERS)
         self.assertAlmostEqual(result['requests'][0]['busy']['helper_during_target_ms'], 6, places=6)
         self.assertEqual(result['timing']['all_requests']['4']['helper_ms'], 8)
         serial = self.analyze('serial', [])
         self.assertAlmostEqual(serial['requests'][0]['busy']['idle_ms'], 15, places=6)
-        for mode, markers in (('overlap', driver.OVERLAP_MARKERS[:1]), ('serial', driver.OVERLAP_MARKERS[1:])):
+        for mode, markers in (('overlap', OVERLAP_MARKERS[:1]), ('serial', OVERLAP_MARKERS[1:])):
             with self.subTest(mode=mode), self.assertRaisesRegex(ValueError, 'overlap settings did not reach'):
                 self.analyze(mode, markers)
 
@@ -235,6 +235,15 @@ class OverlapEngineTests(unittest.TestCase):
         for tuning in ('compact-cols', 'route-map', 'encoders0'):
             with self.subTest(tuning=tuning), self.assertRaises(ValueError):
                 configure({}, 'm5-overlap', 'on', tuning)
+
+    def test_the_app_setting_adds_only_the_two_overlap_switches_and_needs_the_overlap_engine(self):
+        kept, _ = configure({}, 'm5-small-stack', 'on', 'small-reduce')
+        app, receipt = configure({'GGML_M5_LAB_HELPER_OVERLAP': '0'}, 'm5-overlap', 'on', 'overlap-reduce')
+        self.assertEqual(app, {**kept, 'GGML_M5_LAB_CONTEXT_QUEUE': '1', 'GGML_M5_LAB_HELPER_OVERLAP': '1'})
+        self.assertEqual(receipt['tuning'], 'overlap-reduce')
+        for engine in ('m5-small-stack', 'm5-segments', 'm5-advise'):
+            with self.subTest(engine=engine), self.assertRaisesRegex(ValueError, 'isolated m5-overlap engine'):
+                configure({}, engine, 'on', 'overlap-reduce')
 
     def test_manifest_binds_the_patch_and_every_kept_stack_component(self):
         manifest = json.loads((ROOT / 'config/m5_overlap_experiment.json').read_text())

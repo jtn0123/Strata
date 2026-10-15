@@ -18,9 +18,18 @@ from prompt_ops import Buffer
 from segment_ops import output_parity
 
 MODES = ("overlap", "serial")
+# Native lines that the helper overlap switches print (N15); no other setting prints them.
+OVERLAP_MARKERS = ("using a separate command queue for this context", "lab: deferring prompt-chunk helper decodes")
 BusyField = Literal["span_ms", "target_ms", "helper_ms", "helper_during_target_ms", "idle_ms"]
 BUSY_FIELDS: tuple[BusyField, ...] = ("span_ms", "target_ms", "helper_ms", "helper_during_target_ms", "idle_ms")
 Interval = tuple[float, float]
+
+
+def overlap_receipt(text: str, expected: bool) -> bool:
+    """The helper overlap switches reached the engine exactly when the launch set them."""
+    if any((marker in text) != expected for marker in OVERLAP_MARKERS):
+        raise ValueError("The helper overlap settings did not reach the engine")
+    return expected
 
 
 class Busy(TypedDict):
