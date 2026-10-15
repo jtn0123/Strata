@@ -71,8 +71,9 @@ HF_REVISIONS = {
 }
 
 
-# --allow-unpinned: a pinned revision that is gone falls back to the repository's current file.  Off, setup stops
-# instead: the current file was installed with only a warning, and nothing checked it against the pin.
+# --allow-unpinned: a pinned revision that is gone falls back to the repository's current file, and a ready-made
+# engine without a pin (PREBUILT_PINS) is installed unchecked.  Off, setup stops instead, or compiles the engine: the
+# current file was installed with only a warning, and nothing checked it against the pin.
 ALLOW_UNPINNED = False
 
 HF_DEFAULT = "https://huggingface.co"
@@ -97,6 +98,9 @@ def hf_unpinned(url: str) -> str:
 HF = hf("ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF")
 LLAMA_CPP_COMMIT = "3cf03257f219afbe7334045ff7c6a06ac68c627d"
 LLAMA_CPP_ZIP = f"https://github.com/ggml-org/llama.cpp/archive/{LLAMA_CPP_COMMIT}.zip"
+# GitHub's zip of that commit, its size and SHA-256 (the same bytes in two downloads, 2026-10-14): get_llama_cpp()
+# unpacks it only with these.  A new commit needs its own.
+LLAMA_CPP_ZIP_PIN = (39564399, "cbe23c594282ead2937abb3f008e51fcec4609d9256652fff42c7cc1c21ea47b")
 # NVIDIA's CUDA repository key package (cuda-keyring_1.1-1_all.deb) per Ubuntu release, as downloaded 2026-10-14:
 # install_cuda_keyring() installs it as root only with this SHA-256.
 CUDA_KEYRING_SHA256 = {
@@ -112,6 +116,21 @@ CUDA_KEYRING_SHA256 = {
 PREBUILT_URL = "https://github.com/Niko1221/Strata/releases/latest/download/"
 PREBUILT_TAG_URL = "https://github.com/Niko1221/Strata/releases/download/v{version}/"
 PREBUILT_ASSET = "strata-windows-x64.zip" if WIN else "strata-linux-x64.zip"
+# The ready-made engines of the default source's releases, by version: each zip's size and SHA-256 (GitHub's digests of
+# the v0.1.40 assets, read 2026-10-14; strata-windows-x64.zip downloaded and hashed to the same).  An engine from the
+# default source is installed only with its pin here: the latest release (the fallback when this version's is not
+# published) needs --allow-unpinned.  A --prebuilt folder or URL elsewhere is the user's own choice and is not checked.
+# A new version in CMakeLists.txt needs its release here (tools/test_setup_pins.py checks).
+PREBUILT_PINS = {
+    "0.1.40": {
+        "strata-windows-x64.zip":
+            (131707082, "cd264b2125fdb85e84a8264da2ab2343463e6c7f9a12f317d4ce7192cd2c6b33"),
+        "strata-windows-x64-cuda12.zip":
+            (190241259, "5ffaf2ba1fc68cc4cc7ef26889a0eaad5b302e251067a12f191911ea29770f42"),
+        "strata-windows-x64-hip.zip":
+            (627481056, "b2fa4a660409fa0f842d442a6991f359a7f0aebefec6f854c852a8b639621d7a"),
+    },
+}
 # the CUDA libraries the ready-made engine loads (the same CUDA 13.0 it is built with), from NVIDIA's pip packages
 CUDA_WHEELS = ["nvidia-cublas==13.0.2.14", "nvidia-cuda-runtime==13.0.96"]
 MIN_DRIVER = 580                       # CUDA 13.0
@@ -1329,15 +1348,16 @@ def gguf_dir_problem(folder: Path, first: Path, fam: dict, model: str) -> tuple 
 
 
 def verify_sha256(s: Path, size: int, sha: str) -> None:
-    """A shard's size and SHA-256 against the pinned values (the Unsloth file); the result is kept in its finish mark,
-    so the ~5 minutes of hashing 111 GB happen once.  A wrong file is deleted, so the next run downloads it again."""
+    """A download's size and SHA-256 against the pinned values (an Unsloth shard, an engine zip, llama.cpp); the result
+    is kept in its finish mark, so the ~5 minutes of hashing 111 GB happen once.  A wrong file is deleted, so the next
+    run downloads it again."""
     m = s.with_name(s.name + ".done")
     if m.exists() and f"sha256 {sha}" in m.read_text(encoding="utf-8", errors="replace"):
         return
     have = s.stat().st_size if s.exists() else -1
     if have != size:
         fail(f"{s.name} is {have:,} bytes, not {size:,}", "delete it and run setup again (the download restarts)")
-    say(f"  checking {s.name} (SHA-256, {size / 1e9:.1f} GB) ...")
+    say(f"  checking {s.name} (SHA-256, " + (f"{size / 1e9:.1f} GB" if size >= 1e9 else f"{size / 1e6:.0f} MB") + ") ...")
     h = hashlib.sha256()
     with open(s, "rb") as f:
         while True:
@@ -1351,6 +1371,16 @@ def verify_sha256(s: Path, size: int, sha: str) -> None:
         fail(f"{s.name} has the wrong SHA-256 ({h.hexdigest()}, expected {sha}): deleted",
              "run setup again to download it again")
     mark(s, f"sha256 {sha}")
+
+
+def verify_download(z: Path, size: int, sha: str) -> None:
+    """verify_sha256 for an archive setup downloaded itself (an engine zip, llama.cpp): one of another size is deleted
+    too, so the next run downloads it again."""
+    have = z.stat().st_size if z.exists() else -1
+    if have != size:
+        drop_archive(z)
+        fail(f"{z.name} is {have:,} bytes, not {size:,}: deleted", "run setup again to download it again")
+    verify_sha256(z, size, sha)
 
 
 def resident_budget_gib(model, ram, kv_ram_gb=0.0) -> int:
@@ -1408,6 +1438,7 @@ def get_llama_cpp():
         return llama
     z = ROOT / "third_party" / f"llama.cpp-{LLAMA_CPP_COMMIT[:7]}.zip"
     download(LLAMA_CPP_ZIP, z, "llama.cpp source")
+    verify_download(z, *LLAMA_CPP_ZIP_PIN)
     tmp = ROOT / "third_party" / "_unpack"
     shutil.rmtree(tmp, ignore_errors=True)
     with zipfile.ZipFile(z) as f:
@@ -2028,8 +2059,14 @@ def get_prebuilt_hip(url_base, gpu, updating=False) -> Path | None:
                 continue
             warn(f"no ready-made AMD engine at {base} ({e})")
             return None
+    if unpinned_prebuilt(base, WIN_HIP_ASSET):
+        warn(f"the ready-made AMD engine at {base} has no pinned SHA-256 in this setup "
+             "(--allow-unpinned installs it unchecked)")
+        return None
     say("  Downloading the ready-made Strata engine for AMD GPUs (with the ROCm libraries it uses) ...")
     download(base + WIN_HIP_ASSET, z, "Strata AMD engine")
+    if pin := prebuilt_pin(base, WIN_HIP_ASSET):
+        verify_download(z, *pin)
     tmp = eng / "_unpack"
     shutil.rmtree(tmp, ignore_errors=True)
     with zipfile.ZipFile(z) as f:
@@ -2261,6 +2298,27 @@ def prebuilt_bases(url_base) -> list[str]:
     return [PREBUILT_TAG_URL.format(version=source_version()), base]
 
 
+def strata_release(base: str) -> bool:
+    """`base` is a folder of Strata's own releases (PREBUILT_URL, or a tag of PREBUILT_TAG_URL), not one the user
+    gave with --prebuilt / STRATA_PREBUILT_URL."""
+    return base == PREBUILT_URL or base.startswith(PREBUILT_TAG_URL.split("{", 1)[0])
+
+
+def prebuilt_pin(base: str, asset: str) -> tuple[int, str] | None:
+    """The size and SHA-256 `asset` from `base` (one of prebuilt_bases) must have: PREBUILT_PINS has them for the
+    release of this checkout's version.  None for any other release or source."""
+    if base == PREBUILT_URL or not strata_release(base):
+        return None
+    version = source_version()
+    return PREBUILT_PINS.get(version, {}).get(asset) if base == PREBUILT_TAG_URL.format(version=version) else None
+
+
+def unpinned_prebuilt(base: str, asset: str) -> bool:
+    """`asset` would come from Strata's releases without a pin (the latest release, or a version PREBUILT_PINS does
+    not have) and --allow-unpinned is off: it is not installed."""
+    return strata_release(base) and not ALLOW_UNPINNED and prebuilt_pin(base, asset) is None
+
+
 PREVIOUS_ENGINE = ".previous"
 
 
@@ -2367,8 +2425,14 @@ def get_prebuilt(url_base, gpu, vision, updating=False, toolkit=13) -> Path | No
                 continue
             warn(f"no ready-made engine at {base} ({e})" + ("" if updating else ": compiling instead"))
             return None
+    if unpinned_prebuilt(base, asset):
+        warn(f"the ready-made engine at {base} has no pinned SHA-256 in this setup"
+             + ("" if updating else ": compiling instead") + " (--allow-unpinned installs it unchecked)")
+        return None
     say("  Downloading the ready-made Strata engine" + (" (CUDA 12, experimental)" if int(toolkit) == 12 else "") + " ...")
     download(base + asset, z, "Strata engine")
+    if pin := prebuilt_pin(base, asset):
+        verify_download(z, *pin)
     tmp = eng / "_unpack"
     shutil.rmtree(tmp, ignore_errors=True)
     try:
@@ -4121,7 +4185,7 @@ def main() -> int:
     ap.add_argument("--check", action="store_true", help="only check this PC and exit")
     ap.add_argument("--allow-unpinned", action="store_true",
                     help="when a pinned Hugging Face revision is gone, download the repository's current files instead "
-                         "of stopping")
+                         "of stopping; install a ready-made engine that has no pinned SHA-256 (the latest release)")
     ap.add_argument("--calibrate", action="store_true",
                     help="tune the engine's settings for this PC (about 5-10 minutes), then start the model")
     ap.add_argument("--draft-vocab", choices=list(DRAFT_VOCABS),

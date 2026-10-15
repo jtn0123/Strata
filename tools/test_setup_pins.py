@@ -1,5 +1,6 @@
-"""Tests for setup.py's reproducible installs (#214): the engine of the checkout's own release first (the latest as
-the fallback), Hugging Face files at pinned revisions (a revision that is gone stops setup; --allow-unpinned takes the
+"""Tests for setup.py's reproducible installs (#214): the engine of the checkout's own release first, installed only
+with its pinned SHA-256 (the latest release, unpinned, only with --allow-unpinned), llama.cpp's zip with its pinned
+SHA-256, Hugging Face files at pinned revisions (a revision that is gone stops setup; --allow-unpinned takes the
 current files), the pinned CUDA key package, the pinned requirements file, and an existing install left as it is.
 Mocked network - nothing is downloaded.
 
@@ -239,13 +240,29 @@ class CudaKeyring(unittest.TestCase):
             self.install(b"someone else's package")
 
 
+def engine_zip(meta) -> bytes:
+    out = io.BytesIO()
+    with zipfile.ZipFile(out, "w") as z:
+        z.writestr("BUILD.json", json.dumps(meta))
+        z.writestr(setup.EXE, b"engine")
+    return out.getvalue()
+
+
+def pin_of(body: bytes) -> tuple[int, str]:
+    return len(body), hashlib.sha256(body).hexdigest()
+
+
 class Engine(unittest.TestCase):
+    TAG = "https://github.com/Niko1221/Strata/releases/download/v0.1.31/"
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
         (self.root / "engine").mkdir()
+        self.body = engine_zip({"version": ".".join(map(str, setup.MIN_ENGINE)), "archs": [89]})
         self.patches = [mock.patch.object(setup, "ROOT", self.root),
-                        mock.patch.object(setup, "source_version", lambda: "0.1.31")]
+                        mock.patch.object(setup, "source_version", lambda: "0.1.31"),
+                        mock.patch.object(setup, "PREBUILT_PINS", {"0.1.31": {setup.PREBUILT_ASSET: pin_of(self.body)}})]
         for p in self.patches:
             p.start()
 
@@ -254,15 +271,14 @@ class Engine(unittest.TestCase):
             p.stop()
         self.tmp.cleanup()
 
-    def fake_download(self, got):
+    def fake_download(self, got, body=None):
         def download(url, dst, what=None):
             got.append(url)
-            with zipfile.ZipFile(dst, "w") as z:
-                z.writestr("BUILD.json", json.dumps({"version": ".".join(map(str, setup.MIN_ENGINE)), "archs": [89]}))
-                z.writestr(setup.EXE, b"engine")
+            dst.write_bytes(self.body if body is None else body)
+            setup.mark(dst)
         return download
 
-    def run_get(self, published):
+    def run_get(self, published, body=None):
         heads, got = [], []
 
         def urlopen(req, timeout=None):
@@ -272,7 +288,7 @@ class Engine(unittest.TestCase):
             return Response()
 
         with mock.patch.object(setup.urllib.request, "urlopen", urlopen), \
-                mock.patch.object(setup, "download", self.fake_download(got)):
+                mock.patch.object(setup, "download", self.fake_download(got, body)):
             eng, out = quiet(setup.get_prebuilt, setup.PREBUILT_URL, {"arch": 89}, "gpu")
         return eng, out, heads, got
 
@@ -282,17 +298,60 @@ class Engine(unittest.TestCase):
         self.assertEqual(setup.prebuilt_bases("https://mirror.example/x"), ["https://mirror.example/x/"])
 
     def test_the_checkout_s_release_first(self):
-        tag = "https://github.com/Niko1221/Strata/releases/download/v0.1.31/"
-        eng, out, heads, got = self.run_get([tag, setup.PREBUILT_URL])
+        eng, out, heads, got = self.run_get([self.TAG, setup.PREBUILT_URL])
         self.assertEqual(eng, self.root / "engine")
-        self.assertEqual(got, [tag + setup.PREBUILT_ASSET])
+        self.assertEqual(got, [self.TAG + setup.PREBUILT_ASSET])
         self.assertEqual(len(heads), 1)
+        self.assertIn("checking " + setup.PREBUILT_ASSET, out)
 
-    def test_latest_when_it_is_not_published(self):
+    def test_the_latest_is_not_installed_without_a_pin(self):
         eng, out, heads, got = self.run_get([setup.PREBUILT_URL])
+        self.assertIsNone(eng)
+        self.assertEqual(got, [])                       # not even downloaded
+        self.assertIn("No ready-made engine for v0.1.31", out)
+        self.assertIn("has no pinned SHA-256", out)
+        self.assertIn("--allow-unpinned", out)
+
+    def test_the_latest_with_allow_unpinned(self):
+        with mock.patch.object(setup, "ALLOW_UNPINNED", True):
+            eng, out, heads, got = self.run_get([setup.PREBUILT_URL])
         self.assertEqual(eng, self.root / "engine")
         self.assertEqual(got, [setup.PREBUILT_URL + setup.PREBUILT_ASSET])
-        self.assertIn("No ready-made engine for v0.1.31", out)
+
+    def test_a_release_without_pins_is_not_installed(self):
+        with mock.patch.object(setup, "PREBUILT_PINS", {}):
+            eng, out, heads, got = self.run_get([self.TAG])
+        self.assertIsNone(eng)
+        self.assertEqual(got, [])
+
+    def test_another_engine_is_deleted(self):
+        z = self.root / "engine" / setup.PREBUILT_ASSET
+        with self.assertRaises(SystemExit):
+            self.run_get([self.TAG], body=engine_zip({"version": "9.9.9", "archs": [89]}))
+        self.assertFalse(z.exists())
+        self.assertFalse(z.with_name(z.name + ".done").exists())
+        self.assertFalse((self.root / "engine" / setup.EXE).exists())
+
+    def test_a_folder_the_user_gave_is_not_checked(self):
+        with tempfile.TemporaryDirectory() as folder:
+            (Path(folder) / setup.PREBUILT_ASSET).write_bytes(engine_zip({"version": "9.9.9", "archs": [89]}))
+            eng, _ = quiet(setup.get_prebuilt, folder, {"arch": 89}, "gpu")
+        self.assertEqual(eng, self.root / "engine")
+        self.assertEqual(json.loads((eng / "BUILD.json").read_text())["version"], "9.9.9")
+
+    def test_the_amd_engine_too(self):
+        def urlopen(req, timeout=None):
+            if not req.full_url.startswith(setup.PREBUILT_URL):
+                raise not_found(req.full_url)
+            return Response()
+
+        got = []
+        with mock.patch.object(setup.urllib.request, "urlopen", urlopen), \
+                mock.patch.object(setup, "download", self.fake_download(got)):
+            eng, out = quiet(setup.get_prebuilt_hip, setup.PREBUILT_URL, {"arch": "gfx1201"})
+        self.assertIsNone(eng)
+        self.assertEqual(got, [])
+        self.assertIn("AMD engine at " + setup.PREBUILT_URL + " has no pinned SHA-256", out)
 
     def test_a_refused_archive_is_not_kept(self):
         """PR #324: a refused archive (too old, or no code for the GPU) kept its zip and .done mark, and every later
@@ -300,15 +359,12 @@ class Engine(unittest.TestCase):
         for meta in ({"version": "0.1.0", "archs": [89]},
                      {"version": ".".join(map(str, setup.MIN_ENGINE)), "archs": [120]}):
             with self.subTest(meta=meta):
-                def download(url, dst, what=None):
-                    with zipfile.ZipFile(dst, "w") as z:
-                        z.writestr("BUILD.json", json.dumps(meta))
-                        z.writestr(setup.EXE, b"engine")
-                    setup.mark(dst)
-
+                body, got = engine_zip(meta), []
                 with mock.patch.object(setup.urllib.request, "urlopen", lambda req, timeout=None: Response()), \
-                        mock.patch.object(setup, "download", download):
+                        mock.patch.object(setup, "download", self.fake_download(got, body)), \
+                        mock.patch.object(setup, "PREBUILT_PINS", {"0.1.31": {setup.PREBUILT_ASSET: pin_of(body)}}):
                     eng, _ = quiet(setup.get_prebuilt, setup.PREBUILT_URL, {"arch": 89}, "gpu")
+                self.assertEqual(len(got), 1)                   # downloaded and checked, then refused
                 self.assertIsNone(eng)
                 z = self.root / "engine" / setup.PREBUILT_ASSET
                 self.assertFalse(z.exists())
@@ -341,6 +397,61 @@ class Engine(unittest.TestCase):
             eng, out = quiet(setup.get_prebuilt, setup.PREBUILT_URL, {"arch": 89}, "gpu")
         self.assertEqual(eng, self.root / "engine")
         self.assertEqual((self.root / "engine" / setup.EXE).read_bytes(), b"old")
+
+
+class EnginePins(unittest.TestCase):
+    def test_this_version_is_pinned(self):
+        pins = setup.PREBUILT_PINS[setup.source_version()]
+        self.assertEqual(set(pins), {"strata-windows-x64.zip", "strata-windows-x64-cuda12.zip",
+                                     "strata-windows-x64-hip.zip"})
+        for size, sha in pins.values():
+            self.assertGreater(size, 0)
+            self.assertRegex(sha, r"^[0-9a-f]{64}$")
+
+
+class LlamaCpp(unittest.TestCase):
+    """llama.cpp's zip (the source the engine is built from) is unpacked only with its pinned size and SHA-256."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        out = io.BytesIO()
+        with zipfile.ZipFile(out, "w") as z:
+            z.writestr("llama.cpp-3cf0325/ggml/CMakeLists.txt", "project(ggml)")
+            z.writestr("llama.cpp-3cf0325/gguf-py/gguf/__init__.py", "")
+        self.body = out.getvalue()
+        self.published = self.root / "published.zip"
+        self.published.write_bytes(self.body)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def get(self, pin):
+        with mock.patch.object(setup, "ROOT", self.root), \
+                mock.patch.object(setup, "LLAMA_CPP_ZIP", str(self.published)), \
+                mock.patch.object(setup, "LLAMA_CPP_ZIP_PIN", pin):
+            return quiet(setup.get_llama_cpp)
+
+    def test_the_pin(self):
+        self.assertIn(setup.LLAMA_CPP_COMMIT, setup.LLAMA_CPP_ZIP)
+        size, sha = setup.LLAMA_CPP_ZIP_PIN
+        self.assertGreater(size, 0)
+        self.assertRegex(sha, r"^[0-9a-f]{64}$")
+
+    def test_the_pinned_zip_is_unpacked(self):
+        llama, out = self.get(pin_of(self.body))
+        self.assertEqual(llama, self.root / "third_party" / "llama.cpp")
+        self.assertTrue((llama / "ggml" / "CMakeLists.txt").exists())
+        self.assertIn("checking llama.cpp-3cf0325.zip (SHA-256, 0 MB)", out)
+
+    def test_another_zip_is_deleted(self):
+        with self.assertRaises(SystemExit):
+            self.get((len(self.body), "0" * 64))
+        third = self.root / "third_party"
+        self.assertEqual(sorted(p.name for p in third.iterdir()), [])
+        with self.assertRaises(SystemExit):              # another size: deleted as well
+            self.get((len(self.body) + 1, hashlib.sha256(self.body).hexdigest()))
+        self.assertEqual(sorted(p.name for p in third.iterdir()), [])
 
 
 class Requirements(unittest.TestCase):

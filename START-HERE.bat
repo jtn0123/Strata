@@ -17,7 +17,8 @@ call :findpy
 if defined PY goto venv
 :pyorg
 echo  Downloading the Python installer from python.org ...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol='Tls12'; Invoke-WebRequest -UseBasicParsing https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.exe -OutFile \"$env:TEMP\strata-python-setup.exe\""
+rem run only with the installer's SHA-256 (python.org lists its MD5, 5eddb0b6f12c852725de071ae681dde4, which this file matched, 2026-10-14)
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[Net.ServicePointManager]::SecurityProtocol='Tls12'; $f = Join-Path $env:TEMP 'strata-python-setup.exe'; Invoke-WebRequest -UseBasicParsing https://www.python.org/ftp/python/3.12.10/python-3.12.10-amd64.exe -OutFile $f; if ((Test-Path $f) -and (Get-FileHash -Algorithm SHA256 $f).Hash -ne '67B5635E80EA51072B87941312D00EC8927C4DB9BA18938F7AD2D27B328B95FB') { Remove-Item $f; Write-Host '  The downloaded Python installer is not the expected file (SHA-256): deleted, not run.' }"
 if exist "%TEMP%\strata-python-setup.exe" "%TEMP%\strata-python-setup.exe" /quiet InstallAllUsers=0 PrependPath=1 Include_launcher=1 Include_test=0
 call :findpy
 if defined PY goto venv
