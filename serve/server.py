@@ -4016,6 +4016,14 @@ def make_handler(svc: Service):
             self._static(f, types[ext], "no-cache")
 
         def _page(self):
+            if self.route and self.path.split("?")[0].endswith("/"):
+                # /api-monitor/: the page's links are relative (they work behind a path-prefixed proxy), so from
+                # there they would name /api-monitor/web/...; the page's own address has no slash
+                self.send_response(301)
+                self.send_header("Location", "../" + self.route.rsplit("/", 1)[-1])
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
             self._static(ROOT / "serve" / "web" / ("monitor.html" if self.route else "index.html"),
                          "text/html; charset=utf-8", "no-cache", page=True)
 

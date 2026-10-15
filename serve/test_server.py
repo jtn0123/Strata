@@ -2443,6 +2443,32 @@ class WebApp(unittest.TestCase):
                 self.assertEqual(code, 200)
                 self.assertIn(want, ctype)
 
+    def test_the_monitor_page_is_relative_too(self):
+        """Behind a proxy that serves Strata under a path (/strata/...), an absolute /web/... or /v1/... misses it:
+        the API Monitor's page and script name everything relative, as the app's page does (#82)."""
+        import http.client
+        import re
+        with mock.patch.object(self.svc, "api_monitor", True):
+            code, _, html = self.get("/api-monitor")
+            self.assertEqual(code, 200)
+            self.assertIn(b'href="web/tokens.css"', html)
+            self.assertIn(b'src="web/monitor.js"', html)
+            self.assertNotRegex(html, rb'(href|src)="/')
+            script = self.get("/web/monitor.js")[2].decode()
+            calls = re.findall(r'\bapi\(([^,)]*)', script)                  # each call's first argument
+            self.assertGreaterEqual(len(calls), 5, calls)
+            self.assertFalse([c for c in calls if re.search(r'["`]/', c)], calls)
+            # with a slash its relative links would name /api-monitor/web/...: it moves to the address without
+            c = http.client.HTTPConnection("127.0.0.1", self.httpd.server_address[1], timeout=10)
+            try:
+                c.request("GET", "/api-monitor/")
+                r = c.getresponse()
+                r.read()
+                self.assertEqual((r.status, r.headers["Location"]), (301, "../api-monitor"))
+            finally:
+                c.close()
+        self.assertEqual(self.get("/api-monitor/")[0], 404)                   # off: nothing to move to
+
     def test_security_headers(self):
         """No page of another site frames the app, no answer is read as another type, and the page runs only its own
         scripts: the files it loads and its inline script, by SHA-256."""
