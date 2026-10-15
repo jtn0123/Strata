@@ -4,11 +4,13 @@ from collections import Counter
 import json
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
 import benchmark_m5_compact as probe
+from metal_environment import configure
 
 
 class CompactEvidenceGates(unittest.TestCase):
@@ -152,6 +154,35 @@ class CompactEvidenceGates(unittest.TestCase):
         timed = runs(89000000)
         timed[2][0]['cases'][1]['median_ns'] = 100000000
         self.assertFalse(probe.summarize(timed)['qualifies_for_model_trial'])
+
+    def test_each_variant_pairs_its_own_engine_tuning_and_folders(self):
+        for name, variant in probe.VARIANTS.items():
+            with self.subTest(name):
+                configure({}, variant.engine, 'on', variant.tuning)
+                for other in probe.VARIANTS.values():
+                    if other.engine != variant.engine:
+                        with self.assertRaises(ValueError):
+                            configure({}, other.engine, 'on', variant.tuning)
+                self.assertTrue(all(path.is_file() for path in probe.experiment_files(variant.engine)))
+        for field in ('work', 'results', 'model_source'):
+            self.assertEqual(len({getattr(variant, field) for variant in probe.VARIANTS.values()}), len(probe.VARIANTS))
+
+    def test_a_run_uses_its_variants_engine_and_folder_and_keeps_failed_receipts(self):
+        seen = []
+        def stop(environment, engine, tensor_api, tuning):
+            seen.append((engine, tuning))
+            raise RuntimeError('stopped before the probe')
+        with tempfile.TemporaryDirectory() as tmp:
+            variant = probe.VARIANTS['cols']._replace(work=Path(tmp)/'work', results=Path(tmp)/'results')
+            variant.results.mkdir()
+            with (patch.object(probe, 'assert_no_model_server'), patch.object(probe, 'pins', lambda engine: dict(engine=engine)),
+                  patch.object(probe, 'sha256', return_value='b'*64), patch.object(probe, 'configure', stop)):
+                for scope, engine in (('control', 'm5-copy'), ('compact', 'm5-compact-cols')):
+                    with self.assertRaises(RuntimeError):
+                        probe.execute(scope, 'check', dict(engine=engine, binary_sha256='b'*64), variant)
+            self.assertEqual(seen, [('m5-copy', 'conv-direct'), ('m5-compact-cols', 'compact-cols')])
+            records = [json.loads(path.read_text()) for path in sorted(variant.results.glob('*/result.json'))]
+            self.assertEqual([(record['status'], record['scope']) for record in records], [('failed', 'control'), ('failed', 'compact')])
 
 
 if __name__ == '__main__':

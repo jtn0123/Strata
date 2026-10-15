@@ -47,6 +47,7 @@ P11/P12 are built and screened independently. Neither clears its fixed component
 - **Validation:** 273 correctness records per engine (91 fixtures, A/B/A); 18 timing cases in fresh ABBA. Two complete dependent blocks, exact finite F32 output digests, all six MM activation/fallback counters pass, immutable inputs/weights, valid maximum-capacity/skew/permuted routes, zero new swap across six launches. Independent Astra raw audit. Corrupt-header/overlap edges are source-reviewed, not runtime-injected.
 - **Revisit:** Different measured scheduling or data-reuse mechanism with exact original math, complete overhead and fresh preregistered controls. Physical Metal group order is not guaranteed; do not revisit unchanged axis transpose.
 - **Evidence:** [Report](results/20261009-compact-tiles/REPORT.md), [raw](results/20261009-compact-tiles/columns/comparison.json), [verification](results/20261009-compact-tiles/final-verification.json).
+- **Driver:** `scripts/benchmark_m5_compact.py --variant cols` (and `benchmark_m5_compact_models.py --variant cols`). The separate `benchmark_m5_compact_cols.py` that produced this result is [archived with it](results/20261009-compact-tiles/columns/source/scripts/benchmark_m5_compact_cols.py).
 
 The [R05 checkpoint lifecycle card](research/20261009-astra-stateless-checkpoint-plan.md) holds a general cache_prompt=false omission until later cache-enabled slot reuse is safe. Skipping serialization can change prompt splits and restore behavior. Exact-format cooperative-input prompt compute remains independently unimplemented.
 
@@ -168,6 +169,7 @@ Next queued is R03compactexpert/tokenworklist, independently over originalcopy/P
 - **Validation:** 58 cases, 11,162,880 F32 values bit-identical; six accepted native runs, zero new swap.
 - **Revisit:** A materially different epilogue/dispatch mechanism with a normal-path cost argument and repeatable complete-block improvement. The new parallel **eight-output** mode was not benchmarked; this result must not be described as testing it. Old serial eight-output failure is P01.
 - **Evidence:** [Combined report](results/20261009-sequential-pass/REPORT.md), [raw gate evidence](results/20261009-sequential-pass/gate-lanes.json), [pinned manifest](../config/m5_gate_lanes_experiment.json), [predeclared screen](../config/m5_sequential_plan.json).
+- **Driver:** `scripts/benchmark_m5_gate.py --engine m5-gate-lanes`. The separate `benchmark_m5_gate_lanes.py` that produced this result is [archived](results/20261009-next-speed-pass/before/scripts/benchmark_m5_gate_lanes.py).
 
 ### S02 — Zero extra Metal encoding workers
 

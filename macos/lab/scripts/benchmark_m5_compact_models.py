@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Matched original-engine control for compact expert tile scheduling."""
+"""Matched original-engine control for compact expert tile scheduling, or its column-first job order."""
 import argparse
 import fcntl
 import json
@@ -9,25 +9,23 @@ from pathlib import Path
 from benchmark_m5 import execute
 from benchmark_m5_next import finish, output_signatures, wait_for_headroom
 from benchmark_m5_encoder_models import adoption
-from benchmark_m5_compact import RESULTS, SOURCE, WORK, parse, markers, pins, compare_exact, summarize
-from engines import ROOT, sha256, verify_engine
+from benchmark_m5_compact import VARIANTS, parse, markers, pins, compare_exact, summarize
+from engines import ROOT, sha256
 from validate_offline import require_pass, fingerprint
 
-BUNDLE = ROOT/'bench/results/20261009-compact-tiles'
-
-def prerequisites():
-    comparison = json.loads((RESULTS/'comparison.json').read_text())
-    receipts = json.loads((WORK/'build.json').read_text())
-    plan = json.loads((RESULTS/'plan.json').read_text())
+def prerequisites(variant):
+    comparison = json.loads((variant.results/'comparison.json').read_text())
+    receipts = json.loads((variant.work/'build.json').read_text())
+    plan = json.loads((variant.results/'plan.json').read_text())
     if comparison['status'] != 'passed' or not comparison['qualifies_for_model_trial']:
         raise ValueError('Qualified component comparison required')
-    for scope, engine in (('control','m5-copy'),('compact','m5-compact')):
+    for scope, engine in (('control','m5-copy'),('compact',variant.engine)):
         current = pins(engine)
         saved = receipts[scope]
-        if current != {key:saved[key] for key in current} or sha256(WORK/(scope+'-probe')) != saved['binary_sha256']:
+        if current != {key:saved[key] for key in current} or sha256(variant.work/(scope+'-probe')) != saved['binary_sha256']:
             raise ValueError('Component/native source or binary changed')
     for name, expected in plan['archive'].items():
-        if sha256(RESULTS/'source'/name) != expected or sha256(ROOT/name) != expected:
+        if sha256(variant.results/'source'/name) != expected or sha256(ROOT/name) != expected:
             raise ValueError('Component source archive changed: '+name)
     paths = comparison['checks'] + comparison['runs']
     order = [('control','check'),('compact','check'),('control','perf'),('compact','perf'),('compact','perf'),('control','perf')]
@@ -70,13 +68,13 @@ def dispatch(text, candidate):
     return dict(markers=records, actual_eligible_encoding=candidate, shader_frequency_proven=False)
 
 
-def latency_decision(summary):
+def latency_decision(summary, tuning='compact-tiles'):
     winning = []
     real = [row for row in summary if not row['cached'] and row['workload'] in ('code','prose')]
     if len(real) != 2 or {row['workload'] for row in real} != {'code','prose'}:
         raise ValueError('Both contextual English tasks required')
     for row in real:
-        gain, drift = row['vs_control']['compact-tiles'], row['control_drift']
+        gain, drift = row['vs_control'][tuning], row['control_drift']
         if (gain['ttft_reduction_percent'] >= 1
                 and gain['ttft_reduction_percent'] > 2*abs(drift['ttft_reduction_percent'])
                 and gain['total_time_reduction_percent'] > abs(drift['total_time_reduction_percent'])
@@ -98,37 +96,42 @@ def signatures(record):
             result[key] = (c['token_ids'],c['text'])
     return result
 
-def render(record):
+def render(record, variant):
     lines = ['# Compact expert tile scheduling: matched model result','',
-        'Original m5-copy/conv-direct versus isolated m5-compact/compact-tiles. Qwen3.8-Flash-Next Q2_0, shared Q3 helper, mixed placement, eight helper workers, depth3/confidence0, Tensor API on, F16/4K/batch512.','',
+        f'Original m5-copy/conv-direct versus isolated {variant.engine}/{variant.tuning}. Qwen3.8-Flash-Next Q2_0, shared Q3 helper, mixed placement, eight helper workers, depth3/confidence0, Tensor API on, F16/4K/batch512.','',
         'Practical English scheduler review and incident analysis use complete context from the hashed fixture. Fresh ABBA,256 outputs, excluded warmup plus three repetitions. Cached ledgers are separate.','',
         '| Workload/input | Control TPS | Candidate TPS | TPS change | Reply quicker | First token quicker | TPS drift | Reply drift | TTFT drift |',
         '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |']
     for row in record['summary']:
-        a,b = row['profiles']['conv-direct'],row['profiles']['compact-tiles']
-        d,f = row['vs_control']['compact-tiles'],row['control_drift']
+        a,b = row['profiles']['conv-direct'],row['profiles'][variant.tuning]
+        d,f = row['vs_control'][variant.tuning],row['control_drift']
         lines.append(f"| {row['workload']}/{row['input_budget']} | {a['generation_tok_s']:.3f} | {b['generation_tok_s']:.3f} | {d['generation_increase_percent']:+.3f}% | {d['total_time_reduction_percent']:+.3f}% | {d['ttft_reduction_percent']:+.3f}% | {f['generation_increase_percent']:+.3f}% | {f['total_time_reduction_percent']:+.3f}% | {f['ttft_reduction_percent']:+.3f}% |")
     lines += ['', 'General TPS/reply acceptance: '+str(record['decision']['measured_speed_candidate'])+'. '+record['decision']['rule'],
         '', 'Prompt-latency acceptance: '+str(record['latency_decision']['measured_prompt_latency_candidate'])+'. '+record['latency_decision']['rule'],
         '', 'Candidate encoding marker proves one eligible native operation was encoded. It does not measure branch frequency. Exact complete outputs and zero new swap are required; defaults remain unchanged.','', '[Raw comparison](comparison.json).']
     return '\n'.join(lines)+'\n'
 
+def model_spec(variant):
+    return dict(id=variant.tuning,engine=variant.engine,depth=3,axis='m5_tuning',control='conv-direct',
+                candidates=[variant.tuning],predict=256,
+                engine_for_value={'conv-direct':'m5-copy',variant.tuning:variant.engine},
+                workloads_file='config/m5_compact_workloads.json',prompts=[])
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument('--variant',choices=tuple(VARIANTS),default='tiles')
     ap.add_argument('--run',action='store_true')
     ap.add_argument('--resume',type=Path)
     args = ap.parse_args()
-    spec = dict(id='compact-tiles',engine='m5-compact',depth=3,axis='m5_tuning',control='conv-direct',
-                candidates=['compact-tiles'],predict=256,
-                engine_for_value={'conv-direct':'m5-copy','compact-tiles':'m5-compact'},
-                workloads_file='config/m5_compact_workloads.json',prompts=[])
+    variant = VARIANTS[args.variant]
+    spec = model_spec(variant)
     if not args.run: print('Prepared:',spec); return
     require_pass()
     with (ROOT/'bench/.lock').open('w') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
-        proof = prerequisites()
+        proof = prerequisites(variant)
         source = fingerprint()
-        archive = BUNDLE/'model-source'
+        archive = variant.model_source
         archive.mkdir(exist_ok=True)
         if args.resume:
             if json.loads((archive/'pins.json').read_text()) != source:
@@ -145,22 +148,22 @@ def main():
                 r=json.loads((ROOT/'bench/results'/entry['run_id']/'result.json').read_text())
                 if reference is None: reference=signatures(r)
                 if signatures(r)!=reference: raise ValueError('Resume output changed')
-                receipts.append(dict(run_id=r['run_id'],**dispatch((ROOT/'bench/results'/r['run_id']/'server.log').read_text(),entry['value']=='compact-tiles')))
+                receipts.append(dict(run_id=r['run_id'],**dispatch((ROOT/'bench/results'/r['run_id']/'server.log').read_text(),entry['value']==variant.tuning)))
         def check_pass(record,value):
             nonlocal reference
             if fingerprint()!=source: raise ValueError('Model benchmark closure changed')
             current=signatures(record)
             if reference is None: reference=current
             if current != reference: raise ValueError('Fresh, warmup or cache outputs differ from control')
-            receipts.append(dict(run_id=record['run_id'],**dispatch((ROOT/'bench/results'/record['run_id']/'server.log').read_text(),value=='compact-tiles')))
+            receipts.append(dict(run_id=record['run_id'],**dispatch((ROOT/'bench/results'/record['run_id']/'server.log').read_text(),value==variant.tuning)))
         folder=execute(spec,3,resume=args.resume,before_pass=wait_for_headroom,after_pass=check_pass)
         record=finish(folder)
-        decision=adoption(record['summary'],'compact-tiles')
+        decision=adoption(record['summary'],variant.tuning)
         decision['rule']='At least1% TPS and reply gain on both English code/prose, each above its own absolute control drift; exact tested outputs and zero new swap.'
         record.update(component_prerequisites=proof,compact_encoding_receipts=receipts,source_pins=source,
-                      output_parity_including_warmups=True,decision=decision,latency_decision=latency_decision(record['summary']))
+                      output_parity_including_warmups=True,decision=decision,latency_decision=latency_decision(record['summary'],variant.tuning))
         (folder/'comparison.json').write_text(json.dumps(record,indent=2)+'\n')
-        (folder/'REPORT.md').write_text(render(record))
+        (folder/'REPORT.md').write_text(render(record,variant))
         print('Matched model result:',folder,decision,flush=True)
 
 if __name__=='__main__':main()

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Exact Q2 gate/up/SwiGLU checks and scheduled sequential operator timing; not model TPS."""
+"""Exact Q2 gate/up/SwiGLU checks and scheduled sequential operator timing (m5-gate, or m5-gate-lanes with
+lane-distributed activation); not model TPS."""
 import argparse
 from collections import Counter
 from datetime import datetime, timezone
@@ -15,7 +16,9 @@ from check_memory import assert_no_model_server
 from engines import ROOT, sha256, verify_engine
 from metal_environment import configure
 
-WORK=ROOT/'bench/runtime/m5-gate';SOURCE=ROOT/'native/m5_gate_probe.cpp';BINARY=WORK/'gate-probe'
+SOURCE=ROOT/'native/m5_gate_probe.cpp'
+# bench/EXPERIMENT-LEDGER.md P01/P02 (m5-gate) and S01 (m5-gate-lanes); each builds its own probe
+ENGINES=('m5-gate','m5-gate-lanes')
 FIXTURE=ROOT/'config/m5_group_routes.json'
 LAYOUTS=('input-strided','weights-strided','ids-contiguous','ids-offset','retained','external','bias','clamp',
          'different-ids','different-input','reversed','activation-unfused','cancel','wide')
@@ -58,23 +61,27 @@ def fixtures():
     return data
 
 
-def build():
-    fixtures();pin=verify_engine('m5-gate');native=ROOT/pin['directory'];WORK.mkdir(parents=True,exist_ok=True)
+def work(engine):return ROOT/'bench/runtime'/engine
+
+
+def build(engine):
+    fixtures();pin=verify_engine(engine);native=ROOT/pin['directory'];binary=work(engine)/'gate-probe'
+    work(engine).mkdir(parents=True,exist_ok=True)
     cmd=['/usr/bin/c++','-O3','-ffp-contract=off','-std=gnu++17','-arch','arm64',
-         '-I'+str(native/'ggml/include'),'-I'+str(native/'vendor'),str(SOURCE),'-o',str(BINARY),
+         '-I'+str(native/'ggml/include'),'-I'+str(native/'vendor'),str(SOURCE),'-o',str(binary),
          '-Wl,-rpath,'+str(native/'build/bin'),
          *[str(native/'build/bin'/n) for n in ('libggml.0.26.0.dylib','libggml-base.0.26.0.dylib')]]
-    with (WORK/'probe-build.log').open('w') as log:subprocess.run(cmd,stdout=log,stderr=log,check=True)
+    with (work(engine)/'probe-build.log').open('w') as log:subprocess.run(cmd,stdout=log,stderr=log,check=True)
     record={'engine':pin,'source_sha256':sha256(SOURCE),'runner_sha256':sha256(__file__),
-            'fixture_sha256':sha256(FIXTURE),'binary_sha256':sha256(BINARY),'command':cmd}
-    (WORK/'probe-build.json').write_text(json.dumps(record,indent=2)+'\n');return record
+            'fixture_sha256':sha256(FIXTURE),'binary_sha256':sha256(binary),'command':cmd}
+    (work(engine)/'probe-build.json').write_text(json.dumps(record,indent=2)+'\n');return record
 
 
-def verify():
-    record=json.loads((WORK/'probe-build.json').read_text());fixtures()
-    if (record['engine']!=verify_engine('m5-gate') or record['source_sha256']!=sha256(SOURCE)
+def verify(engine):
+    record=json.loads((work(engine)/'probe-build.json').read_text());fixtures()
+    if (record['engine']!=verify_engine(engine) or record['source_sha256']!=sha256(SOURCE)
         or record['runner_sha256']!=sha256(__file__) or record['fixture_sha256']!=sha256(FIXTURE)
-        or record['binary_sha256']!=sha256(BINARY)):raise RuntimeError('Gate probe provenance changed')
+        or record['binary_sha256']!=sha256(work(engine)/'gate-probe')):raise RuntimeError('Gate probe provenance changed')
     return record
 
 
@@ -116,18 +123,18 @@ def parse(text,mode,tuning):
     return cases
 
 
-def execute(mode,tuning):
+def execute(mode,tuning,engine):
     if tuning not in ('conv-direct',*TUNINGS):raise ValueError('Unknown gate tuning')
-    assert_no_model_server();pin=verify()
-    folder=ROOT/'bench/features'/(datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')+'-m5-gate-'+mode+'-'+tuning)
-    folder.mkdir();env,flags=configure(os.environ,'m5-gate','on',tuning)
+    assert_no_model_server();pin=verify(engine)
+    folder=ROOT/'bench/features'/(datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')+'-'+engine+'-'+mode+'-'+tuning)
+    folder.mkdir();env,flags=configure(os.environ,engine,'on',tuning)
     if mode=='check':env['GGML_M5_LAB_GATE_TRACE']='1';flags['variables']['GGML_M5_LAB_GATE_TRACE']='1'
     record={'status':'running','probe':pin,'mode':mode,'metal_environment':flags,'models_loaded':False,'tps_measured':False,
         'scope':'Normal backend scheduler/optimizer and allocation dependencies; all graph nodes forced to Metal and placement verified. Eight sequential gate/up/SwiGLU/down blocks with weighted reduction/residual per perf graph, two full512 weight sets and eight recorded routes. Full dispatch/sync costs included. No callbacks, perf traces or CPU graph work.'}
     process=monitor=None
     try:
         with (folder/'native.log').open('w') as log:
-            baseline=Monitor.baseline();process=subprocess.Popen([BINARY,mode,FIXTURE,folder/'outputs.bin'],env=env,stdout=log,stderr=log)
+            baseline=Monitor.baseline();process=subprocess.Popen([work(engine)/'gate-probe',mode,FIXTURE,folder/'outputs.bin'],env=env,stdout=log,stderr=log)
             monitor=Monitor(process,folder/'memory.jsonl',0,2**30,baseline=baseline);monitor.thread.start();code=process.wait(timeout=1200)
         monitor.thread.join(timeout=5);record['memory']=monitor.finish()
         record['native_returncode']=code
@@ -137,7 +144,7 @@ def execute(mode,tuning):
         record['outputs_sha256']=sha256(folder/'outputs.bin')
         size=sum(c['output_elements'] for c in record['cases'])*4 if mode=='check' else 0
         if (folder/'outputs.bin').stat().st_size!=size:raise RuntimeError('Wrong tensor evidence size')
-        if verify()!=pin:raise RuntimeError('Engine/probe changed during execution')
+        if verify(engine)!=pin:raise RuntimeError('Engine/probe changed during execution')
         record['status']='passed'
     except BaseException as error:
         record.update(status='failed',error=f'{type(error).__name__}: {error}');raise
@@ -178,10 +185,10 @@ def compare(control,candidate):
     (candidate/'comparison.json').write_text(json.dumps(result,indent=2)+'\n');return result
 
 
-def require_check(path,tuning):
+def require_check(path,tuning,engine):
     record=json.loads((path/'probe.json').read_text());comparison=json.loads((path/'comparison.json').read_text())
     if (record['mode']!='check' or record['status']!='passed' or comparison['status']!='passed'
-        or record['metal_environment']['tuning']!=tuning or record['probe']!=verify()
+        or record['metal_environment']['tuning']!=tuning or record['probe']!=verify(engine)
         or record['outputs_sha256']!=sha256(path/'outputs.bin') or comparison.get('elements_bit_identical',0)<=0):
         raise RuntimeError('A current exact-parity check is required before perf')
 
@@ -189,17 +196,18 @@ def require_check(path,tuning):
 def main():
     ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('--build',action='store_true');ap.add_argument('--run',action='store_true')
     ap.add_argument('--mode',choices=('check','perf'),default='check');ap.add_argument('--tuning',choices=tuple(TUNINGS),default='gate-up8')
+    ap.add_argument('--engine',choices=ENGINES,default='m5-gate')
     ap.add_argument('--check-result',type=lambda p:ROOT/p);args=ap.parse_args()
     with (ROOT/'bench/.lock').open('w') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
-        if args.build:build()
+        if args.build:build(args.engine)
         if args.run:
-            if args.mode=='check':compare(execute('check','conv-direct'),execute('check',args.tuning))
+            if args.mode=='check':compare(execute('check','conv-direct',args.engine),execute('check',args.tuning,args.engine))
             else:
                 if not args.check_result:raise ValueError('--check-result is required for perf')
-                require_check(args.check_result,args.tuning)
-                a1=execute('perf','conv-direct');b1=execute('perf',args.tuning)
-                b2=execute('perf',args.tuning);a2=execute('perf','conv-direct')
+                require_check(args.check_result,args.tuning,args.engine)
+                a1=execute('perf','conv-direct',args.engine);b1=execute('perf',args.tuning,args.engine)
+                b2=execute('perf',args.tuning,args.engine);a2=execute('perf','conv-direct',args.engine)
                 compare(a1,b1);compare(a2,b2)
                 result={'status':'passed','order':'ABBA','control_before':str(a1.relative_to(ROOT)),
                     'candidate_first':str(b1.relative_to(ROOT)),'candidate_second':str(b2.relative_to(ROOT)),

@@ -6,7 +6,8 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from benchmark_m5_compact_models import dispatch, latency_decision
+from benchmark_m5_compact import VARIANTS
+from benchmark_m5_compact_models import dispatch, latency_decision, model_spec
 from benchmark_m5 import settings
 
 
@@ -28,6 +29,7 @@ class CompactModelGates(unittest.TestCase):
                     control='conv-direct', candidates=['compact-tiles'], predict=256,
                     engine_for_value={'conv-direct': 'm5-copy', 'compact-tiles': 'm5-compact'},
                     workloads_file='config/m5_compact_workloads.json', prompts=[])
+        self.assertEqual(model_spec(VARIANTS['tiles']), spec)
         control = settings(spec, 'conv-direct', 'fixture', 3)
         candidate = settings(spec, 'compact-tiles', 'fixture', 3)
         self.assertEqual((control.engine, candidate.engine), ('m5-copy', 'm5-compact'))
@@ -51,6 +53,16 @@ class CompactModelGates(unittest.TestCase):
             self.assertFalse(latency_decision(broken)['measured_prompt_latency_candidate'])
         with self.assertRaises(ValueError):
             latency_decision(rows[:1])
+        columns = [dict(row, vs_control={'compact-cols': row['vs_control']['compact-tiles']}) for row in rows]
+        self.assertTrue(latency_decision(columns, 'compact-cols')['measured_prompt_latency_candidate'])
+
+    def test_the_column_first_variant_runs_its_own_engine(self):
+        spec = model_spec(VARIANTS['cols'])
+        control = settings(spec, 'conv-direct', 'fixture', 3)
+        candidate = settings(spec, 'compact-cols', 'fixture', 3)
+        self.assertEqual((control.engine, candidate.engine), ('m5-copy', 'm5-compact-cols'))
+        self.assertEqual((control.swap_guard_bytes, candidate.swap_guard_bytes), (0, 0))
+        self.assertEqual(control.real_workload_sha256, candidate.real_workload_sha256)
 
 
 if __name__ == '__main__':
