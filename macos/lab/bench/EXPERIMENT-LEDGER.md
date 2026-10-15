@@ -832,3 +832,17 @@ Balanced P07 remains the normal launcher; editing lookup has a maintained dedica
 - **Decision:** not qualified; the app is unchanged and N15 remains a diagnostic engine.
 - **Revisit:** find and remove the first-draft cost after a long prompt, then qualify again. Before that run, fix a rule with enough replies per row that one slow reply cannot decide a row.
 - **Evidence:** [report](research/20261014-n15-qualify/REPORT.md). Native logs, per-request rows, conversation text and memory samples stay ignored under the local feature folder.
+
+### E16 — N01: llama.cpp #30373 on the expert matrices, without the model (not ported)
+
+- **What ran:** `test-backend-ops` timing of the expert matrix operation (`MUL_MAT_ID`) alone on Metal, at the model's Q2_0 gate/up [2560, 640, 512] and down [640, 2560, 512] shapes with 10 experts per token. No model was loaded.
+  - Four setups, each a scratch copy of the pinned source: pristine, pristine plus #30373, the kept patch with `small-reduce`, and the kept patch with `small-reduce` plus P11's compact tiles.
+  - Random routes at 32, 512 and 1,536 tokens, and a sweep at 512 tokens that puts the same work on 10 to 512 experts.
+  - Two rounds of pristine, #30373, kept, compact, compact, kept, #30373, pristine. Every setup matched the CPU backend on all 10 cases.
+- **Findings:**
+  - #30373 against pristine, summed over 48 layers: +2.6% at 32 tokens, +1.4% at 512 (294.9 → 298.9 ms), −1.7% at 1,536 (562.2 → 552.8 ms). Down got faster (−4.5% at 512, −9.7% at 1,536) and gate/up slower (+4.7%, +3.1%).
+  - The kept engine's compact tiles took 283.8 ms at 512, 4.0% less than kept without them and 5.1% less than #30373. They gave no full-model gain in the P11 screen.
+  - Moving the same work from 10 to 512 experts adds 137.1 ms per 512-token chunk on the pristine source (134.6 → 271.7 ms): 1.90–2.04 µs per expert per matrix, about the same in all four setups.
+- **Decision:** not ported. At the default chunk size it is slower on our shapes, and it needs a three-file merge with the kept patch.
+- **Revisit:** if upstream changes its gate/up path, or if the model ever needs its duplicate-id fix.
+- **Evidence:** [report](research/20261014-n01-sizing/REPORT.md). Raw runs and logs stay ignored under the local feature folder.
