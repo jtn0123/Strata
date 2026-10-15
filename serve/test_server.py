@@ -2097,10 +2097,8 @@ class Routes(unittest.TestCase):
                 self.assertEqual(self.call("GET", path), 404)
 
 
-class WrongFieldTypes(unittest.TestCase):
-    """A field of the wrong type is a 400 naming it.  int() on a list, an object or an infinite max_tokens, a number as
-    message content or as Anthropic's system, and text as chat_template_kwargs raised TypeError, AttributeError or
-    OverflowError, which no handler caught: the client got no answer at all, the console a stack trace."""
+class OverHTTP:
+    """A real server on a free port with a RecordingEngine, and post(path, body) -> (status, text)."""
 
     @classmethod
     def setUpClass(cls):
@@ -2125,6 +2123,12 @@ class WrongFieldTypes(unittest.TestCase):
                 return r.status, r.read().decode()
         finally:
             c.close()
+
+
+class WrongFieldTypes(OverHTTP, unittest.TestCase):
+    """A field of the wrong type is a 400 naming it.  int() on a list, an object or an infinite max_tokens, a number as
+    message content or as Anthropic's system, and text as chat_template_kwargs raised TypeError, AttributeError or
+    OverflowError, which no handler caught: the client got no answer at all, the console a stack trace."""
 
     def test_each_field_is_named_in_a_400(self):
         hi = [{"role": "user", "content": "hi"}]
@@ -2171,6 +2175,27 @@ class WrongFieldTypes(unittest.TestCase):
         self.assertEqual(status, 200)                         # no 400 written into the stream that had started
         self.assertIn('"content": "x"', text)
         self.assertNotIn("invalid_request_error", text)
+
+class ChecksBeforeTheModelLoads(OverHTTP, unittest.TestCase):
+    """A request that is a 400 loads no model: loading takes tens of seconds and tens of GB, and /v1/messages loaded
+    first and checked after, so a malformed request could start a load (OpenAI's route checked most things first)."""
+
+    def test_a_bad_request_loads_nothing(self):
+        hi = [{"role": "user", "content": "hi"}]
+        bad = {"messages": 5, "max_tokens": [1], "stop_sequences": 5, "stop": 5,
+               "reasoning_budget_tokens": "x", "tools": [5]}
+        loads = []
+        with mock.patch.object(self.svc, "load", lambda: loads.append(1)):
+            for path, base in (("/v1/messages", {"messages": hi, "max_tokens": 8}), ("/v1/chat/completions", {"messages": hi})):
+                for key, value in bad.items():
+                    if (path, key) in (("/v1/messages", "stop"), ("/v1/chat/completions", "stop_sequences")):
+                        continue                              # the other API's field: not read here
+                    with self.subTest(path=path, field=key):
+                        self.assertEqual(self.post(path, {**base, key: value})[0], 400)
+            self.assertEqual(loads, [])
+            for path, body in (("/v1/messages", {"messages": hi, "max_tokens": 8}), ("/v1/chat/completions", {"messages": hi})):
+                self.assertEqual(self.post(path, body)[0], 200)
+        self.assertEqual(loads, [1, 1])                       # a good request still loads it
 
 class SharedSettings(unittest.TestCase):
     """The web app's "Use for other apps too": POST /settings makes its Chat settings every client's defaults."""

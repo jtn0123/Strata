@@ -4294,7 +4294,6 @@ def make_handler(svc: Service):
             messages, validator = prepare_format(req.get("response_format"), messages)
             if validator is not None and (tools or req.get("strata_mcp")):
                 raise ValueError("structured response_format with tools/MCP is not supported")
-            svc.load()
             max_req = max_new = token_limit(req, "max_completion_tokens", "max_tokens")   # 0/-1: the rest
             use_mcp = req.get("strata_mcp") is True and svc.mcp is not None      # the web app's opt-in (serve/mcp.py)
             own = {t.get("name") for t in tools or [] if isinstance(t, dict)}   # #592: a second line of defence
@@ -4309,6 +4308,7 @@ def make_handler(svc: Service):
                 raise ValueError("a forced tool_choice with MCP tools is not supported")
             svc.reasoning_budget(req)                         # a bad value is a 400 before anything is sent
             stop_strings(req)                                 # ... and so is a bad stop / stop_sequences
+            svc.load()                                        # after every check: a bad request loads no model
             ids, thinking, max_new = svc.prepare(messages, tools, kw, max_new, force=force)
             _debug_req("openai", req, messages, tools, max_new, thinking, len(ids))
             cancel = threading.Event()
@@ -4485,7 +4485,6 @@ def make_handler(svc: Service):
             self._json(200, {"input_tokens": len(svc.encode_prompt(messages, tools, kw))})
 
         def _anthropic(self, req):
-            svc.load()
             req = svc.with_shared(req, "anthropic")
             messages, tools, kw = anthropic_to_messages(req, svc.anthropic_think_unasked)
             self._no_local_images(messages)
@@ -4495,6 +4494,7 @@ def make_handler(svc: Service):
             max_new = token_limit(req, "max_tokens")                    # 0/-1: the rest of the context
             svc.reasoning_budget(req)                         # a bad value is a 400 before anything is sent
             stop_strings(req)                                 # ... and so is a bad stop / stop_sequences
+            svc.load()                                        # after every check, as on the chat route
             ids, thinking, max_new = svc.prepare(messages, tools, kw, max_new, force=force)
             _debug_req("anthropic", req, messages, tools, max_new, thinking, len(ids))
             cancel = threading.Event()
