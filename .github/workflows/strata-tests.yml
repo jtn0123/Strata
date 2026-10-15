@@ -2,7 +2,7 @@ name: Strata tests
 
 # The server's and the installer's own tests, and the tools' (everything outside macos/, which has
 # mac-lab-offline.yml): no GPU, no model, no download but llama.cpp's gguf-py. On the oldest Python setup.py
-# accepts (setup.sh: 3.10) and on the one the lab uses.
+# accepts (setup.sh: 3.10) and on the one the lab uses. The web app's escaping and Markdown run in Node.
 on:
   pull_request:
     branches: [mac-m5-lab]
@@ -60,3 +60,19 @@ jobs:
       - name: Tools
         run: |
           git ls-files -z 'tools/test_*.py' ':!tools/test_setup_*' | xargs -0 python -m unittest
+
+  web:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+      - name: Web app
+        run: |
+          node --check serve/web/app.js
+          node --check serve/web/monitor.js
+          node --test serve/*.test.cjs
