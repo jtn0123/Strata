@@ -36,7 +36,8 @@ the kernel's amdgpu driver (no ROCm install needed):
   ROCm 7 is the tested path there).
 - **Engine:** compiled on your PC for the card's architecture (10-20 minutes, once; again after a `git pull` that
   changes it, or when you pick a card of another architecture). This needs a C++ compiler and git
-  (`sudo apt install build-essential git`).
+  (`sudo apt install build-essential git`; Fedora `sudo dnf install gcc-c++ make git`; Arch
+  `sudo pacman -S base-devel git`).
 - **hipBLASLt tuning table:** setup uses `tools/hip/<arch>-hipblaslt-<version>.txt` only when it matches both the
   card's architecture and the installed hipBLASLt version (read from `hipblaslt-version.h`; 1.2.0 is `100200`).
   Otherwise it says so and the prompt's dense matrix products use plain hipBLAS (slower prompts, same answers).

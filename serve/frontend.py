@@ -61,11 +61,15 @@ class ChatTemplate:
 
 
 # ------------------------------------------------------------------------------------------------ requests
-def _text_of(content) -> str:
+def _text_of(content, field: str = "message content") -> str:
+    """Text content: a string, or the text parts of a list (other parts are left out).  Anything else (a number, an
+    object) is a ValueError naming the field - a 400 - where iterating it took the request thread down unanswered."""
     if content is None:
         return ""
     if isinstance(content, str):
         return content
+    if not isinstance(content, list):
+        raise ValueError(f"{field} must be text or a list of content parts, not {type(content).__name__}")
     return "".join(part.get("text", "") for part in content if isinstance(part, dict) and part.get("type") in
                    ("text", "input_text", None))
 
@@ -328,7 +332,10 @@ def openai_to_messages(req: dict) -> tuple[list[dict], list[dict] | None, dict]:
     reasoning = req.get("reasoning") if isinstance(req.get("reasoning"), dict) else {}
     kwargs.update(effort_kwargs(req.get("reasoning_effort") or reasoning.get("effort")))
     # the vLLM / llama.cpp convention: {"chat_template_kwargs": {"enable_thinking": false, "reasoning_effort": "low"}}
-    for k, v in (req.get("chat_template_kwargs") or {}).items():
+    template_kwargs = req.get("chat_template_kwargs")
+    if template_kwargs and not isinstance(template_kwargs, dict):
+        raise ValueError("chat_template_kwargs must be an object")
+    for k, v in (template_kwargs or {}).items():
         if k == "enable_thinking" and not v:
             kwargs = {"enable_thinking": False}
         elif k == "reasoning_effort" and "enable_thinking" not in kwargs:
@@ -372,7 +379,7 @@ def anthropic_to_messages(req: dict, think_unasked: bool = True) -> tuple[list[d
     messages = []
     system = req.get("system")
     if system:
-        messages.append({"role": "system", "content": pin_billing_stamp(_text_of(system))})
+        messages.append({"role": "system", "content": pin_billing_stamp(_text_of(system, "system"))})
     for m in _object_list(req.get("messages"), "messages"):
         content = m.get("content")
         if isinstance(content, str):
@@ -382,6 +389,8 @@ def anthropic_to_messages(req: dict, think_unasked: bool = True) -> tuple[list[d
                 isinstance(b, dict) and b.get("type") == "tool_result" for b in content):
             messages.append({"role": "user", "content": _parts_of(content)})
             continue
+        if content is not None and not (isinstance(content, list) and all(isinstance(b, dict) for b in content)):
+            raise ValueError("a message's content must be text or a list of content blocks (objects)")
         text, reasoning, calls, parts = [], [], [], []
         for block in content or []:
             kind = block.get("type")

@@ -2083,6 +2083,21 @@ class Detokenizer:
 OPENAI_MAX_STOP = 4                                  # OpenAI's limit on `stop`
 
 
+def token_limit(req: dict, *names: str) -> int:
+    """The first of a request's token-limit fields that is set (max_completion_tokens before max_tokens), as int()
+    reads it ("256" and 256.0 too); 0 when none is (0 or -1: the rest of the context).  A list, an object, text that
+    is no number, or an infinite number is a ValueError naming the field, a 400: int() raised TypeError or
+    OverflowError for them, which no handler caught, so the client got no answer at all."""
+    for name in names:
+        value = req.get(name)
+        if value:
+            try:
+                return int(value)
+            except (TypeError, ValueError, OverflowError):
+                raise ValueError(f"{name} must be a whole number of tokens, not {value!r:.60}") from None
+    return 0
+
+
 def stop_strings(req: dict) -> list[str]:
     """The request's stop strings: OpenAI's `stop` (a string or a list of up to 4) or Anthropic's `stop_sequences`
     (a list).  Empty strings are left out.  A bad value is a ValueError, so a 400 before anything is generated."""
@@ -3655,13 +3670,23 @@ def make_handler(svc: Service):
         protocol_version = "HTTP/1.0"                       # SSE ends by closing the connection
 
         record = None                                       # #332: this request's monitor record, if kept
+        answered = False                                    # whether this request's status line was sent
         watch_done = None                                   # #430 #431: stops this request's disconnect watcher
         body_read = False                                   # whether a handler took this request's body
+        body_length = 0                                     # its Content-Length, once _body_size checked it
         route = ""                                          # this request's path: no query, no trailing slash
         DRAIN_SECONDS = 5                                   # the longest an unread body is read and dropped
+        MAX_BODY = 256 << 20                                # the largest body read: the web app sends every picture
+        #                                                     of a chat (up to 20 MB each, as data: URLs) each turn
+        timeout = 120                                       # a client silent this long while its request is read is
+        #                                                     dropped (StreamRequestHandler sets it); the answer has none
 
         def log_message(self, fmt, *args):
             pass
+
+        def send_response(self, code, message=None):
+            self.answered = True
+            super().send_response(code, message)
 
         def handle_one_request(self):
             super().handle_one_request()
@@ -3669,7 +3694,33 @@ def make_handler(svc: Service):
 
         def _body(self) -> bytes:
             self.body_read = True
-            return self.rfile.read(int(self.headers.get("Content-Length", 0)))
+            try:
+                body = self.rfile.read(self.body_length)
+            except TimeoutError:
+                self._json(408, {"error": {"type": "invalid_request_error", "message":
+                                           f"the request body stopped arriving for {self.timeout} s"}})
+                raise                                        # handle_one_request closes the connection
+            self.connection.settimeout(None)                 # as before: the answer takes what it takes
+            return body
+
+        def _body_size(self) -> bool:
+            """Check the Content-Length before anything reads the body.  One that is no number was a ValueError no
+            handler caught (no answer at all), a negative one read until the client closed, and any size was read
+            whole into memory: now they are a 400 and, above MAX_BODY, a 413.  No header: an empty body."""
+            text = self.headers.get("Content-Length", "0")
+            try:
+                length = int(text)
+            except ValueError:
+                length = -1
+            if length < 0:
+                self._invalid(self.route, f"invalid Content-Length {text!r:.40}")
+                return False
+            if length > self.MAX_BODY:
+                self._invalid(self.route, f"the request body is {length} bytes; this server reads at most "
+                                          f"{self.MAX_BODY >> 20} MiB", status=413)
+                return False
+            self.body_length = length
+            return True
 
         def _drain_body(self):
             """An answer sent before the body was read (a 401, a 403, /load, a method with no handler) must not close
@@ -3861,7 +3912,10 @@ def make_handler(svc: Service):
             if route is None:
                 self._json(404, {"error": {"message": "not found"}})
                 return
-            if route.body == "control" and not self._control_body():
+            if route.body == "control":
+                if not self._control_body():
+                    return
+            elif not self._body_size():
                 return
             if route.own_page and not self._own_page(route.own_page):
                 return
@@ -3881,11 +3935,14 @@ def make_handler(svc: Service):
                     self.record = svc.begin_request(path, req)
                 route.run(self, req)
             except ValueError as e:
-                print(f"[strata] 400 invalid request: {e}", flush=True)
-                if path == "/v1/responses":
-                    self._json(400, responses_error_body(str(e)))
-                else:
-                    self._json(400, {"error": {"type": "invalid_request_error", "message": str(e)}})
+                self._invalid(path, str(e))
+            except (TypeError, AttributeError, KeyError) as e:
+                # a field of a type or shape the code did not expect (the fields known to need it are checked with a
+                # ValueError naming them): still an answer, as long as none was started - mid-stream the headers are
+                # out, and the connection ends as before
+                if self.answered:
+                    raise
+                self._invalid(path, f"a field has an unexpected type or shape ({type(e).__name__}: {e})")
             except ModelBusy as e:
                 self._json(409, {"error": {"type": "model_busy", "message": str(e)}})
             except StructuredOutputError as e:
@@ -3913,15 +3970,31 @@ def make_handler(svc: Service):
                         record["state"] = "error" if record.get("error") else record.get("outcome", "completed")
                     svc.request_trace.record = None
 
+        def _invalid(self, path, message, status=400):
+            print(f"[strata] {status} invalid request: {message}", flush=True)
+            if path == "/v1/responses":
+                self._json(status, responses_error_body(message))
+            else:
+                self._json(status, {"error": {"type": "invalid_request_error", "message": message}})
+
         # ---- GET handlers
-        def _static(self, f: Path, content_type: str, cache: str):
-            body = f.read_bytes()
-            self.send_response(200)
-            self.send_header("Content-Type", content_type)
+        def _static(self, f: Path, content_type: str, cache: str, page: bool = False):
+            """A web app file from memory (static_file), with its ETag: a browser that has this copy (If-None-Match)
+            gets a 304 and no body.  `page`: an HTML page, sent with its Content-Security-Policy."""
+            body, etag = static_file(f)
+            tags = {t.strip().removeprefix("W/") for t in (self.headers.get("If-None-Match") or "").split(",")}
+            fresh = etag in tags or "*" in tags
+            self.send_response(304 if fresh else 200)
+            self.send_header("ETag", etag)
             self.send_header("Cache-Control", cache)
-            self.send_header("Content-Length", str(len(body)))
+            if not fresh:
+                self.send_header("Content-Type", content_type)
+                if page:
+                    self.send_header("Content-Security-Policy", page_policy(body))
+                self.send_header("Content-Length", str(len(body)))
             self.end_headers()
-            self.wfile.write(body)
+            if not fresh:
+                self.wfile.write(body)
 
         def _font(self, name):
             # the web app's font (Outfit, OFL: serve/web/fonts); the page falls back to the system font
@@ -3943,13 +4016,16 @@ def make_handler(svc: Service):
             self._static(f, types[ext], "no-cache")
 
         def _page(self):
-            body = (ROOT / "serve" / "web" / ("monitor.html" if self.route else "index.html")).read_bytes()
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Security-Policy", page_policy(body))
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
+            if self.route and self.path.split("?")[0].endswith("/"):
+                # /api-monitor/: the page's links are relative (they work behind a path-prefixed proxy), so from
+                # there they would name /api-monitor/web/...; the page's own address has no slash
+                self.send_response(301)
+                self.send_header("Location", "../" + self.route.rsplit("/", 1)[-1])
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
+            self._static(ROOT / "serve" / "web" / ("monitor.html" if self.route else "index.html"),
+                         "text/html; charset=utf-8", "no-cache", page=True)
 
         def _metrics(self):
             # the last 12 requests; `?requests=all` every one kept (the Monitor's "Show all", issue #35)
@@ -4264,8 +4340,7 @@ def make_handler(svc: Service):
             messages, validator = prepare_format(req.get("response_format"), messages)
             if validator is not None and (tools or req.get("strata_mcp")):
                 raise ValueError("structured response_format with tools/MCP is not supported")
-            svc.load()
-            max_req = max_new = int(req.get("max_completion_tokens") or req.get("max_tokens") or 0)   # 0/-1: the rest
+            max_req = max_new = token_limit(req, "max_completion_tokens", "max_tokens")   # 0/-1: the rest
             use_mcp = req.get("strata_mcp") is True and svc.mcp is not None      # the web app's opt-in (serve/mcp.py)
             own = {t.get("name") for t in tools or [] if isinstance(t, dict)}   # #592: a second line of defence
             if use_mcp:
@@ -4279,6 +4354,7 @@ def make_handler(svc: Service):
                 raise ValueError("a forced tool_choice with MCP tools is not supported")
             svc.reasoning_budget(req)                         # a bad value is a 400 before anything is sent
             stop_strings(req)                                 # ... and so is a bad stop / stop_sequences
+            svc.load()                                        # after every check: a bad request loads no model
             ids, thinking, max_new = svc.prepare(messages, tools, kw, max_new, force=force)
             _debug_req("openai", req, messages, tools, max_new, thinking, len(ids))
             cancel = threading.Event()
@@ -4455,16 +4531,16 @@ def make_handler(svc: Service):
             self._json(200, {"input_tokens": len(svc.encode_prompt(messages, tools, kw))})
 
         def _anthropic(self, req):
-            svc.load()
             req = svc.with_shared(req, "anthropic")
             messages, tools, kw = anthropic_to_messages(req, svc.anthropic_think_unasked)
             self._no_local_images(messages)
             if tool_choice_of(req.get("tool_choice"))[0] == "none":   # Anthropic's {"type": "none"}: no tools offered
                 tools = None
             force = forced_call(req.get("tool_choice"), tools)        # "any" / {"type": "tool", "name": N}
-            max_new = int(req.get("max_tokens") or 0)                  # 0/-1: the rest of the context
+            max_new = token_limit(req, "max_tokens")                    # 0/-1: the rest of the context
             svc.reasoning_budget(req)                         # a bad value is a 400 before anything is sent
             stop_strings(req)                                 # ... and so is a bad stop / stop_sequences
+            svc.load()                                        # after every check, as on the chat route
             ids, thinking, max_new = svc.prepare(messages, tools, kw, max_new, force=force)
             _debug_req("anthropic", req, messages, tools, max_new, thinking, len(ids))
             cancel = threading.Event()
@@ -4716,6 +4792,28 @@ def origin_allowed(origin: str, host, names, origins=()) -> bool:
     name = host_name(rest)
     return bool(name) and (name in LOOPBACK_NAMES or name.endswith(".localhost") or _name_in(name, names))
 
+
+
+_static_files: dict[Path, tuple[tuple[int, int], bytes, str]] = {}
+_static_lock = threading.Lock()
+
+
+def static_file(f: Path) -> tuple[bytes, str]:
+    """A web app file's bytes and ETag (its SHA-256), read from disk again only when its modification time or size
+    changes: the pages, styles, script and fonts were read on every request.  An edited file is served at once."""
+    st = f.stat()
+    key = (st.st_mtime_ns, st.st_size)
+    with _static_lock:
+        cached = _static_files.get(f)
+    if cached is not None and cached[0] == key:
+        return cached[1], cached[2]
+    with f.open("rb") as fh:
+        st = os.fstat(fh.fileno())                       # the bytes read, and the time and size they had
+        body = fh.read()
+    etag = '"' + hashlib.sha256(body).hexdigest()[:32] + '"'
+    with _static_lock:
+        _static_files[f] = ((st.st_mtime_ns, st.st_size), body, etag)
+    return body, etag
 
 
 def page_policy(page: bytes) -> str:

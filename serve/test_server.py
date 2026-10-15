@@ -2097,6 +2097,200 @@ class Routes(unittest.TestCase):
                 self.assertEqual(self.call("GET", path), 404)
 
 
+class OverHTTP:
+    """A real server on a free port with a RecordingEngine, and post(path, body) -> (status, text)."""
+
+    @classmethod
+    def setUpClass(cls):
+        tok = ByteTokenizer()
+        cls.engine = RecordingEngine(tok, "hello", max_context=CTX)
+        cls.svc = Service(cls.engine, tok, ChatTemplate(ROOT / "serve/chat_template.jinja"))
+        cls.httpd = serve(cls.svc, port=0)
+        cls.port = cls.httpd.server_address[1]
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.httpd.shutdown()
+        cls.httpd.server_close()
+
+    def post(self, path, body):
+        import http.client
+        c = http.client.HTTPConnection("127.0.0.1", self.port, timeout=30)
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                c.request("POST", path, body=json.dumps(body).encode(), headers={"Content-Type": "application/json"})
+                r = c.getresponse()
+                return r.status, r.read().decode()
+        finally:
+            c.close()
+
+
+class WrongFieldTypes(OverHTTP, unittest.TestCase):
+    """A field of the wrong type is a 400 naming it.  int() on a list, an object or an infinite max_tokens, a number as
+    message content or as Anthropic's system, and text as chat_template_kwargs raised TypeError, AttributeError or
+    OverflowError, which no handler caught: the client got no answer at all, the console a stack trace."""
+
+    def test_each_field_is_named_in_a_400(self):
+        hi = [{"role": "user", "content": "hi"}]
+        cases = [("/v1/chat/completions", {"messages": hi, "max_tokens": value}, "max_tokens")
+                 for value in ([1], {"a": 1}, "abc", float("inf"))]
+        cases += [("/v1/chat/completions", {"messages": hi, "max_completion_tokens": [1]}, "max_completion_tokens"),
+                  ("/v1/messages", {"messages": hi, "max_tokens": {"a": 1}}, "max_tokens"),
+                  ("/v1/chat/completions", {"messages": hi, "chat_template_kwargs": "abc"}, "chat_template_kwargs"),
+                  ("/v1/messages", {"messages": hi, "max_tokens": 8, "system": 5}, "system"),
+                  ("/v1/messages/count_tokens", {"messages": hi, "system": True}, "system"),
+                  ("/v1/chat/completions", {"messages": [{"role": "user", "content": 5}]}, "content"),
+                  ("/v1/messages", {"messages": [{"role": "user", "content": 5}], "max_tokens": 8}, "content"),
+                  ("/v1/messages", {"messages": [{"role": "user", "content": [5]}], "max_tokens": 8}, "content")]
+        for path, body, field in cases:
+            with self.subTest(path=path, body=body):
+                status, text = self.post(path, body)
+                self.assertEqual(status, 400, text)
+                self.assertIn(field, json.loads(text)["error"]["message"])
+
+    def test_what_int_reads_is_still_taken(self):
+        hi = [{"role": "user", "content": "hi"}]
+        for value in ("5", 5.0, 5):
+            with self.subTest(value=value):
+                self.assertEqual(self.post("/v1/chat/completions", {"messages": hi, "max_tokens": value})[0], 200)
+                self.assertEqual(self.engine.last_max_new, 5)
+
+    def test_an_unexpected_type_error_is_still_answered(self):
+        hi = [{"role": "user", "content": "hi"}]
+        with mock.patch.object(self.svc, "prepare", side_effect=TypeError("'int' object is not iterable")):
+            for path, body in (("/v1/chat/completions", {"messages": hi}), ("/v1/messages", {"messages": hi, "max_tokens": 8}),
+                               ("/v1/responses", {"input": "hi"})):
+                with self.subTest(path=path):
+                    status, text = self.post(path, body)
+                    self.assertEqual(status, 400, text)
+                    self.assertIn("TypeError", text)
+
+    def test_mid_stream_the_stream_just_ends(self):
+        def chunks(*args, **kwargs):
+            yield {"choices": [{"index": 0, "delta": {"content": "x"}, "finish_reason": None}]}
+            raise TypeError("a bug after the answer started")
+        with mock.patch("serve.server.openai_chunks", chunks), contextlib.redirect_stderr(io.StringIO()):
+            status, text = self.post("/v1/chat/completions", {"messages": [{"role": "user", "content": "hi"}],
+                                                              "stream": True})
+        self.assertEqual(status, 200)                         # no 400 written into the stream that had started
+        self.assertIn('"content": "x"', text)
+        self.assertNotIn("invalid_request_error", text)
+
+class ChecksBeforeTheModelLoads(OverHTTP, unittest.TestCase):
+    """A request that is a 400 loads no model: loading takes tens of seconds and tens of GB, and /v1/messages loaded
+    first and checked after, so a malformed request could start a load (OpenAI's route checked most things first)."""
+
+    def test_a_bad_request_loads_nothing(self):
+        hi = [{"role": "user", "content": "hi"}]
+        bad = {"messages": 5, "max_tokens": [1], "stop_sequences": 5, "stop": 5,
+               "reasoning_budget_tokens": "x", "tools": [5]}
+        loads = []
+        with mock.patch.object(self.svc, "load", lambda: loads.append(1)):
+            for path, base in (("/v1/messages", {"messages": hi, "max_tokens": 8}), ("/v1/chat/completions", {"messages": hi})):
+                for key, value in bad.items():
+                    if (path, key) in (("/v1/messages", "stop"), ("/v1/chat/completions", "stop_sequences")):
+                        continue                              # the other API's field: not read here
+                    with self.subTest(path=path, field=key):
+                        self.assertEqual(self.post(path, {**base, key: value})[0], 400)
+            self.assertEqual(loads, [])
+            for path, body in (("/v1/messages", {"messages": hi, "max_tokens": 8}), ("/v1/chat/completions", {"messages": hi})):
+                self.assertEqual(self.post(path, body)[0], 200)
+        self.assertEqual(loads, [1, 1])                       # a good request still loads it
+
+class BodySize(OverHTTP, unittest.TestCase):
+    """The Content-Length is checked before the body is read: text there was a ValueError no handler caught (no
+    answer), -1 read until the client gave up, and any size was read whole into memory."""
+
+    def send(self, path, length, body=b""):
+        import http.client
+        c = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                c.putrequest("POST", path)
+                c.putheader("Content-Type", "application/json")
+                c.putheader("Content-Length", length)
+                c.endheaders(body)
+                r = c.getresponse()
+                return r.status, json.loads(r.read())
+        finally:
+            c.close()
+
+    def test_a_bad_length_is_a_400_on_every_route(self):
+        for path in ("/v1/chat/completions", "/v1/messages", "/v1/responses", "/settings", "/config"):
+            for length in ("abc", "-1"):
+                with self.subTest(path=path, length=length):
+                    status, body = self.send(path, length)
+                    self.assertEqual(status, 400)
+                    self.assertIn("Content-Length", body["error"]["message"])
+
+    def test_a_body_over_the_limit_is_a_413_unread(self):
+        Handler = self.httpd.RequestHandlerClass
+        status, body = self.send("/v1/chat/completions", str(Handler.MAX_BODY + 1))   # nothing sent: never read
+        self.assertEqual(status, 413)
+        self.assertIn("256 MiB", body["error"]["message"])
+        status, body = self.send("/v1/responses", str(Handler.MAX_BODY + 1))
+        self.assertEqual((status, body["error"]["type"]), (413, "invalid_request_error"))
+
+    def test_a_body_up_to_the_limit_is_answered(self):
+        small = json.dumps({"messages": [{"role": "user", "content": "hi"}]}).encode()
+        large = json.dumps({"messages": [{"role": "user", "content": "x" * 400}]}).encode()
+        with mock.patch.object(self.httpd.RequestHandlerClass, "MAX_BODY", 200):
+            self.assertEqual(self.send("/v1/chat/completions", str(len(large)), large)[0], 413)
+            self.assertEqual(self.send("/v1/chat/completions", str(len(small)), small)[0], 200)
+            self.assertEqual(self.post("/v1/chat/completions", {"messages": [{"role": "user", "content": "hi"}]})[0],
+                             200)
+
+class SilentClients(OverHTTP, unittest.TestCase):
+    """A client that opens a connection and sends nothing, or stops halfway through its body, is dropped after
+    Handler.timeout: before, each held a thread for as long as it stayed silent.  The answer itself has no limit."""
+
+    def setUp(self):
+        self.default = self.httpd.RequestHandlerClass.timeout
+        patcher = mock.patch.object(self.httpd.RequestHandlerClass, "timeout", 0.5)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_there_is_a_limit(self):
+        self.assertEqual(self.default, 120)                   # BaseHTTPRequestHandler's own default is None: none
+
+    def read_all(self, sock):
+        sock.settimeout(10)                                   # the server must end it long before this
+        data = b""
+        while chunk := sock.recv(65536):
+            data += chunk
+        return data
+
+    def test_a_silent_connection_is_closed(self):
+        for sent in (b"", b"POST /v1/chat/comp", b"POST /v1/chat/completions HTTP/1.1\r\nHost: 127.0.0.1\r\n"):
+            with self.subTest(sent=sent), socket.create_connection(("127.0.0.1", self.port)) as sock:
+                sock.sendall(sent)
+                self.assertEqual(self.read_all(sock), b"")
+
+    def test_a_body_that_stops_arriving_is_a_408(self):
+        with socket.create_connection(("127.0.0.1", self.port)) as sock, \
+                contextlib.redirect_stdout(io.StringIO()):
+            sock.sendall(b"POST /v1/chat/completions HTTP/1.1\r\nHost: 127.0.0.1\r\n"
+                         b"Content-Type: application/json\r\nContent-Length: 100\r\n\r\n{\"messages\":")
+            answer = self.read_all(sock)
+        self.assertTrue(answer.startswith(b"HTTP/1.0 408"), answer[:80])
+        self.assertIn(b"stopped arriving", answer)
+
+    def test_the_answer_has_no_timeout(self):
+        Handler = self.httpd.RequestHandlerClass
+        seen = []
+        real = Handler.send_response
+
+        def spy(handler, code, message=None):
+            seen.append((code, handler.connection.gettimeout()))
+            real(handler, code, message)
+
+        hi = {"messages": [{"role": "user", "content": "hi"}]}
+        with mock.patch.object(Handler, "send_response", spy):
+            self.assertEqual(self.post("/v1/chat/completions", hi)[0], 200)
+            self.assertEqual(self.post("/v1/chat/completions", {**hi, "stream": True})[0], 200)
+            self.assertEqual(self.post("/v1/messages", {**hi, "max_tokens": 8, "stream": True})[0], 200)
+        self.assertEqual(seen, [(200, None)] * 3)
+
 class SharedSettings(unittest.TestCase):
     """The web app's "Use for other apps too": POST /settings makes its Chat settings every client's defaults."""
 
@@ -2249,6 +2443,32 @@ class WebApp(unittest.TestCase):
                 self.assertEqual(code, 200)
                 self.assertIn(want, ctype)
 
+    def test_the_monitor_page_is_relative_too(self):
+        """Behind a proxy that serves Strata under a path (/strata/...), an absolute /web/... or /v1/... misses it:
+        the API Monitor's page and script name everything relative, as the app's page does (#82)."""
+        import http.client
+        import re
+        with mock.patch.object(self.svc, "api_monitor", True):
+            code, _, html = self.get("/api-monitor")
+            self.assertEqual(code, 200)
+            self.assertIn(b'href="web/tokens.css"', html)
+            self.assertIn(b'src="web/monitor.js"', html)
+            self.assertNotRegex(html, rb'(href|src)="/')
+            script = self.get("/web/monitor.js")[2].decode()
+            calls = re.findall(r'\bapi\(([^,)]*)', script)                  # each call's first argument
+            self.assertGreaterEqual(len(calls), 5, calls)
+            self.assertFalse([c for c in calls if re.search(r'["`]/', c)], calls)
+            # with a slash its relative links would name /api-monitor/web/...: it moves to the address without
+            c = http.client.HTTPConnection("127.0.0.1", self.httpd.server_address[1], timeout=10)
+            try:
+                c.request("GET", "/api-monitor/")
+                r = c.getresponse()
+                r.read()
+                self.assertEqual((r.status, r.headers["Location"]), (301, "../api-monitor"))
+            finally:
+                c.close()
+        self.assertEqual(self.get("/api-monitor/")[0], 404)                   # off: nothing to move to
+
     def test_security_headers(self):
         """No page of another site frames the app, no answer is read as another type, and the page runs only its own
         scripts: the files it loads and its inline script, by SHA-256."""
@@ -2288,6 +2508,53 @@ class WebApp(unittest.TestCase):
         self.assertIn("script-src 'self' 'sha256-ungWv48Bz+pBQUDeXa4iI7ADYaOWF3qctBD/YfIAFa0=' "
                       "'sha256-+8khpoqJueccJqbV5OzuWFHilflx1ZzCPYj3RcQx9J8=';",
                       page_policy(b"<script>abc</script><p>x</p><script>\nlet t = 1;\n</script>"))
+
+    def test_a_copy_the_browser_has_is_a_304(self):
+        """Each file carries an ETag; sent back in If-None-Match it gets a 304 and no body (app.js was sent whole on
+        every reload: it is no-cache)."""
+        import http.client
+
+        def get(path, tag=None):
+            c = http.client.HTTPConnection("127.0.0.1", self.httpd.server_address[1], timeout=10)
+            try:
+                c.request("GET", path, headers={"If-None-Match": tag} if tag else {})
+                r = c.getresponse()
+                return r.status, r.headers, r.read()
+            finally:
+                c.close()
+
+        monitor = mock.patch.object(self.svc, "api_monitor", True)          # its page too
+        monitor.start()
+        self.addCleanup(monitor.stop)
+        for path in ("/", "/api-monitor", "/web/app.js", "/web/sprite.svg", "/fonts/outfit-latin-wght.woff2"):
+            with self.subTest(path=path):
+                status, headers, body = get(path)
+                etag = headers["ETag"]
+                self.assertEqual((status, etag[0], etag[-1]), (200, '"', '"'))
+                self.assertTrue(body)
+                for tag in (etag, "W/" + etag, f'"other", {etag}', "*"):
+                    status, again, body = get(path, tag)
+                    self.assertEqual((status, body, again["ETag"]), (304, b"", etag))
+                    self.assertIsNone(again["Content-Length"])
+                self.assertEqual(get(path, '"other"')[0], 200)
+
+    def test_files_are_read_again_only_when_they_change(self):
+        from serve.server import static_file
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / "app.js"
+            f.write_bytes(b"one")
+            body, etag = static_file(f)
+            self.assertEqual(body, b"one")
+            with mock.patch.object(Path, "open", side_effect=AssertionError("read again")):
+                self.assertEqual(static_file(f), (body, etag))         # unchanged: from memory
+            f.write_bytes(b"two")                                      # same size: the time tells
+            st = f.stat()
+            os.utime(f, ns=(st.st_atime_ns, st.st_mtime_ns + 1_000_000))
+            body2, etag2 = static_file(f)
+            self.assertEqual(body2, b"two")
+            self.assertNotEqual(etag2, etag)
+            f.write_bytes(b"three")
+            self.assertEqual(static_file(f)[0], b"three")
 
     def test_only_the_app_files_are_served(self):
         for path in ("/web/..%2Fserver.py", "/web/index.html", "/web/test.py", "/fonts/..%2F..%2Fsetup.py",

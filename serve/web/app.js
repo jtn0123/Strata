@@ -72,9 +72,10 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
 });
 
 let tab = "chat";
+const tabButtons = [...document.querySelectorAll(".st-tab")];
 function showTab(name) {
   tab = ["chat", "monitor", "about"].includes(name) ? name : "chat";
-  for (const b of document.querySelectorAll(".st-tab")) b.setAttribute("aria-selected", String(b.dataset.tab === tab));
+  for (const b of tabButtons) { b.setAttribute("aria-selected", String(b.dataset.tab === tab)); b.tabIndex = b.dataset.tab === tab ? 0 : -1; }
   for (const v of ["chat", "monitor", "about"]) $(`view-${v}`).hidden = v !== tab;
   if (location.hash.slice(1) !== tab) history.replaceState(null, "", tab === "chat" ? location.pathname : `#${tab}`);
   if (tab === "chat") $("input").focus();
@@ -82,7 +83,18 @@ function showTab(name) {
   if (tab === "about") loadConfig();
   if (lastMetrics) render(lastMetrics);
 }
-for (const b of document.querySelectorAll(".st-tab")) b.onclick = () => showTab(b.dataset.tab);
+tabButtons.forEach((b, i) => {
+  b.onclick = () => showTab(b.dataset.tab);
+  // the tabs are one stop for the Tab key; the arrow keys, Home and End move between them (ARIA's tabs pattern)
+  b.onkeydown = (e) => {
+    const next = {ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabButtons.length - 1}[e.key];
+    if (next == null) return;
+    e.preventDefault();
+    const to = tabButtons[(next + tabButtons.length) % tabButtons.length];
+    showTab(to.dataset.tab);
+    to.focus();
+  };
+});
 window.addEventListener("hashchange", () => showTab(location.hash.slice(1)));
 
 // ------------------------------------------------------------------ server access
@@ -684,6 +696,13 @@ function updateAssistant(el, m, streaming) {
   el.querySelector(".meta-text").textContent = m.meta || (streaming ? "" : m.stopped ? "Stopped" : "");
   el.querySelector("[data-msg-copy]").hidden = streaming || !m.text;
 }
+// a screen reader hears each answer once, complete: the chat is rebuilt on every send and the answer on every token,
+// so a live region there would read the whole conversation again and then each token
+function announce(text) {
+  const said = $("chat-said");
+  said.textContent = "";
+  setTimeout(() => { said.textContent = text; }, 100);   // emptied first, so the same words twice are heard twice
+}
 function renderChat() {
   const chat = $("chat");
   chat.querySelectorAll(".st-msg").forEach((e) => e.remove());
@@ -854,6 +873,8 @@ async function send() {
   setBusy(false);
   if (frame) cancelAnimationFrame(frame);
   updateAssistant(el, m, false);
+  // the answer for a screen reader, its lines kept (innerText); an error is read from its toast
+  if (m.text && !m.error) announce(`${m.stopped ? "Stopped answer" : "Answer"}: ${el.querySelector(".st-bubble").innerText}`);
   saveChat();
   scrollDown();
 }

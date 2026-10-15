@@ -57,7 +57,7 @@ RTX 3090 (24 GB) debería escribir unos 100-140 tokens por segundo. Chats largos
 | --- | --- |
 | **Tarjeta gráfica** | **NVIDIA** GeForce serie RTX 20, 30, 40 o 50, o **AMD** Radeon RX 7900 XT / XTX, RX 7800 XT / 7700 XT, RX 9060 XT, RX 9070 / 9070 XT, Radeon AI PRO R9700 o serie RX 6800 / 6900. Necesita **12 GB de VRAM o más**. |
 | **RAM** | 32 GB o más. Tu RAM decide [qué modelo](#qué-modelo-elijo) cabe. Con 64 GB funcionan todos los tamaños. |
-| **Disco** | Unos 80 GB libres. Usa un SSD si puedes: el primer arranque es mucho más rápido. |
+| **Disco** | Unos 80 GB libres (66-115 GB según el modelo). Usa un SSD si puedes: el primer arranque es mucho más rápido. |
 | **Sistema** | Windows 10 / 11 o Linux, y un controlador gráfico actual de NVIDIA o AMD. |
 
 El instalador prepara todo lo demás. Dos o tres tarjetas pueden repartirse el modelo ([multi-GPU](docs/MULTI_GPU.md)).
@@ -102,7 +102,7 @@ descarga se detiene, vuelve a ejecutarlo: sigue donde lo dejó. Tu navegador abr
 `http://127.0.0.1:8080`.
 
 > **Mientras el modelo arranca, tu PC puede ir lento o dejar de responder durante 1-3 minutos** (más la primera vez).
-> Strata carga 35-55 GB en tu RAM y reserva una parte para la tarjeta gráfica. Es normal. Espera y no cierres la
+> Strata carga 30-65 GB en tu RAM y reserva una parte para la tarjeta gráfica. Es normal. Espera y no cierres la
 > ventana. La ventana muestra lo que está haciendo Strata.
 
 **La próxima vez**, vuelve a ejecutar `START-HERE.bat` (o `./setup.sh`). Arranca enseguida y no descarga nada dos

@@ -1121,16 +1121,22 @@ if(STRATA_NATIVE_EXPERTS)
   if(STRATA_GGML_DIR)
     add_subdirectory(${STRATA_GGML_DIR}/ggml ${CMAKE_BINARY_DIR}/ggml EXCLUDE_FROM_ALL)
   else()
+    # as above: only llama.cpp's ggml/, built in build/ggml, and only the libraries Strata links.  Declared and made
+    # available (FetchContent_Populate with declared details is deprecated, CMP0169); EXCLUDE_FROM_ALL here needs
+    # CMake 3.28, so 3.24-3.27 also build ggml's own "ggml" library, unused
     include(FetchContent)
+    set(_strata_ggml_exclude "")
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.28)
+      set(_strata_ggml_exclude EXCLUDE_FROM_ALL)
+    endif()
     FetchContent_Declare(strata_llamacpp
       GIT_REPOSITORY https://github.com/ggml-org/llama.cpp.git
       GIT_TAG 3cf03257f219afbe7334045ff7c6a06ac68c627d
-      GIT_SHALLOW FALSE)
-    FetchContent_GetProperties(strata_llamacpp)
-    if(NOT strata_llamacpp_POPULATED)
-      FetchContent_Populate(strata_llamacpp)
-    endif()
-    add_subdirectory(${strata_llamacpp_SOURCE_DIR}/ggml ${CMAKE_BINARY_DIR}/ggml EXCLUDE_FROM_ALL)
+      GIT_SHALLOW FALSE
+      SOURCE_SUBDIR ggml
+      BINARY_DIR ${CMAKE_BINARY_DIR}/ggml
+      ${_strata_ggml_exclude})
+    FetchContent_MakeAvailable(strata_llamacpp)
   endif()
   # part of strata_kernels_cpu (the pool calls these and they call its CPU probe: one library, so GNU ld's
   # one-pass static linking has no cycle to resolve)

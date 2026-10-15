@@ -6,7 +6,7 @@ error messages, with the older engine fixes, is in the [details](DETAILS.md#trou
 ## While installing or starting
 
 **My PC froze, or got very slow, the first time Strata started.**
-That's normal while it starts, most of all the first time. Strata loads 35-55 GB into your RAM, locks part of it for
+That's normal while it starts, most of all the first time. Strata loads 30-65 GB into your RAM, locks part of it for
 the graphics card, and works out how much of the model fits on your GPU. The mouse can freeze for a few minutes.
 **Wait, and don't close the window.** The next starts are much faster. Still frozen after 10 minutes? Restart the
 PC, close other programs (browsers use a lot of RAM) and try again. If it keeps happening, pick a smaller size (Q2_0

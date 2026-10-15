@@ -57,7 +57,7 @@ RTX 3090 (24 GB) deve escrever cerca de 100-140 tokens por segundo. Conversas lo
 | --- | --- |
 | **Placa de vídeo** | **NVIDIA** GeForce RTX séries 20, 30, 40 ou 50, ou **AMD** Radeon RX 7900 XT / XTX, RX 7800 XT / 7700 XT, RX 9060 XT, RX 9070 / 9070 XT, Radeon AI PRO R9700 ou séries RX 6800 / 6900. Ela precisa de **12 GB de VRAM ou mais**. |
 | **RAM** | 32 GB ou mais. Sua RAM decide [qual modelo](#qual-modelo-devo-escolher) cabe. Com 64 GB, roda qualquer tamanho. |
-| **Disco** | Cerca de 80 GB livres. Use um SSD se puder: a primeira inicialização fica bem mais rápida. |
+| **Disco** | Cerca de 80 GB livres (66-115 GB conforme o modelo). Use um SSD se puder: a primeira inicialização fica bem mais rápida. |
 | **Sistema** | Windows 10 / 11 ou Linux, e um driver de vídeo atualizado da NVIDIA ou da AMD. |
 
 O instalador cuida de todo o resto. Duas ou três placas podem dividir o modelo ([multi-GPU](docs/MULTI_GPU.md)).
@@ -102,7 +102,7 @@ Se o download parar, rode de novo: ele continua de onde parou. Seu navegador abr
 `http://127.0.0.1:8080`.
 
 > **Enquanto o modelo inicia, seu PC pode ficar lento ou parar de responder por 1-3 minutos** (mais na primeira vez).
-> O Strata carrega 35-55 GB na sua RAM e reserva parte dela para a placa de vídeo. Isso é normal. Espere e não
+> O Strata carrega 30-65 GB na sua RAM e reserva parte dela para a placa de vídeo. Isso é normal. Espere e não
 > feche a janela. A janela mostra o que o Strata está fazendo.
 
 **Da próxima vez**, rode `START-HERE.bat` (ou `./setup.sh`) de novo. Ele inicia na hora e não baixa nada duas

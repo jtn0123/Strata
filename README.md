@@ -1,6 +1,6 @@
 <h1 align="center">Strata</h1>
 
-**Apple Silicon lab:** The measured 48 GB M5 Pro setup, launchers, source/model pins and raw benchmarks are in [macos/lab](macos/lab/README.md). Start there for the Mac profile. [Fork notes](FORK-NOTES.md) explain the imported history and next experiment.
+**Apple Silicon lab:** The measured 48 GB M5 Pro setup, launchers, source/model pins and raw benchmarks are in [macos/lab](macos/lab/README.md). Start there for the Mac profile. [Fork notes](FORK-NOTES.md): the fork's branches and where its results are.
 
 **English** · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Deutsch](README.de.md) · [Français](README.fr.md) · [Español](README.es.md) · [Português](README.pt-BR.md)
 
@@ -59,7 +59,7 @@ about 100-140 tokens per second. Long chats and other cards: [speed of each mode
 | --- | --- |
 | **Graphics card** | **NVIDIA** GeForce RTX 20, 30, 40 or 50 series, or **AMD** Radeon RX 7900 XT / XTX, RX 7800 XT / 7700 XT, RX 9060 XT, RX 9070 / 9070 XT, Radeon AI PRO R9700 or RX 6800 / 6900 series. It needs **12 GB of VRAM or more**. |
 | **RAM** | 32 GB or more. Your RAM decides [which model](#which-model-should-i-pick) fits. 64 GB runs every size. |
-| **Disk** | About 80 GB free. Use an SSD if you can: the first start is much faster. |
+| **Disk** | About 80 GB free for the recommended size, 66-115 GB by model ([details](docs/INSTALL.md#what-you-need)). Use an SSD if you can: the first start is much faster. |
 | **System** | Windows 10 / 11 or Linux, and a current graphics driver from NVIDIA or AMD. |
 
 The installer sets up everything else. Two or three cards can share the model ([multi-GPU](docs/MULTI_GPU.md)).
@@ -104,7 +104,7 @@ download stops, run it again: it continues where it left off. Your browser opens
 `http://127.0.0.1:8080`.
 
 > **While the model starts, your PC can be slow or stop responding for 1-3 minutes** (longest the first time).
-> Strata loads 35-55 GB into your RAM and locks part of it for the graphics card. This is normal. Wait, and don't
+> Strata loads 30-65 GB into your RAM and locks part of it for the graphics card. This is normal. Wait, and don't
 > close the window. The window shows what Strata is doing.
 
 **Next time**, run `START-HERE.bat` (or `./setup.sh`) again. It starts right away and downloads nothing twice. Close
