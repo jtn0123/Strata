@@ -3978,14 +3978,23 @@ def make_handler(svc: Service):
                 self._json(status, {"error": {"type": "invalid_request_error", "message": message}})
 
         # ---- GET handlers
-        def _static(self, f: Path, content_type: str, cache: str):
-            body = f.read_bytes()
-            self.send_response(200)
-            self.send_header("Content-Type", content_type)
+        def _static(self, f: Path, content_type: str, cache: str, page: bool = False):
+            """A web app file from memory (static_file), with its ETag: a browser that has this copy (If-None-Match)
+            gets a 304 and no body.  `page`: an HTML page, sent with its Content-Security-Policy."""
+            body, etag = static_file(f)
+            tags = {t.strip().removeprefix("W/") for t in (self.headers.get("If-None-Match") or "").split(",")}
+            fresh = etag in tags or "*" in tags
+            self.send_response(304 if fresh else 200)
+            self.send_header("ETag", etag)
             self.send_header("Cache-Control", cache)
-            self.send_header("Content-Length", str(len(body)))
+            if not fresh:
+                self.send_header("Content-Type", content_type)
+                if page:
+                    self.send_header("Content-Security-Policy", page_policy(body))
+                self.send_header("Content-Length", str(len(body)))
             self.end_headers()
-            self.wfile.write(body)
+            if not fresh:
+                self.wfile.write(body)
 
         def _font(self, name):
             # the web app's font (Outfit, OFL: serve/web/fonts); the page falls back to the system font
@@ -4007,13 +4016,8 @@ def make_handler(svc: Service):
             self._static(f, types[ext], "no-cache")
 
         def _page(self):
-            body = (ROOT / "serve" / "web" / ("monitor.html" if self.route else "index.html")).read_bytes()
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.send_header("Content-Security-Policy", page_policy(body))
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
+            self._static(ROOT / "serve" / "web" / ("monitor.html" if self.route else "index.html"),
+                         "text/html; charset=utf-8", "no-cache", page=True)
 
         def _metrics(self):
             # the last 12 requests; `?requests=all` every one kept (the Monitor's "Show all", issue #35)
@@ -4780,6 +4784,28 @@ def origin_allowed(origin: str, host, names, origins=()) -> bool:
     name = host_name(rest)
     return bool(name) and (name in LOOPBACK_NAMES or name.endswith(".localhost") or _name_in(name, names))
 
+
+
+_static_files: dict[Path, tuple[tuple[int, int], bytes, str]] = {}
+_static_lock = threading.Lock()
+
+
+def static_file(f: Path) -> tuple[bytes, str]:
+    """A web app file's bytes and ETag (its SHA-256), read from disk again only when its modification time or size
+    changes: the pages, styles, script and fonts were read on every request.  An edited file is served at once."""
+    st = f.stat()
+    key = (st.st_mtime_ns, st.st_size)
+    with _static_lock:
+        cached = _static_files.get(f)
+    if cached is not None and cached[0] == key:
+        return cached[1], cached[2]
+    with f.open("rb") as fh:
+        st = os.fstat(fh.fileno())                       # the bytes read, and the time and size they had
+        body = fh.read()
+    etag = '"' + hashlib.sha256(body).hexdigest()[:32] + '"'
+    with _static_lock:
+        _static_files[f] = ((st.st_mtime_ns, st.st_size), body, etag)
+    return body, etag
 
 
 def page_policy(page: bytes) -> str:

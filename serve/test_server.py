@@ -2483,6 +2483,53 @@ class WebApp(unittest.TestCase):
                       "'sha256-+8khpoqJueccJqbV5OzuWFHilflx1ZzCPYj3RcQx9J8=';",
                       page_policy(b"<script>abc</script><p>x</p><script>\nlet t = 1;\n</script>"))
 
+    def test_a_copy_the_browser_has_is_a_304(self):
+        """Each file carries an ETag; sent back in If-None-Match it gets a 304 and no body (app.js was sent whole on
+        every reload: it is no-cache)."""
+        import http.client
+
+        def get(path, tag=None):
+            c = http.client.HTTPConnection("127.0.0.1", self.httpd.server_address[1], timeout=10)
+            try:
+                c.request("GET", path, headers={"If-None-Match": tag} if tag else {})
+                r = c.getresponse()
+                return r.status, r.headers, r.read()
+            finally:
+                c.close()
+
+        monitor = mock.patch.object(self.svc, "api_monitor", True)          # its page too
+        monitor.start()
+        self.addCleanup(monitor.stop)
+        for path in ("/", "/api-monitor", "/web/app.js", "/web/sprite.svg", "/fonts/outfit-latin-wght.woff2"):
+            with self.subTest(path=path):
+                status, headers, body = get(path)
+                etag = headers["ETag"]
+                self.assertEqual((status, etag[0], etag[-1]), (200, '"', '"'))
+                self.assertTrue(body)
+                for tag in (etag, "W/" + etag, f'"other", {etag}', "*"):
+                    status, again, body = get(path, tag)
+                    self.assertEqual((status, body, again["ETag"]), (304, b"", etag))
+                    self.assertIsNone(again["Content-Length"])
+                self.assertEqual(get(path, '"other"')[0], 200)
+
+    def test_files_are_read_again_only_when_they_change(self):
+        from serve.server import static_file
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / "app.js"
+            f.write_bytes(b"one")
+            body, etag = static_file(f)
+            self.assertEqual(body, b"one")
+            with mock.patch.object(Path, "open", side_effect=AssertionError("read again")):
+                self.assertEqual(static_file(f), (body, etag))         # unchanged: from memory
+            f.write_bytes(b"two")                                      # same size: the time tells
+            st = f.stat()
+            os.utime(f, ns=(st.st_atime_ns, st.st_mtime_ns + 1_000_000))
+            body2, etag2 = static_file(f)
+            self.assertEqual(body2, b"two")
+            self.assertNotEqual(etag2, etag)
+            f.write_bytes(b"three")
+            self.assertEqual(static_file(f)[0], b"three")
+
     def test_only_the_app_files_are_served(self):
         for path in ("/web/..%2Fserver.py", "/web/index.html", "/web/test.py", "/fonts/..%2F..%2Fsetup.py",
                      "/fonts/missing.woff2", "/fonts/x.ttf"):
