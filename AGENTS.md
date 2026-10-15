@@ -18,6 +18,7 @@ offers the same steps as tools.
   the [paper](docs/paper/Strata-Paper.pdf).
 - AMD (HIP) build and validation: [docs/AMD_HIP.md](docs/AMD_HIP.md); multi-GPU: [docs/MULTI_GPU.md](docs/MULTI_GPU.md).
 - Setup's own tests run without a GPU or downloads: `python tools/test_setup_<name>.py` (for example
-  `tools/test_setup_amd.py`, `tools/test_setup_choices.py`).
+  `tools/test_setup_amd.py`, `tools/test_setup_choices.py`). CI runs them with the server's and the tools' tests
+  on Python 3.10 and 3.12 (`.github/workflows/strata-tests.yml`, which shows the commands).
 - Keep the docs' style: plain words, measured numbers with what they were measured on, no claims without a
   measurement.

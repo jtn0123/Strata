@@ -260,5 +260,11 @@ point setup at them with `--gguf-dir`. To let setup download from a Hugging Face
 first (Windows: `set HF_ENDPOINT=https://hf-mirror.com`, Linux: `export HF_ENDPOINT=https://hf-mirror.com`): the same
 pinned revisions and checks apply, and the MTP draft layer comes from there too.
 
+**Checked downloads:** setup installs the ready-made engine only when its size and SHA-256 match the ones pinned for
+this version's release, and checks llama.cpp's source zip the same way; `START-HERE.bat` runs the Python installer it
+downloads only with its pinned SHA-256. When this version's release is missing, the latest release has no pin: setup
+compiles instead, or installs it unchecked with `--allow-unpinned`. A `--prebuilt` folder or URL of your own is not
+checked.
+
 On Linux the same options go to `./setup.sh`. `START-HERE.bat --help` lists them all. The server's own settings
 (sharing the GPU with games, MCP tools, CORS, API keys, the API itself) are in the [details](DETAILS.md#using-it).

@@ -1,0 +1,62 @@
+name: Strata tests
+
+# The server's and the installer's own tests, and the tools' (everything outside macos/, which has
+# mac-lab-offline.yml): no GPU, no model, no download but llama.cpp's gguf-py. On the oldest Python setup.py
+# accepts (setup.sh: 3.10) and on the one the lab uses.
+on:
+  pull_request:
+    branches: [mac-m5-lab]
+    paths:
+      - '**'
+      - '!macos/**'
+      - '!docs/**'
+      - '!bench/**'
+  push:
+    branches: [mac-m5-lab]
+    paths:
+      - '**'
+      - '!macos/**'
+      - '!docs/**'
+      - '!bench/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.10', '3.12']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install the pinned test packages
+        run: |
+          python -m pip install --only-binary :all: --require-hashes -r .github/requirements-tests.lock
+      - name: llama.cpp's gguf-py at the commit setup.py pins
+        # the tools read GGUF files with it (setup.py puts the same files in third_party/)
+        run: |
+          commit=$(sed -n 's/^LLAMA_CPP_COMMIT = "\([0-9a-f]\{40\}\)"$/\1/p' setup.py)
+          test -n "$commit"
+          dest="$RUNNER_TEMP/llama.cpp"
+          git init -q "$dest"
+          git -C "$dest" sparse-checkout set --no-cone /gguf-py
+          git -C "$dest" fetch -q --depth 1 --filter=blob:none https://github.com/ggml-org/llama.cpp "$commit"
+          git -C "$dest" checkout -q FETCH_HEAD
+          echo "STRATA_GGUF_PY=$dest/gguf-py" >> "$GITHUB_ENV"
+      - name: Server
+        run: python -m unittest discover -s serve -t . -p 'test_*.py'
+      - name: Installer
+        working-directory: tools
+        run: python -m unittest discover -s . -p 'test_setup_*.py'
+      - name: Tools
+        run: |
+          git ls-files -z 'tools/test_*.py' ':!tools/test_setup_*' | xargs -0 python -m unittest

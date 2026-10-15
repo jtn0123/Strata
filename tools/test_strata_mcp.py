@@ -20,6 +20,7 @@ import time
 import unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
+from unittest import mock
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -314,8 +315,11 @@ class Validation(FakeRoot):
         sysdir = (os.environ.get("SystemRoot", "C:\\Windows") + "\\Strata-data") if M.WIN else "/etc/Strata-data"
         self.assertRejected("strata_install", {"data_dir": sysdir}, "system folder")
         ok = [self.root.parent / "Strata-data", self.root / "models-here", self.root.parent / "Strata-big"]
-        for d in ok:
-            self.assertEqual(M.norm(self.tools.check_data_dir(str(d))), M.norm(d))
+        base = M.norm(self.root.parent)                 # macOS keeps temporary folders in /var: not a system folder here
+        others = [f for f in M.system_folders() if not M.is_inside(base, f)]
+        with mock.patch.object(M, "system_folders", lambda: others):
+            for d in ok:
+                self.assertEqual(M.norm(self.tools.check_data_dir(str(d))), M.norm(d))
 
     def test_other_tools_arguments(self):
         self.assertRejected("strata_start", {"model": "../../etc/passwd"}, "not valid")

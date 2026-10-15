@@ -142,9 +142,11 @@ def proc_identity(pid) -> str | None:
         return f"linux:{fields[19]}"                    # field 22 of stat: the start time in clock ticks
     try:                                                # elsewhere (no /proc): alive, without a start time
         os.kill(pid, 0)
-        return "pid"
     except OSError:
         return None
+    if run_quiet(["ps", "-o", "stat=", "-p", str(pid)], 5).startswith("Z"):   # a zombie has ended (macOS)
+        return None
+    return "pid"
 
 
 def proc_alive(pid, ident) -> bool:
