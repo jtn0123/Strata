@@ -224,21 +224,40 @@ struct TensorInfo {
     std::vector<uint64_t> shape; // GGUF order: dim 0 varies fastest
     uint32_t type = 0;
     uint64_t offset = 0;
+    /// The element count; 0 when it overflows 64 bits (a crafted shape could wrap to any count, e.g. N * (1 + 2^55)).
     uint64_t elements() const {
         uint64_t n = 1;
-        for (auto d : shape) n *= d;
+        for (auto d : shape) {
+            if (d != 0 && n > (std::numeric_limits<uint64_t>::max)() / d) return 0;
+            n *= d;
+        }
         return n;
     }
     const char* type_name() const { return ggml_type_name(type); }
 };
+
+// Bytes of a tensor's payload from its shape and block geometry; 0 when the type is unknown, a row is not whole
+// blocks, or the count overflows.
+inline uint64_t tensor_payload_bytes(const TensorInfo& t) {
+    int be = 0, bb = 0;
+    if (t.shape.empty() || !block_geometry(t.type, be, bb) || t.shape[0] % (uint64_t) be) return 0;
+    uint64_t elements = 1;
+    for (uint64_t d : t.shape) {
+        if (d == 0 || elements > (std::numeric_limits<uint64_t>::max)() / d) return 0;
+        elements *= d;
+    }
+    const uint64_t blocks = elements / (uint64_t) be;
+    if (blocks > (std::numeric_limits<uint64_t>::max)() / (uint64_t) bb) return 0;
+    return blocks * (uint64_t) bb;
+}
 
 // A bounds-checked cursor over the mmapped header region. Every read is checked, so a truncated or
 // corrupt file produces a precise error rather than a segfault.
 class Cursor {
 public:
     Cursor(const uint8_t* base, size_t size) : base_(base), size_(size) {}
-    void need(size_t n) const {
-        if (pos_ + n > size_) throw std::runtime_error("GGUF: unexpected end of file in header");
+    void need(uint64_t n) const {   // pos_ <= size_ always; pos_ + n could wrap for a crafted length
+        if (n > size_ - pos_) throw std::runtime_error("GGUF: unexpected end of file in header");
     }
     template <class T> T read() {
         need(sizeof(T));
@@ -249,12 +268,13 @@ public:
     }
     std::string str() {
         const uint64_t n = read<uint64_t>();
-        need((size_t)n);
+        need(n);
         std::string s(reinterpret_cast<const char*>(base_ + pos_), (size_t)n);
         pos_ += (size_t)n;
         return s;
     }
     size_t pos() const { return pos_; }
+    size_t left() const { return size_ - pos_; }
 
 private:
     const uint8_t* base_;
@@ -370,7 +390,15 @@ public:
         auto it = meta_.find(key);
         return it == meta_.end() ? nullptr : &it->second;
     }
+    /// Not checked: a truncated shard still opens, and only its tensors past the end are unusable.  Read a tensor
+    /// only after in_bounds() (or a check of its own).
     const uint8_t* tensor_data(const TensorInfo& t) const { return base_ + data_start_ + t.offset; }
+    /// Whether `t` (one of this file's tensors) has a known byte count that lies inside the file.
+    bool in_bounds(const TensorInfo& t) const {
+        const uint64_t bytes = tensor_payload_bytes(t);
+        const uint64_t payload = size_ - data_start_;
+        return bytes != 0 && t.offset <= payload && bytes <= payload - t.offset;
+    }
 
 private:
     void open() {
@@ -433,6 +461,9 @@ private:
             MetaType t = (MetaType)c.read<uint32_t>();
             meta_.emplace(std::move(key), read_value(c, t));
         }
+        // the smallest directory entry: name length, n_dims, one dimension, type, offset
+        if (n_tensors > c.left() / 32)
+            throw std::runtime_error("GGUF: " + std::to_string(n_tensors) + " tensors cannot fit in " + path_);
         tensors_.reserve((size_t)n_tensors);
         // GGUF has no index to arbitrate between two tensors of one name: find() is first-match, so a
         // duplicate would silently win by position.  Refuse the file at open instead, naming both.
@@ -453,6 +484,9 @@ private:
         uint64_t align = 32;
         if (const MetaValue* a = get("general.alignment"))
             if (a->u) align = a->u;
+        if ((align & (align - 1)) != 0 || align > size_)   // and so pos + align below cannot wrap
+            throw std::runtime_error("GGUF: general.alignment " + std::to_string(align) +
+                                     " is not a power of two that fits in " + path_);
         alignment_ = align;
         data_start_ = (c.pos() + align - 1) / align * align;
         if (data_start_ > size_) throw std::runtime_error("GGUF: data section starts past EOF");
@@ -471,21 +505,6 @@ private:
     std::vector<TensorInfo> tensors_;
     std::map<std::string, MetaValue> meta_;
 };
-
-// Bytes of a tensor's payload from its shape and block geometry; 0 when the type is unknown, a row is not whole
-// blocks, or the count overflows.
-inline uint64_t tensor_payload_bytes(const TensorInfo& t) {
-    int be = 0, bb = 0;
-    if (t.shape.empty() || !block_geometry(t.type, be, bb) || t.shape[0] % (uint64_t) be) return 0;
-    uint64_t elements = 1;
-    for (uint64_t d : t.shape) {
-        if (d == 0 || elements > (std::numeric_limits<uint64_t>::max)() / d) return 0;
-        elements *= d;
-    }
-    const uint64_t blocks = elements / (uint64_t) be;
-    if (blocks > (std::numeric_limits<uint64_t>::max)() / (uint64_t) bb) return 0;
-    return blocks * (uint64_t) bb;
-}
 
 // The shards of one model (strata::gguf_split_paths), opened together; tensors are looked up across all of them.
 // From eddoursul/Strata 8029fa9, with the split-key validation of #255 (gopinath87607) made a property of the
@@ -528,12 +547,7 @@ public:
         return it->second.second;
     }
     /// Whether `t` (a tensor of shard `s`) has a known byte count that lies inside its file.
-    bool in_bounds(const TensorInfo& t, size_t s) const {
-        const GgufFile& g = *shards_[s];
-        const uint64_t bytes = tensor_payload_bytes(t);
-        const uint64_t payload = g.file_size() - g.data_start();
-        return bytes != 0 && t.offset <= payload && bytes <= payload - t.offset;
-    }
+    bool in_bounds(const TensorInfo& t, size_t s) const { return shards_[s]->in_bounds(t); }
 
 private:
     void validate_split() const {
