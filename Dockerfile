@@ -43,7 +43,10 @@
 # -e GPUS=0,2. A volume set up for one card switches to the pair on its first start
 # on a two-card host unless GPU or GPUS pins it. LOW_RAM=on runs on one card.
 
-FROM nvidia/cuda:13.0.0-devel-ubuntu24.04
+# The base image by digest (the tag's amd64 + arm64 index, taken 2026-10-15), so a rebuild of the same commit starts
+# from the same image. For a newer one, take the tag's digest then:
+#   docker buildx imagetools inspect nvidia/cuda:13.0.0-devel-ubuntu24.04
+FROM nvidia/cuda:13.0.0-devel-ubuntu24.04@sha256:1e8ac7a54c184a1af8ef2167f28fa98281892a835c981ebcddb1fad04bdd452d
 
 # STRATA_EXECV=1: setup.py replaces itself with the server, so the server is PID 1
 # and docker stop's SIGTERM reaches it (see setup.start). Normal Linux starts, which
@@ -70,7 +73,7 @@ ARG CUDA_ARCHITECTURES=75;80;86;89;120
 ARG BUILD_VISION=1
 
 RUN python3 -m venv .venv \
-    && .venv/bin/pip install --no-cache-dir --upgrade pip \
+    && .venv/bin/pip install --no-cache-dir pip==26.2.1 \
     && .venv/bin/pip install --no-cache-dir -r requirements.txt \
     && chmod +x setup.sh docker-entrypoint.sh
 
