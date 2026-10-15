@@ -1,9 +1,13 @@
 import json
 from pathlib import Path
+import shutil
 import sys
+import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
+import benchmark_m5_gate as gate
 from benchmark_m5_gate import inventory,output_elements,parse,POSITIVE
 
 
@@ -45,6 +49,18 @@ class GateEvidenceTests(unittest.TestCase):
         text=evidence('perf');self.assertEqual(len(parse(text,'perf','gate-up8')),6)
         extra='\nM5_GATE_ROUTE '+json.dumps(dict(phase='structural',k=2560,m=640,rows=4,tile=8))
         with self.assertRaises(ValueError):parse(text+extra,'perf','gate-up8')
+
+    def test_each_engine_runs_only_the_probe_built_for_it(self):
+        with (tempfile.TemporaryDirectory() as tmp,patch.object(gate,'ROOT',Path(tmp)),patch.object(gate,'fixtures'),
+              patch.object(gate,'verify_engine',lambda engine:{'id':engine})):
+            for engine in gate.ENGINES:
+                folder=gate.work(engine);folder.mkdir(parents=True);(folder/'gate-probe').write_bytes(engine.encode())
+                (folder/'probe-build.json').write_text(json.dumps({'engine':{'id':engine},'source_sha256':gate.sha256(gate.SOURCE),
+                    'runner_sha256':gate.sha256(gate.__file__),'fixture_sha256':gate.sha256(gate.FIXTURE),
+                    'binary_sha256':gate.sha256(folder/'gate-probe'),'command':[]}))
+            self.assertEqual([gate.verify(engine)['engine'] for engine in gate.ENGINES],[{'id':engine} for engine in gate.ENGINES])
+            shutil.copy(gate.work('m5-gate')/'probe-build.json',gate.work('m5-gate-lanes')/'probe-build.json')
+            with self.assertRaises(RuntimeError):gate.verify('m5-gate-lanes')
 
 
 if __name__=='__main__':unittest.main()

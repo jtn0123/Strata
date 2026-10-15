@@ -1,23 +1,41 @@
 #!/usr/bin/env python3
-"""Exact two-block MoE screen for compact expert/token tile scheduling."""
+"""Exact two-block MoE screen for compact expert/token tile scheduling, or its column-first job order."""
 import argparse
 from datetime import datetime, timezone
 import fcntl
 import json
 import math
 import os
+from pathlib import Path
 import shutil
 import subprocess
+from typing import NamedTuple
 
 from benchmark import Monitor
 from check_memory import assert_no_model_server
-from engines import ROOT, sha256, verify_engine
+from engines import EXPERIMENTS, ROOT, sha256, verify_engine
 from metal_environment import configure
 from validate_offline import require_pass
 
 SOURCE = ROOT/'native/m5_compact_probe.cpp'
-WORK = ROOT/'bench/runtime/m5-compact'
-RESULTS = ROOT/'bench/results/20261009-compact-tiles/component'
+BUNDLE = ROOT/'bench/results/20261009-compact-tiles'
+
+
+class Variant(NamedTuple):
+    engine: str        # the candidate engine; the control is always m5-copy/conv-direct
+    tuning: str        # its m5_tuning value
+    work: Path         # probe builds
+    results: Path      # component evidence
+    model_source: Path  # benchmark_m5_compact_models.py's source archive
+
+
+# bench/EXPERIMENT-LEDGER.md P11 (compact tiles) and P12 (the same tiles in column-first job order)
+VARIANTS = {
+    'tiles': Variant('m5-compact', 'compact-tiles', ROOT/'bench/runtime/m5-compact', BUNDLE/'component',
+                     BUNDLE/'model-source'),
+    'cols': Variant('m5-compact-cols', 'compact-cols', ROOT/'bench/runtime/m5-compact-cols', BUNDLE/'columns',
+                    BUNDLE/'columns-model-source'),
+}
 EXACT_ORACLE = 'original-engine full F32 byte digests'
 COUNTER_SEMANTICS = 'each eligible encoded compact MM_ID; elapsed complete graph measured separately'
 GATE = ('Strictly more than 10% complete two-dependent-block time reduction above twice absolute '
@@ -243,19 +261,19 @@ def compare_exact(control, candidate):
         raise ValueError('Complete original-engine terminal/projection F32 bytes changed')
 
 
-def execute(scope, mode, receipt):
+def execute(scope, mode, receipt, variant):
     assert_no_model_server()
-    folder = RESULTS/(datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')+'-'+mode+'-'+scope)
+    folder = variant.results/(datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')+'-'+mode+'-'+scope)
     folder.mkdir()
-    engine = 'm5-compact' if scope == 'compact' else 'm5-copy'
-    binary = WORK/(scope+'-probe')
+    engine = variant.engine if scope == 'compact' else 'm5-copy'
+    binary = variant.work/(scope+'-probe')
     process = monitor = None
     record = dict(status='running', scope=scope, mode=mode, probe=receipt)
     try:
         before = pins(engine)
         if before != {key: receipt[key] for key in before} or sha256(binary) != receipt['binary_sha256']:
             raise ValueError('Probe closure changed')
-        env, flags = configure(dict(os.environ), engine, 'on', 'compact-tiles' if scope == 'compact' else 'conv-direct')
+        env, flags = configure(dict(os.environ), engine, 'on', variant.tuning if scope == 'compact' else 'conv-direct')
         record['metal_environment'] = flags
         with (folder/'native.log').open('w') as log:
             baseline = Monitor.baseline()
@@ -317,40 +335,48 @@ def summarize(timed):
                 models_loaded=False, route_source='synthetic', gate=GATE)
 
 
+def experiment_files(engine):
+    """An engine's manifest and the patch it pins."""
+    config = ROOT/'config'/EXPERIMENTS[engine]
+    return [config, ROOT/json.loads(config.read_text())['patch']]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--variant', choices=tuple(VARIANTS), default='tiles')
     parser.add_argument('--run', action='store_true')
     args = parser.parse_args()
+    variant = VARIANTS[args.variant]
     if not args.run:
         print('Prepared exact full prompt-block screen; no GPU execution or models loaded.')
         return
     require_pass()
-    RESULTS.mkdir(parents=True, exist_ok=True)
-    WORK.mkdir(parents=True, exist_ok=True)
+    variant.results.mkdir(parents=True, exist_ok=True)
+    variant.work.mkdir(parents=True, exist_ok=True)
     with (ROOT/'bench/.lock').open('w') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         assert_no_model_server()
         receipts = {}
-        for scope, engine in (('control', 'm5-copy'), ('compact', 'm5-compact')):
+        for scope, engine in (('control', 'm5-copy'), ('compact', variant.engine)):
             before = pins(engine)
             native = ROOT/before['engine']['directory']
-            binary = WORK/(scope+'-probe')
+            binary = variant.work/(scope+'-probe')
             command = ['/usr/bin/c++', '-O3', '-ffp-contract=off', '-std=gnu++17', '-arch', 'arm64',
                        '-I'+str(native/'ggml/include'), '-I'+str(native/'vendor'), str(SOURCE), '-o', str(binary),
                        '-Wl,-rpath,'+str(native/'build/bin'), *[str(native/'build/bin'/name) for name in
                                                              ('libggml.0.26.0.dylib', 'libggml-base.0.26.0.dylib')]]
-            with (WORK/(scope+'-build.log')).open('w') as log:
+            with (variant.work/(scope+'-build.log')).open('w') as log:
                 subprocess.run(command, stdout=log, stderr=log, check=True)
             after = pins(engine)
             if after != before:
                 raise ValueError('Source closure changed during compilation')
             receipts[scope] = dict(**before, binary_sha256=sha256(binary), command=command)
-        archive = RESULTS/'source'
+        archive = variant.results/'source'
         archive.mkdir()
         closure = [SOURCE, ROOT/'scripts/benchmark_m5_compact.py', ROOT/'tests/test_m5_compact.py',
                    *[ROOT/'scripts'/name for name in receipts['control']['dependencies']],
-                   ROOT/'config/m5_compact_experiment.json', ROOT/'patches/mtp-m5-compact.patch',
-                   ROOT/'config/m5_copy_experiment.json', ROOT/'patches/mtp-m5-copy.patch']
+                   *[path for engine in dict.fromkeys((variant.engine, 'm5-compact', 'm5-copy'))
+                     for path in experiment_files(engine)]]
         archived = {}
         for path in closure:
             destination = archive/path.relative_to(ROOT)
@@ -359,13 +385,13 @@ def main():
             archived[str(path.relative_to(ROOT))] = sha256(destination)
             if sha256(path) != archived[str(path.relative_to(ROOT))]:
                 raise ValueError('Archived source closure differs')
-        (WORK/'build.json').write_text(json.dumps(receipts, indent=2)+'\n')
-        (RESULTS/'plan.json').write_text(json.dumps(dict(status='preregistered_before_gpu', source=receipts,
+        (variant.work/'build.json').write_text(json.dumps(receipts, indent=2)+'\n')
+        (variant.results/'plan.json').write_text(json.dumps(dict(status='preregistered_before_gpu', source=receipts,
                                                        archive=archived, check_inventory=inventory('check'),
                                                        perf_inventory=inventory('perf'), gate=GATE), indent=2)+'\n')
-        checked = [execute(scope, 'check', receipts[scope]) for scope in ('control', 'compact')]
+        checked = [execute(scope, 'check', receipts[scope], variant) for scope in ('control', 'compact')]
         compare_exact(checked[0][0]['cases'], checked[1][0]['cases'])
-        timed = [execute(scope, 'perf', receipts[scope]) for scope in ('control', 'compact', 'compact', 'control')]
+        timed = [execute(scope, 'perf', receipts[scope], variant) for scope in ('control', 'compact', 'compact', 'control')]
         # Reparse native text, JSONL and saved JSON before accepting the aggregate.
         for record, folder in checked+timed:
             text = (folder/'native.log').read_text()
@@ -376,7 +402,7 @@ def main():
                 raise ValueError('Saved artifact differs from raw evidence')
         result = summarize(timed)
         result['checks'] = [str(path.relative_to(ROOT)) for _, path in checked]
-        (RESULTS/'comparison.json').write_text(json.dumps(result, indent=2)+'\n')
+        (variant.results/'comparison.json').write_text(json.dumps(result, indent=2)+'\n')
         print(json.dumps(result['rows'], indent=2), flush=True)
 
 
