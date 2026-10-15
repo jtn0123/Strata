@@ -2083,6 +2083,21 @@ class Detokenizer:
 OPENAI_MAX_STOP = 4                                  # OpenAI's limit on `stop`
 
 
+def token_limit(req: dict, *names: str) -> int:
+    """The first of a request's token-limit fields that is set (max_completion_tokens before max_tokens), as int()
+    reads it ("256" and 256.0 too); 0 when none is (0 or -1: the rest of the context).  A list, an object, text that
+    is no number, or an infinite number is a ValueError naming the field, a 400: int() raised TypeError or
+    OverflowError for them, which no handler caught, so the client got no answer at all."""
+    for name in names:
+        value = req.get(name)
+        if value:
+            try:
+                return int(value)
+            except (TypeError, ValueError, OverflowError):
+                raise ValueError(f"{name} must be a whole number of tokens, not {value!r:.60}") from None
+    return 0
+
+
 def stop_strings(req: dict) -> list[str]:
     """The request's stop strings: OpenAI's `stop` (a string or a list of up to 4) or Anthropic's `stop_sequences`
     (a list).  Empty strings are left out.  A bad value is a ValueError, so a 400 before anything is generated."""
@@ -3655,6 +3670,7 @@ def make_handler(svc: Service):
         protocol_version = "HTTP/1.0"                       # SSE ends by closing the connection
 
         record = None                                       # #332: this request's monitor record, if kept
+        answered = False                                    # whether this request's status line was sent
         watch_done = None                                   # #430 #431: stops this request's disconnect watcher
         body_read = False                                   # whether a handler took this request's body
         route = ""                                          # this request's path: no query, no trailing slash
@@ -3662,6 +3678,10 @@ def make_handler(svc: Service):
 
         def log_message(self, fmt, *args):
             pass
+
+        def send_response(self, code, message=None):
+            self.answered = True
+            super().send_response(code, message)
 
         def handle_one_request(self):
             super().handle_one_request()
@@ -3881,11 +3901,14 @@ def make_handler(svc: Service):
                     self.record = svc.begin_request(path, req)
                 route.run(self, req)
             except ValueError as e:
-                print(f"[strata] 400 invalid request: {e}", flush=True)
-                if path == "/v1/responses":
-                    self._json(400, responses_error_body(str(e)))
-                else:
-                    self._json(400, {"error": {"type": "invalid_request_error", "message": str(e)}})
+                self._invalid(path, str(e))
+            except (TypeError, AttributeError, KeyError) as e:
+                # a field of a type or shape the code did not expect (the fields known to need it are checked with a
+                # ValueError naming them): still an answer, as long as none was started - mid-stream the headers are
+                # out, and the connection ends as before
+                if self.answered:
+                    raise
+                self._invalid(path, f"a field has an unexpected type or shape ({type(e).__name__}: {e})")
             except ModelBusy as e:
                 self._json(409, {"error": {"type": "model_busy", "message": str(e)}})
             except StructuredOutputError as e:
@@ -3912,6 +3935,13 @@ def make_handler(svc: Service):
                         record["finished_at"] = time.time()
                         record["state"] = "error" if record.get("error") else record.get("outcome", "completed")
                     svc.request_trace.record = None
+
+        def _invalid(self, path, message):
+            print(f"[strata] 400 invalid request: {message}", flush=True)
+            if path == "/v1/responses":
+                self._json(400, responses_error_body(message))
+            else:
+                self._json(400, {"error": {"type": "invalid_request_error", "message": message}})
 
         # ---- GET handlers
         def _static(self, f: Path, content_type: str, cache: str):
@@ -4265,7 +4295,7 @@ def make_handler(svc: Service):
             if validator is not None and (tools or req.get("strata_mcp")):
                 raise ValueError("structured response_format with tools/MCP is not supported")
             svc.load()
-            max_req = max_new = int(req.get("max_completion_tokens") or req.get("max_tokens") or 0)   # 0/-1: the rest
+            max_req = max_new = token_limit(req, "max_completion_tokens", "max_tokens")   # 0/-1: the rest
             use_mcp = req.get("strata_mcp") is True and svc.mcp is not None      # the web app's opt-in (serve/mcp.py)
             own = {t.get("name") for t in tools or [] if isinstance(t, dict)}   # #592: a second line of defence
             if use_mcp:
@@ -4462,7 +4492,7 @@ def make_handler(svc: Service):
             if tool_choice_of(req.get("tool_choice"))[0] == "none":   # Anthropic's {"type": "none"}: no tools offered
                 tools = None
             force = forced_call(req.get("tool_choice"), tools)        # "any" / {"type": "tool", "name": N}
-            max_new = int(req.get("max_tokens") or 0)                  # 0/-1: the rest of the context
+            max_new = token_limit(req, "max_tokens")                    # 0/-1: the rest of the context
             svc.reasoning_budget(req)                         # a bad value is a 400 before anything is sent
             stop_strings(req)                                 # ... and so is a bad stop / stop_sequences
             ids, thinking, max_new = svc.prepare(messages, tools, kw, max_new, force=force)

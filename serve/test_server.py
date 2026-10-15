@@ -2097,6 +2097,81 @@ class Routes(unittest.TestCase):
                 self.assertEqual(self.call("GET", path), 404)
 
 
+class WrongFieldTypes(unittest.TestCase):
+    """A field of the wrong type is a 400 naming it.  int() on a list, an object or an infinite max_tokens, a number as
+    message content or as Anthropic's system, and text as chat_template_kwargs raised TypeError, AttributeError or
+    OverflowError, which no handler caught: the client got no answer at all, the console a stack trace."""
+
+    @classmethod
+    def setUpClass(cls):
+        tok = ByteTokenizer()
+        cls.engine = RecordingEngine(tok, "hello", max_context=CTX)
+        cls.svc = Service(cls.engine, tok, ChatTemplate(ROOT / "serve/chat_template.jinja"))
+        cls.httpd = serve(cls.svc, port=0)
+        cls.port = cls.httpd.server_address[1]
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.httpd.shutdown()
+        cls.httpd.server_close()
+
+    def post(self, path, body):
+        import http.client
+        c = http.client.HTTPConnection("127.0.0.1", self.port, timeout=30)
+        try:
+            with contextlib.redirect_stdout(io.StringIO()):
+                c.request("POST", path, body=json.dumps(body).encode(), headers={"Content-Type": "application/json"})
+                r = c.getresponse()
+                return r.status, r.read().decode()
+        finally:
+            c.close()
+
+    def test_each_field_is_named_in_a_400(self):
+        hi = [{"role": "user", "content": "hi"}]
+        cases = [("/v1/chat/completions", {"messages": hi, "max_tokens": value}, "max_tokens")
+                 for value in ([1], {"a": 1}, "abc", float("inf"))]
+        cases += [("/v1/chat/completions", {"messages": hi, "max_completion_tokens": [1]}, "max_completion_tokens"),
+                  ("/v1/messages", {"messages": hi, "max_tokens": {"a": 1}}, "max_tokens"),
+                  ("/v1/chat/completions", {"messages": hi, "chat_template_kwargs": "abc"}, "chat_template_kwargs"),
+                  ("/v1/messages", {"messages": hi, "max_tokens": 8, "system": 5}, "system"),
+                  ("/v1/messages/count_tokens", {"messages": hi, "system": True}, "system"),
+                  ("/v1/chat/completions", {"messages": [{"role": "user", "content": 5}]}, "content"),
+                  ("/v1/messages", {"messages": [{"role": "user", "content": 5}], "max_tokens": 8}, "content"),
+                  ("/v1/messages", {"messages": [{"role": "user", "content": [5]}], "max_tokens": 8}, "content")]
+        for path, body, field in cases:
+            with self.subTest(path=path, body=body):
+                status, text = self.post(path, body)
+                self.assertEqual(status, 400, text)
+                self.assertIn(field, json.loads(text)["error"]["message"])
+
+    def test_what_int_reads_is_still_taken(self):
+        hi = [{"role": "user", "content": "hi"}]
+        for value in ("5", 5.0, 5):
+            with self.subTest(value=value):
+                self.assertEqual(self.post("/v1/chat/completions", {"messages": hi, "max_tokens": value})[0], 200)
+                self.assertEqual(self.engine.last_max_new, 5)
+
+    def test_an_unexpected_type_error_is_still_answered(self):
+        hi = [{"role": "user", "content": "hi"}]
+        with mock.patch.object(self.svc, "prepare", side_effect=TypeError("'int' object is not iterable")):
+            for path, body in (("/v1/chat/completions", {"messages": hi}), ("/v1/messages", {"messages": hi, "max_tokens": 8}),
+                               ("/v1/responses", {"input": "hi"})):
+                with self.subTest(path=path):
+                    status, text = self.post(path, body)
+                    self.assertEqual(status, 400, text)
+                    self.assertIn("TypeError", text)
+
+    def test_mid_stream_the_stream_just_ends(self):
+        def chunks(*args, **kwargs):
+            yield {"choices": [{"index": 0, "delta": {"content": "x"}, "finish_reason": None}]}
+            raise TypeError("a bug after the answer started")
+        with mock.patch("serve.server.openai_chunks", chunks), contextlib.redirect_stderr(io.StringIO()):
+            status, text = self.post("/v1/chat/completions", {"messages": [{"role": "user", "content": "hi"}],
+                                                              "stream": True})
+        self.assertEqual(status, 200)                         # no 400 written into the stream that had started
+        self.assertIn('"content": "x"', text)
+        self.assertNotIn("invalid_request_error", text)
+
 class SharedSettings(unittest.TestCase):
     """The web app's "Use for other apps too": POST /settings makes its Chat settings every client's defaults."""
 
