@@ -27,7 +27,14 @@ LOW_RAM="${LOW_RAM:-auto}"      # on: the experts come from the pack's experts.b
 case "$FAMILY" in qwen) prefix="" ;; *) prefix="${FAMILY}-" ;; esac
 tag="${prefix}$(printf '%s' "$MODEL" | tr 'A-Z' 'a-z')"
 cfg="$STRATA_DATA/config/strata-$tag.json"
-mkdir -p "$STRATA_DATA/config"
+# the image runs as the user strata, not root: a volume an older, root image made is not writable for it
+if ! mkdir -p "$STRATA_DATA/config" 2>/dev/null || [ ! -w "$STRATA_DATA/config" ]; then
+  echo "$STRATA_DATA is not writable for the user $(id -un) (uid $(id -u)) that Strata runs as." >&2
+  echo "A volume an older image made belongs to root; hand it over once, then start again:" >&2
+  echo "  docker run --rm -v strata-data:/data --user root --entrypoint chown <image> -R strata:strata /data" >&2
+  echo "A host folder mounted at /data has to be writable for uid $(id -u)." >&2
+  exit 1
+fi
 
 # REINSTALL is only needed to change settings for a model that is already set up
 # (context, vision, KV, host, api_key). Switching between models already on the

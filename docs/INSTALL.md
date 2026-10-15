@@ -120,6 +120,10 @@ The same idea, in a container (NVIDIA cards).
    The server listens on `0.0.0.0:8080` by default; set `-e API_KEY=<secret>` before exposing the port
    to a network. The image has a `HEALTHCHECK` on `/health`, so `docker ps` shows the container
    healthy once the model is loaded, and `GET /v1/status` says what it is running.
+   The container runs as the user `strata` (uid 10001), not root. A volume made by an older image
+   belongs to root; hand it over once with
+   `docker run --rm -v strata-data:/data --user root --entrypoint chown strata -R strata:strata /data`.
+   A host folder mounted at `/data` has to be writable for uid 10001.
 
 ## Older CPUs (experimental)
 
