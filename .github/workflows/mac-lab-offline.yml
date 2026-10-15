@@ -49,8 +49,10 @@ jobs:
       - name: Run load-free inventory
         working-directory: macos/lab
         run: |
-          export MAC_QUALITY_COVERAGE_SCOPE="$(python scripts/check_coverage.py --scope)"
-          export MAC_QUALITY_COVERAGE_CONTEXT="$(python scripts/check_coverage.py --context)"
+          # assigned first, so a failing check_coverage.py stops the step (export would hide its exit status)
+          scope="$(python scripts/check_coverage.py --scope)"
+          context="$(python scripts/check_coverage.py --context)"
+          export MAC_QUALITY_COVERAGE_SCOPE="$scope" MAC_QUALITY_COVERAGE_CONTEXT="$context"
           python -m coverage run --rcfile=config/coverage.ini scripts/validate_offline.py
       - name: Check benchmark termination with tiny owned fixtures
         working-directory: macos/lab
