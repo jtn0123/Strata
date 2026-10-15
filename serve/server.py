@@ -48,7 +48,7 @@ import uuid
 from http.client import HTTPException
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Iterator, Protocol
+from typing import Callable, Iterator, NamedTuple, Protocol
 from urllib.parse import parse_qs, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -3641,6 +3641,15 @@ def anthropic_collect(events) -> dict:
 
 
 # ------------------------------------------------------------------------------------------------ HTTP
+class PostRoute(NamedTuple):
+    """A POST route of make_handler's table."""
+    run: Callable          # the handler: (handler, req) with a JSON body, (handler) otherwise
+    body: str = "json"     # "json": a JSON object, its errors answered by _json_route; "control": at most 64 KiB,
+    #                        read and dropped (_control_body); "self": the handler reads it
+    own_page: str = ""     # what only Strata's own page may do (_own_page), checked before the body is parsed
+    record: bool = False   # an API request the monitor keeps (svc.begin_request)
+
+
 def make_handler(svc: Service):
     class Handler(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.0"                       # SSE ends by closing the connection
@@ -3648,6 +3657,7 @@ def make_handler(svc: Service):
         record = None                                       # #332: this request's monitor record, if kept
         watch_done = None                                   # #430 #431: stops this request's disconnect watcher
         body_read = False                                   # whether a handler took this request's body
+        route = ""                                          # this request's path: no query, no trailing slash
         DRAIN_SECONDS = 5                                   # the longest an unread body is read and dropped
 
         def log_message(self, fmt, *args):
@@ -3827,222 +3837,49 @@ def make_handler(svc: Service):
             return False
 
         def do_GET(self):
-            path = self.path.split("?")[0].rstrip("/")
-            if path.startswith("/fonts/"):
-                # the web app's font (Outfit, OFL: serve/web/fonts); the page falls back to the system font
-                name = path[len("/fonts/"):]
-                f = ROOT / "serve" / "web" / "fonts" / name
-                if "/" in name or "\\" in name or not name.endswith(".woff2") or not f.is_file():
-                    self._json(404, {"error": {"message": "not found"}})
+            path = self.route = self.path.split("?")[0].rstrip("/")
+            for prefix, serve_file in self.GET_FILES.items():
+                if path.startswith(prefix):
+                    serve_file(self, path[len(prefix):])
                     return
-                body = f.read_bytes()
-                self.send_response(200)
-                self.send_header("Content-Type", "font/woff2")
-                self.send_header("Cache-Control", "max-age=86400")
-                self.send_header("Content-Length", str(len(body)))
-                self.end_headers()
-                self.wfile.write(body)
-                return
-            if path.startswith("/web/"):
-                # the web app's own files (serve/web): styles, script, icon sprite - same origin, no CDN
-                name = path[len("/web/"):]
-                types = {".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8",
-                         ".svg": "image/svg+xml"}
-                f = ROOT / "serve" / "web" / name
-                ext = os.path.splitext(name)[1]
-                if "/" in name or "\\" in name or ext not in types or not f.is_file():
-                    self._json(404, {"error": {"message": "not found"}})
-                    return
-                body = f.read_bytes()
-                self.send_response(200)
-                self.send_header("Content-Type", types[ext])
-                self.send_header("Cache-Control", "no-cache")
-                self.send_header("Content-Length", str(len(body)))
-                self.end_headers()
-                self.wfile.write(body)
-                return
-            if path == "/metrics":
-                if self._authorized():
-                    # the last 12 requests; `?requests=all` every one kept (the Monitor's "Show all", issue #35)
-                    self._json(200, svc.metrics(all_requests="requests=all" in self.path))
-                return
-            if path == "/api/requests" and svc.api_monitor:
-                if self._authorized():
-                    request_id = parse_qs(urlsplit(self.path).query).get("id", [None])[0]
-                    records = svc.request_records(request_id)
-                    self._json(404 if records is None else 200,
-                               {"error": {"message": "request no longer retained"}} if records is None else
-                               records if request_id else {"requests": records, "retention": 100, "persistent": False,
-                                                          "loaded": svc.loaded(), "auto_load": hasattr(svc.engine, "restart")})
-                return
-            if path == "/settings":
-                if self._authorized():
-                    self._json(200, {"shared": bool(svc.shared), "defaults": svc.shared})
-                return
-            if path == "/config":                            # #564: the Settings view's keys of the run config
-                if self._authorized():
-                    self._config_get()
-                return
-            if path == "/mcp":
-                # the MCP servers, their state and tools (the web app's switch and Monitor card)
-                if self._authorized():
-                    self._json(200, svc.mcp.status() if svc.mcp else {"servers": [], "tools": 0})
-                return
-            if path == "" or (path == "/api-monitor" and svc.api_monitor):
-                body = (ROOT / "serve" / "web" / ("monitor.html" if path else "index.html")).read_bytes()
-                self.send_response(200)
-                self.send_header("Content-Type", "text/html; charset=utf-8")
-                self.send_header("Content-Security-Policy", page_policy(body))
-                self.send_header("Content-Length", str(len(body)))
-                self.end_headers()
-                self.wfile.write(body)
-            elif path in ("/health", "/api/health"):
-                self._json(200, {"status": "ok", "max_context": svc.engine.max_context, "model": svc.model,
-                                 "images": svc.vision is not None, "api_key": bool(svc.api_key),
-                                 "loaded": svc.loaded(), "service": "strata"})
-            elif path == "/status":
-                if not self._authorized():                  # #212: it shows the end of the last answer
-                    return
-                with svc.status_lock:
-                    s = dict(svc.status)
-                now = time.time()
-                if s.get("busy"):
-                    s["elapsed_s"] = round(now - s["started"], 1)
-                    if s.get("first_token"):
-                        s["tokens_per_s"] = round(svc._tok_s(), 1)
-                        s["tokens_per_s_mean"] = round(svc._tok_s_mean(), 1)
-                for k in ("started", "first_token"):
-                    s.pop(k, None)
-                self._json(200, s)
-            elif path in ("/v1/models", "/models"):
-                if self._authorized():
-                    loaded = svc.loaded()
-                    model = {"id": svc.model, "object": "model", "status": {"value": "loaded"},
-                             "meta": {"n_ctx": svc.engine.max_context},
-                             "architecture": {"input_modalities": ["text", "image"] if svc.vision is not None else ["text"],
-                                              "output_modalities": ["text"]}}
-                    if not loaded and (svc.idle_unload_s or getattr(svc.engine, "unloaded", False)):
-                        model["status"] = {"value": "unloaded"}   # like llama-server's router: listed, loads on use
-                        loaded = True
-                    if svc.aliases:                       # #297: the aliases, and each one listed under its own id
-                        model["aliases"] = list(svc.aliases)
-                    data = [model, *({**model, "id": x, "alias_of": svc.model} for x in svc.aliases)]
-                    self._json(200, {"object": "list", "data": data if loaded else []})
-            elif path == "/props":
-                if self._authorized():
-                    self._props()
-            elif path == "/slots":
-                if self._authorized():
-                    loaded = not hasattr(svc.engine, "alive") or svc.engine.alive()
-                    with svc.status_lock:
-                        busy = bool(svc.status.get("busy"))
-                    slot = {"id": 0, "n_ctx": svc.engine.max_context, "is_processing": busy}
-                    self._json(200, [slot] if loaded else [])
-            elif path == "/v1/status":
-                if self._authorized():
-                    self._json(200, svc.v1_status())
-            else:
+            route = self.GET_ROUTES.get(path) or (svc.api_monitor and self.MONITOR_GET_ROUTES.get(path))
+            if not route:
                 self._json(404, {"error": {"message": "not found"}})
+                return
+            run, key = route
+            if not key or self._authorized():
+                run(self)
 
         def do_POST(self):
             if not self._authorized():
                 return
-            path = self.path.split("?")[0].rstrip("/")   # issue #55: Claude Code posts /v1/messages?beta=true
+            path = self.route = self.path.split("?")[0].rstrip("/")   # issue #55: Claude Code posts /v1/messages?beta=true
             if path.startswith("/v1/") and self._foreign_page():
                 return
-            if path == "/settings":
-                self._settings()
+            route = self.POST_ROUTES.get(path) or next(
+                (r for prefix, r in self.POST_PREFIXES.items() if path.startswith(prefix)), None)
+            if route is None:
+                self._json(404, {"error": {"message": "not found"}})
                 return
-            if path == "/config":
-                self._config_post()
+            if route.body == "control" and not self._control_body():
                 return
-            if path in ("/unload", "/load") and not self._control_body():
+            if route.own_page and not self._own_page(route.own_page):
                 return
-            # JSON from Strata's own page only, as /settings: else a plain form POST from any site unloads the model
-            if path in ("/unload", "/load") and not self._own_page("the model can be loaded or unloaded"):
-                return
-            # the same for the slot files: else any site could overwrite a saved conversation or replace the live one
-            if path.startswith("/slots/") and not self._own_page("conversations can be saved or restored"):
-                return
-            if path == "/unload":                            # give the GPU back now (between requests)
-                try:
-                    r = svc.unload()
-                except EngineStuck as e:
-                    self._json(503, {"error": {"type": "server_error", "message": str(e)}})
-                    return
-                self._json(409 if r == "busy" else 200, {"status": r})
-                return
-            if path == "/load":                              # load now, e.g. ahead of a request
-                try:
-                    svc.load()
-                    self._json(200, {"status": "loaded"})
-                except GpuBusy as e:
-                    self._json(503, {"error": {"type": "server_error", "message": str(e)}})
-                return
+            if route.body == "json":
+                self._json_route(route, path)
+            else:
+                route.run(self)
+
+        def _json_route(self, route, path):
+            """A POST route whose body is a JSON object: parsed, given to the handler, and its errors answered with
+            their status (400 for an invalid request, 409 busy, 503 for an engine that cannot run it)."""
             try:
                 req = json.loads(self._body() or b"{}")
                 if not isinstance(req, dict):
                     raise ValueError("send a JSON object")
-                if path.startswith("/v1/responses/"):        # retrieve/delete/cancel/compact: nothing is stored
-                    self._json(404, responses_error_body("this server keeps no responses (stateless); send the "
-                                                         "whole conversation to POST /v1/responses", code="not_found"))
-                    return
-                if path in ("/v1/load", "/v1/unload"):
-                    if not self._own_page("the model can be loaded or unloaded"):
-                        return
-                    if req.get("model") not in (None, svc.model):
-                        self._json(404, {"error": {"message": "model not found"}})
-                        return
-                    if path == "/v1/unload":
-                        result = svc.unload()
-                        if result == "busy":
-                            raise ModelBusy("a request is running or queued")
-                    else:
-                        if not svc.fifo.acquire(blocking=False):
-                            raise ModelBusy("a request is running or queued")
-                        try:
-                            with svc.status_lock:
-                                if svc.status.get("busy") or svc.status.get("queued"):
-                                    raise ModelBusy("a request is running or queued")
-                            svc.ensure_loaded()
-                            svc.last_request_at = time.time()
-                        finally:
-                            svc.fifo.release()
-                        result = "loaded"
-                    self._json(200, {"status": result, **svc.v1_status()})
-                    return
-                if path == "/v1/vram":                       # #533: give VRAM back to other programs, or take it
-                    if not self._own_page("the VRAM reserve can be changed"):
-                        return
-                    r = req.get("reserve_mib")
-                    if r is not None and (isinstance(r, bool) or not isinstance(r, int) or r < 0):
-                        raise ValueError("reserve_mib: a whole number of MiB (0 or more), or null for the start's")
-                    try:
-                        self._json(200, svc.vram(r))
-                    except EngineDied as e:
-                        self._json(503, {"error": {"type": "server_error", "message": str(e)}})
-                    return
-                if path in ("/v1/chat/completions", "/v1/messages", "/v1/responses"):
+                if route.record:
                     self.record = svc.begin_request(path, req)
-                if path == "/v1/responses":
-                    self._responses(req)
-                elif path.startswith("/slots/"):
-                    query = parse_qs(self.path.partition("?")[2])
-                    try:
-                        code, body = svc.slot_action(path[len("/slots/"):], (query.get("action") or [""])[0],
-                                                     req.get("filename"))
-                    except EngineDied as e:                  # EngineSilent included: the engine was ended
-                        code, body = 500, {"error": {"code": 500, "message": str(e) + "; the next request starts "
-                                                     "the engine again", "type": "server_error"}}
-                    self._json(code, body)
-                elif path == "/v1/chat/completions":
-                    self._openai(req)
-                elif path == "/v1/messages":
-                    self._anthropic(req)
-                elif path == "/v1/messages/count_tokens":
-                    self._count_tokens(req)
-                else:
-                    self._json(404, {"error": {"message": "not found"}})
+                route.run(self, req)
             except ValueError as e:
                 print(f"[strata] 400 invalid request: {e}", flush=True)
                 if path == "/v1/responses":
@@ -4075,6 +3912,166 @@ def make_handler(svc: Service):
                         record["finished_at"] = time.time()
                         record["state"] = "error" if record.get("error") else record.get("outcome", "completed")
                     svc.request_trace.record = None
+
+        # ---- GET handlers
+        def _static(self, f: Path, content_type: str, cache: str):
+            body = f.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Cache-Control", cache)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def _font(self, name):
+            # the web app's font (Outfit, OFL: serve/web/fonts); the page falls back to the system font
+            f = ROOT / "serve" / "web" / "fonts" / name
+            if "/" in name or "\\" in name or not name.endswith(".woff2") or not f.is_file():
+                self._json(404, {"error": {"message": "not found"}})
+                return
+            self._static(f, "font/woff2", "max-age=86400")
+
+        def _web_file(self, name):
+            # the web app's own files (serve/web): styles, script, icon sprite - same origin, no CDN
+            types = {".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8",
+                     ".svg": "image/svg+xml"}
+            f = ROOT / "serve" / "web" / name
+            ext = os.path.splitext(name)[1]
+            if "/" in name or "\\" in name or ext not in types or not f.is_file():
+                self._json(404, {"error": {"message": "not found"}})
+                return
+            self._static(f, types[ext], "no-cache")
+
+        def _page(self):
+            body = (ROOT / "serve" / "web" / ("monitor.html" if self.route else "index.html")).read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Security-Policy", page_policy(body))
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def _metrics(self):
+            # the last 12 requests; `?requests=all` every one kept (the Monitor's "Show all", issue #35)
+            self._json(200, svc.metrics(all_requests="requests=all" in self.path))
+
+        def _requests(self):
+            request_id = parse_qs(urlsplit(self.path).query).get("id", [None])[0]
+            records = svc.request_records(request_id)
+            self._json(404 if records is None else 200,
+                       {"error": {"message": "request no longer retained"}} if records is None else
+                       records if request_id else {"requests": records, "retention": 100, "persistent": False,
+                                                  "loaded": svc.loaded(), "auto_load": hasattr(svc.engine, "restart")})
+
+        def _settings_get(self):
+            self._json(200, {"shared": bool(svc.shared), "defaults": svc.shared})
+
+        def _mcp_get(self):
+            # the MCP servers, their state and tools (the web app's switch and Monitor card)
+            self._json(200, svc.mcp.status() if svc.mcp else {"servers": [], "tools": 0})
+
+        def _health(self):
+            self._json(200, {"status": "ok", "max_context": svc.engine.max_context, "model": svc.model,
+                             "images": svc.vision is not None, "api_key": bool(svc.api_key),
+                             "loaded": svc.loaded(), "service": "strata"})
+
+        def _status(self):
+            with svc.status_lock:
+                s = dict(svc.status)
+            now = time.time()
+            if s.get("busy"):
+                s["elapsed_s"] = round(now - s["started"], 1)
+                if s.get("first_token"):
+                    s["tokens_per_s"] = round(svc._tok_s(), 1)
+                    s["tokens_per_s_mean"] = round(svc._tok_s_mean(), 1)
+            for k in ("started", "first_token"):
+                s.pop(k, None)
+            self._json(200, s)
+
+        def _models(self):
+            loaded = svc.loaded()
+            model = {"id": svc.model, "object": "model", "status": {"value": "loaded"},
+                     "meta": {"n_ctx": svc.engine.max_context},
+                     "architecture": {"input_modalities": ["text", "image"] if svc.vision is not None else ["text"],
+                                      "output_modalities": ["text"]}}
+            if not loaded and (svc.idle_unload_s or getattr(svc.engine, "unloaded", False)):
+                model["status"] = {"value": "unloaded"}   # like llama-server's router: listed, loads on use
+                loaded = True
+            if svc.aliases:                               # #297: the aliases, and each one listed under its own id
+                model["aliases"] = list(svc.aliases)
+            data = [model, *({**model, "id": x, "alias_of": svc.model} for x in svc.aliases)]
+            self._json(200, {"object": "list", "data": data if loaded else []})
+
+        def _slots(self):
+            loaded = not hasattr(svc.engine, "alive") or svc.engine.alive()
+            with svc.status_lock:
+                busy = bool(svc.status.get("busy"))
+            slot = {"id": 0, "n_ctx": svc.engine.max_context, "is_processing": busy}
+            self._json(200, [slot] if loaded else [])
+
+        def _v1_status(self):
+            self._json(200, svc.v1_status())
+
+        # ---- POST handlers
+        def _unload(self):                                   # give the GPU back now (between requests)
+            try:
+                r = svc.unload()
+            except EngineStuck as e:
+                self._json(503, {"error": {"type": "server_error", "message": str(e)}})
+                return
+            self._json(409 if r == "busy" else 200, {"status": r})
+
+        def _load(self):                                     # load now, e.g. ahead of a request
+            try:
+                svc.load()
+                self._json(200, {"status": "loaded"})
+            except GpuBusy as e:
+                self._json(503, {"error": {"type": "server_error", "message": str(e)}})
+
+        def _stored_response(self, req):                     # retrieve/delete/cancel/compact: nothing is stored
+            self._json(404, responses_error_body("this server keeps no responses (stateless); send the "
+                                                 "whole conversation to POST /v1/responses", code="not_found"))
+
+        def _v1_load(self, req):
+            if req.get("model") not in (None, svc.model):
+                self._json(404, {"error": {"message": "model not found"}})
+                return
+            if self.route == "/v1/unload":
+                result = svc.unload()
+                if result == "busy":
+                    raise ModelBusy("a request is running or queued")
+            else:
+                if not svc.fifo.acquire(blocking=False):
+                    raise ModelBusy("a request is running or queued")
+                try:
+                    with svc.status_lock:
+                        if svc.status.get("busy") or svc.status.get("queued"):
+                            raise ModelBusy("a request is running or queued")
+                    svc.ensure_loaded()
+                    svc.last_request_at = time.time()
+                finally:
+                    svc.fifo.release()
+                result = "loaded"
+            self._json(200, {"status": result, **svc.v1_status()})
+
+        def _vram(self, req):                                # #533: give VRAM back to other programs, or take it
+            r = req.get("reserve_mib")
+            if r is not None and (isinstance(r, bool) or not isinstance(r, int) or r < 0):
+                raise ValueError("reserve_mib: a whole number of MiB (0 or more), or null for the start's")
+            try:
+                self._json(200, svc.vram(r))
+            except EngineDied as e:
+                self._json(503, {"error": {"type": "server_error", "message": str(e)}})
+
+        def _slot_action(self, req):
+            query = parse_qs(self.path.partition("?")[2])
+            try:
+                code, body = svc.slot_action(self.route[len("/slots/"):], (query.get("action") or [""])[0],
+                                             req.get("filename"))
+            except EngineDied as e:                          # EngineSilent included: the engine was ended
+                code, body = 500, {"error": {"code": 500, "message": str(e) + "; the next request starts "
+                                             "the engine again", "type": "server_error"}}
+            self._json(code, body)
 
         def _props(self):
             model = parse_qs(urlsplit(self.path).query).get("model", [svc.model])[0]
@@ -4498,6 +4495,39 @@ def make_handler(svc: Service):
                 err = {"type": "error", "error": {"type": "api_error", "message": str(e)}}
                 self._note(error=err["error"])
                 self.wfile.write(b"event: error\ndata: " + json.dumps(err).encode() + b"\n\n")
+
+        # ---- the routes.  GET: path -> (handler, whether it needs the API key); the monitor's two only with
+        # api_monitor; GET_FILES: a path prefix -> the handler of the file named after it (no key: the web app's own).
+        GET_ROUTES = {
+            "": (_page, False), "/health": (_health, False), "/api/health": (_health, False),
+            "/metrics": (_metrics, True), "/settings": (_settings_get, True), "/config": (_config_get, True),
+            "/mcp": (_mcp_get, True), "/status": (_status, True),        # #212: /status shows the last answer's end
+            "/v1/models": (_models, True), "/models": (_models, True), "/props": (_props, True),
+            "/slots": (_slots, True), "/v1/status": (_v1_status, True),
+        }
+        MONITOR_GET_ROUTES = {"/api/requests": (_requests, True), "/api-monitor": (_page, False)}
+        GET_FILES = {"/fonts/": _font, "/web/": _web_file}
+        # POST: every one needs the API key, and a /v1/ one from another site's page is refused (_foreign_page).
+        # own_page: JSON from Strata's own page only (_own_page): else a plain form POST from any site could unload
+        # the model, overwrite a saved conversation or change the VRAM reserve.  /settings and /config check it
+        # themselves, after reading their body.
+        POST_ROUTES = {
+            "/settings": PostRoute(_settings, body="self"),
+            "/config": PostRoute(_config_post, body="self"),
+            "/unload": PostRoute(_unload, body="control", own_page="the model can be loaded or unloaded"),
+            "/load": PostRoute(_load, body="control", own_page="the model can be loaded or unloaded"),
+            "/v1/load": PostRoute(_v1_load, own_page="the model can be loaded or unloaded"),
+            "/v1/unload": PostRoute(_v1_load, own_page="the model can be loaded or unloaded"),
+            "/v1/vram": PostRoute(_vram, own_page="the VRAM reserve can be changed"),
+            "/v1/chat/completions": PostRoute(_openai, record=True),
+            "/v1/messages": PostRoute(_anthropic, record=True),
+            "/v1/responses": PostRoute(_responses, record=True),
+            "/v1/messages/count_tokens": PostRoute(_count_tokens),
+        }
+        POST_PREFIXES = {
+            "/slots/": PostRoute(_slot_action, own_page="conversations can be saved or restored"),
+            "/v1/responses/": PostRoute(_stored_response),
+        }
 
     return Handler
 

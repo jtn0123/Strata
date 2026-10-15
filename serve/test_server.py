@@ -2006,6 +2006,97 @@ class PromptProgress(unittest.TestCase):
                          "an engine too old to print RESUME counts the reused prefix as work")
 
 
+class Routes(unittest.TestCase):
+    """The route tables (make_handler's GET_ROUTES, POST_ROUTES ...) are where a route says what it needs: each check
+    is applied from there to every route, so a new one gets the same."""
+
+    @classmethod
+    def setUpClass(cls):
+        tok = ByteTokenizer()
+        cls.engine = RecordingEngine(tok, "hello", max_context=CTX)
+        cls.svc = Service(cls.engine, tok, ChatTemplate(ROOT / "serve/chat_template.jinja"))
+        cls.httpd = serve(cls.svc, port=0)
+        cls.port = cls.httpd.server_address[1]
+        cls.handler = cls.httpd.RequestHandlerClass
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.httpd.shutdown()
+        cls.httpd.server_close()
+
+    def setUp(self):
+        self.svc.api_key, self.svc.api_monitor = "", False
+
+    def call(self, method, path, body=b"", headers=None):
+        import http.client
+        c = http.client.HTTPConnection("127.0.0.1", self.port, timeout=30)
+        try:
+            c.request(method, path, body=body if method == "POST" else None,
+                      headers={"Content-Type": "application/json", **(headers or {})})
+            r = c.getresponse()
+            r.read()
+            return r.status
+        finally:
+            c.close()
+
+    def post_paths(self):
+        """Every POST path, a prefix's with a name after it, and its route."""
+        return [*self.handler.POST_ROUTES.items(),
+                *((prefix + "x", route) for prefix, route in self.handler.POST_PREFIXES.items())]
+
+    def test_every_get_route_that_needs_the_key_asks_for_it(self):
+        self.svc.api_key, self.svc.api_monitor = "secret", True
+        routes = {**self.handler.GET_ROUTES, **self.handler.MONITOR_GET_ROUTES}
+        # without the key: the pages (they ask for it themselves) and the health check, nothing else
+        self.assertEqual({path for path, (_, key) in routes.items() if not key},
+                         {"", "/health", "/api/health", "/api-monitor"})
+        for path, (_, key) in routes.items():
+            with self.subTest(path=path or "/"):
+                code = self.call("GET", path or "/")
+                self.assertEqual(code == 401, key, code)
+                if key:
+                    self.assertNotEqual(self.call("GET", path, headers={"Authorization": "Bearer secret"}), 401)
+
+    def test_every_post_route_asks_for_the_key(self):
+        self.svc.api_key = "secret"
+        for path, _ in self.post_paths():
+            with self.subTest(path=path):
+                self.assertEqual(self.call("POST", path, b"{}"), 401)
+
+    def test_what_only_strata_s_own_page_may_do(self):
+        own = [(path, r) for path, r in self.post_paths() if r.own_page] + \
+              [(path, r) for path, r in self.handler.POST_ROUTES.items() if r.body == "self"]
+        self.assertEqual({p for p, _ in own}, {"/unload", "/load", "/v1/load", "/v1/unload", "/v1/vram", "/slots/x",
+                                                "/settings", "/config"})
+        ran = []
+        acts = ("unload", "load", "ensure_loaded", "vram", "slot_action", "set_shared")
+        with contextlib.ExitStack() as stack:
+            for name in acts:
+                stack.enter_context(mock.patch.object(self.svc, name, lambda *a, n=name, **k: ran.append(n)))
+            for path, _ in own:
+                with self.subTest(path=path):
+                    self.assertEqual(self.call("POST", path, b"{}", {"Origin": "http://evil.example"}), 403)
+                    self.assertEqual(self.call("POST", path, b"{}", {"Content-Type": "text/plain"}), 415)
+        self.assertEqual(ran, [])                            # nothing was unloaded, saved or changed
+
+    def test_an_unknown_path(self):
+        self.assertEqual(self.call("GET", "/nope"), 404)
+        self.assertEqual(self.call("POST", "/nope", b"not json"), 404)
+        self.assertEqual(self.call("POST", "/v1/nope", b"{}"), 404)
+
+    def test_the_monitor_s_routes_only_with_the_monitor(self):
+        for path in self.handler.MONITOR_GET_ROUTES:
+            with self.subTest(path=path):
+                self.assertEqual(self.call("GET", path), 404)
+        self.svc.api_monitor = True
+        self.assertEqual(self.call("GET", "/api-monitor"), 200)
+
+    def test_a_static_file_name_cannot_leave_its_folder(self):
+        for path in ("/web/../server.py", "/web/%2e%2e%2fserver.py", "/fonts/x.woff2", "/web/app.exe"):
+            with self.subTest(path=path):
+                self.assertEqual(self.call("GET", path), 404)
+
+
 class SharedSettings(unittest.TestCase):
     """The web app's "Use for other apps too": POST /settings makes its Chat settings every client's defaults."""
 
