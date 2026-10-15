@@ -7,6 +7,13 @@ on:
       - 'macos/lab/**'
       - 'FORK-NOTES.md'
       - '.github/workflows/mac-lab-offline.yml'
+  # the merged result too: a pull request is checked at its own head, not as it lands
+  push:
+    branches: [mac-m5-lab]
+    paths:
+      - 'macos/lab/**'
+      - 'FORK-NOTES.md'
+      - '.github/workflows/mac-lab-offline.yml'
   workflow_dispatch:
 
 permissions:
@@ -45,9 +52,6 @@ jobs:
           export MAC_QUALITY_COVERAGE_SCOPE="$(python scripts/check_coverage.py --scope)"
           export MAC_QUALITY_COVERAGE_CONTEXT="$(python scripts/check_coverage.py --context)"
           python -m coverage run --rcfile=config/coverage.ini scripts/validate_offline.py
-      - name: Check measured campaign protocol
-        working-directory: macos/lab
-        run: python -m unittest discover -s bench/results/20261010-small-gains-stack -p test_sequence.py -v
       - name: Check benchmark termination with tiny owned fixtures
         working-directory: macos/lab
         run: python -m unittest discover -s tests -p test_benchmark_termination.py -v

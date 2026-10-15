@@ -77,8 +77,8 @@ node --test tests/*.test.cjs
 
 Run the offline inventory under the configured coverage context, then check the
 coverage receipt, using the exact commands in `.github/workflows/mac-lab-offline.yml`.
-Tiny-process termination, socket ownership and campaign-protocol checks remain
-separate from the network/native-denying inventory. Test methods, parity probes,
+Tiny-process termination and socket ownership checks remain separate from the
+network/native-denying inventory; the campaign-protocol check now runs inside it. Test methods, parity probes,
 coverage percentages and lint/type results are separate measurements.
 
 Raw logs, machine-specific paths, screenshots, coverage data, model bytes and local

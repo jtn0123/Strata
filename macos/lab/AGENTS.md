@@ -23,7 +23,6 @@ python -m unittest discover -s tests -p test_run_termination.py
 python -m unittest discover -s tests -p test_profile_verifier_termination.py
 python -m unittest discover -s tests -p test_runtime_ports.py
 python -m unittest discover -s tests -p test_web_intake_sockets.py
-python -m unittest discover -s bench/results/20261010-small-gains-stack -p test_sequence.py
 npm run lint
 node --test tests/*.test.cjs
 ```
