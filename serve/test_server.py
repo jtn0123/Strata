@@ -2240,6 +2240,57 @@ class BodySize(OverHTTP, unittest.TestCase):
             self.assertEqual(self.post("/v1/chat/completions", {"messages": [{"role": "user", "content": "hi"}]})[0],
                              200)
 
+class SilentClients(OverHTTP, unittest.TestCase):
+    """A client that opens a connection and sends nothing, or stops halfway through its body, is dropped after
+    Handler.timeout: before, each held a thread for as long as it stayed silent.  The answer itself has no limit."""
+
+    def setUp(self):
+        self.default = self.httpd.RequestHandlerClass.timeout
+        patcher = mock.patch.object(self.httpd.RequestHandlerClass, "timeout", 0.5)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_there_is_a_limit(self):
+        self.assertEqual(self.default, 120)                   # BaseHTTPRequestHandler's own default is None: none
+
+    def read_all(self, sock):
+        sock.settimeout(10)                                   # the server must end it long before this
+        data = b""
+        while chunk := sock.recv(65536):
+            data += chunk
+        return data
+
+    def test_a_silent_connection_is_closed(self):
+        for sent in (b"", b"POST /v1/chat/comp", b"POST /v1/chat/completions HTTP/1.1\r\nHost: 127.0.0.1\r\n"):
+            with self.subTest(sent=sent), socket.create_connection(("127.0.0.1", self.port)) as sock:
+                sock.sendall(sent)
+                self.assertEqual(self.read_all(sock), b"")
+
+    def test_a_body_that_stops_arriving_is_a_408(self):
+        with socket.create_connection(("127.0.0.1", self.port)) as sock, \
+                contextlib.redirect_stdout(io.StringIO()):
+            sock.sendall(b"POST /v1/chat/completions HTTP/1.1\r\nHost: 127.0.0.1\r\n"
+                         b"Content-Type: application/json\r\nContent-Length: 100\r\n\r\n{\"messages\":")
+            answer = self.read_all(sock)
+        self.assertTrue(answer.startswith(b"HTTP/1.0 408"), answer[:80])
+        self.assertIn(b"stopped arriving", answer)
+
+    def test_the_answer_has_no_timeout(self):
+        Handler = self.httpd.RequestHandlerClass
+        seen = []
+        real = Handler.send_response
+
+        def spy(handler, code, message=None):
+            seen.append((code, handler.connection.gettimeout()))
+            real(handler, code, message)
+
+        hi = {"messages": [{"role": "user", "content": "hi"}]}
+        with mock.patch.object(Handler, "send_response", spy):
+            self.assertEqual(self.post("/v1/chat/completions", hi)[0], 200)
+            self.assertEqual(self.post("/v1/chat/completions", {**hi, "stream": True})[0], 200)
+            self.assertEqual(self.post("/v1/messages", {**hi, "max_tokens": 8, "stream": True})[0], 200)
+        self.assertEqual(seen, [(200, None)] * 3)
+
 class SharedSettings(unittest.TestCase):
     """The web app's "Use for other apps too": POST /settings makes its Chat settings every client's defaults."""
 

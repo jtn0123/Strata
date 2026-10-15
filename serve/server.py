@@ -3678,6 +3678,8 @@ def make_handler(svc: Service):
         DRAIN_SECONDS = 5                                   # the longest an unread body is read and dropped
         MAX_BODY = 256 << 20                                # the largest body read: the web app sends every picture
         #                                                     of a chat (up to 20 MB each, as data: URLs) each turn
+        timeout = 120                                       # a client silent this long while its request is read is
+        #                                                     dropped (StreamRequestHandler sets it); the answer has none
 
         def log_message(self, fmt, *args):
             pass
@@ -3692,7 +3694,14 @@ def make_handler(svc: Service):
 
         def _body(self) -> bytes:
             self.body_read = True
-            return self.rfile.read(self.body_length)
+            try:
+                body = self.rfile.read(self.body_length)
+            except TimeoutError:
+                self._json(408, {"error": {"type": "invalid_request_error", "message":
+                                           f"the request body stopped arriving for {self.timeout} s"}})
+                raise                                        # handle_one_request closes the connection
+            self.connection.settimeout(None)                 # as before: the answer takes what it takes
+            return body
 
         def _body_size(self) -> bool:
             """Check the Content-Length before anything reads the body.  One that is no number was a ValueError no

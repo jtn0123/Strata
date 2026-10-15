@@ -708,7 +708,8 @@ print(r.choices[0].message.content)
   and also takes only JSON from no `Origin`, Strata's own page or a trusted origin - also when an API key is set.
 - **Request size.** A `POST` body is read only after its `Content-Length` is checked: at most 256 MiB (the web app
   sends every picture of a chat, up to 20 MB each, with each turn), larger is **413**; a length that is not a number,
-  or is negative, is **400**. `/load` and `/unload` take at most 64 KiB.
+  or is negative, is **400**. `/load` and `/unload` take at most 64 KiB. A client that sends nothing for 120 s while
+  its request is read is dropped (a body that stops arriving gets **408**); the answer itself has no time limit.
 
 **Conversation cache.** A request that continues a chat reads only the part after what the engine already holds: the
 live session, or one of the checkpoints it keeps in RAM (up to 6, ~118 MB each, taken at the start of each new
