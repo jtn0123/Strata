@@ -22,3 +22,4 @@ offers the same steps as tools.
   on Python 3.10 and 3.12 (`.github/workflows/strata-tests.yml`, which shows the commands).
 - Keep the docs' style: plain words, measured numbers with what they were measured on, no claims without a
   measurement.
+- Every test command and the pull-request rules: [CONTRIBUTING.md](CONTRIBUTING.md).
