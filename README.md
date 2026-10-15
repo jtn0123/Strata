@@ -1,6 +1,6 @@
 <h1 align="center">Strata</h1>
 
-**Apple Silicon lab:** The measured 48 GB M5 Pro setup, launchers, source/model pins and raw benchmarks are in [macos/lab](macos/lab/README.md). Start there for the Mac profile. [Fork notes](FORK-NOTES.md) explain the imported history and next experiment.
+**Apple Silicon lab:** The measured 48 GB M5 Pro setup, launchers, source/model pins and raw benchmarks are in [macos/lab](macos/lab/README.md). Start there for the Mac profile. [Fork notes](FORK-NOTES.md): the fork's branches and where its results are.
 
 **English** · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [Deutsch](README.de.md) · [Français](README.fr.md) · [Español](README.es.md) · [Português](README.pt-BR.md)
 
