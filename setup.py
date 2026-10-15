@@ -50,6 +50,7 @@ import shutil
 import struct
 import subprocess
 import sys
+import tempfile
 import textwrap
 import time
 import urllib.error
@@ -61,7 +62,7 @@ ROOT = Path(__file__).resolve().parent
 WIN = os.name == "nt"
 # #214: every Hugging Face file comes from a fixed commit of its repository (the `sha` of
 # https://huggingface.co/api/models/<repo> when this was pinned), so a checkout installs the same files on any
-# day.  A revision the repository no longer has falls back to its current files, with a message (download()).
+# day.  A revision the repository no longer has stops setup; --allow-unpinned takes its current files (download()).
 HF_REVISIONS = {
     "ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF": "ed59f92082b1e93c0e96d60a8b11aab089b52f09",        # 2026-09-29
     "ukisai/Swift-1.5-Qwen3.8-Flash-Next-GSQ-RCO-GGUF": "b22d729eae29b5796f76fb70f91aef549b9fc52c",   # 2026-09-24
@@ -69,6 +70,10 @@ HF_REVISIONS = {
     "unsloth/Qwen3.8-Flash-Next-GGUF": "38bb39ee97821de2c9009abb7e93950eec396e66",                   # 2026-09-30
 }
 
+
+# --allow-unpinned: a pinned revision that is gone falls back to the repository's current file.  Off, setup stops
+# instead: the current file was installed with only a warning, and nothing checked it against the pin.
+ALLOW_UNPINNED = False
 
 HF_DEFAULT = "https://huggingface.co"
 
@@ -92,6 +97,12 @@ def hf_unpinned(url: str) -> str:
 HF = hf("ISTA-DASLab/Qwen3.8-Flash-Next-GSQ-RCO-GGUF")
 LLAMA_CPP_COMMIT = "3cf03257f219afbe7334045ff7c6a06ac68c627d"
 LLAMA_CPP_ZIP = f"https://github.com/ggml-org/llama.cpp/archive/{LLAMA_CPP_COMMIT}.zip"
+# NVIDIA's CUDA repository key package (cuda-keyring_1.1-1_all.deb) per Ubuntu release, as downloaded 2026-10-14:
+# install_cuda_keyring() installs it as root only with this SHA-256.
+CUDA_KEYRING_SHA256 = {
+    "2204": "d93190d50b98ad4699ff40f4f7af50f16a76dac3bb8da1eaaf366d47898ff8df",
+    "2404": "d2a6b11c096396d868758b86dab1823b25e14d70333f1dfa74da5ddaf6a06dba",
+}
 
 # The ready-made engine: <PREBUILT_URL><asset>, a zip with strata(.exe), strata-vision(.exe) and BUILD.json, built
 # by tools/make_release.py.  Set this to the GitHub release download folder when publishing, e.g.
@@ -1175,8 +1186,12 @@ def download(url, dst: Path, what=None):
             break
         except urllib.error.HTTPError as e:
             if e.code == 404 and hf_unpinned(url) != url:  # #214: the pinned revision is gone from the repository
+                if not ALLOW_UNPINNED:
+                    fail(f"{what or dst.name}: not at the pinned revision any more",
+                         "update Strata (a newer version pins the repository's current files), or run setup again "
+                         "with --allow-unpinned to download the current file without the pin")
                 warn(f"{what or dst.name}: not at the pinned revision any more; downloading the repository's "
-                     "current file")
+                     "current file (--allow-unpinned)")
                 url = hf_unpinned(url)
                 continue
             if attempt == 4:
@@ -2557,10 +2572,7 @@ def install_build_tools(gpu, yes):
             if osr.get("ID") != "ubuntu" or ver not in ("2204", "2404"):
                 fail("the CUDA Toolkit can be installed automatically on Ubuntu 22.04 / 24.04 only",
                      "install it from https://developer.nvidia.com/cuda-downloads and run it again")
-            deb = Path("/tmp/cuda-keyring.deb")
-            download(f"https://developer.download.nvidia.com/compute/cuda/repos/ubuntu{ver}/x86_64/cuda-keyring_1.1-1_all.deb",
-                     deb, "CUDA repository key")
-            run(["sudo", "dpkg", "-i", str(deb)])
+            install_cuda_keyring(ver)
             run(["sudo", "apt-get", "update"])
             run(["sudo", "apt-get", "install", "-y", "cuda-toolkit-13-0"])
     nvcc, cuda_v = find_nvcc(below=(13, 0)) if old else find_nvcc()
@@ -2571,6 +2583,22 @@ def install_build_tools(gpu, yes):
     ok(f"build tools installed (CUDA {cuda_v[0]}.{cuda_v[1]})")
     return nvcc, find_vcvars() if WIN else None
 
+
+
+def install_cuda_keyring(ver: str) -> None:
+    """NVIDIA's repository key package for Ubuntu `ver` ("2204", "2404"), installed with sudo.  It is downloaded into a
+    new private folder and checked against its pinned SHA-256 first: the fixed /tmp/cuda-keyring.deb it was before
+    could be created by another user of the PC, with its .done mark, and download() then kept it and dpkg installed
+    it as root."""
+    with tempfile.TemporaryDirectory(prefix="strata-cuda-") as tmp:
+        deb = Path(tmp) / "cuda-keyring.deb"
+        repo = f"https://developer.download.nvidia.com/compute/cuda/repos/ubuntu{ver}/x86_64/"
+        download(repo + "cuda-keyring_1.1-1_all.deb", deb, "CUDA repository key")
+        got = hashlib.sha256(deb.read_bytes()).hexdigest()
+        if got != CUDA_KEYRING_SHA256[ver]:
+            fail(f"the CUDA repository key package has the wrong SHA-256 ({got}, expected {CUDA_KEYRING_SHA256[ver]})",
+                 "install the CUDA Toolkit from https://developer.nvidia.com/cuda-downloads and run it again")
+        run(["sudo", "dpkg", "-i", str(deb)])
 
 def cmake_build(src, bdir, target, defs, vcvars, bat_name):
     cmake, ninja = find_tool("cmake"), find_tool("ninja")
@@ -4091,6 +4119,9 @@ def main() -> int:
     ap.add_argument("--prebuilt", default=os.environ.get("STRATA_PREBUILT_URL", PREBUILT_URL),
                     help="where the ready-made engine is (a URL folder or a local folder)")
     ap.add_argument("--check", action="store_true", help="only check this PC and exit")
+    ap.add_argument("--allow-unpinned", action="store_true",
+                    help="when a pinned Hugging Face revision is gone, download the repository's current files instead "
+                         "of stopping")
     ap.add_argument("--calibrate", action="store_true",
                     help="tune the engine's settings for this PC (about 5-10 minutes), then start the model")
     ap.add_argument("--draft-vocab", choices=list(DRAFT_VOCABS),
@@ -4121,6 +4152,8 @@ def main() -> int:
                          "sycl = Intel Arc, EXPERIMENTAL: Linux, built from source (docs/INTEL_ARC.md)")
     ap.add_argument("--skip-build", action="store_true", help=argparse.SUPPRESS)
     a = ap.parse_args()
+    global ALLOW_UNPINNED
+    ALLOW_UNPINNED = a.allow_unpinned
     if a.backend == "sycl":                            # Intel Arc: the SYCL port's own setup (sycl/setup_intel.py)
         return sycl_setup(sys.argv[1:])
     if a.resident_budget_gib is not None and not a.resident_budget_gib > 0:

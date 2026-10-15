@@ -1,15 +1,19 @@
 """Tests for setup.py's reproducible installs (#214): the engine of the checkout's own release first (the latest as
-the fallback), Hugging Face files at pinned revisions (the current files when a revision is gone), the pinned
-requirements file, and an existing install left as it is.  Mocked network - nothing is downloaded.
+the fallback), Hugging Face files at pinned revisions (a revision that is gone stops setup; --allow-unpinned takes the
+current files), the pinned CUDA key package, the pinned requirements file, and an existing install left as it is.
+Mocked network - nothing is downloaded.
 
     python -m unittest tools.test_setup_pins
 """
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import io
 import json
+import os
 import re
+import stat
 import sys
 import tempfile
 import unittest
@@ -64,7 +68,8 @@ class HuggingFacePins(unittest.TestCase):
                          "https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-Flash-Next-GSQ-RCO-GGUF/resolve/main/x.gguf")
         self.assertEqual(setup.hf_unpinned("https://example.com/a/b"), "https://example.com/a/b")
 
-    def test_a_gone_revision_downloads_the_current_file(self):
+    @staticmethod
+    def gone_revision():
         seen = []
 
         def urlopen(req, timeout=None):
@@ -73,13 +78,44 @@ class HuggingFacePins(unittest.TestCase):
                 raise not_found(req.full_url)
             return Response(b"model bytes", status=200)
 
+        return seen, urlopen
+
+    def test_a_gone_revision_stops_setup(self):
+        """The current file is not the pinned one, and nothing checks it: setup stops and says how to go on."""
+        seen, urlopen = self.gone_revision()
         with tempfile.TemporaryDirectory() as d, mock.patch.object(setup.urllib.request, "urlopen", urlopen):
+            dst = Path(d) / "m.gguf"
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out), self.assertRaises(SystemExit):
+                setup.download(setup.FAMILIES["qwen"]["mmproj_hf"] + "m.gguf", dst)
+            self.assertFalse(dst.exists())
+        self.assertIn("not at the pinned revision any more", out.getvalue())
+        self.assertIn("--allow-unpinned", out.getvalue())
+        self.assertEqual([m for m, _ in seen], ["HEAD"])
+
+    def test_allow_unpinned_downloads_the_current_file(self):
+        seen, urlopen = self.gone_revision()
+        with tempfile.TemporaryDirectory() as d, mock.patch.object(setup.urllib.request, "urlopen", urlopen), \
+                mock.patch.object(setup, "ALLOW_UNPINNED", True):
             dst = Path(d) / "m.gguf"
             _, out = quiet(setup.download, setup.FAMILIES["qwen"]["mmproj_hf"] + "m.gguf", dst)
             self.assertEqual(dst.read_bytes(), b"model bytes")
         self.assertIn("not at the pinned revision any more", out)
         self.assertEqual([m for m, _ in seen], ["HEAD", "HEAD", "GET"])
         self.assertTrue(all("/resolve/main/" in u for _, u in seen[1:]))
+
+    def test_the_flag_sets_it(self):
+        seen = []
+
+        def stop(*args):                                # main's first line of output: the arguments are parsed
+            seen.append(setup.ALLOW_UNPINNED)
+            raise RuntimeError("parsed")
+
+        for argv in (["setup.py", "--allow-unpinned"], ["setup.py"]):
+            with mock.patch.object(sys, "argv", argv), mock.patch.object(setup, "ALLOW_UNPINNED", None), \
+                    mock.patch.object(setup, "say", stop), self.assertRaisesRegex(RuntimeError, "parsed"):
+                setup.main()
+        self.assertEqual(seen, [True, False])
 
     def test_a_complete_part_is_finished_without_a_request(self):
         """A .part with every byte (setup stopped between the last byte and the rename): renamed, not resumed with a
@@ -159,6 +195,48 @@ class HuggingFacePins(unittest.TestCase):
                       text)
         self.assertIn("--gguf-dir", text)
         self.assertIn("Downloading from https://hf-mirror.com (HF_ENDPOINT)", text)
+
+
+
+class CudaKeyring(unittest.TestCase):
+    """NVIDIA's key package is installed as root: from a new private folder (a fixed /tmp name could be another user's
+    file, which download() kept), and only with its pinned SHA-256."""
+
+    def install(self, body):
+        ran, folders = [], []
+
+        def download(url, dst, what=None):
+            self.assertIn("/ubuntu2404/", url)
+            folders.append((dst.parent, stat.S_IMODE(dst.parent.stat().st_mode)))
+            dst.write_bytes(body)
+
+        def run(cmd, **kw):
+            ran.append(cmd)
+            self.assertTrue(Path(cmd[-1]).is_file())    # dpkg runs while the package is still there
+
+        pins = {"2404": hashlib.sha256(b"key package").hexdigest()}
+        with mock.patch.object(setup, "download", download), mock.patch.object(setup, "run", run), \
+                mock.patch.object(setup, "CUDA_KEYRING_SHA256", pins):
+            quiet(setup.install_cuda_keyring, "2404")
+        return ran, folders
+
+    def test_every_supported_release_is_pinned(self):
+        self.assertEqual(set(setup.CUDA_KEYRING_SHA256), {"2204", "2404"})
+        for sha in setup.CUDA_KEYRING_SHA256.values():
+            self.assertRegex(sha, r"^[0-9a-f]{64}$")
+
+    def test_the_pinned_package_is_installed_from_a_private_folder(self):
+        ran, folders = self.install(b"key package")
+        (folder, mode), = folders
+        self.assertTrue(folder.name.startswith("strata-cuda-"))
+        if os.name != "nt":
+            self.assertEqual(mode, 0o700)
+        self.assertFalse(folder.exists())               # removed after the install
+        self.assertEqual([c[:3] for c in ran], [["sudo", "dpkg", "-i"]])
+
+    def test_another_package_is_not_installed(self):
+        with self.assertRaises(SystemExit):
+            self.install(b"someone else's package")
 
 
 class Engine(unittest.TestCase):
